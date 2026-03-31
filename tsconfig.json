@@ -1,9 +1,18 @@
 {
-  "extends": "@diplodoc/tsconfig",
   "compilerOptions": {
-    "target": "es2022",
-    "module": "es2022",
-    "declaration": true
+    "target": "es2020",
+    "module": "commonjs",
+    "lib": ["es2020"],
+    "outDir": "build",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "paths": {
+      "vscode": ["../../node_modules/@types/vscode"]
+    },
+    "jsx": "react-jsx"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/modules/webview"]
 }
