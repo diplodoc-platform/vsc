@@ -1,8 +1,3 @@
-<!-- TEMPLATE SECTION - This section will be removed after running init.sh -->
-<!-- ============================================================================ -->
-<!-- TEMPLATE: Package Template Documentation -->
-<!-- ============================================================================ -->
-
 # AGENTS.md - Package Template
 
 This file is part of the `@diplodoc/package-template` package. After running `./init.sh`, the template section below will be removed, and only the package-specific section will remain.
