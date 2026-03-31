@@ -1,0 +1,43 @@
+{
+  "name": "@diplodoc/package-template",
+  "version": "1.0.0",
+  "description": "Template package for Diplodoc platform development",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "homepage": "https://diplodoc.com/",
+  "engines": {
+    "npm": ">=11.5.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diplodoc-platform/package-template.git"
+  },
+  "bugs": {
+    "url": "https://github.com/diplodoc-platform/diplodoc/issues"
+  },
+  "private": true,
+  "author": "",
+  "license": "MIT",
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "run-p build:*",
+    "build:js": "./esbuild/build.mjs",
+    "build:declarations": "tsc --project tsconfig.publish.json --emitDeclarationOnly --outDir ./build",
+    "build:clean": "rm -rf build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@diplodoc/tsconfig": "^1.0.2",
+    "@vitest/coverage-v8": "^2.0.0",
+    "esbuild": "^0.27.2",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.5.3",
+    "vitest": "^2.0.0"
+  }
+}
