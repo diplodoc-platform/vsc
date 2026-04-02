@@ -3,6 +3,7 @@
 .idea
 .env
 *.vsix
+.claude
 
 /build
 /coverage

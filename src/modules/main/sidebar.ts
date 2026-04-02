@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getBaseHtml } from './html';
+import { getBaseHtml } from '../../ui/common/html';
 
 export class Sidebar implements vscode.WebviewViewProvider {
     private _view?: vscode.WebviewView;
@@ -10,7 +10,7 @@ export class Sidebar implements vscode.WebviewViewProvider {
     resolveWebviewView(webviewView: vscode.WebviewView) {
         this._view = webviewView;
 
-        const buildUri = vscode.Uri.joinPath(this._extensionUri, 'build', 'webview');
+        const buildUri = vscode.Uri.joinPath(this._extensionUri, 'build', 'sidebar');
 
         webviewView.webview.options = {
             enableScripts: true,
@@ -25,9 +25,11 @@ export class Sidebar implements vscode.WebviewViewProvider {
         );
 
         webviewView.webview.html = getBaseHtml(
+            'sidebar',
             scriptUri,
             styleUri,
-            webviewView.webview.cspSource
+            webviewView.webview.cspSource,
+            vscode.env.language
         );
 
         webviewView.webview.onDidReceiveMessage(async (message) => {

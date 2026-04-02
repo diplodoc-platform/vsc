@@ -1,0 +1,42 @@
+.mdEditor {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.header {
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--vscode-sideBarTitle-foreground, #ccc);
+    background: var(--vscode-sideBar-background, #1e1e1e);
+    border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border, #333);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    flex-shrink: 0;
+}
+
+.headerIcon {
+    opacity: 0.6;
+}
+
+.content {
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.error {
+    padding: 16px;
+    color: #f47067;
+    font-family: monospace;
+    font-size: 12px;
+
+    pre {
+        white-space: pre-wrap;
+    }
+}
