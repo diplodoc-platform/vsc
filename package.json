@@ -1,7 +1,7 @@
 {
-  "name": "vsc",
+  "name": "diplodoc-vsc-extension",
   "displayName": "Diplodoc Extension",
-  "publisher": "Diplodoc",
+  "publisher": "diplodoc",
   "icon": "assets/diplodoc-logo.png",
   "description": "Diplodoc Extension for VSC",
   "version": "0.0.1",
@@ -17,21 +17,59 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:markdown",
+    "onLanguage:yaml"
+  ],
   "main": "./build/index.js",
   "contributes": {
     "commands": [
       {
-        "command": "diplodoc.openEditor",
-        "title": "Open Diplodoc Editor",
+        "command": "diplodoc.openMdEditor",
+        "title": "Open Diplodoc Markdown Editor",
         "icon": "assets/diplodoc-logo-colored.svg"
+      },
+      {
+        "command": "diplodoc.openTocEditor",
+        "title": "Open Diplodoc TOC Editor",
+        "icon": "assets/diplodoc-logo-colored.svg"
+      }
+    ],
+    "languages": [
+      {
+        "id": "yaml",
+        "filenames": [
+          ".yfm"
+        ],
+        "extensions": [
+          ".yfm"
+        ]
+      }
+    ],
+    "yamlValidation": [
+      {
+        "fileMatch": "**/toc.yaml",
+        "url": "./schemas/toc-schema.json"
+      },
+      {
+        "fileMatch": "**/.yfm",
+        "url": "./schemas/yfm-schema.json"
+      },
+      {
+        "fileMatch": "**/.yfm.yaml",
+        "url": "./schemas/yfm-schema.json"
       }
     ],
     "menus": {
       "editor/title": [
         {
-          "command": "diplodoc.openEditor",
+          "command": "diplodoc.openMdEditor",
           "when": "resourceLangId == markdown",
+          "group": "navigation@1"
+        },
+        {
+          "command": "diplodoc.openTocEditor",
+          "when": "resourceFilename == toc.yaml",
           "group": "navigation@1"
         }
       ]
@@ -40,7 +78,7 @@
       "activitybar": [
         {
           "id": "diplodoc-extension",
-          "title": "Diplodoc Markdown Editor",
+          "title": "Diplodoc",
           "icon": "./assets/diplodoc-logo-colored.svg"
         }
       ]
@@ -50,25 +88,28 @@
         {
           "type": "webview",
           "id": "diplodoc-extension-view",
-          "name": "Diplodoc Markdown Editor",
+          "name": "Diplodoc",
           "icon": "./assets/diplodoc-logo-colored.svg"
         }
       ]
     }
   },
   "scripts": {
-    "compile:ext": "tsc -p .",
-    "compile:webview": "node esbuild.js",
-    "compile": "npm run compile:ext && npm run compile:webview",
-    "watch:ext": "tsc -watch -p .",
-    "watch:webview": "node esbuild.js --watch",
+    "compile:ext": "BUILD_TARGET=ext node esbuild.js",
+    "compile:webview": "BUILD_TARGET=webview node esbuild.js",
+    "compile": "node esbuild.js",
+    "watch:ext": "BUILD_TARGET=ext node esbuild.js --watch",
+    "watch:webview": "BUILD_TARGET=webview node esbuild.js --watch",
+    "typecheck": "tsc -p . --noEmit",
     "vsce": "vsce package --no-dependencies"
   },
   "dependencies": {
     "@diplodoc/transform": "^4.72.0",
+    "@diplodoc/yfmlint": "^1.6.0",
     "@gravity-ui/components": "^4.18.0",
     "@gravity-ui/markdown-editor": "^15.37.0",
     "@gravity-ui/uikit": "^7.35.2",
+    "ajv": "^8.18.0",
     "highlight.js": "^11.11.1",
     "lowlight": "^3.3.0",
     "markdown-it": "^13.0.2",
@@ -78,11 +119,14 @@
     "url": "^0.11.4"
   },
   "devDependencies": {
+    "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/vscode": "^1.110.0",
     "@vscode/vsce": "^3.7.1",
     "esbuild": "^0.27.4",
+    "esbuild-sass-plugin": "^3.7.0",
+    "sass": "^1.98.0",
     "typescript": "^6.0.2"
   }
 }

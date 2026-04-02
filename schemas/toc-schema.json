@@ -1,0 +1,805 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://diplodoc.com/schemas/toc/draft-01/schema#",
+  "title": "Table of content file schema",
+  "description": "Diplodoc table of contents file (toc.yaml). Defines the structure, navigation, and metadata of the documentation project.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "string. Title of the documentation project or section. Displayed in the browser tab and navigation header.",
+      "markdownDescription": "**`string`** Title of the documentation project or section. Displayed in the browser tab and navigation header."
+    },
+    "href": {
+      "type": "string",
+      "description": "string (uri). URL of the documentation root. Used when the TOC is embedded or linked externally.",
+      "markdownDescription": "**`string (uri)`** URL of the documentation root. Used when the TOC is embedded or linked externally."
+    },
+    "stage": {
+      "type": "string",
+      "description": "string. Publication stage of the entire TOC. Controls visibility during build.",
+      "markdownDescription": "**`string`** Publication stage of the entire TOC. Controls visibility during build.\n\nExamples: `new`, `preview`, `tech-preview`, `skip`."
+    },
+    "base": {
+      "type": "string",
+      "description": "string. Base path prefix prepended to all relative hrefs in this TOC.",
+      "markdownDescription": "**`string`** Base path prefix prepended to all relative hrefs in this TOC."
+    },
+    "singlePage": {
+      "type": "boolean",
+      "description": "boolean. Generate a single-page HTML variant that combines all TOC items into one page.",
+      "markdownDescription": "**`boolean`** Generate a single-page HTML variant that combines all TOC items into one page."
+    },
+    "label": {
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TocLabel"
+          },
+          "description": "TocLabel[]. Array of label badges shown next to the TOC title.",
+          "markdownDescription": "**`TocLabel[]`** Array of label badges shown next to the TOC title."
+        },
+        {
+          "$ref": "#/definitions/TocLabel",
+          "description": "TocLabel. Single label badge shown next to the TOC title.",
+          "markdownDescription": "**`TocLabel`** Single label badge shown next to the TOC title."
+        }
+      ],
+      "description": "TocLabel | TocLabel[]. Label badge(s) displayed next to the TOC title in the navigation sidebar.",
+      "markdownDescription": "**`TocLabel | TocLabel[]`** Label badge(s) displayed next to the TOC title in the navigation sidebar."
+    },
+    "when": {
+      "type": ["string", "boolean"],
+      "description": "string | boolean. Condition expression for including this TOC in the build.",
+      "markdownDescription": "**`string | boolean`** Condition expression for including this TOC in the build.\n\nExample: `'env == \"production\"'`."
+    },
+    "navigation": {
+      "oneOf": [
+        {
+          "type": "boolean",
+          "description": "boolean. Enable or disable the top navigation bar.",
+          "markdownDescription": "**`boolean`** Enable or disable the top navigation bar."
+        },
+        {
+          "type": "string",
+          "description": "string. Path to an external navigation config file.",
+          "markdownDescription": "**`string`** Path to an external navigation config file."
+        },
+        {
+          "$ref": "#/definitions/Navigation",
+          "description": "Navigation. Inline navigation bar configuration.",
+          "markdownDescription": "**`Navigation`** Inline navigation bar configuration."
+        }
+      ],
+      "description": "boolean | string | Navigation. Top navigation bar configuration.",
+      "markdownDescription": "**`boolean | string | Navigation`** Top navigation bar configuration. Can be a boolean toggle, a path to an external config, or an inline `Navigation` object."
+    },
+    "pdf": {
+      "type": "object",
+      "description": "object. PDF output configuration for this TOC.",
+      "markdownDescription": "**`object`** PDF output configuration for this TOC.",
+      "properties": {
+        "startPages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "string[]. Paths to pages inserted at the beginning of the PDF (e.g. cover page, preface).",
+          "markdownDescription": "**`string[]`** Paths to pages inserted at the beginning of the PDF.\n\nExamples: cover page, preface."
+        },
+        "endPages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "string[]. Paths to pages appended at the end of the PDF (e.g. appendix, legal notice).",
+          "markdownDescription": "**`string[]`** Paths to pages appended at the end of the PDF.\n\nExamples: appendix, legal notice."
+        }
+      },
+      "additionalProperties": false
+    },
+    "items": {
+      "$ref": "#/definitions/TocItems",
+      "description": "TocItem[]. Top-level list of TOC items defining the documentation structure.",
+      "markdownDescription": "**`TocItem[]`** Top-level list of TOC items defining the documentation structure."
+    }
+  },
+  "definitions": {
+    "TocLabel": {
+      "title": "TOC label badge",
+      "description": "A badge label displayed next to a TOC item or section title.",
+      "markdownDescription": "A badge label displayed next to a TOC item or section title.",
+      "type": "object",
+      "required": ["title"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "string. Text displayed on the label badge.",
+          "markdownDescription": "**`string`** Text displayed on the label badge."
+        },
+        "description": {
+          "type": "string",
+          "description": "string. Tooltip text shown when hovering over the label badge.",
+          "markdownDescription": "**`string`** Tooltip text shown when hovering over the label badge."
+        },
+        "theme": {
+          "type": "string",
+          "enum": [
+            "normal",
+            "info",
+            "danger",
+            "warning",
+            "success",
+            "utility",
+            "unknown",
+            "clear"
+          ],
+          "description": "string (enum). Visual color theme of the label badge.",
+          "markdownDescription": "**`string (enum)`** Visual color theme of the label badge.\n\n| Value | Description |\n|---|---|\n| `normal` | Default grey |\n| `info` | Blue |\n| `danger` | Red |\n| `warning` | Orange |\n| `success` | Green |\n| `utility` | Purple |\n| `unknown` | Grey (unknown state) |\n| `clear` | Transparent |"
+        },
+        "when": {
+          "type": ["string", "boolean"],
+          "description": "string | boolean. Condition expression for showing this label.",
+          "markdownDescription": "**`string | boolean`** Condition expression for showing this label.\n\nExample: `'version == \"2.0\"'`."
+        }
+      },
+      "additionalProperties": false
+    },
+    "TocItems": {
+      "title": "TOC items list",
+      "description": "TocItem[]. An ordered list of TOC items (pages, sections, or includes).",
+      "markdownDescription": "**`TocItem[]`** An ordered list of TOC items (pages, sections, or includes).",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/TocItem"
+      }
+    },
+    "TocItem": {
+      "title": "TOC item",
+      "description": "object. A single entry in the table of contents. Must have at least one of: href, include, or items.",
+      "markdownDescription": "**`object`** A single entry in the table of contents.\n\nMust have at least one of:\n- `href` — page link\n- `include` — external TOC\n- `items` — section with children",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "string. Display name of this item in the navigation sidebar.",
+          "markdownDescription": "**`string`** Display name of this item in the navigation sidebar."
+        },
+        "expanded": {
+          "type": "boolean",
+          "description": "boolean. Whether this section is expanded by default in the sidebar. Only applies to items with children.",
+          "markdownDescription": "**`boolean`** Whether this section is expanded by default in the sidebar.\n\nOnly applies to items with `items` (sections)."
+        },
+        "labeled": {
+          "type": "boolean",
+          "description": "boolean. Whether to show the label badge for this item.",
+          "markdownDescription": "**`boolean`** Whether to show the label badge for this item."
+        },
+        "hidden": {
+          "type": "boolean",
+          "description": "boolean. Hide this item from the navigation sidebar. The page is still built and accessible via direct URL.",
+          "markdownDescription": "**`boolean`** Hide this item from the navigation sidebar.\n\nThe page is still built and accessible via direct URL."
+        },
+        "restricted-access": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "string. Single role or group that can access this item.",
+              "markdownDescription": "**`string`** Single role or group that can access this item."
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "string[]. List of roles or groups that can access this item.",
+              "markdownDescription": "**`string[]`** List of roles or groups that can access this item."
+            }
+          ],
+          "description": "string | string[]. Access control: role name(s) or group(s) allowed to view this item.",
+          "markdownDescription": "**`string | string[]`** Access control: role name(s) or group(s) allowed to view this item."
+        },
+        "when": {
+          "type": ["string", "boolean"],
+          "description": "string | boolean. Condition expression for including this item in the build.",
+          "markdownDescription": "**`string | boolean`** Condition expression for including this item in the build.\n\nExample: `'env != \"internal\"'`."
+        },
+        "items": {
+          "$ref": "#/definitions/TocItems",
+          "description": "TocItem[]. Child items for creating a nested section.",
+          "markdownDescription": "**`TocItem[]`** Child items for creating a nested section."
+        },
+        "href": {
+          "type": "string",
+          "description": "string. Relative path to the Markdown file for this page (e.g. 'quickstart.md') or an external URL.",
+          "markdownDescription": "**`string`** Relative path to the Markdown file for this page or an external URL.\n\nExample: `quickstart.md`, `https://example.com`."
+        },
+        "include": {
+          "$ref": "#/definitions/Include",
+          "description": "Include. Include an external TOC or content source into this position.",
+          "markdownDescription": "**`Include`** Include an external TOC or content source into this position."
+        }
+      },
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": ["href"]
+        },
+        {
+          "required": ["include"]
+        },
+        {
+          "required": ["items"]
+        }
+      ]
+    },
+    "Include": {
+      "title": "Include directive",
+      "description": "object. Includes an external TOC file or content source into the current TOC position.",
+      "markdownDescription": "**`object`** Includes an external TOC file or content source into the current TOC position.",
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["link", "merge", "root_merge"],
+          "description": "string (enum). Include mode controlling how the external TOC is merged.",
+          "markdownDescription": "**`string (enum)`** Include mode controlling how the external TOC is merged.\n\n| Value | Description |\n|---|---|\n| `link` | Keep as a separate TOC with its own base path |\n| `merge` | Merge items into the current TOC |\n| `root_merge` | Merge items at the root level |"
+        },
+        "path": {
+          "type": "string",
+          "description": "string. Relative path to the external toc.yaml file to include.",
+          "markdownDescription": "**`string`** Relative path to the external `toc.yaml` file to include."
+        },
+        "includers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Includer"
+          },
+          "description": "Includer[]. List of includer plugins that transform content before including.",
+          "markdownDescription": "**`Includer[]`** List of includer plugins that transform content before including.\n\nCommon names: `openapi`, `generic`, `unarchive`."
+        }
+      },
+      "additionalProperties": false
+    },
+    "Includer": {
+      "title": "Includer plugin",
+      "description": "object. A plugin that transforms or generates TOC content before it is included.",
+      "markdownDescription": "**`object`** A plugin that transforms or generates TOC content before it is included.\n\nCommon names: `openapi`, `generic`, `unarchive`.",
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "string. Includer plugin name.",
+          "markdownDescription": "**`string`** Includer plugin name.\n\nExamples: `openapi`, `generic`, `unarchive`."
+        }
+      },
+      "additionalProperties": true
+    },
+    "OpenApiIncluder": {
+      "title": "OpenAPI includer configuration",
+      "description": "object. Configuration for the 'openapi' includer plugin that generates TOC from an OpenAPI spec.",
+      "markdownDescription": "**`object`** Configuration for the `openapi` includer plugin that generates TOC from an OpenAPI spec.",
+      "type": "object",
+      "required": ["input"],
+      "properties": {
+        "input": {
+          "type": "string",
+          "description": "string. Path to the OpenAPI specification file (JSON or YAML).",
+          "markdownDescription": "**`string`** Path to the OpenAPI specification file (JSON or YAML)."
+        },
+        "filter": {
+          "$ref": "#/definitions/OpenApiIncluderFilter",
+          "description": "OpenApiIncluderFilter. Filter which endpoints or tags to include in the generated TOC.",
+          "markdownDescription": "**`OpenApiIncluderFilter`** Filter which endpoints or tags to include in the generated TOC."
+        },
+        "noindex": {
+          "$ref": "#/definitions/OpenApiIncluderFilter",
+          "description": "OpenApiIncluderFilter. Filter for endpoints or tags to exclude from search indexing.",
+          "markdownDescription": "**`OpenApiIncluderFilter`** Filter for endpoints or tags to exclude from search indexing."
+        },
+        "hidden": {
+          "$ref": "#/definitions/OpenApiIncluderFilter",
+          "description": "OpenApiIncluderFilter. Filter for endpoints or tags to hide from the navigation sidebar.",
+          "markdownDescription": "**`OpenApiIncluderFilter`** Filter for endpoints or tags to hide from the navigation sidebar."
+        },
+        "sandbox": {
+          "type": "object",
+          "description": "object. Interactive API sandbox (try-it-out) configuration.",
+          "markdownDescription": "**`object`** Interactive API sandbox (try-it-out) configuration.",
+          "properties": {
+            "tabName": {
+              "type": "string",
+              "description": "string. Display name for the API sandbox tab.",
+              "markdownDescription": "**`string`** Display name for the API sandbox tab."
+            },
+            "host": {
+              "type": "string",
+              "format": "uri",
+              "description": "string (uri). Base URL for the API sandbox try-it-out requests.",
+              "markdownDescription": "**`string (uri)`** Base URL for the API sandbox try-it-out requests."
+            }
+          },
+          "additionalProperties": false
+        },
+        "leadingPage": {
+          "type": "object",
+          "description": "object. Configuration for the auto-generated leading (overview) page of the API reference.",
+          "markdownDescription": "**`object`** Configuration for the auto-generated leading (overview) page of the API reference.",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "string. Display name for the leading overview page.",
+              "markdownDescription": "**`string`** Display name for the leading overview page."
+            },
+            "mode": {
+              "type": "string",
+              "enum": ["section", "leaf"],
+              "description": "string (enum). Page mode.",
+              "markdownDescription": "**`string (enum)`** Page mode.\n\n| Value | Description |\n|---|---|\n| `section` | Acts as a section header with children |\n| `leaf` | Standalone page without children |"
+            },
+            "spec": {
+              "type": "object",
+              "description": "object. OpenAPI spec rendering options on the leading page.",
+              "markdownDescription": "**`object`** OpenAPI spec rendering options on the leading page.",
+              "properties": {
+                "renderMode": {
+                  "type": "string",
+                  "enum": ["inline", "hidden"],
+                  "description": "string (enum). How to render the OpenAPI spec on the leading page.",
+                  "markdownDescription": "**`string (enum)`** How to render the OpenAPI spec on the leading page.\n\n| Value | Description |\n|---|---|\n| `inline` | Render spec inline on the page |\n| `hidden` | Do not render spec |"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/OpenApiCustomTag"
+          },
+          "description": "Record<string, OpenApiCustomTag>. Per-tag customization. Keys are OpenAPI tag names.",
+          "markdownDescription": "**`Record<string, OpenApiCustomTag>`** Per-tag customization. Keys are OpenAPI tag names, values are custom tag configurations."
+        }
+      },
+      "additionalProperties": false
+    },
+    "OpenApiCustomTag": {
+      "title": "OpenAPI custom tag",
+      "description": "object. Customization options for a specific OpenAPI tag in the generated TOC.",
+      "markdownDescription": "**`object`** Customization options for a specific OpenAPI tag in the generated TOC.",
+      "type": "object",
+      "properties": {
+        "hidden": {
+          "type": "boolean",
+          "description": "boolean. Hide all endpoints under this tag from the navigation sidebar.",
+          "markdownDescription": "**`boolean`** Hide all endpoints under this tag from the navigation sidebar."
+        },
+        "name": {
+          "type": "string",
+          "description": "string. Override the display name for this tag in the navigation.",
+          "markdownDescription": "**`string`** Override the display name for this tag in the navigation."
+        },
+        "path": {
+          "type": "string",
+          "description": "string. Override the output path for pages generated from this tag.",
+          "markdownDescription": "**`string`** Override the output path for pages generated from this tag."
+        },
+        "alias": {
+          "type": "string",
+          "description": "string. Alias for this tag used in URL generation.",
+          "markdownDescription": "**`string`** Alias for this tag used in URL generation."
+        }
+      },
+      "additionalProperties": false
+    },
+    "OpenApiIncluderFilter": {
+      "title": "OpenAPI includer filter",
+      "description": "object. Filter for selecting specific OpenAPI endpoints or tags.",
+      "markdownDescription": "**`object`** Filter for selecting specific OpenAPI endpoints or tags.",
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "description": "string. Filter by endpoint path pattern.",
+          "markdownDescription": "**`string`** Filter by endpoint path pattern.\n\nExample: `/api/v1/users`."
+        },
+        "tag": {
+          "type": "string",
+          "description": "string. Filter by OpenAPI tag name.",
+          "markdownDescription": "**`string`** Filter by OpenAPI tag name.\n\nExample: `Authentication`."
+        }
+      },
+      "additionalProperties": false
+    },
+    "Navigation": {
+      "title": "Navigation bar configuration",
+      "description": "object. Top navigation bar configuration with logo and header items.",
+      "markdownDescription": "**`object`** Top navigation bar configuration with logo and header items.",
+      "type": "object",
+      "properties": {
+        "logo": {
+          "$ref": "#/definitions/NavigationLogo",
+          "description": "NavigationLogo. Logo displayed in the navigation bar.",
+          "markdownDescription": "**`NavigationLogo`** Logo displayed in the navigation bar."
+        },
+        "header": {
+          "$ref": "#/definitions/NavigationHeader",
+          "description": "NavigationHeader. Header navigation items (links, buttons, dropdowns, controls).",
+          "markdownDescription": "**`NavigationHeader`** Header navigation items (links, buttons, dropdowns, controls)."
+        }
+      },
+      "additionalProperties": false
+    },
+    "NavigationLogo": {
+      "title": "Navigation logo",
+      "description": "object. Logo configuration for the navigation bar. Supports light/dark theme variants.",
+      "markdownDescription": "**`object`** Logo configuration for the navigation bar. Supports light/dark theme variants.",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "string. Text label displayed next to the logo image.",
+          "markdownDescription": "**`string`** Text label displayed next to the logo image."
+        },
+        "url": {
+          "type": "string",
+          "description": "string (uri). URL the logo links to when clicked.",
+          "markdownDescription": "**`string (uri)`** URL the logo links to when clicked."
+        },
+        "urlTitle": {
+          "type": "string",
+          "description": "string. Accessible title (aria-label) for the logo link.",
+          "markdownDescription": "**`string`** Accessible title (`aria-label`) for the logo link."
+        },
+        "icon": {
+          "type": "string",
+          "description": "string (uri). URL or path to the logo image file.",
+          "markdownDescription": "**`string (uri)`** URL or path to the logo image file."
+        },
+        "dark": {
+          "$ref": "#/definitions/NavigationLogo",
+          "description": "NavigationLogo. Logo configuration override for dark theme.",
+          "markdownDescription": "**`NavigationLogo`** Logo configuration override for dark theme."
+        },
+        "light": {
+          "$ref": "#/definitions/NavigationLogo",
+          "description": "NavigationLogo. Logo configuration override for light theme.",
+          "markdownDescription": "**`NavigationLogo`** Logo configuration override for light theme."
+        }
+      },
+      "additionalProperties": false
+    },
+    "NavigationHeader": {
+      "title": "Navigation header",
+      "description": "object. Configuration for left and right navigation header item groups.",
+      "markdownDescription": "**`object`** Configuration for left and right navigation header item groups.",
+      "type": "object",
+      "properties": {
+        "leftItems": {
+          "$ref": "#/definitions/NavigationItems",
+          "description": "NavigationItem[]. Navigation items aligned to the left side of the header.",
+          "markdownDescription": "**`NavigationItem[]`** Navigation items aligned to the left side of the header."
+        },
+        "rightItems": {
+          "$ref": "#/definitions/NavigationItems",
+          "description": "NavigationItem[]. Navigation items aligned to the right side of the header.",
+          "markdownDescription": "**`NavigationItem[]`** Navigation items aligned to the right side of the header."
+        },
+        "iconSize": {
+          "type": "number",
+          "description": "number. Default icon size in pixels for all items in this header.",
+          "markdownDescription": "**`number`** Default icon size in pixels for all items in this header."
+        }
+      },
+      "additionalProperties": false
+    },
+    "NavigationItems": {
+      "title": "Navigation items list",
+      "description": "NavigationItem[]. An ordered list of navigation bar items.",
+      "markdownDescription": "**`NavigationItem[]`** An ordered list of navigation bar items.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/NavigationItem"
+      }
+    },
+    "NavigationItem": {
+      "title": "Navigation item",
+      "description": "object. A single navigation bar item. Must have a 'type' field: 'link', 'button', 'dropdown', or 'controls'.",
+      "markdownDescription": "**`object`** A single navigation bar item. Must have a `type` field.\n\n| Type | Description |\n|---|---|\n| `link` | Plain text link |\n| `button` | Styled button |\n| `dropdown` | Dropdown menu |\n| `controls` | Theme/language switcher |",
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["link", "button", "dropdown", "controls"],
+          "description": "string (enum). Item type: 'link', 'button', 'dropdown', or 'controls'.",
+          "markdownDescription": "**`string (enum)`** Item type.\n\n| Value | Description |\n|---|---|\n| `link` | Plain text link |\n| `button` | Styled button |\n| `dropdown` | Dropdown menu |\n| `controls` | Theme/language switcher controls |"
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/NavigationBaseItem"
+        },
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/NavigationLinkItem"
+            },
+            {
+              "$ref": "#/definitions/NavigationButtonItem"
+            },
+            {
+              "$ref": "#/definitions/NavigationDropdownItem"
+            },
+            {
+              "$ref": "#/definitions/NavigationControlsItem"
+            }
+          ]
+        }
+      ]
+    },
+    "NavigationBaseItem": {
+      "title": "Navigation base item",
+      "description": "object. Common fields shared by all navigation item types.",
+      "markdownDescription": "**`object`** Common fields shared by all navigation item types.",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "string. Display text label for the navigation item.",
+          "markdownDescription": "**`string`** Display text label for the navigation item."
+        },
+        "url": {
+          "type": "string",
+          "description": "string (uri). URL the navigation item links to.",
+          "markdownDescription": "**`string (uri)`** URL the navigation item links to."
+        },
+        "icon": {
+          "type": "string",
+          "description": "string (uri). URL or path to the icon image displayed alongside the text.",
+          "markdownDescription": "**`string (uri)`** URL or path to the icon image displayed alongside the text."
+        },
+        "iconSize": {
+          "type": "number",
+          "description": "number. Icon size in pixels. Overrides the header-level iconSize.",
+          "markdownDescription": "**`number`** Icon size in pixels. Overrides the header-level `iconSize`."
+        },
+        "when": {
+          "type": ["string", "boolean"],
+          "description": "string | boolean. Condition expression for showing this navigation item.",
+          "markdownDescription": "**`string | boolean`** Condition expression for showing this navigation item.\n\nExample: `'lang == \"en\"'`."
+        }
+      }
+    },
+    "NavigationLinkItem": {
+      "title": "Navigation link item",
+      "description": "object. A plain text navigation link. Requires type='link' and a text label.",
+      "markdownDescription": "**`object`** A plain text navigation link.\n\nRequired: `type: link`, `text`.",
+      "type": "object",
+      "required": ["type", "text"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "pattern": "^link$",
+          "description": "string. Must be 'link'.",
+          "markdownDescription": "**`string`** Must be `link`."
+        },
+        "text": {
+          "type": "string",
+          "description": "string. Display text for the link.",
+          "markdownDescription": "**`string`** Display text for the link."
+        },
+        "target": {
+          "$ref": "#/definitions/NavigationLinkTarget",
+          "description": "NavigationLinkTarget. Browser target for opening the link.",
+          "markdownDescription": "**`NavigationLinkTarget`** Browser target for opening the link."
+        },
+        "arrow": {
+          "type": "boolean",
+          "description": "boolean. Show an arrow icon after the link text to indicate external navigation.",
+          "markdownDescription": "**`boolean`** Show an arrow icon after the link text to indicate external navigation."
+        }
+      }
+    },
+    "NavigationButtonItem": {
+      "title": "Navigation button item",
+      "description": "object. A styled call-to-action button. Requires type='button', text, and url.",
+      "markdownDescription": "**`object`** A styled call-to-action button.\n\nRequired: `type: button`, `text`, `url`.",
+      "type": "object",
+      "required": ["type", "text", "url"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "pattern": "^button$",
+          "description": "string. Must be 'button'.",
+          "markdownDescription": "**`string`** Must be `button`."
+        },
+        "urlTitle": {
+          "type": "string",
+          "description": "string. Accessible title (aria-label) for the button link.",
+          "markdownDescription": "**`string`** Accessible title (`aria-label`) for the button link."
+        },
+        "primary": {
+          "type": "boolean",
+          "description": "boolean. Render the button with a primary (accent) visual style.",
+          "markdownDescription": "**`boolean`** Render the button with a primary (accent) visual style."
+        },
+        "size": {
+          "type": "string",
+          "description": "string. Button size.",
+          "markdownDescription": "**`string`** Button size.\n\nExamples: `s`, `m`, `l`, `xl`."
+        },
+        "theme": {
+          "type": "string",
+          "description": "string. Visual theme of the button.",
+          "markdownDescription": "**`string`** Visual theme of the button.\n\nExamples: `normal`, `action`, `outlined`, `flat`."
+        },
+        "img": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "string. URL or path to an image displayed inside the button.",
+              "markdownDescription": "**`string`** URL or path to an image displayed inside the button."
+            },
+            {
+              "type": "object",
+              "required": ["data"],
+              "properties": {
+                "data": {
+                  "type": "string",
+                  "description": "string. URL or path to the image file.",
+                  "markdownDescription": "**`string`** URL or path to the image file."
+                },
+                "position": {
+                  "type": "string",
+                  "enum": ["left", "right"],
+                  "description": "string (enum). Position of the image relative to the button text.",
+                  "markdownDescription": "**`string (enum)`** Position of the image relative to the button text: `left` or `right`."
+                },
+                "alt": {
+                  "type": "string",
+                  "description": "string. Alternative text for the image (accessibility).",
+                  "markdownDescription": "**`string`** Alternative text for the image (accessibility)."
+                }
+              },
+              "additionalProperties": false,
+              "description": "object. Image configuration with position and alt text.",
+              "markdownDescription": "**`object`** Image configuration with position and alt text."
+            }
+          ],
+          "description": "string | object. Image displayed inside the button.",
+          "markdownDescription": "**`string | object`** Image displayed inside the button. String shorthand or full configuration object."
+        },
+        "analyticsEvents": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/NavigationAnalyticsEvent",
+              "description": "NavigationAnalyticsEvent. Single analytics event fired on button click.",
+              "markdownDescription": "**`NavigationAnalyticsEvent`** Single analytics event fired on button click."
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/NavigationAnalyticsEvent"
+              },
+              "description": "NavigationAnalyticsEvent[]. Multiple analytics events fired on button click.",
+              "markdownDescription": "**`NavigationAnalyticsEvent[]`** Multiple analytics events fired on button click."
+            }
+          ],
+          "description": "NavigationAnalyticsEvent | NavigationAnalyticsEvent[]. Analytics event(s) to fire when the button is clicked.",
+          "markdownDescription": "**`NavigationAnalyticsEvent | NavigationAnalyticsEvent[]`** Analytics event(s) to fire when the button is clicked."
+        },
+        "target": {
+          "$ref": "#/definitions/NavigationLinkTarget",
+          "description": "NavigationLinkTarget. Browser target for opening the button link.",
+          "markdownDescription": "**`NavigationLinkTarget`** Browser target for opening the button link."
+        },
+        "width": {
+          "type": "string",
+          "enum": ["auto", "max"],
+          "description": "string (enum). Button width.",
+          "markdownDescription": "**`string (enum)`** Button width.\n\n| Value | Description |\n|---|---|\n| `auto` | Fit content |\n| `max` | Stretch to available width |"
+        }
+      }
+    },
+    "NavigationDropdownItem": {
+      "title": "Navigation dropdown item",
+      "description": "object. A dropdown menu containing multiple links. Requires type='dropdown' and items.",
+      "markdownDescription": "**`object`** A dropdown menu containing multiple links.\n\nRequired: `type: dropdown`, `items`.",
+      "type": "object",
+      "required": ["type", "items"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "pattern": "^dropdown$",
+          "description": "string. Must be 'dropdown'.",
+          "markdownDescription": "**`string`** Must be `dropdown`."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NavigationLinkItem"
+          },
+          "description": "NavigationLinkItem[]. List of link items shown in the dropdown menu.",
+          "markdownDescription": "**`NavigationLinkItem[]`** List of link items shown in the dropdown menu."
+        }
+      }
+    },
+    "NavigationControlsItem": {
+      "title": "Navigation controls item",
+      "description": "object. Built-in UI controls (theme/language switcher). Requires type='controls'.",
+      "markdownDescription": "**`object`** Built-in UI controls (theme/language switcher).\n\nRequired: `type: controls`.",
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "pattern": "^controls$",
+          "description": "string. Must be 'controls'.",
+          "markdownDescription": "**`string`** Must be `controls`."
+        }
+      }
+    },
+    "NavigationLinkTarget": {
+      "title": "Link target",
+      "description": "string (enum). HTML anchor target attribute controlling how the link opens.",
+      "markdownDescription": "**`string (enum)`** HTML anchor target attribute controlling how the link opens.\n\n| Value | Description |\n|---|---|\n| `_self` | Current browsing context (default) |\n| `_blank` | New tab or window |\n| `_parent` | Parent browsing context |\n| `_top` | Top-level browsing context |",
+      "type": "string",
+      "enum": ["_self", "_blank", "_parent", "_top"]
+    },
+    "NavigationAnalyticsEvent": {
+      "title": "Analytics event",
+      "description": "object. An analytics event definition sent to configured analytics providers on user interaction.",
+      "markdownDescription": "**`object`** An analytics event definition sent to configured analytics providers on user interaction.",
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "string. Event name sent to the analytics provider.",
+          "markdownDescription": "**`string`** Event name sent to the analytics provider.\n\nExample: `header_cta_click`."
+        },
+        "type": {
+          "type": "string",
+          "description": "string. Event type or category used for grouping in analytics dashboards.",
+          "markdownDescription": "**`string`** Event type or category used for grouping in analytics dashboards."
+        },
+        "counters": {
+          "type": "object",
+          "properties": {
+            "include": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "string[]. List of analytics counter IDs to send this event to.",
+              "markdownDescription": "**`string[]`** List of analytics counter IDs to send this event to."
+            },
+            "exclude": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "string[]. List of analytics counter IDs to exclude from receiving this event.",
+              "markdownDescription": "**`string[]`** List of analytics counter IDs to exclude from receiving this event."
+            }
+          },
+          "additionalProperties": false,
+          "description": "object. Counter include/exclude lists for targeting specific analytics counters.",
+          "markdownDescription": "**`object`** Counter include/exclude lists for targeting specific analytics counters."
+        },
+        "context": {
+          "type": "string",
+          "description": "string. Additional context string attached to the event payload.",
+          "markdownDescription": "**`string`** Additional context string attached to the event payload."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,4 +1,8 @@
 const esbuild = require('esbuild');
+const {sassPlugin} = require('esbuild-sass-plugin');
+
+const isWatch = process.argv.includes('--watch');
+const target = process.env.BUILD_TARGET ?? 'all'; // 'ext' | 'webview' | 'all'
 
 const browserPolyfills = {
     punycode: require.resolve('punycode/'),
@@ -41,15 +45,39 @@ const nodeShims = {
     },
 };
 
-esbuild.build({
-    entryPoints: ['src/helpers/webview/index.tsx'],
+const ctx = isWatch ? esbuild.context : (opts) => esbuild.build(opts).then(r => r);
+
+const builds = [];
+
+// Extension host — bundled as CJS Node.js module.
+// vscode is provided by VS Code at runtime; everything else is inlined.
+if (target === 'ext' || target === 'all') {
+    builds.push(
+        ctx({
+            entryPoints: ['src/index.ts'],
+            bundle: true,
+            outfile: 'build/index.js',
+            external: ['vscode'],
+            platform: 'node',
+            target: 'node18',
+            format: 'cjs',
+            sourcemap: true,
+            loader: {'.json': 'json'},
+        }).then(c => isWatch ? c.watch() : c),
+    );
+}
+
+const webviewBase = {
     bundle: true,
-    outdir: 'build/webview',
     platform: 'browser',
     target: 'es2020',
     format: 'iife',
     sourcemap: false,
-    plugins: [nodeShims],
+    plugins: [
+            nodeShims,
+            sassPlugin({filter: /\.module\.scss$/, type: 'local-css'}),
+            sassPlugin(),
+        ],
     define: {
         'process.env.NODE_ENV': '"production"',
         global: 'window',
@@ -64,4 +92,39 @@ esbuild.build({
         '.ttf': 'dataurl',
         '.eot': 'dataurl',
     },
-}).catch(() => process.exit(1));
+};
+
+// Markdown editor webview
+if (target === 'webview' || target === 'all') {
+    builds.push(
+        ctx({
+            ...webviewBase,
+            entryPoints: ['src/ui/md-editor/index.tsx'],
+            outdir: 'build/md-editor',
+        }).then(c => isWatch ? c.watch() : c),
+    );
+}
+
+// TOC editor webview
+if (target === 'webview' || target === 'all') {
+    builds.push(
+        ctx({
+            ...webviewBase,
+            entryPoints: ['src/ui/toc-editor/index.tsx'],
+            outdir: 'build/toc-editor',
+        }).then(c => isWatch ? c.watch() : c),
+    );
+}
+
+// Sidebar webview
+if (target === 'webview' || target === 'all') {
+    builds.push(
+        ctx({
+            ...webviewBase,
+            entryPoints: ['src/ui/sidebar/index.tsx'],
+            outdir: 'build/sidebar',
+        }).then(c => isWatch ? c.watch() : c),
+    );
+}
+
+Promise.all(builds).catch(() => process.exit(1));

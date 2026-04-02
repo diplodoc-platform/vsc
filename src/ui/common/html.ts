@@ -1,13 +1,15 @@
 import * as vscode from 'vscode';
 
 export function getBaseHtml(
+    id: string,
     scriptUri: vscode.Uri,
     styleUri: vscode.Uri,
-    cspSource: string
+    cspSource: string,
+    lang: string = 'en'
 ): string {
     return `
         <!DOCTYPE html>
-        <html lang="ru">
+        <html lang="${lang}">
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,7 +31,7 @@ export function getBaseHtml(
                 </style>
             </head>
             <body>
-                <div id="root"></div>
+                <div id=${id}></div>
                 <script src="${scriptUri}"></script>
             </body>
         </html>
