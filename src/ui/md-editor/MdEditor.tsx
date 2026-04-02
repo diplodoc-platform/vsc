@@ -1,12 +1,17 @@
-import React from 'react';
-import {createRoot} from 'react-dom/client';
 import {useMarkdownEditor, MarkdownEditorView} from '@gravity-ui/markdown-editor';
 import {configure, ThemeProvider, ToasterProvider, Toaster} from '@gravity-ui/uikit';
+import styles from './MdEditor.module.scss';
+import {t} from '../../i18n';
+import {Component, ReactNode, useEffect, useMemo, useRef, useState} from 'react';
+import {debounce} from './utils';
+
 import '@gravity-ui/uikit/styles/fonts.css';
 import '@gravity-ui/uikit/styles/styles.css';
 import '@gravity-ui/markdown-editor/styles/styles.css';
 
-configure({lang: 'ru'});
+configure({
+    lang: (document.documentElement.lang || 'en') as 'ru' | 'en',
+});
 
 const toaster = new Toaster();
 
@@ -18,20 +23,12 @@ declare const acquireVsCodeApi: () => {
 
 const vscodeApi = acquireVsCodeApi();
 
-function debounce<T extends (...args: Parameters<T>) => void>(fn: T, ms: number): T {
-    let timer: ReturnType<typeof setTimeout>;
-    return ((...args: Parameters<T>) => {
-        clearTimeout(timer);
-        timer = setTimeout(() => fn(...args), ms);
-    }) as T;
-}
-
-class ErrorBoundary extends React.Component<
-    {children: React.ReactNode},
+class ErrorBoundary extends Component<
+    {children: ReactNode},
     {error: Error | null}
 > {
     state = {error: null};
-    
+
     static getDerivedStateFromError(error: Error) {
         return {error};
     }
@@ -39,9 +36,9 @@ class ErrorBoundary extends React.Component<
     render() {
         if (this.state.error) {
             return (
-                <div style={{padding: 16, color: '#f47067', fontFamily: 'monospace', fontSize: 12}}>
-                    <b>Ошибка редактора:</b>
-                    <pre style={{whiteSpace: 'pre-wrap'}}>{String(this.state.error)}</pre>
+                <div className={styles.error}>
+                    <b>{t('editor.error')}:</b>
+                    <pre>{String(this.state.error)}</pre>
                 </div>
             );
         }
@@ -49,8 +46,9 @@ class ErrorBoundary extends React.Component<
     }
 }
 
-function Editor() {
-    const [fileName, setFileName] = React.useState<string>('');
+function MdEditor() {
+    const [fileName, setFileName] = useState<string>('');
+    const isSettingContent = useRef(false);
 
     const editor = useMarkdownEditor({
         preset: 'commonmark',
@@ -58,53 +56,44 @@ function Editor() {
         initial: {mode: 'wysiwyg'},
     });
 
-    const sendChange = React.useMemo(
+    const sendChange = useMemo(
         () => debounce(() => {
+            if (isSettingContent.current) return;
             vscodeApi.postMessage({command: 'change', text: editor.getValue()});
         }, 300),
-        [editor]
+        [editor],
     );
 
-    React.useEffect(() => {
+    useEffect(() => {
         editor.on('change', sendChange);
         return () => editor.off('change', sendChange);
     }, [editor, sendChange]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         function onMessage(event: MessageEvent) {
             const {command, text, fileName: name} = event.data ?? {};
+
             if (command === 'setContent') {
                 setFileName(name ?? '');
+                isSettingContent.current = true;
                 editor.replace(text ?? '');
+                setTimeout(() => { isSettingContent.current = false; }, 350);
             }
         }
         window.addEventListener('message', onMessage);
+
         return () => window.removeEventListener('message', onMessage);
     }, [editor]);
 
     return (
-        <div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
+        <div className={styles.mdEditor}>
             {fileName && (
-                <div style={{
-                    padding: '6px 12px',
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: 'var(--vscode-sideBarTitle-foreground, #ccc)',
-                    background: 'var(--vscode-sideBar-background, #1e1e1e)',
-                    borderBottom: '1px solid var(--vscode-sideBarSectionHeader-border, #333)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    overflow: 'hidden',
-                    whiteSpace: 'nowrap',
-                    textOverflow: 'ellipsis',
-                    flexShrink: 0,
-                }}>
-                    <span style={{opacity: 0.6}}>📄</span>
+                <div className={styles.header}>
+                    <span className={styles.headerIcon}>📄</span>
                     {fileName}
                 </div>
             )}
-            <div style={{flex: 1, overflow: 'hidden', minHeight: 0}}>
+            <div className={styles.content}>
                 <MarkdownEditorView
                     stickyToolbar
                     autofocus
@@ -115,22 +104,14 @@ function Editor() {
     );
 }
 
-function App() {
+export function App() {
     return (
         <ThemeProvider theme="dark">
             <ToasterProvider toaster={toaster}>
                 <ErrorBoundary>
-                    <Editor />
+                    <MdEditor />
                 </ErrorBoundary>
             </ToasterProvider>
         </ThemeProvider>
     );
-}
-
-const container = document.getElementById('root');
-
-if (container) {
-    createRoot(container).render(<App />);
-} else {
-    document.body.innerHTML = '<div style="padding:16px;color:red">root element not found</div>';
 }
