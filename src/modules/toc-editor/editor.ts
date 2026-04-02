@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { getBaseHtml } from './html';
+import { getBaseHtml } from '../../ui/common/html';
 
-export class Editor {
+export class TocEditor {
     private _panel?: vscode.WebviewPanel;
     isUpdatingFromWebview = false;
 
@@ -15,14 +15,14 @@ export class Editor {
         }
 
         this._panel = vscode.window.createWebviewPanel(
-            'diplodoc-editor',
-            'Diplodoc Markdown Editor',
+            'diplodoc-toc-editor',
+            'Diplodoc TOC Editor',
             vscode.ViewColumn.Beside,
             {
                 enableScripts: true,
                 retainContextWhenHidden: true,
                 localResourceRoots: [
-                    vscode.Uri.joinPath(this._extensionUri, 'build', 'webview'),
+                    vscode.Uri.joinPath(this._extensionUri, 'build', 'toc-editor'),
                 ],
             }
         );
@@ -51,8 +51,8 @@ export class Editor {
         const fileName = editor.document.fileName.split('/').pop() ?? '';
 
         this._panel.title = fileName
-            ? `Diplodoc Markdown Editor: ${fileName}`
-            : 'Diplodoc Markdown Editor';
+            ? `Diplodoc TOC Editor: ${fileName}`
+            : 'Diplodoc TOC Editor';
 
         this._panel.webview.postMessage({
             command: 'setContent',
@@ -62,7 +62,7 @@ export class Editor {
     }
 
     private _setupWebview(webview: vscode.Webview) {
-        const buildUri = vscode.Uri.joinPath(this._extensionUri, 'build', 'webview');
+        const buildUri = vscode.Uri.joinPath(this._extensionUri, 'build', 'toc-editor');
 
         const scriptUri = webview.asWebviewUri(
             vscode.Uri.joinPath(buildUri, 'index.js')
@@ -72,9 +72,11 @@ export class Editor {
         );
 
         webview.html = getBaseHtml(
+            'toc-editor',
             scriptUri,
             styleUri,
-            webview.cspSource
+            webview.cspSource,
+            vscode.env.language
         );
 
         webview.onDidReceiveMessage(async (message) => {
@@ -87,7 +89,7 @@ export class Editor {
     private _syncActiveEditor() {
         const editor = vscode.window.activeTextEditor;
 
-        if (editor && editor.document.languageId === 'markdown') {
+        if (editor && editor.document.fileName === 'toc.yaml') {
             this.syncFromEditor(editor);
         }
     }
@@ -95,7 +97,7 @@ export class Editor {
     private async _applyToDocument(text: string) {
         const editor = vscode.window.activeTextEditor;
 
-        if (!editor || editor.document.languageId !== 'markdown') {
+        if (!editor || editor.document.fileName !== 'toc.yaml') {
             return;
         }
 
