@@ -1,9 +1,11 @@
 import * as vscode from 'vscode';
-import { getBaseHtml } from '../../ui/common/html';
+import {getBaseHtml} from '../../ui/utils/html';
 
 export class MdEditor {
     private _panel?: vscode.WebviewPanel;
     private _currentDocUri?: vscode.Uri;
+    private _pendingSync?: {text: string; fileName: string};
+    private _frontmatter = '';
     isUpdatingFromWebview = false;
 
     constructor(private readonly _extensionUri: vscode.Uri) {}
@@ -49,18 +51,32 @@ export class MdEditor {
         }
 
         this._currentDocUri = editor.document.uri;
-        const text = editor.document.getText();
+        const rawText = editor.document.getText();
         const fileName = editor.document.fileName.split('/').pop() ?? '';
 
         this._panel.title = fileName
             ? `Diplodoc Markdown Editor: ${fileName}`
             : 'Diplodoc Markdown Editor';
 
+        const {frontmatter, content} = this._extractFrontmatter(rawText);
+
+        this._frontmatter = frontmatter;
+        this._pendingSync = {text: content, fileName};
         this._panel.webview.postMessage({
             command: 'setContent',
-            text,
+            text: content,
             fileName,
         });
+    }
+
+    private _extractFrontmatter(text: string): {frontmatter: string; content: string} {
+        const match = text.match(/^(---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$))/);
+
+        if (match) {
+            return {frontmatter: match[1], content: text.slice(match[1].length)};
+        }
+
+        return {frontmatter: '', content: text};
     }
 
     private _setupWebview(webview: vscode.Webview) {
@@ -82,7 +98,16 @@ export class MdEditor {
         );
 
         webview.onDidReceiveMessage(async (message) => {
-            if (message.command === 'change') {
+            if (message.command === 'ready') {
+                if (this._pendingSync) {
+                    this._panel?.webview.postMessage({
+                        command: 'setContent',
+                        ...this._pendingSync,
+                    });
+
+                    this._pendingSync = undefined;
+                }
+            } else if (message.command === 'change') {
                 await this._applyToDocument(message.text);
             }
         });
@@ -112,7 +137,7 @@ export class MdEditor {
                 document.positionAt(document.getText().length)
             );
 
-            edit.replace(this._currentDocUri, fullRange, text);
+            edit.replace(this._currentDocUri, fullRange, this._frontmatter + text);
 
             await vscode.workspace.applyEdit(edit);
         } finally {

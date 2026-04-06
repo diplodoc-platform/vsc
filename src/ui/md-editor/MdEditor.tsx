@@ -1,10 +1,16 @@
-import {useMarkdownEditor, MarkdownEditorView} from '@gravity-ui/markdown-editor';
+import {
+    useMarkdownEditor,
+    MarkdownEditorView,
+    wysiwygToolbarConfigs,
+} from '@gravity-ui/markdown-editor';
+import {Math as MathExtension} from '@gravity-ui/markdown-editor/extensions/additional/Math/index.js';
+import {Mermaid as MermaidExtension} from '@gravity-ui/markdown-editor/extensions/additional/Mermaid/index.js';
 import {configure, ThemeProvider, ToasterProvider, Toaster} from '@gravity-ui/uikit';
 import styles from './MdEditor.module.scss';
-import {t} from '../../i18n';
-import {Component, ReactNode, useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {debounce} from './utils';
-
+import {ErrorBoundary} from '../error/ErrorBoundary';
+import {useVscodeTheme} from '../useVscodeTheme';
 import '@gravity-ui/uikit/styles/fonts.css';
 import '@gravity-ui/uikit/styles/styles.css';
 import '@gravity-ui/markdown-editor/styles/styles.css';
@@ -23,37 +29,55 @@ declare const acquireVsCodeApi: () => {
 
 const vscodeApi = acquireVsCodeApi();
 
-class ErrorBoundary extends Component<
-    {children: ReactNode},
-    {error: Error | null}
-> {
-    state = {error: null};
+const {
+    wMathInlineItemData,
+    wMathBlockItemData,
+    wMathListItem,
+    wMermaidItemData,
+    wToolbarConfigByPreset,
+    wCommandMenuConfigByPreset,
+} = wysiwygToolbarConfigs;
 
-    static getDerivedStateFromError(error: Error) {
-        return {error};
-    }
+const yfmBase = wToolbarConfigByPreset.yfm;
+const wysiwygToolbarConfig = [
+    ...yfmBase.slice(0, -1),
+    [...yfmBase[yfmBase.length - 1], wMathListItem, wMermaidItemData],
+];
 
-    render() {
-        if (this.state.error) {
-            return (
-                <div className={styles.error}>
-                    <b>{t('editor.error')}:</b>
-                    <pre>{String(this.state.error)}</pre>
-                </div>
-            );
-        }
-        return this.props.children;
-    }
-}
+const commandMenuActions = [
+    ...wCommandMenuConfigByPreset.yfm,
+    wMathInlineItemData,
+    wMathBlockItemData,
+    wMermaidItemData,
+];
 
 function MdEditor() {
     const [fileName, setFileName] = useState<string>('');
     const isSettingContent = useRef(false);
 
     const editor = useMarkdownEditor({
-        preset: 'commonmark',
-        md: {html: false},
+        preset: 'yfm',
         initial: {mode: 'wysiwyg'},
+        wysiwygConfig: {
+            extensions: (builder) => {
+                builder.use(MathExtension, {
+                    loadRuntimeScript: () => {
+                        import('@diplodoc/latex-extension/runtime');
+                        import('@diplodoc/latex-extension/runtime/styles');
+                    },
+                });
+                builder.use(MermaidExtension, {
+                    loadRuntimeScript: () => {
+                        import('@diplodoc/mermaid-extension/runtime');
+                    },
+                });
+            },
+            extensionOptions: {
+                commandMenu: {
+                    actions: commandMenuActions,
+                },
+            },
+        },
     });
 
     const sendChange = useMemo(
@@ -71,7 +95,7 @@ function MdEditor() {
 
     useEffect(() => {
         function onMessage(event: MessageEvent) {
-            const {command, text, fileName: name} = event.data ?? {};
+            const {command, text, fileName: name, ratio} = event.data ?? {};
 
             if (command === 'setContent') {
                 setFileName(name ?? '');
@@ -80,10 +104,13 @@ function MdEditor() {
                 setTimeout(() => { isSettingContent.current = false; }, 350);
             }
         }
+
         window.addEventListener('message', onMessage);
+        vscodeApi.postMessage({command: 'ready'});
 
         return () => window.removeEventListener('message', onMessage);
     }, [editor]);
+
 
     return (
         <div className={styles.mdEditor}>
@@ -98,6 +125,7 @@ function MdEditor() {
                     stickyToolbar
                     autofocus
                     editor={editor}
+                    wysiwygToolbarConfig={wysiwygToolbarConfig}
                 />
             </div>
         </div>
@@ -105,8 +133,10 @@ function MdEditor() {
 }
 
 export function App() {
+    const theme = useVscodeTheme();
+
     return (
-        <ThemeProvider theme="dark">
+        <ThemeProvider theme={theme}>
             <ToasterProvider toaster={toaster}>
                 <ErrorBoundary>
                     <MdEditor />

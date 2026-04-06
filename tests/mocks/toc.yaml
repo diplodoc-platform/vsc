@@ -3,6 +3,16 @@ items:
     href: index.md
   - name: Toc Include
     href: toc-include.md
+  - name: Mermaid
+    href: mermaid.md
+  - name: Latex
+    href: latex.md
+  - name: Notes
+    href: notes.md
+  - name: Page constructor
+    href: pc.md
+  - name: Features
+    href: features.md
   - name: Level 1
     items:
       - name: Page 1

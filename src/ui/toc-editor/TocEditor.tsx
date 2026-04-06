@@ -1,7 +1,7 @@
 import {configure, ThemeProvider, ToasterProvider, Toaster} from '@gravity-ui/uikit';
 import styles from './TocEditor.module.scss';
-import {t} from '../../i18n';
-import {Component, ReactNode} from 'react';
+import {ErrorBoundary} from '../error/ErrorBoundary';
+import {useVscodeTheme} from '../useVscodeTheme';
 
 import '@gravity-ui/uikit/styles/fonts.css';
 import '@gravity-ui/uikit/styles/styles.css';
@@ -13,29 +13,6 @@ configure({
 
 const toaster = new Toaster();
 
-class ErrorBoundary extends Component<
-    {children: ReactNode},
-    {error: Error | null}
-> {
-    state = {error: null};
-
-    static getDerivedStateFromError(error: Error) {
-        return {error};
-    }
-
-    render() {
-        if (this.state.error) {
-            return (
-                <div className={styles.error}>
-                    <b>{t('editor.error')}:</b>
-                    <pre>{String(this.state.error)}</pre>
-                </div>
-            );
-        }
-        return this.props.children;
-    }
-}
-
 function TocEditor() {
     return (
         <div className={styles.tocEditor}>
@@ -45,8 +22,10 @@ function TocEditor() {
 }
 
 export function App() {
+    const theme = useVscodeTheme();
+
     return (
-        <ThemeProvider theme="dark">
+        <ThemeProvider theme={theme}>
             <ToasterProvider toaster={toaster}>
                 <ErrorBoundary>
                     <TocEditor />

@@ -1,12 +1,20 @@
-.g-root_theme_dark {
-    --g-color-base-brand: #63D590;
+$color: #63D590;
+
+:root .g-root_theme_dark,
+:root .g-root_theme_light {
+    --g-color-base-brand: #{$color};
     --g-color-base-brand-hover: #4ec77a;
     --g-color-base-selection: rgba(99, 213, 144, 0.15);
     --g-color-base-selection-hover: rgba(99, 213, 144, 0.25);
-    --g-color-line-brand: #63D590;
-    --g-color-base-brand-hover: #63D590;                                                                                                     
-    --g-color-base-selection: rgba(34, 197, 94, 0.15);                                                                                       
-    --g-color-base-selection-hover: rgba(34, 197, 94, 0.25);
-    --g-color-text-brand: #63D590;                                                                                                           
-    --g-color-text-brand-heavy: #63D590;  
+    --g-color-line-brand: #{$color};
+    --g-color-text-brand: #{$color};
+    --g-color-text-brand-heavy: #{$color};
+
+    --g-color-base-background: var(--vscode-editor-background);
+    --g-color-base-float: var(--vscode-editorWidget-background, var(--vscode-editor-background));
+    --g-color-base-float-heavy: var(--vscode-editorWidget-background, var(--vscode-editor-background));
+    --g-color-text-primary: var(--vscode-editor-foreground);
+    --g-color-text-secondary: var(--vscode-descriptionForeground, var(--vscode-editor-foreground));
+    --g-color-line-generic: var(--vscode-widget-border, var(--vscode-editorWidget-border));
+    --g-color-line-generic-solid: var(--vscode-widget-border, var(--vscode-editorWidget-border));
 }
