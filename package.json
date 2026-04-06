@@ -23,6 +23,18 @@
   ],
   "main": "./build/index.js",
   "contributes": {
+    "keybindings": [
+      {
+        "command": "diplodoc.insertTable",
+        "key": "alt+t",
+        "when": "editorLangId == markdown && editorTextFocus"
+      },
+      {
+        "command": "diplodoc.insertNote",
+        "key": "alt+r",
+        "when": "editorLangId == markdown && editorTextFocus"
+      }
+    ],
     "commands": [
       {
         "command": "diplodoc.openMdEditor",
@@ -33,6 +45,14 @@
         "command": "diplodoc.openTocEditor",
         "title": "Open Diplodoc TOC Editor",
         "icon": "assets/diplodoc-logo-colored.svg"
+      },
+      {
+        "command": "diplodoc.insertTable",
+        "title": "Diplodoc: Insert Table"
+      },
+      {
+        "command": "diplodoc.insertNote",
+        "title": "Diplodoc: Insert Note"
       }
     ],
     "languages": [

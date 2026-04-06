@@ -7,9 +7,13 @@ neuroExpert:
 
 This is a test page for various include scenarios.
 
+Hello, world
+
+
+
 ## Include from root level
 
-{% include [root-include](includes/root-include.md) %}
+\{% include [root-include](includes/root-include.md) %\}
 
 ## Include from level1
 
