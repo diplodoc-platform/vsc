@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getBaseHtml } from '../../ui/common/html';
+import {getBaseHtml} from '../../ui/utils/html';
 
 export class TocEditor {
     private _panel?: vscode.WebviewPanel;

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getBaseHtml } from '../../ui/common/html';
+import {getBaseHtml} from '../../ui/utils/html';
 
 export class Sidebar implements vscode.WebviewViewProvider {
     private _view?: vscode.WebviewView;

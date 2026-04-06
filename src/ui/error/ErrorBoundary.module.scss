@@ -1,0 +1,11 @@
+.error {
+    padding: 16px;
+    color: var(--vscode-errorForeground, #f47067);
+    font-family: monospace;
+    font-size: 12px;
+
+    pre {
+        white-space: pre-wrap;
+        margin: 4px 0 0;
+    }
+}

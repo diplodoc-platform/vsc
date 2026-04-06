@@ -1,7 +1,8 @@
 ---
-neuroExpert
+neuroExpert:
+    projectId:
+        default: rrrr
 ---
-
 # Test Includes
 
 This is a test page for various include scenarios.
@@ -12,21 +13,21 @@ This is a test page for various include scenarios.
 
 ## Include from level1
 
-{% include [level1-include](level1/includes/level1-include.md) %}
+\{% include [level1-include](level1/includes/level1-include.md) %\}
 
 ## Include from level2
 
-{% include [level2-include](level1/level2/includes/level2-include.md) %}
+\{% include [level2-include](level1/level2/includes/level2-include.md) %\}
 
 ## Include with missing file
 
-<!-- {% include [missing](includes/missing.md) %} -->
+\<!-- \{% include [missing](includes/missing.md) %\} --\>
 
 ## Include file that is in toc
 
 [Link to toc-include](toc-include.md)
 
-{% include [toc-include](toc-include.md) %}
+\{% include [toc-include](toc-include.md) %\}
 
 ## Links to different levels
 
@@ -36,38 +37,39 @@ This is a test page for various include scenarios.
 
 ## Include with anchor
 
-{% include [fragment](includes/fragments.md#section1) %}
+\{% include [fragment](includes/fragments.md#section1) %\}
 
 ## Include with multiple anchors
 
-{% include [fragment](includes/fragments.md#section2) %}
+\{% include [fragment](includes/fragments.md#section2) %\}
 
 ## Include with paragraph anchor
 
-{% include [fragment](includes/fragments.md#p1) %}
+\{% include [fragment](includes/fragments.md#p1) %\}
 
 ## Nested includes
 
-{% include [nested](includes/nested-include.md) %}
+\{% include [nested](includes/nested-include.md) %\}
 
 ## Deep nested includes
 
-{% include [deep](includes/deep-include.md) %}
+\{% include [deep](includes/deep-include.md) %\}
 
 ## Commented includes
 
-<!-- {% include [commented](includes/commented-include.md) %} -->
+\<!-- \{% include [commented](includes/commented-include.md) %\} --\>
 
 ## Include with variable substitution
 
-{% include [user](includes/user.md) %}
+\{% include [user](includes/user.md) %\}
+
 ## Include without title
 
-{% include [no-title-include](includes/no-title-include.md) %}
+\{% include [no-title-include](includes/no-title-include.md) %\}
 
 ## Include with anchor {#anchor}
 
-{% include notitle [anchor](#anchor) %}
-{% include [anchor](#anchor) %}
+\{% include notitle [anchor](#anchor) %\}
+\{% include [anchor](#anchor) %\}
 
-{% include [no-title-include](includes/no-title-include.md#anchor) %}
+\{% include [no-title-include](includes/no-title-include.md#anchor) %\}
