@@ -5,3 +5,7 @@
 This is info.
 
 {% endnote %}
+
+| | |
+| --- | --- |
+| | |

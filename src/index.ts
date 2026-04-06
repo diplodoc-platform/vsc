@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
-import { MdEditor } from './modules/md-editor/editor';
-import { Sidebar } from './modules/main/sidebar';
+import {MdEditor} from './modules/md-editor/editor';
+import {Sidebar} from './modules/main/sidebar';
 import * as validation from './modules/validation';
-import { TocEditor } from './modules/toc-editor/editor';
+import {TocEditor} from './modules/toc-editor/editor';
+import {insertElement} from './utils';
 
 export function activate(context: vscode.ExtensionContext) {
     validation.activate(context);
@@ -37,6 +38,33 @@ export function activate(context: vscode.ExtensionContext) {
 
             tocEditor.show();
             tocEditor.syncFromEditor(editor);
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('diplodoc.insertTable', () => {
+            const activeEditor = vscode.window.activeTextEditor;
+            if (activeEditor && activeEditor.document.languageId === 'markdown') {
+                const position = activeEditor.selection.active;
+
+                activeEditor.edit(editBuilder => {
+                    editBuilder.insert(position, insertElement('table'));
+                });
+            }
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('diplodoc.insertNote', () => {
+            const activeEditor = vscode.window.activeTextEditor;
+
+            if (activeEditor && activeEditor.document.languageId === 'markdown') {
+                const position = activeEditor.selection.active;
+
+                activeEditor.edit(editBuilder => {
+                    editBuilder.insert(position, insertElement('note'));
+                });
+            }
         })
     );
 

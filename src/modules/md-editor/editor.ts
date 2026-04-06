@@ -73,7 +73,10 @@ export class MdEditor {
         const match = text.match(/^(---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$))/);
 
         if (match) {
-            return {frontmatter: match[1], content: text.slice(match[1].length)};
+            return {
+                frontmatter: match[1],
+                content: text.slice(match[1].length)
+            };
         }
 
         return {frontmatter: '', content: text};
@@ -109,8 +112,27 @@ export class MdEditor {
                 }
             } else if (message.command === 'change') {
                 await this._applyToDocument(message.text);
+            } else if (message.command === 'save') {
+                if (message.text) {
+                    await this._applyToDocument(message.text);
+                }
+                
+                await this._saveDocument();
             }
         });
+    }
+
+    private async _saveDocument() {
+        if (!this._currentDocUri) {
+            return;
+        }
+
+        const document = await vscode.workspace.openTextDocument(this._currentDocUri);
+        await document.save();
+    }
+
+    postAction(action: string) {
+        this._panel?.webview.postMessage({command: 'action', action});
     }
 
     private _syncActiveEditor() {

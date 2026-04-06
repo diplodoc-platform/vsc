@@ -11,6 +11,7 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import {debounce} from './utils';
 import {ErrorBoundary} from '../error/ErrorBoundary';
 import {useVscodeTheme} from '../useVscodeTheme';
+import {useShortcuts, editorShortcuts} from '../shortcuts';
 import '@gravity-ui/uikit/styles/fonts.css';
 import '@gravity-ui/uikit/styles/styles.css';
 import '@gravity-ui/markdown-editor/styles/styles.css';
@@ -82,7 +83,10 @@ function MdEditor() {
 
     const sendChange = useMemo(
         () => debounce(() => {
-            if (isSettingContent.current) return;
+            if (isSettingContent.current) {
+                return;
+            }
+
             vscodeApi.postMessage({command: 'change', text: editor.getValue()});
         }, 300),
         [editor],
@@ -90,6 +94,7 @@ function MdEditor() {
 
     useEffect(() => {
         editor.on('change', sendChange);
+        
         return () => editor.off('change', sendChange);
     }, [editor, sendChange]);
 
@@ -111,6 +116,17 @@ function MdEditor() {
         return () => window.removeEventListener('message', onMessage);
     }, [editor]);
 
+    const commands = useMemo(() => [
+        ...editorShortcuts,
+        {
+            action: 'save',
+            key: 's',
+            cmdOrCtrl: true,
+            handler: () => vscodeApi.postMessage({command: 'save', text: editor.getValue()}),
+        },
+    ], [editor]);
+
+    useShortcuts(editor, commands);
 
     return (
         <div className={styles.mdEditor}>
