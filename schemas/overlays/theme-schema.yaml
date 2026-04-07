@@ -1,0 +1,228 @@
+title: Diplodoc (theme.yaml)
+markdownDescription: >-
+  Diplodoc theme configuration file.
+
+  Override brand colors and UI element colors for the documentation viewer.
+  All values are CSS color expressions (hex, `rgb()`, `var(--...)`, etc.).
+
+  Top-level properties set **both** light and dark themes simultaneously.
+  Use `light:` and `dark:` sections to set theme-specific values.
+
+  ```yaml
+  base-brand: '#005BFF'
+  light:
+    base-background: '#FFFFFF'
+  dark:
+    base-background: '#22262E'
+  ```
+properties:
+  base-brand:
+    description: Primary brand color used for highlights, active states, and accents.
+    markdownDescription: "**`string (CSS color)`** Primary brand color — used for highlights, active indicators, focus rings, and key accents throughout the UI."
+  base-selection:
+    description: Background color for selected/active navigation items.
+    markdownDescription: "**`string (CSS color)`** Background color for the selected / active state of navigation items and interactive elements."
+  base-background:
+    description: Main page background color.
+    markdownDescription: "**`string (CSS color)`** Main page background color (applied to `<body>`)."
+  text-primary:
+    description: Primary text color for body text and headings.
+    markdownDescription: "**`string (CSS color)`** Primary text color — used for body text, headings, and most readable content."
+  text-secondary:
+    description: Secondary/muted text color for captions, labels, and helper text.
+    markdownDescription: "**`string (CSS color)`** Secondary (muted) text color — used for captions, labels, breadcrumbs, and other supporting text."
+  base-simple-hover:
+    description: Hover background color for simple interactive elements (buttons, menu items).
+    markdownDescription: "**`string (CSS color)`** Hover background applied to simple interactive elements like menu items and icon buttons."
+  line-generic:
+    description: Default border/divider/separator line color.
+    markdownDescription: "**`string (CSS color)`** Default color for borders, dividers, and horizontal rules (`<hr>`)."
+  note-info-background:
+    description: Background color for informational note/callout blocks.
+    markdownDescription: "**`string (CSS color)`** Background of `{% note info %}` callout blocks."
+  note-tip-background:
+    description: Background color for tip/hint note blocks.
+    markdownDescription: "**`string (CSS color)`** Background of `{% note tip %}` callout blocks."
+  note-warning-background:
+    description: Background color for warning note blocks.
+    markdownDescription: "**`string (CSS color)`** Background of `{% note warning %}` callout blocks."
+  note-important-background:
+    description: Background color for important/critical note blocks.
+    markdownDescription: "**`string (CSS color)`** Background of `{% note important %}` / `{% note alert %}` callout blocks."
+  quote:
+    description: Text or border color for blockquote elements.
+    markdownDescription: "**`string (CSS color)`** Color applied to blockquote `>` elements — typically the left border accent."
+  tab-active:
+    description: Active tab indicator color (underline or background).
+    markdownDescription: "**`string (CSS color)`** Color of the active tab indicator (usually the bottom border or background of the selected tab)."
+  tab-text:
+    description: Default text color of tab labels.
+    markdownDescription: "**`string (CSS color)`** Default text color of tab labels in `{% list tabs %}` blocks."
+  tab-text-hover:
+    description: Text color of tab labels on hover.
+    markdownDescription: "**`string (CSS color)`** Text color of tab labels when hovered."
+  link:
+    description: Default hyperlink color.
+    markdownDescription: "**`string (CSS color)`** Default color for hyperlinks (`<a>`)."
+  link-hover:
+    description: Hyperlink color on hover.
+    markdownDescription: "**`string (CSS color)`** Color for hyperlinks on hover/focus."
+  term-dfn-background:
+    description: Background color for term definition tooltip popups.
+    markdownDescription: "**`string (CSS color)`** Background of the tooltip popup shown when hovering over a defined term (`[*term]: definition`)."
+  code:
+    description: Text color inside fenced code blocks.
+    markdownDescription: "**`string (CSS color)`** Text color inside fenced code blocks (` ``` ` blocks)."
+  code-background:
+    description: Background color of fenced code blocks.
+    markdownDescription: "**`string (CSS color)`** Background color of fenced code blocks."
+  inline-code:
+    description: Text color of inline code spans.
+    markdownDescription: "**`string (CSS color)`** Text color of inline code spans (`` `code` ``)."
+  inline-code-background:
+    description: Background color of inline code spans.
+    markdownDescription: "**`string (CSS color)`** Background color of inline code spans (`` `code` ``)."
+  table:
+    description: Default text color inside tables.
+    markdownDescription: "**`string (CSS color)`** Default text color inside table cells."
+  table-row-background:
+    description: Alternating (zebra-stripe) row background in tables.
+    markdownDescription: "**`string (CSS color)`** Background color for alternating (even) rows in tables."
+  table-background:
+    description: Default table cell / header background.
+    markdownDescription: "**`string (CSS color)`** Default background for table cells and the table header row."
+  table-border:
+    description: Table border/grid line color.
+    markdownDescription: "**`string (CSS color)`** Color of table border lines and cell dividers."
+  mini-toc-border:
+    description: Border/accent line color of the mini table-of-contents sidebar.
+    markdownDescription: "**`string (CSS color)`** Left border color of the mini TOC (on-page heading navigator) sidebar."
+  mini-toc:
+    description: Default text color of mini TOC heading links.
+    markdownDescription: "**`string (CSS color)`** Default text color of links in the mini TOC sidebar."
+  mini-toc-hover:
+    description: Text color of mini TOC links on hover.
+    markdownDescription: "**`string (CSS color)`** Text color of mini TOC links on hover."
+  mini-toc-active:
+    description: Text color of the currently active mini TOC heading link.
+    markdownDescription: "**`string (CSS color)`** Text color of the currently-visible (active) heading link in the mini TOC."
+  mini-toc-active-border:
+    description: Accent border color for the active mini TOC heading link.
+    markdownDescription: "**`string (CSS color)`** Left border/indicator color for the active heading in the mini TOC sidebar."
+  light:
+    description: Color overrides applied only in light theme.
+    markdownDescription: "**`ColorProperties`** Color overrides applied **only in light theme**. Uses the same properties as the root level."
+    defaultSnippets:
+      - label: Light theme overrides
+        body:
+          base-background: "${1:#FFFFFF}"
+          text-primary: "${2:#22262E}"
+          base-brand: "${3:#005BFF}"
+  dark:
+    description: Color overrides applied only in dark theme.
+    markdownDescription: "**`ColorProperties`** Color overrides applied **only in dark theme**. Uses the same properties as the root level."
+    defaultSnippets:
+      - label: Dark theme overrides
+        body:
+          base-background: "${1:#22262E}"
+          text-primary: "${2:#FFFFFF}"
+          base-brand: "${3:#4DA3FF}"
+
+definitions:
+  ColorProperties:
+    description: Theme-specific color property overrides.
+    markdownDescription: "**`ColorProperties`** Color property overrides for a specific theme variant (light or dark). All values are CSS color expressions."
+    properties:
+      base-brand:
+        description: Primary brand color.
+        markdownDescription: "**`string (CSS color)`** Primary brand color for this theme variant."
+      base-selection:
+        description: Background for selected/active elements.
+        markdownDescription: "**`string (CSS color)`** Background of selected/active elements."
+      base-background:
+        description: Main page background.
+        markdownDescription: "**`string (CSS color)`** Main page background color."
+      text-primary:
+        description: Primary text color.
+        markdownDescription: "**`string (CSS color)`** Primary text color."
+      text-secondary:
+        description: Secondary/muted text color.
+        markdownDescription: "**`string (CSS color)`** Secondary (muted) text color."
+      base-simple-hover:
+        description: Hover background for interactive elements.
+        markdownDescription: "**`string (CSS color)`** Hover background for simple interactive elements."
+      line-generic:
+        description: Default border/divider color.
+        markdownDescription: "**`string (CSS color)`** Default border and divider color."
+      note-info-background:
+        description: Info note background.
+        markdownDescription: "**`string (CSS color)`** Background of info callout blocks."
+      note-tip-background:
+        description: Tip note background.
+        markdownDescription: "**`string (CSS color)`** Background of tip callout blocks."
+      note-warning-background:
+        description: Warning note background.
+        markdownDescription: "**`string (CSS color)`** Background of warning callout blocks."
+      note-important-background:
+        description: Important note background.
+        markdownDescription: "**`string (CSS color)`** Background of important callout blocks."
+      quote:
+        description: Blockquote color.
+        markdownDescription: "**`string (CSS color)`** Blockquote accent color."
+      tab-active:
+        description: Active tab indicator color.
+        markdownDescription: "**`string (CSS color)`** Active tab indicator."
+      tab-text:
+        description: Tab label text color.
+        markdownDescription: "**`string (CSS color)`** Tab label text."
+      tab-text-hover:
+        description: Tab label hover color.
+        markdownDescription: "**`string (CSS color)`** Tab label text on hover."
+      link:
+        description: Link color.
+        markdownDescription: "**`string (CSS color)`** Hyperlink color."
+      link-hover:
+        description: Link hover color.
+        markdownDescription: "**`string (CSS color)`** Hyperlink color on hover."
+      term-dfn-background:
+        description: Term definition tooltip background.
+        markdownDescription: "**`string (CSS color)`** Term definition tooltip background."
+      code:
+        description: Code block text color.
+        markdownDescription: "**`string (CSS color)`** Fenced code block text color."
+      code-background:
+        description: Code block background.
+        markdownDescription: "**`string (CSS color)`** Fenced code block background."
+      inline-code:
+        description: Inline code text color.
+        markdownDescription: "**`string (CSS color)`** Inline code span text color."
+      inline-code-background:
+        description: Inline code background.
+        markdownDescription: "**`string (CSS color)`** Inline code span background."
+      table:
+        description: Table text color.
+        markdownDescription: "**`string (CSS color)`** Table cell text color."
+      table-row-background:
+        description: Alternating table row background.
+        markdownDescription: "**`string (CSS color)`** Alternating table row background (zebra striping)."
+      table-background:
+        description: Table header/default cell background.
+        markdownDescription: "**`string (CSS color)`** Table header and default cell background."
+      table-border:
+        description: Table border color.
+        markdownDescription: "**`string (CSS color)`** Table border and cell divider color."
+      mini-toc-border:
+        description: Mini TOC sidebar border color.
+        markdownDescription: "**`string (CSS color)`** Mini TOC left border accent."
+      mini-toc:
+        description: Mini TOC link text color.
+        markdownDescription: "**`string (CSS color)`** Mini TOC link text."
+      mini-toc-hover:
+        description: Mini TOC link hover color.
+        markdownDescription: "**`string (CSS color)`** Mini TOC link text on hover."
+      mini-toc-active:
+        description: Active mini TOC link color.
+        markdownDescription: "**`string (CSS color)`** Active heading link in the mini TOC."
+      mini-toc-active-border:
+        description: Active mini TOC link border color.
+        markdownDescription: "**`string (CSS color)`** Active heading indicator border in the mini TOC."

@@ -1,0 +1,128 @@
+title: Diplodoc (.yfmlint)
+markdownDescription: >-
+  YFM lint configuration file (`.yfmlint`).
+
+  Controls which Markdown and YFM rules are enabled and at what severity level.
+
+  ```yaml
+  # Disable all rules by default, then enable only what you need
+  default: false
+  MD013: false       # line-length — disable
+  YFM003: warn       # unreachable-link — warn
+  YFM001:
+    level: error
+    maximum: 80      # inline code max length
+  ```
+properties:
+  default:
+    description: Default state for all rules. false disables all rules unless individually overridden.
+    markdownDescription: "**`boolean`** Default enabled state for **all** rules.\n\n- `true` — all rules are enabled at their default level unless overridden\n- `false` — all rules are disabled unless individually overridden\n\nUseful for an allowlist approach: set `default: false`, then enable only specific rules."
+  log-levels:
+    description: Override the log level for specific rules without changing their enabled state.
+    markdownDescription: "**`object`** Override the log/severity level for specific rules.\n\nLevels: `error` · `warn` · `info` · `disabled`\n\n```yaml\nlog-levels:\n  MD013: warn\n  YFM003: error\n```"
+  MD001:
+    description: "heading-increment: Heading levels should only increment by one level at a time."
+    markdownDescription: "**`RuleValue`** **MD001** `heading-increment` — Heading levels must only increment by one level at a time.\n\nBad: `## H2` followed immediately by `#### H4`."
+  MD002:
+    description: "first-heading-h1: First heading should be a top-level heading."
+    markdownDescription: "**`RuleValue`** **MD002** `first-heading-h1` — The first heading in a document must be a top-level `#` heading."
+  MD003:
+    description: "heading-style: Heading style should be consistent."
+    markdownDescription: "**`RuleValue`** **MD003** `heading-style` — Heading style must be consistent throughout the document (atx `#` or setext `===`)."
+  MD004:
+    description: "ul-style: Unordered list style should be consistent."
+    markdownDescription: "**`RuleValue`** **MD004** `ul-style` — Unordered list marker style must be consistent (`-`, `*`, or `+`)."
+  MD007:
+    description: "ul-indent: Unordered list indentation."
+    markdownDescription: "**`RuleValue`** **MD007** `ul-indent` — Unordered list items must be indented consistently."
+  MD013:
+    description: "line-length: Line length should not exceed a maximum."
+    markdownDescription: "**`RuleValue`** **MD013** `line-length` — Lines must not exceed the configured maximum length (default: 80).\n\nOften disabled in documentation projects."
+  MD022:
+    description: "blanks-around-headings: Headings should be surrounded by blank lines."
+    markdownDescription: "**`RuleValue`** **MD022** `blanks-around-headings` — Headings must have a blank line before and after them."
+  MD024:
+    description: "no-duplicate-heading: Multiple headings with the same content."
+    markdownDescription: "**`RuleValue`** **MD024** `no-duplicate-heading` — Document must not have multiple headings with identical text."
+  MD025:
+    description: "single-h1: Only one top-level heading per document."
+    markdownDescription: "**`RuleValue`** **MD025** `single-h1` — Each document should have exactly one `#` top-level heading."
+  MD033:
+    description: "no-inline-html: Inline HTML is controlled by allowHtml config."
+    markdownDescription: "**`RuleValue`** **MD033** `no-inline-html` — Raw HTML tags inside Markdown. Controlled automatically by the `allowHtml` build config."
+  MD040:
+    description: "fenced-code-language: Fenced code blocks should declare a language."
+    markdownDescription: "**`RuleValue`** **MD040** `fenced-code-language` — Fenced code blocks should specify a language for syntax highlighting.\n\n````md\n```javascript\nconst x = 1;\n```\n````"
+  MD041:
+    description: "first-line-h1: First line should be a top-level heading."
+    markdownDescription: "**`RuleValue`** **MD041** `first-line-h1` — The first line of the document should be a `#` heading.\n\nOften disabled when pages use frontmatter `title`."
+  YFM001:
+    description: "inline-code-length: Inline code span exceeds maximum length."
+    markdownDescription: "**`boolean | LogLevel | object`** **YFM001** `inline-code-length` — Inline code spans must not exceed the maximum character length.\n\nObject form lets you set `maximum`:\n```yaml\nYFM001:\n  level: warn\n  maximum: 100\n```"
+  YFM002:
+    description: "no-header-found-for-link: Link anchor references a heading that does not exist."
+    markdownDescription: "**`RuleValue`** **YFM002** `no-header-found-for-link` — Anchor fragments in links (e.g. `page.md#section`) must reference an existing heading."
+  YFM003:
+    description: "unreachable-link: Linked file does not exist or is not included in the TOC."
+    markdownDescription: "**`RuleValue`** **YFM003** `unreachable-link` — All internal links must point to files that exist **and** are reachable via the TOC."
+  YFM004:
+    description: "table-not-closed: YFM table block is missing a closing token."
+    markdownDescription: "**`RuleValue`** **YFM004** `table-not-closed` — Every `{% list type=... %}` table block must have a matching `{% endlist %}`."
+  YFM005:
+    description: "tab-list-not-closed: Tab list is missing a closing token."
+    markdownDescription: "**`RuleValue`** **YFM005** `tab-list-not-closed` — Every `{% list tabs %}` block must have a matching `{% endlist %}`."
+  YFM006:
+    description: "term-definition-duplicated: Same term is defined more than once."
+    markdownDescription: "**`RuleValue`** **YFM006** `term-definition-duplicated` — Each term (`[*key]: ...`) must be defined only once per file."
+  YFM007:
+    description: "term-used-without-definition: Term is referenced but never defined."
+    markdownDescription: "**`RuleValue`** **YFM007** `term-used-without-definition` — Every term reference (`{[key]}`) must have a corresponding definition."
+  YFM008:
+    description: "term-inside-definition-not-allowed: Term reference inside its own definition."
+    markdownDescription: "**`RuleValue`** **YFM008** `term-inside-definition-not-allowed` — A term definition must not reference itself."
+  YFM009:
+    description: "no-term-definition-in-content: Term definitions must be at the end of the file."
+    markdownDescription: "**`RuleValue`** **YFM009** `no-term-definition-in-content` — Term definitions (`[*key]: ...`) must appear at the **end** of the file, after all content."
+  YFM010:
+    description: "unreachable-autotitle-anchor: Auto-generated title anchor is unreachable."
+    markdownDescription: "**`RuleValue`** **YFM010** `unreachable-autotitle-anchor` — An auto-generated heading anchor is not reachable via any link in the project."
+  YFM011:
+    description: "max-svg-size: SVG file exceeds the maximum allowed file size."
+    markdownDescription: "**`RuleValue`** **YFM011** `max-svg-size` — SVG assets must not exceed the configured size limit (from `content.maxInlineSvgSize`)."
+  YFM012:
+    description: "max-html-size: Output HTML file size exceeds the limit."
+    markdownDescription: "**`RuleValue`** **YFM012** `max-html-size` — Generated HTML page must not exceed the configured size limit (from `content.maxHtmlSize`)."
+    doNotSuggest: true
+  YFM013:
+    description: "max-asset-size: Single asset file size exceeds the limit."
+    markdownDescription: "**`RuleValue`** **YFM013** `max-asset-size` — Asset files must not exceed the configured size limit (from `content.maxAssetSize`)."
+    doNotSuggest: true
+  YFM014:
+    description: "anchor-as-filepath: Anchor used as file path in an include directive."
+    markdownDescription: "**`RuleValue`** **YFM014** `anchor-as-filepath` *(build-time)* — A `#anchor` fragment was mistakenly used as a file path in an `{% include %}` directive."
+    doNotSuggest: true
+  YFM015:
+    description: "anchor-not-found: Anchor referenced in an include was not found."
+    markdownDescription: "**`RuleValue`** **YFM015** `anchor-not-found` *(build-time)* — The anchor fragment specified in an include was not found in the target file."
+    doNotSuggest: true
+  YFM016:
+    description: "self-include: A file includes itself."
+    markdownDescription: "**`RuleValue`** **YFM016** `self-include` *(build-time)* — A file must not include itself (circular include)."
+    doNotSuggest: true
+  YFM017:
+    description: "invalid-frontmatter: Frontmatter block has invalid YAML (e.g. duplicated keys)."
+    markdownDescription: "**`RuleValue`** **YFM017** `invalid-frontmatter` *(build-time)* — The frontmatter YAML block contains invalid syntax (e.g. duplicate mapping keys)."
+    doNotSuggest: true
+
+definitions:
+  LogLevel:
+    description: "Rule severity level: error | warn | info | disabled."
+    markdownDescription: "**`string`** Rule severity level."
+    markdownEnumDescriptions:
+      - "**error** — rule violation causes the build to fail (exit code 1)."
+      - "**warn** — rule violation is reported but the build succeeds."
+      - "**info** — rule violation is logged as information only."
+      - "**disabled** — rule is completely silenced."
+  RuleValue:
+    description: "Rule value: true/false, a log level string, or an object with level and rule-specific options."
+    markdownDescription: "**`boolean | LogLevel | object`** Rule configuration.\n\n- `true` — enable at default level\n- `false` — disable\n- `'error'` / `'warn'` / `'info'` / `'disabled'` — set level\n- Object — set level plus rule-specific options:\n  ```yaml\n  level: warn\n  # rule-specific options here\n  ```"

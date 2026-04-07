@@ -59,10 +59,12 @@
       {
         "id": "yaml",
         "filenames": [
-          ".yfm"
+          ".yfm",
+          ".yfmlint"
         ],
         "extensions": [
-          ".yfm"
+          ".yfm",
+          ".yfmlint"
         ]
       }
     ],
@@ -78,6 +80,22 @@
       {
         "fileMatch": "**/.yfm.yaml",
         "url": "./schemas/yfm-schema.json"
+      },
+      {
+        "fileMatch": "**/presets.yaml",
+        "url": "./schemas/presets-schema.json"
+      },
+      {
+        "fileMatch": "**/redirects.yaml",
+        "url": "./schemas/redirects-schema.json"
+      },
+      {
+        "fileMatch": "**/.yfmlint",
+        "url": "./schemas/yfmlint-schema.json"
+      },
+      {
+        "fileMatch": "**/index.yaml",
+        "url": "./schemas/leading-schema.json"
       }
     ],
     "menus": {
@@ -121,7 +139,8 @@
     "watch:ext": "BUILD_TARGET=ext node esbuild.js --watch",
     "watch:webview": "BUILD_TARGET=webview node esbuild.js --watch",
     "typecheck": "tsc -p . --noEmit",
-    "vsce": "vsce package --no-dependencies"
+    "vsce": "vsce package --no-dependencies",
+    "merge-schemas": "node scripts/merge-schemas.js"
   },
   "dependencies": {
     "@diplodoc/latex-extension": "^1.4.1",

@@ -3,3 +3,7 @@ allowHtml: true
 neuroExpert:
     projectId:
         default: rrrr
+
+interface:
+    toc: true
+  

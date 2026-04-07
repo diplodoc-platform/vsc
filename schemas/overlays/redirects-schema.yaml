@@ -1,0 +1,44 @@
+title: Diplodoc (redirects.yaml)
+markdownDescription: >-
+  Diplodoc redirects file (`redirects.yaml`).
+
+  Defines URL redirects that are applied during the `publish` step.
+  Each redirect maps a set of old paths to a new path.
+
+  ```yaml
+  # Simple redirect
+  old/path.md:
+    - from: old/path.html
+      to: new/path.html
+
+  # VCS-based redirects (track file renames via Git history)
+  vcs: true
+  ```
+
+properties:
+  vcs:
+    description: "Enable VCS-based redirect tracking (detects renames from Git history)."
+    markdownDescription: "**`boolean | VcsConfig`** Enable VCS-based redirect generation.\n\n- `true` — track file renames using the full Git commit history\n- Object — enable with a specific `initialCommit` as the history start point\n\n```yaml\nvcs:\n  initialCommit: abc1234\n```"
+    defaultSnippets:
+      - label: VCS redirects with initial commit
+        body:
+          initialCommit: "${1:abc1234def5678}"
+
+definitions:
+  VcsConfig:
+    description: VCS redirect tracking configuration.
+    markdownDescription: "**`VcsConfig`** VCS-based redirect tracking configuration."
+    properties:
+      initialCommit:
+        description: Commit SHA used as the start of the Git history scan for renames.
+        markdownDescription: "**`string`** Git commit SHA to use as the starting point when scanning history for file renames. Commits older than this are ignored."
+  Redirect:
+    description: A single redirect rule mapping an old URL path to a new one.
+    markdownDescription: "**`Redirect`** A single URL redirect rule.\n\nBoth `from` and `to` are paths relative to the documentation root (without leading `/`)."
+    properties:
+      from:
+        description: Old URL path to redirect from (relative, without leading slash).
+        markdownDescription: "**`string`** Old URL path to redirect **from** (e.g. `old/page.html`). Relative to the docs root, without a leading `/`."
+      to:
+        description: New URL path to redirect to (relative, without leading slash).
+        markdownDescription: "**`string`** New URL path to redirect **to** (e.g. `new/page.html`). Relative to the docs root, without a leading `/`."
