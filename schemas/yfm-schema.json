@@ -1,609 +1,628 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Diplodoc configuration file schema (.yfm)",
-  "description": "Configuration file for Diplodoc documentation builder (.yfm or .yfm.yaml)",
-  "markdownDescription": "Configuration file for Diplodoc documentation builder (`.yfm` or `.yfm.yaml`)",
+  "title": "Diplodoc (.yfm)",
   "type": "object",
-  "additionalProperties": false,
   "properties": {
     "input": {
       "type": "string",
-      "description": "string. Path to input directory with documentation sources.",
-      "markdownDescription": "**`string`** Path to input directory with documentation sources."
+      "description": "Path to input directory with documentation sources.",
+      "markdownDescription": "**`string`** Path to the directory containing documentation sources (`.md` files, `toc.yaml`, `presets.yaml`, etc.)."
     },
     "output": {
       "type": "string",
-      "description": "string. Path to output directory for build artifacts.",
-      "markdownDescription": "**`string`** Path to output directory for build artifacts."
+      "description": "Path to output directory for build artifacts.",
+      "markdownDescription": "**`string`** Path to the directory where build artifacts are written."
     },
     "quiet": {
       "type": "boolean",
-      "description": "boolean. Suppress stdout logs.",
-      "markdownDescription": "**`boolean`** Suppress stdout logs."
+      "description": "Suppress stdout logs.",
+      "markdownDescription": "**`boolean`** Suppress all stdout log output during the build."
     },
     "strict": {
       "type": "boolean",
-      "description": "boolean. Exit with non-zero code on errors or warnings.",
-      "markdownDescription": "**`boolean`** Exit with non-zero code on errors or warnings."
+      "description": "Exit with non-zero code on errors or warnings.",
+      "markdownDescription": "**`boolean`** Exit with a non-zero code if any errors **or warnings** are emitted during the build."
     },
     "jobs": {
       "type": "integer",
       "minimum": 0,
-      "description": "integer (>=0). Number of parallel worker threads. 0 means single-threaded, omitted value uses cpus-1.",
-      "markdownDescription": "**`integer (>=0)`** Number of parallel worker threads.\n\n- `0` — single-threaded\n- omitted — uses `cpus - 1`"
+      "description": "Number of parallel worker threads. 0 means single-threaded, omitted value uses cpus-1.",
+      "markdownDescription": "**`integer (≥0)`** Number of parallel worker threads.\n\n- `0` — single-threaded (no workers)\n- omitted — uses `CPU count − 1`"
     },
     "workerMaxOldSpace": {
       "type": "integer",
       "minimum": 0,
-      "description": "integer (>=0). Max old space size for worker threads in megabytes.",
-      "markdownDescription": "**`integer (>=0)`** Max old space size for worker threads in megabytes."
+      "description": "Max old space size for worker threads in megabytes.",
+      "markdownDescription": "**`integer`** Maximum V8 old-space heap size (in **megabytes**) for each worker thread."
     },
     "config": {
       "type": "string",
-      "description": "string. Path to an alternative config file.",
-      "markdownDescription": "**`string`** Path to an alternative config file."
+      "description": "Path to an alternative config file.",
+      "markdownDescription": "**`string`** Path to an alternative config file. Useful for environment-specific overrides."
     },
     "copyOnWrite": {
       "type": "boolean",
-      "description": "boolean. Use COPYFILE_FICLONE flag for file copying.",
-      "markdownDescription": "**`boolean`** Use `COPYFILE_FICLONE` flag for file copying."
+      "description": "Use COPYFILE_FICLONE flag for file copying.",
+      "markdownDescription": "**`boolean`** Use `COPYFILE_FICLONE` (copy-on-write / reflinks) when copying files. Faster on supported filesystems (APFS, Btrfs)."
     },
     "originAsInput": {
       "type": "boolean",
-      "description": "boolean. Allow modifying the input directory in-place.",
-      "markdownDescription": "**`boolean`** Allow modifying the input directory in-place."
+      "description": "Allow modifying the input directory in-place.",
+      "markdownDescription": "**`boolean`** Allow the build to modify the `input` directory in-place (used in `md` output mode)."
     },
     "lang": {
       "type": "string",
-      "description": "string. Default language code (e.g. 'en', 'ru').",
-      "markdownDescription": "**`string`** Default language code.\n\nExamples: `en`, `ru`."
+      "description": "Default language code.",
+      "markdownDescription": "**`string`** Default language code for the documentation (ISO 639-1, e.g. `en`, `ru`)."
     },
     "langs": {
       "type": "array",
       "items": {
         "$ref": "#/definitions/LangItem"
       },
-      "description": "LangItem[]. Languages supported by the documentation project. Each item is a language code string or an extended object.",
-      "markdownDescription": "**`LangItem[]`** Languages supported by the documentation project.\n\nEach item is a language code string or an extended `LangItem` object."
+      "description": "Languages supported by the documentation project. Each item is a language code string or an extended object.",
+      "markdownDescription": "**`LangItem[]`** All languages supported by the project. Used to generate language-switcher links.\n\nEach item is a language code string or an extended object:\n```yaml\nlangs:\n  - en\n  - ru\n  - lang: zh\n    tld: .cn\n```"
     },
     "outputFormat": {
       "type": "string",
-      "enum": ["html", "md"],
-      "description": "string (enum). Output format: 'html' or 'md'.",
-      "markdownDescription": "**`string (enum)`** Output format.\n\n| Value | Description |\n|---|---|\n| `html` | Render to static HTML |\n| `md` | Render to enriched Markdown with metadata |"
+      "enum": [
+        "html",
+        "md"
+      ],
+      "description": "Output format. html — render to static HTML. md — render to enriched Markdown with metadata.",
+      "markdownDescription": "**`'html' | 'md'`** Output format for the build.",
+      "markdownEnumDescriptions": [
+        "**html** — render to a fully static HTML site (default).",
+        "**md** — render to enriched Markdown with injected metadata (for further processing or translation)."
+      ]
     },
     "varsPreset": {
       "type": "string",
-      "description": "string. Name of the variables preset from presets.yaml. Merged with the 'default' section.",
-      "markdownDescription": "**`string`** Name of the variables preset from `presets.yaml`. Merged with the `default` section."
+      "description": "Name of the variables preset from presets.yaml. Merged with the \"default\" section.",
+      "markdownDescription": "**`string`** Name of a preset from `presets.yaml` to activate.\n\nThe named preset is deep-merged with the `default` preset."
     },
     "vars": {
       "type": "object",
-      "description": "object. Template variables passed directly to the build. Overrides matching keys from presets.yaml.",
-      "markdownDescription": "**`object`** Template variables passed directly to the build. Overrides matching keys from `presets.yaml`.",
-      "additionalProperties": true
+      "description": "Template variables passed directly to the build. Overrides matching keys from presets.yaml.",
+      "markdownDescription": "**`object`** Template variables passed directly to the build. Overrides matching keys from `presets.yaml`.\n\n```yaml\nvars:\n  version: '2.0'\n  env: production\n```"
     },
     "allowHTML": {
       "type": "boolean",
-      "description": "boolean. Allow raw HTML inside Markdown files. Deprecated: Use allowHtml instead.",
-      "markdownDescription": "**`boolean`** Allow raw HTML inside Markdown files.\n\n> ⚠️ **Deprecated:** Use `allowHtml` instead.",
-      "deprecationMessage": "Use allowHtml instead."
+      "description": "Allow raw HTML inside Markdown files (legacy alias for allowHtml).",
+      "markdownDescription": "**`boolean`** *(legacy alias)* Allow raw HTML inside Markdown files. Prefer `allowHtml`.",
+      "deprecationMessage": "Deprecated: use allowHtml instead."
     },
     "allowHtml": {
       "type": "boolean",
-      "description": "boolean. Allow raw HTML inside Markdown files.",
-      "markdownDescription": "**`boolean`** Allow raw HTML inside Markdown files."
+      "description": "Allow raw HTML inside Markdown files.",
+      "markdownDescription": "**`boolean`** Allow raw HTML tags inside Markdown files. When `false` (default), HTML tags are escaped."
     },
     "sanitizeHtml": {
       "type": "boolean",
-      "description": "boolean. Sanitize transformed HTML output. Slow but more secure.",
-      "markdownDescription": "**`boolean`** Sanitize transformed HTML output. Slow but more secure."
+      "description": "Sanitize transformed HTML output. Slow but more secure.",
+      "markdownDescription": "**`boolean`** Run the generated HTML through an HTML sanitizer. Slower but removes potentially dangerous markup."
     },
     "sanitizeOptions": {
       "type": "object",
-      "description": "object. Sanitizer configuration options (passed to the HTML sanitizer).",
-      "markdownDescription": "**`object`** Sanitizer configuration options (passed to the HTML sanitizer).",
-      "additionalProperties": true
+      "description": "Sanitizer configuration options (passed to the HTML sanitizer).",
+      "additionalProperties": true,
+      "markdownDescription": "**`object`** Options passed to the HTML sanitizer (when `sanitizeHtml: true`). See the sanitizer's documentation for available keys."
     },
     "linkifyTlds": {
       "oneOf": [
         {
-          "type": "string",
-          "description": "string. Single TLD for the linkify plugin.",
-          "markdownDescription": "**`string`** Single TLD for the linkify plugin."
+          "type": "string"
         },
         {
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "description": "string[]. Array of TLDs for the linkify plugin.",
-          "markdownDescription": "**`string[]`** Array of TLDs for the linkify plugin."
+          }
         }
       ],
-      "description": "string | string[]. TLD configuration for the linkify plugin.",
-      "markdownDescription": "**`string | string[]`** TLD configuration for the linkify plugin."
+      "description": "TLD configuration for the linkify plugin.",
+      "markdownDescription": "**`string | string[]`** Additional TLDs recognized by the linkify plugin as auto-link candidates.\n\nExample: `['.internal', '.corp']`"
     },
     "ignore": {
       "type": "array",
       "items": {
         "type": "string"
       },
-      "description": "string[]. Glob patterns for paths to exclude from processing.",
-      "markdownDescription": "**`string[]`** Glob patterns for paths to exclude from processing."
+      "description": "Glob patterns for paths to exclude from processing.",
+      "markdownDescription": "**`string[]`** Glob patterns for files/directories to exclude from processing.\n\n```yaml\nignore:\n  - '**/draft/**'\n  - '**/*.tmp.md'\n```"
     },
     "ignoreStage": {
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["new", "preview", "tech-preview", "skip"]
+        "enum": [
+          "new",
+          "preview",
+          "tech-preview",
+          "skip"
+        ],
+        "markdownEnumDescriptions": [
+          "Exclude pages tagged `new`.",
+          "Exclude pages tagged `preview`.",
+          "Exclude pages tagged `tech-preview`.",
+          "Exclude pages tagged `skip` (already excluded by default)."
+        ]
       },
-      "description": "string[]. TOC stages to exclude from the build. Values: 'new', 'preview', 'tech-preview', 'skip'.",
-      "markdownDescription": "**`string[]`** TOC stages to exclude from the build.\n\nAllowed values: `new`, `preview`, `tech-preview`, `skip`."
+      "description": "TOC stages to exclude from the build.",
+      "markdownDescription": "**`string[]`** TOC `stage` values to exclude from the build.\n\nExample: `['new', 'preview']` — only ship stable pages."
     },
     "staticContent": {
       "type": "boolean",
-      "description": "boolean. Allow loading custom resources into statically generated pages.",
-      "markdownDescription": "**`boolean`** Allow loading custom resources into statically generated pages."
+      "description": "Allow loading custom resources into statically generated pages.",
+      "markdownDescription": "**`boolean`** Allow custom resources (`script`, `style`) to be injected in static output mode."
     },
     "addSystemMeta": {
       "type": "boolean",
-      "description": "boolean. Include system variables from presets in file metadata.",
-      "markdownDescription": "**`boolean`** Include system variables from presets in file metadata."
+      "description": "Include system variables from presets in file metadata.",
+      "markdownDescription": "**`boolean`** Inject preset variables into each page's `__system` metadata field."
     },
     "addMapFile": {
       "type": "boolean",
-      "description": "boolean. Write all documentation paths to file.json. Deprecated: Use buildManifest instead.",
-      "markdownDescription": "**`boolean`** Write all documentation paths to `file.json`.\n\n> ⚠️ **Deprecated:** Use `buildManifest` instead.",
-      "deprecationMessage": "Use buildManifest instead."
+      "description": "Write all documentation paths to file.json.",
+      "deprecated": "Use buildManifest instead.",
+      "markdownDescription": "**`boolean`** *(deprecated)* Write all documentation paths to `file.json`.",
+      "deprecationMessage": "Deprecated: use buildManifest instead.",
+      "doNotSuggest": true
     },
     "addAlternateMeta": {
       "type": "boolean",
-      "description": "boolean. Add alternate and canonical meta tags to pages.",
-      "markdownDescription": "**`boolean`** Add `alternate` and `canonical` meta tags to pages."
+      "description": "Add alternate and canonical meta tags to pages.",
+      "markdownDescription": "**`boolean`** Emit `<link rel=\"alternate\">` and `<link rel=\"canonical\">` meta tags."
     },
     "supportGithubAnchors": {
       "type": "boolean",
-      "description": "boolean. Use GitHub-compatible heading anchor format.",
-      "markdownDescription": "**`boolean`** Use GitHub-compatible heading anchor format."
+      "description": "Use GitHub-compatible heading anchor format.",
+      "markdownDescription": "**`boolean`** Generate GitHub-compatible heading anchors (lowercase, hyphens) in addition to standard anchors."
     },
     "breaks": {
       "type": "boolean",
-      "description": "boolean. Treat single newlines in Markdown as hard line breaks.",
-      "markdownDescription": "**`boolean`** Treat single newlines in Markdown as hard line breaks."
+      "description": "Treat single newlines in Markdown as hard line breaks.",
+      "markdownDescription": "**`boolean`** Treat single newlines in Markdown as `<br>` hard line breaks (CommonMark 'breaks' option)."
     },
     "linkify": {
       "type": "boolean",
-      "description": "boolean. Automatically convert URL-like text to links.",
-      "markdownDescription": "**`boolean`** Automatically convert URL-like text to links."
+      "description": "Automatically convert URL-like text to links.",
+      "markdownDescription": "**`boolean`** Automatically convert plain URL-like text into clickable `<a>` links."
     },
     "vcs": {
       "oneOf": [
         {
-          "type": "boolean",
-          "description": "boolean. Enable or disable VCS integration.",
-          "markdownDescription": "**`boolean`** Enable or disable VCS integration."
+          "type": "boolean"
         },
         {
           "type": "object",
           "properties": {
             "enabled": {
-              "type": "boolean",
-              "description": "boolean. Enable or disable VCS integration.",
-              "markdownDescription": "**`boolean`** Enable or disable VCS integration."
+              "type": "boolean"
             },
             "endpoint": {
               "type": "string",
-              "description": "string. VCS provider API endpoint (from github-vcs / arcadia-vcs).",
-              "markdownDescription": "**`string`** VCS provider API endpoint (from `github-vcs` / `arcadia-vcs`)."
+              "description": "VCS provider API endpoint (from github-vcs / arcadia-vcs).",
+              "markdownDescription": "**`string`** VCS provider API endpoint (from github-vcs / arcadia-vcs)."
             },
             "owner": {
               "type": "string",
-              "description": "string. Repository owner (from github-vcs).",
-              "markdownDescription": "**`string`** Repository owner (from `github-vcs`)."
+              "description": "Repository owner (from github-vcs).",
+              "markdownDescription": "**`string`** Repository owner (from github-vcs)."
             },
             "repo": {
               "type": "string",
-              "description": "string. Repository name (from github-vcs).",
-              "markdownDescription": "**`string`** Repository name (from `github-vcs`)."
+              "description": "Repository name (from github-vcs).",
+              "markdownDescription": "**`string`** Repository name (from github-vcs)."
             },
             "branch": {
               "type": "string",
-              "description": "string. Default branch (from github-vcs).",
-              "markdownDescription": "**`string`** Default branch (from `github-vcs`)."
+              "description": "Default branch (from github-vcs).",
+              "markdownDescription": "**`string`** Default branch (from github-vcs)."
             },
             "initialCommit": {
               "type": "string",
-              "description": "string. Initial commit SHA for redirect tracking (from github-vcs / arcadia-vcs).",
-              "markdownDescription": "**`string`** Initial commit SHA for redirect tracking (from `github-vcs` / `arcadia-vcs`)."
+              "description": "Initial commit SHA for redirect tracking (from github-vcs / arcadia-vcs).",
+              "markdownDescription": "**`string`** Initial commit SHA for redirect tracking (from github-vcs / arcadia-vcs)."
             },
             "scopes": {
               "type": "array",
               "items": {
                 "type": "string"
               },
-              "description": "string[]. VCS scopes (from arcadia-vcs).",
-              "markdownDescription": "**`string[]`** VCS scopes (from `arcadia-vcs`)."
+              "description": "VCS scopes (from arcadia-vcs).",
+              "markdownDescription": "**`string[]`** VCS scopes (from arcadia-vcs)."
             }
           },
-          "additionalProperties": true,
-          "description": "object. VCS connector configuration.",
-          "markdownDescription": "**`object`** VCS connector configuration. Accepts extension-specific fields."
+          "additionalProperties": true
         }
       ],
-      "description": "boolean | object. Enable or disable the VCS connector.",
-      "markdownDescription": "**`boolean | object`** Enable or disable the VCS connector. Object form accepts extension-specific fields."
+      "description": "Enable or disable the VCS connector. Object form accepts extension-specific fields.",
+      "markdownDescription": "**`boolean | object`** Version control system connector.\n\n- `false` — disable VCS integration\n- `true` — enable with defaults\n- Object — explicit settings:\n  - `enabled` **`boolean`**\n  - `endpoint` **`string`** — API endpoint URL\n  - `owner` **`string`** — repository owner (GitHub)\n  - `repo` **`string`** — repository name (GitHub)\n  - `branch` **`string`** — default branch\n  - `initialCommit` **`string`** — SHA for redirect tracking\n  - `scopes` **`string[]`** — VCS scopes (Arcadia)",
+      "defaultSnippets": [
+        {
+          "label": "GitHub VCS config",
+          "body": {
+            "enabled": true,
+            "endpoint": "${1:https://api.github.com}",
+            "owner": "${2:my-org}",
+            "repo": "${3:my-repo}",
+            "branch": "${4:main}"
+          }
+        }
+      ]
     },
     "vcsToken": {
       "type": "string",
-      "description": "string. VCS access token. WARNING: Do not store secrets in the config file.",
-      "markdownDescription": "**`string`** VCS access token.\n\n> ⚠️ **WARNING:** Do not store secrets in the config file. Use environment variables or CLI arguments instead."
+      "sensitive": true,
+      "description": "VCS access token. WARNING: Do not store secrets in the config file. Use environment variables or CLI arguments instead.",
+      "markdownDescription": "**`string`** ⚠️ VCS access token.\n\n> **WARNING:** Do not store secrets in the config file. Use environment variables or CLI `--vcs-token` argument instead."
     },
     "vcsPath": {
       "$ref": "#/definitions/Toggleable",
-      "description": "boolean | Toggleable. Show the VCS file path in the page header.",
-      "markdownDescription": "**`boolean | Toggleable`** Show the VCS file path in the page header."
+      "description": "Show the VCS file path in the page header.",
+      "markdownDescription": "**`boolean | {enabled: boolean}`** Show the VCS file path (\"Edit on GitHub\" link) in the page header."
     },
     "mtimes": {
       "$ref": "#/definitions/Toggleable",
-      "description": "boolean | Toggleable. Collect file modification timestamps from VCS.",
-      "markdownDescription": "**`boolean | Toggleable`** Collect file modification timestamps from VCS."
+      "description": "Collect file modification timestamps from VCS.",
+      "markdownDescription": "**`boolean | {enabled: boolean}`** Collect file modification timestamps from VCS for the \"Last updated\" footer."
     },
     "authors": {
       "oneOf": [
         {
-          "type": "boolean",
-          "description": "boolean. Enable or disable author collection.",
-          "markdownDescription": "**`boolean`** Enable or disable author collection."
+          "type": "boolean"
         },
         {
           "type": "object",
           "properties": {
             "enabled": {
-              "type": "boolean",
-              "description": "boolean. Enable or disable author collection.",
-              "markdownDescription": "**`boolean`** Enable or disable author collection."
+              "type": "boolean"
             },
             "ignore": {
               "type": "array",
               "items": {
                 "type": "string"
-              },
-              "description": "string[]. List of author login patterns to ignore.",
-              "markdownDescription": "**`string[]`** List of author login patterns to ignore."
+              }
             }
           },
-          "additionalProperties": false,
-          "description": "object. Author collection configuration.",
-          "markdownDescription": "**`object`** Author collection configuration."
+          "additionalProperties": false
         }
       ],
-      "description": "boolean | object. Collect per-file authors from VCS.",
-      "markdownDescription": "**`boolean | object`** Collect per-file authors from VCS."
+      "description": "Collect per-file authors from VCS.",
+      "markdownDescription": "**`boolean | object`** Collect per-file author information from VCS commit history."
     },
     "contributors": {
       "oneOf": [
         {
-          "type": "boolean",
-          "description": "boolean. Enable or disable contributor collection.",
-          "markdownDescription": "**`boolean`** Enable or disable contributor collection."
+          "type": "boolean"
         },
         {
           "type": "object",
           "properties": {
             "enabled": {
-              "type": "boolean",
-              "description": "boolean. Enable or disable contributor collection.",
-              "markdownDescription": "**`boolean`** Enable or disable contributor collection."
+              "type": "boolean"
             },
             "ignore": {
               "type": "array",
               "items": {
                 "type": "string"
-              },
-              "description": "string[]. List of contributor login patterns to ignore.",
-              "markdownDescription": "**`string[]`** List of contributor login patterns to ignore."
+              }
             }
           },
-          "additionalProperties": false,
-          "description": "object. Contributor collection configuration.",
-          "markdownDescription": "**`object`** Contributor collection configuration."
+          "additionalProperties": false
         }
       ],
-      "description": "boolean | object. Collect per-file contributors from VCS.",
-      "markdownDescription": "**`boolean | object`** Collect per-file contributors from VCS."
+      "description": "Collect per-file contributors from VCS.",
+      "markdownDescription": "**`boolean | object`** Collect per-file contributor list from VCS commit history."
     },
     "template": {
       "oneOf": [
         {
-          "type": "boolean",
-          "description": "boolean. Enable or disable the Liquid template engine.",
-          "markdownDescription": "**`boolean`** Enable or disable the Liquid template engine."
+          "type": "boolean"
         },
         {
-          "$ref": "#/definitions/TemplateConfig",
-          "description": "TemplateConfig. Liquid template engine configuration.",
-          "markdownDescription": "**`TemplateConfig`** Liquid template engine configuration."
+          "$ref": "#/definitions/TemplateConfig"
         }
       ],
-      "description": "boolean | TemplateConfig. Configure the Liquid template engine.",
-      "markdownDescription": "**`boolean | TemplateConfig`** Configure the Liquid template engine."
+      "description": "Configure the Liquid template engine.",
+      "markdownDescription": "**`boolean | TemplateConfig`** Configure the Liquid template engine.\n\n- `false` — disable templating entirely\n- Object — fine-grained control over features and scopes",
+      "defaultSnippets": [
+        {
+          "label": "Template engine config",
+          "body": {
+            "enabled": true,
+            "features": {
+              "substitutions": true,
+              "conditions": true,
+              "cycles": true
+            },
+            "scopes": {
+              "text": true,
+              "code": false
+            }
+          }
+        }
+      ]
     },
     "lint": {
       "oneOf": [
         {
-          "type": "boolean",
-          "description": "boolean. Enable or disable YFM linting.",
-          "markdownDescription": "**`boolean`** Enable or disable YFM linting."
+          "type": "boolean"
         },
         {
-          "$ref": "#/definitions/LintConfig",
-          "description": "LintConfig. YFM lint configuration.",
-          "markdownDescription": "**`LintConfig`** YFM lint configuration."
+          "$ref": "#/definitions/LintConfig"
         }
       ],
-      "description": "boolean | LintConfig. Configure YFM linting during build.",
-      "markdownDescription": "**`boolean | LintConfig`** Configure YFM linting during build."
+      "description": "Configure YFM linting during build.",
+      "markdownDescription": "**`boolean | LintConfig`** Configure YFM linting during the build.\n\n- `false` — disable linting\n- Object — enable with custom config path or inline rules",
+      "defaultSnippets": [
+        {
+          "label": "Lint with config file",
+          "body": {
+            "enabled": true,
+            "config": "${1:.yfmlint}"
+          }
+        }
+      ]
     },
     "extensions": {
       "type": "array",
       "items": {
         "$ref": "#/definitions/ExtensionItem"
       },
-      "description": "ExtensionItem[]. External extensions loaded on startup.",
-      "markdownDescription": "**`ExtensionItem[]`** External extensions loaded on startup. Each item is a package name string or an object with `name` and options."
+      "description": "External extensions loaded on startup. Each item is a package name or an object with name and options.",
+      "markdownDescription": "**`ExtensionItem[]`** External extensions loaded at build startup.\n\nEach item is an npm package name or an object with `name` and options:\n```yaml\nextensions:\n  - '@diplodoc/openapi-extension'\n  - name: my-extension\n    option: value\n```"
     },
     "interface": {
       "type": "object",
       "properties": {
         "toc": {
           "type": "boolean",
-          "description": "boolean. Show the table of contents sidebar.",
-          "markdownDescription": "**`boolean`** Show the table of contents sidebar."
+          "description": "Show the table of contents sidebar.",
+          "markdownDescription": "**`boolean`** Show (`true`) or hide (`false`) the table-of-contents sidebar globally."
         },
         "toc-header": {
           "type": "boolean",
-          "description": "boolean. Show the TOC header section.",
-          "markdownDescription": "**`boolean`** Show the TOC header section."
+          "description": "Show the TOC header section.",
+          "markdownDescription": "**`boolean`** Show (`true`) or hide (`false`) the TOC header section globally."
         },
         "search": {
           "type": "boolean",
-          "description": "boolean. Show the search input.",
-          "markdownDescription": "**`boolean`** Show the search input."
+          "description": "Show the search input.",
+          "markdownDescription": "**`boolean`** Show (`true`) or hide (`false`) the search input globally."
         },
         "feedback": {
           "type": "boolean",
-          "description": "boolean. Show feedback controls (likes / dislikes).",
-          "markdownDescription": "**`boolean`** Show feedback controls (likes / dislikes)."
+          "description": "Show feedback controls (likes / dislikes).",
+          "markdownDescription": "**`boolean`** Show (`true`) or hide (`false`) the like/dislike feedback widget globally."
         },
         "favicon-src": {
           "type": "string",
-          "description": "string. URL to a custom favicon.",
-          "markdownDescription": "**`string`** URL to a custom favicon."
+          "description": "URL to a custom favicon.",
+          "markdownDescription": "**`string`** Default favicon URL for all pages."
         }
       },
-      "additionalProperties": true,
-      "description": "object. Viewer interface visibility flags.",
-      "markdownDescription": "**`object`** Viewer interface visibility flags."
+      "additionalProperties": false,
+      "description": "Viewer interface visibility flags.",
+      "markdownDescription": "**`object`** Global UI visibility flags. Per-page `interface` frontmatter overrides these values.\n\nAvailable fields:\n- `toc` — show/hide the sidebar\n- `toc-header` — show/hide the TOC header section\n- `search` — show/hide the search input\n- `feedback` — show/hide like/dislike controls\n- `favicon-src` — custom favicon URL"
     },
     "feedbackUrl": {
       "type": "string",
       "format": "uri",
-      "description": "string (uri). URL endpoint for feedback submission.",
-      "markdownDescription": "**`string (uri)`** URL endpoint for feedback submission."
+      "description": "URL endpoint for feedback submission.",
+      "markdownDescription": "**`string (uri)`** URL endpoint that receives feedback submissions (POST). Used by the feedback widget."
     },
     "resources": {
       "$ref": "#/definitions/Resources",
-      "description": "Resources. Custom scripts, styles, and CSP directives.",
-      "markdownDescription": "**`Resources`** Custom scripts, styles, and CSP directives."
+      "description": "Custom scripts, styles, and CSP directives.",
+      "markdownDescription": "**`Resources`** Custom scripts, stylesheets, and CSP directives injected into every page.\n\n```yaml\nresources:\n  style:\n    - _assets/custom.css\n  script:\n    - _assets/custom.js\n```"
     },
     "allowCustomResources": {
       "type": "boolean",
-      "description": "boolean. Allow loading custom resources in static output mode.",
-      "markdownDescription": "**`boolean`** Allow loading custom resources in static output mode."
+      "description": "Allow loading custom resources in static output mode.",
+      "markdownDescription": "**`boolean`** Allow the `resources` field to inject scripts/styles in static output mode."
     },
     "disableCsp": {
       "type": "boolean",
-      "description": "boolean. Do not inject Content-Security-Policy meta tags into generated HTML pages.",
-      "markdownDescription": "**`boolean`** Do not inject `Content-Security-Policy` meta tags into generated HTML pages.\n\nUse when CSP is managed externally (e.g. via server HTTP headers)."
+      "description": "Do not inject Content-Security-Policy meta tags into generated HTML pages. Use when CSP is managed externally (e.g. via server HTTP headers).",
+      "markdownDescription": "**`boolean`** Do **not** inject `Content-Security-Policy` `<meta>` tags into the HTML output.\n\nUse this when CSP is managed via HTTP headers on the server."
     },
     "theme": {
       "oneOf": [
         {
-          "type": "string",
-          "description": "string. Override the base brand color.",
-          "markdownDescription": "**`string`** Override the base brand color."
+          "type": "string"
         },
         {
-          "type": "null",
-          "description": "null. Disable theme.yaml processing.",
-          "markdownDescription": "**`null`** Disable `theme.yaml` processing."
+          "type": "null"
         }
       ],
-      "description": "string | null. Override the base brand color or disable theming.",
-      "markdownDescription": "**`string | null`** Override the base brand color or disable theming.\n\n`null` disables `theme.yaml` processing."
+      "description": "Override the base brand color or disable theming. null disables theme.yaml processing.",
+      "markdownDescription": "**`string | null`** Path to a `theme.yaml` file that overrides brand colors.\n\n- `null` — disable theme processing entirely"
     },
     "search": {
       "oneOf": [
         {
-          "type": "boolean",
-          "description": "boolean. Enable or disable search.",
-          "markdownDescription": "**`boolean`** Enable or disable search."
+          "type": "boolean"
         },
         {
-          "$ref": "#/definitions/SearchConfig",
-          "description": "SearchConfig. Search feature configuration.",
-          "markdownDescription": "**`SearchConfig`** Search feature configuration."
+          "$ref": "#/definitions/SearchConfig"
         }
       ],
-      "description": "boolean | SearchConfig. Configure the documentation search feature.",
-      "markdownDescription": "**`boolean | SearchConfig`** Configure the documentation search feature."
+      "description": "Configure the documentation search feature.",
+      "markdownDescription": "**`boolean | SearchConfig`** Documentation search feature.\n\n- `false` — disable search\n- Object — configure provider (local or algolia)",
+      "defaultSnippets": [
+        {
+          "label": "Local search",
+          "body": {
+            "enabled": true,
+            "provider": "local"
+          }
+        },
+        {
+          "label": "Algolia search",
+          "body": {
+            "enabled": true,
+            "provider": "algolia",
+            "appId": "${1:YOUR_APP_ID}",
+            "apiKey": "${2:YOUR_API_KEY}",
+            "indexName": "${3:my-docs}"
+          }
+        }
+      ]
     },
     "singlePage": {
       "type": "boolean",
-      "description": "boolean. Produce a single-page HTML variant for each TOC.",
-      "markdownDescription": "**`boolean`** Produce a single-page HTML variant for each TOC."
+      "description": "Produce a single-page HTML variant for each TOC.",
+      "markdownDescription": "**`boolean`** Generate a single-page HTML variant for each TOC that concatenates all pages."
     },
     "pdf": {
       "oneOf": [
         {
-          "type": "boolean",
-          "description": "boolean. Enable or disable PDF output generation.",
-          "markdownDescription": "**`boolean`** Enable or disable PDF output generation."
+          "type": "boolean"
         },
         {
           "type": "object",
           "properties": {
             "enabled": {
-              "type": "boolean",
-              "description": "boolean. Enable or disable PDF output generation.",
-              "markdownDescription": "**`boolean`** Enable or disable PDF output generation."
+              "type": "boolean"
             },
             "hiddenPolicy": {
               "type": "boolean",
-              "description": "boolean. Exclude hidden TOC items from PDF output.",
+              "description": "Exclude hidden TOC items from PDF output.",
               "markdownDescription": "**`boolean`** Exclude hidden TOC items from PDF output."
             }
           },
-          "additionalProperties": false,
-          "description": "object. PDF output configuration.",
-          "markdownDescription": "**`object`** PDF output configuration."
+          "additionalProperties": false
         }
       ],
-      "description": "boolean | object. Configure PDF output generation.",
-      "markdownDescription": "**`boolean | object`** Configure PDF output generation."
+      "description": "Configure PDF output generation.",
+      "markdownDescription": "**`boolean | object`** PDF output generation.\n\n- `false` — disable\n- `true` — enable with defaults\n- Object — enable with `hiddenPolicy`"
     },
     "pdfDebug": {
       "type": "boolean",
-      "description": "boolean. Include PDF start pages in the output for debugging.",
-      "markdownDescription": "**`boolean`** Include PDF start pages in the output for debugging."
+      "description": "Include PDF start pages in the output for debugging.",
+      "markdownDescription": "**`boolean`** Include PDF start/end pages in the HTML output for debugging page breaks."
     },
     "preprocess": {
       "type": "object",
       "properties": {
         "hashIncludes": {
           "type": "boolean",
-          "description": "boolean. Hash include file references.",
-          "markdownDescription": "**`boolean`** Hash include file references."
+          "markdownDescription": "**`boolean`** Replace included file paths with content hashes."
         },
         "mergeIncludes": {
           "type": "boolean",
-          "description": "boolean. Merge include contents into parent files.",
-          "markdownDescription": "**`boolean`** Merge include contents into parent files."
+          "markdownDescription": "**`boolean`** Inline `{% include %}` directives — merge the included content into the parent file."
         },
         "mergeAutotitles": {
           "type": "boolean",
-          "description": "boolean. Merge auto-generated titles.",
-          "markdownDescription": "**`boolean`** Merge auto-generated titles."
+          "markdownDescription": "**`boolean`** Merge auto-generated heading anchors."
         },
         "mergeSvg": {
           "type": "boolean",
-          "description": "boolean. Inline SVG files instead of linking them.",
-          "markdownDescription": "**`boolean`** Inline SVG files instead of linking them."
+          "markdownDescription": "**`boolean`** Inline SVG `<img>` references as `<svg>` blocks."
         },
         "disableMetaMaxLineWidth": {
           "type": "boolean",
-          "description": "boolean. Disable maximum line width restriction in metadata blocks.",
-          "markdownDescription": "**`boolean`** Disable maximum line width restriction in metadata blocks."
+          "markdownDescription": "**`boolean`** Disable the maximum line-width limit on metadata output."
         }
       },
       "additionalProperties": false,
-      "description": "object. Fine-tune Markdown preprocessing for md output format.",
-      "markdownDescription": "**`object`** Fine-tune Markdown preprocessing for `md` output format."
+      "description": "Fine-tune Markdown preprocessing for md output format.",
+      "markdownDescription": "**`object`** Markdown preprocessing flags for `md` output format only.\n\n- `hashIncludes` **`boolean`** — replace include paths with content hashes\n- `mergeIncludes` **`boolean`** — inline `{% include %}` directives\n- `mergeAutotitles` **`boolean`** — merge auto-generated heading anchors\n- `mergeSvg` **`boolean`** — inline SVG `<img>` as `<svg>` blocks\n- `disableMetaMaxLineWidth` **`boolean`** — disable metadata line-width limit"
     },
     "mergeIncludes": {
       "type": "boolean",
-      "description": "boolean. Merge include contents into parent files (shorthand for preprocess.mergeIncludes).",
-      "markdownDescription": "**`boolean`** Merge include contents into parent files.\n\nShorthand for `preprocess.mergeIncludes`."
+      "description": "Merge include contents into parent files (shorthand).",
+      "markdownDescription": "**`boolean`** Shorthand for `preprocess.mergeIncludes: true`."
     },
     "content": {
       "type": "object",
       "properties": {
         "maxInlineSvgSize": {
           "$ref": "#/definitions/FileSize",
-          "description": "FileSize. Maximum size for inline SVG embedding.",
-          "markdownDescription": "**`FileSize`** Maximum size for inline SVG embedding.\n\nExamples: `100K`, `1M`, `102400`."
+          "description": "Maximum size for inline SVG embedding.",
+          "markdownDescription": "**`string | integer`** Maximum SVG file size for inline embedding.\n\nFormat: `'100K'`, `'2M'`, or bytes as integer. Larger files are kept as `<img>` references."
         },
         "maxHtmlSize": {
           "$ref": "#/definitions/FileSize",
-          "description": "FileSize. Maximum rendered HTML file size.",
-          "markdownDescription": "**`FileSize`** Maximum rendered HTML file size.\n\nExamples: `100K`, `1M`, `102400`."
+          "description": "Maximum rendered HTML file size.",
+          "markdownDescription": "**`string | integer`** Maximum rendered HTML file size. Build warns if a page exceeds this limit."
         },
         "maxAssetSize": {
           "$ref": "#/definitions/FileSize",
-          "description": "FileSize. Maximum asset file size. 0 disables the check.",
-          "markdownDescription": "**`FileSize`** Maximum asset file size. `0` disables the check."
+          "description": "Maximum asset file size. 0 disables the check.",
+          "markdownDescription": "**`string | integer`** Maximum single asset file size. `0` disables the check."
         },
         "multilineTermDefinitions": {
           "type": "boolean",
-          "description": "boolean. Allow term definitions to span multiple lines.",
-          "markdownDescription": "**`boolean`** Allow term definitions to span multiple lines.\n\nWhen enabled, a definition continues until the next `[*key]:` or end of block. Default: `false`."
+          "description": "Allow term definitions to span multiple lines. When enabled, a definition continues until the next [*key]: or end of block. Default: false.",
+          "markdownDescription": "**`boolean`** Allow term definitions (`[*key]: ...`) to span multiple lines. Default: `false`."
         }
       },
       "additionalProperties": false,
-      "description": "object. Content size limits and processing options.",
-      "markdownDescription": "**`object`** Content size limits and processing options."
+      "markdownDescription": "**`object`** Content size limits and processing options.\n\n- `maxInlineSvgSize` **`string | integer`** — max SVG size for inline embedding\n- `maxHtmlSize` **`string | integer`** — max rendered HTML page size\n- `maxAssetSize` **`string | integer`** — max asset file size (`0` = no limit)\n- `multilineTermDefinitions` **`boolean`** — allow multi-line term definitions",
+      "defaultSnippets": [
+        {
+          "label": "Set content size limits",
+          "body": {
+            "maxInlineSvgSize": "${1:10K}",
+            "maxHtmlSize": "${2:1M}",
+            "maxAssetSize": "${3:5M}"
+          }
+        }
+      ]
     },
     "removeHiddenTocItems": {
       "type": "boolean",
-      "description": "boolean. Strip hidden items from the table of contents.",
-      "markdownDescription": "**`boolean`** Strip hidden items from the table of contents."
+      "description": "Strip hidden items from the table of contents.",
+      "markdownDescription": "**`boolean`** Strip `hidden: true` items from the compiled TOC JSON."
     },
     "removeEmptyTocItems": {
       "type": "boolean",
-      "description": "boolean. Strip empty items from the table of contents.",
-      "markdownDescription": "**`boolean`** Strip empty items from the table of contents."
+      "description": "Strip empty items from the table of contents.",
+      "markdownDescription": "**`boolean`** Strip TOC sections that have no visible child pages after filtering."
     },
     "buildManifest": {
       "type": "boolean",
-      "description": "boolean. Emit yfm-build-manifest.json with all documentation paths.",
-      "markdownDescription": "**`boolean`** Emit `yfm-build-manifest.json` with all documentation paths."
+      "description": "Emit yfm-build-manifest.json with all documentation paths.",
+      "markdownDescription": "**`boolean`** Emit `yfm-build-manifest.json` listing all built page paths."
     },
     "crawlerManifest": {
       "type": "boolean",
-      "description": "boolean. Emit crawler-manifest.json mapping each source file to its external links.",
-      "markdownDescription": "**`boolean`** Emit `crawler-manifest.json` mapping each source file to its external links.\n\nUseful for link-health checks (detecting 404, 403, etc.)."
+      "description": "Emit crawler-manifest.json mapping each source file to its external links. Useful for link-health checks (detecting 404, 403, etc.).",
+      "markdownDescription": "**`boolean`** Emit `crawler-manifest.json` mapping each source file to its external links. Useful for link-health checks (404/403 detection)."
     },
     "changelogs": {
       "oneOf": [
         {
-          "type": "boolean",
-          "description": "boolean. Enable or disable changelog generation.",
-          "markdownDescription": "**`boolean`** Enable or disable changelog generation."
+          "type": "boolean"
         },
         {
-          "type": "string",
-          "description": "string. Enable changelog generation with the specified format.",
-          "markdownDescription": "**`string`** Enable changelog generation with the specified format."
+          "type": "string"
         }
       ],
-      "description": "boolean | string. Enable changelog generation.",
-      "markdownDescription": "**`boolean | string`** Enable changelog generation. String value selects the format."
+      "description": "Enable changelog generation. String value selects the format.",
+      "markdownDescription": "**`boolean | string`** Enable changelog generation. String value selects the output format."
     },
     "watch": {
       "type": "boolean",
-      "description": "boolean. Enable file-watching mode with incremental rebuilds.",
-      "markdownDescription": "**`boolean`** Enable file-watching mode with incremental rebuilds."
+      "description": "Enable file-watching mode with incremental rebuilds.",
+      "markdownDescription": "**`boolean`** Enable file-watching mode with incremental rebuilds on change."
     },
     "skipHtmlExtension": {
       "type": "boolean",
-      "description": "boolean. Remove .html extension from generated links.",
-      "markdownDescription": "**`boolean`** Remove `.html` extension from generated links."
+      "description": "Remove .html extension from generated links.",
+      "markdownDescription": "**`boolean`** Remove `.html` extension from all generated internal links."
     },
     "rawAddMeta": {
-      "type": "boolean",
-      "description": "boolean. Add raw metadata to pages.",
-      "markdownDescription": "**`boolean`** Add raw metadata to pages."
+      "type": "boolean"
     },
     "addResourcesMeta": {
-      "type": "boolean",
-      "description": "boolean. Add resources metadata to pages.",
-      "markdownDescription": "**`boolean`** Add resources metadata to pages."
+      "type": "boolean"
     },
     "addMetadataMeta": {
-      "type": "boolean",
-      "description": "boolean. Add metadata meta tags to pages.",
-      "markdownDescription": "**`boolean`** Add metadata meta tags to pages."
+      "type": "boolean"
     },
     "analytics": {
       "type": "object",
@@ -613,44 +632,60 @@
           "properties": {
             "id": {
               "type": "string",
-              "description": "string. Google Tag Manager container ID.",
-              "markdownDescription": "**`string`** Google Tag Manager container ID."
+              "markdownDescription": "**`string`** GTM container ID (e.g. `GTM-XXXXXX`)."
             },
             "mode": {
               "type": "string",
-              "enum": ["base", "notification"],
-              "description": "string (enum). GTM consent mode: 'base' or 'notification'.",
-              "markdownDescription": "**`string (enum)`** GTM consent mode.\n\n| Value | Description |\n|---|---|\n| `base` | Base consent mode |\n| `notification` | Notification consent mode |"
+              "enum": [
+                "base",
+                "notification"
+              ],
+              "markdownDescription": "**`'base' | 'notification'`** GTM consent mode.",
+              "markdownEnumDescriptions": [
+                "Base consent mode — basic analytics.",
+                "Notification consent mode — additional consent signals."
+              ]
             }
           },
           "additionalProperties": false,
-          "description": "object. Google Tag Manager configuration.",
-          "markdownDescription": "**`object`** Google Tag Manager configuration."
+          "markdownDescription": "**`object`** Google Tag Manager settings.\n\n- `id` **`string`** — GTM container ID (e.g. `GTM-XXXXXX`)\n- `mode` **`'base' | 'notification'`** — consent mode"
         }
       },
       "additionalProperties": true,
-      "description": "object. Web analytics configuration (e.g. Google Tag Manager).",
-      "markdownDescription": "**`object`** Web analytics configuration (e.g. Google Tag Manager)."
+      "description": "Web analytics configuration (e.g. Google Tag Manager).",
+      "markdownDescription": "**`object`** Web analytics configuration.\n\n- `gtm` **`object`** — Google Tag Manager (`id: string`, `mode: 'base' | 'notification'`)"
     },
     "neuroExpert": {
       "$ref": "#/definitions/NeuroExpertConfig",
-      "description": "NeuroExpertConfig. AI expert widget configuration.",
-      "markdownDescription": "**`NeuroExpertConfig`** AI expert widget configuration."
+      "description": "AI expert widget configuration.",
+      "markdownDescription": "**`NeuroExpertConfig`** AI expert widget global configuration.\n\n- `projectId` **`object`** — language → project ID map\n- `hasOutsideClick` **`boolean`** — close on outside click\n- `parentId` **`string | null`** — parent element ID\n- `disabled` **`boolean`** — disable widget globally\n- `customLabel` **`object`** — language → custom header label map"
     },
     "yabug": {
       "$ref": "#/definitions/YaBugConfig",
-      "description": "YaBugConfig. Bug report widget configuration (docs-viewer).",
-      "markdownDescription": "**`YaBugConfig`** Bug report widget configuration (docs-viewer)."
+      "description": "Bug report widget configuration (docs-viewer).",
+      "markdownDescription": "**`YaBugConfig`** Bug-report widget (docs-viewer) global configuration.\n\n- `disabled` **`boolean`** — disable widget globally\n- `form` **`string`** — custom bug-report form URL or path"
     },
     "yafeedback": {
       "$ref": "#/definitions/YaFeedbackConfig",
-      "description": "YaFeedbackConfig. Feedback widget configuration (docs-viewer).",
-      "markdownDescription": "**`YaFeedbackConfig`** Feedback widget configuration (docs-viewer)."
+      "description": "Feedback widget configuration (docs-viewer).",
+      "markdownDescription": "**`YaFeedbackConfig`** Yandex Feedback (Pythia) widget global configuration.\n\n- `ownerId` **`string | object`** — feedback owner ID or per-language map\n- `hideHeader` **`boolean`** — hide widget header\n- `disabled` **`boolean`** — disable widget globally\n- `testIds` **`object`** — A/B test form IDs"
     },
     "docs-viewer": {
       "$ref": "#/definitions/DocsViewerConfig",
-      "description": "DocsViewerConfig. Configuration for the docs-viewer preview server.",
-      "markdownDescription": "**`DocsViewerConfig`** Configuration for the docs-viewer preview server."
+      "description": "Configuration for the docs-viewer preview server.",
+      "markdownDescription": "**`DocsViewerConfig`** Configuration for the docs-viewer preview server.\n\nKey fields: `project-name`, `lang`, `langs`, `favicon-src`, `logo-options`, `metrika`, `gtm`, `themes`.",
+      "defaultSnippets": [
+        {
+          "label": "Docs viewer config",
+          "body": {
+            "project-name": "${1:my-project}",
+            "lang": "${2:en}",
+            "langs": [
+              "${3:en}"
+            ]
+          }
+        }
+      ]
     },
     "pages": {
       "type": "object",
@@ -658,25 +693,22 @@
         "accessDenied": {
           "type": "object",
           "additionalProperties": true,
-          "description": "object. Custom access-denied (403) page configuration.",
-          "markdownDescription": "**`object`** Custom access-denied (403) page configuration."
+          "markdownDescription": "**`object`** Custom 403 access-denied page settings (passed to the viewer's page renderer)."
         },
         "notFound": {
           "type": "object",
           "additionalProperties": true,
-          "description": "object. Custom not-found (404) page configuration.",
-          "markdownDescription": "**`object`** Custom not-found (404) page configuration."
+          "markdownDescription": "**`object`** Custom 404 not-found page settings (passed to the viewer's page renderer)."
         },
         "serverError": {
           "type": "object",
           "additionalProperties": true,
-          "description": "object. Custom server-error (500) page configuration.",
-          "markdownDescription": "**`object`** Custom server-error (500) page configuration."
+          "markdownDescription": "**`object`** Custom 500 server-error page settings (passed to the viewer's page renderer)."
         }
       },
       "additionalProperties": false,
-      "description": "object. Custom error/access-denied page configuration.",
-      "markdownDescription": "**`object`** Custom error/access-denied page configuration."
+      "description": "Custom error/access-denied page configuration.",
+      "markdownDescription": "**`object`** Custom error and access-denied page configuration.\n\n- `accessDenied` **`object`** — custom 403 page settings\n- `notFound` **`object`** — custom 404 page settings\n- `serverError` **`object`** — custom 500 page settings"
     },
     "queryParameters": {
       "type": "object",
@@ -687,452 +719,430 @@
             "type": "object",
             "properties": {
               "domain": {
-                "type": "string",
-                "description": "string. Domain to forward query parameters to.",
-                "markdownDescription": "**`string`** Domain to forward query parameters to."
+                "type": "string"
               },
               "parameters": {
-                "type": "array",
-                "description": "array. List of query parameter names to forward.",
-                "markdownDescription": "**`array`** List of query parameter names to forward."
+                "type": "array"
               }
             },
             "additionalProperties": false
-          },
-          "description": "object[]. Per-domain query parameter forwarding rules.",
-          "markdownDescription": "**`object[]`** Per-domain query parameter forwarding rules."
+          }
         }
       },
       "additionalProperties": false,
-      "description": "object. Query parameter forwarding rules for embedded iframes.",
-      "markdownDescription": "**`object`** Query parameter forwarding rules for embedded iframes."
+      "description": "Query parameter forwarding rules for embedded iframes.",
+      "markdownDescription": "**`object`** Global query parameter forwarding rules for `<iframe>` embeds."
     },
     "build": {
       "type": "object",
-      "description": "object. Scoped overrides for the build command. Accepts the same properties as the root level.",
-      "markdownDescription": "**`object`** Scoped overrides for the `build` command. Accepts the same properties as the root level.",
-      "additionalProperties": true
+      "description": "Scoped overrides for the build command. Accepts the same properties as the root level.",
+      "markdownDescription": "**`object`** Scoped overrides applied only during the `build` command. Accepts the same properties as the root level."
     },
     "publish": {
       "$ref": "#/definitions/PublishConfig",
-      "description": "PublishConfig. Configuration for the publish command.",
-      "markdownDescription": "**`PublishConfig`** Configuration for the `publish` command."
-    },
-    "translate": {
-      "$ref": "#/definitions/TranslateConfig",
-      "description": "TranslateConfig. Configuration for the translate command.",
-      "markdownDescription": "**`TranslateConfig`** Configuration for the `translate` command."
+      "description": "Configuration for the publish command.",
+      "markdownDescription": "**`PublishConfig`** Configuration for the `publish` command (S3-compatible storage).",
+      "defaultSnippets": [
+        {
+          "label": "Publish to S3",
+          "body": {
+            "endpoint": "${1:https://storage.example.com}",
+            "bucket": "${2:my-docs}",
+            "prefix": "${3:docs/}"
+          }
+        }
+      ]
     },
     "disableLiquid": {
       "type": "boolean",
-      "description": "boolean. Disable the Liquid template engine. Deprecated: Use template.enabled instead.",
-      "markdownDescription": "**`boolean`** Disable the Liquid template engine.\n\n> ⚠️ **Deprecated:** Use `template.enabled` instead.",
-      "deprecationMessage": "Use template.enabled instead."
+      "deprecated": "Use template.enabled instead.",
+      "markdownDescription": "**`boolean`** *(deprecated)* Disable the Liquid template engine.",
+      "deprecationMessage": "Deprecated: use template.enabled: false instead.",
+      "doNotSuggest": true
     },
     "applyPresets": {
       "type": "boolean",
-      "description": "boolean. Apply variable presets. Deprecated: Use template.features.substitutions instead.",
-      "markdownDescription": "**`boolean`** Apply variable presets.\n\n> ⚠️ **Deprecated:** Use `template.features.substitutions` instead.",
-      "deprecationMessage": "Use template.features.substitutions instead."
+      "deprecated": "Use template.features.substitutions instead.",
+      "markdownDescription": "**`boolean`** *(deprecated)* Apply preset variable substitutions.",
+      "deprecationMessage": "Deprecated: use template.features.substitutions instead.",
+      "doNotSuggest": true
     },
     "resolveConditions": {
       "type": "boolean",
-      "description": "boolean. Resolve Liquid conditions. Deprecated: Use template.features.conditions instead.",
-      "markdownDescription": "**`boolean`** Resolve Liquid conditions.\n\n> ⚠️ **Deprecated:** Use `template.features.conditions` instead.",
-      "deprecationMessage": "Use template.features.conditions instead."
+      "deprecated": "Use template.features.conditions instead.",
+      "markdownDescription": "**`boolean`** *(deprecated)* Resolve Liquid conditions during build.",
+      "deprecationMessage": "Deprecated: use template.features.conditions instead.",
+      "doNotSuggest": true
     },
     "conditionsInCode": {
       "type": "boolean",
-      "description": "boolean. Process conditions inside code blocks. Deprecated: Use template.scopes.code instead.",
-      "markdownDescription": "**`boolean`** Process conditions inside code blocks.\n\n> ⚠️ **Deprecated:** Use `template.scopes.code` instead.",
-      "deprecationMessage": "Use template.scopes.code instead."
+      "deprecated": "Use template.scopes.code instead.",
+      "markdownDescription": "**`boolean`** *(deprecated)* Process Liquid conditions inside code blocks.",
+      "deprecationMessage": "Deprecated: use template.scopes.code instead.",
+      "doNotSuggest": true
     },
     "lintDisabled": {
       "type": "boolean",
-      "description": "boolean. Disable linting. Deprecated: Use lint.enabled instead.",
-      "markdownDescription": "**`boolean`** Disable linting.\n\n> ⚠️ **Deprecated:** Use `lint.enabled` instead.",
-      "deprecationMessage": "Use lint.enabled instead."
+      "deprecated": "Use lint.enabled instead.",
+      "markdownDescription": "**`boolean`** *(deprecated)* Disable linting.",
+      "deprecationMessage": "Deprecated: use lint.enabled: false instead.",
+      "doNotSuggest": true
     },
     "needToSanitizeHtml": {
       "type": "boolean",
-      "description": "boolean. Sanitize HTML output. Deprecated: Use sanitizeHtml instead.",
-      "markdownDescription": "**`boolean`** Sanitize HTML output.\n\n> ⚠️ **Deprecated:** Use `sanitizeHtml` instead.",
-      "deprecationMessage": "Use sanitizeHtml instead."
+      "deprecated": "Use sanitizeHtml instead.",
+      "markdownDescription": "**`boolean`** *(deprecated)* Sanitize HTML output.",
+      "deprecationMessage": "Deprecated: use sanitizeHtml instead.",
+      "doNotSuggest": true
+    },
+    "translate": {
+      "markdownDescription": "**`TranslateConfig`** Configuration for the `translate` command."
     }
   },
+  "additionalProperties": false,
   "definitions": {
     "LangItem": {
-      "title": "Language item",
-      "description": "string | object. A language code string or an extended language configuration object.",
-      "markdownDescription": "**`string | object`** A language code string or an extended language configuration object.",
       "oneOf": [
         {
-          "type": "string",
-          "description": "string. ISO 639-1 language code (e.g. 'en', 'ru').",
-          "markdownDescription": "**`string`** ISO 639-1 language code.\n\nExamples: `en`, `ru`."
+          "type": "string"
         },
         {
           "type": "object",
-          "required": ["lang"],
+          "required": [
+            "lang"
+          ],
           "properties": {
             "lang": {
-              "type": "string",
-              "description": "string. ISO 639-1 language code (e.g. 'en', 'ru').",
-              "markdownDescription": "**`string`** ISO 639-1 language code.\n\nExamples: `en`, `ru`."
+              "type": "string"
             },
             "tld": {
-              "type": "string",
-              "description": "string. Top-level domain associated with this language.",
-              "markdownDescription": "**`string`** Top-level domain associated with this language."
+              "type": "string"
             },
             "href": {
-              "type": "string",
-              "description": "string. URL to the documentation in this language.",
-              "markdownDescription": "**`string`** URL to the documentation in this language."
+              "type": "string"
             }
           },
           "additionalProperties": false
         }
-      ]
+      ],
+      "description": "Language code or extended language object.",
+      "markdownDescription": "**`string | {lang, tld?, href?}`** Language entry.\n\n- Simple: `'en'`\n- Extended: `{lang: 'en', tld: '.com', href: '/en/'}`"
     },
     "Toggleable": {
-      "title": "Toggleable feature",
-      "description": "boolean | object. A boolean flag or an object with an 'enabled' property.",
-      "markdownDescription": "**`boolean | object`** A boolean flag or an object with an `enabled` property.",
       "oneOf": [
         {
-          "type": "boolean",
-          "description": "boolean. Enable or disable the feature.",
-          "markdownDescription": "**`boolean`** Enable or disable the feature."
+          "type": "boolean"
         },
         {
           "type": "object",
           "properties": {
             "enabled": {
-              "type": "boolean",
-              "description": "boolean. Enable or disable the feature.",
-              "markdownDescription": "**`boolean`** Enable or disable the feature."
+              "type": "boolean"
             }
           },
           "additionalProperties": false
         }
-      ]
+      ],
+      "description": "Boolean or object with an enabled flag.",
+      "markdownDescription": "**`boolean | {enabled: boolean}`** Simple toggle — either `true`/`false` or an object with `enabled: true/false`."
     },
     "FileSize": {
-      "title": "File size",
-      "description": "string | integer. A file size as bytes (integer) or a string with optional K/M suffix.",
-      "markdownDescription": "**`string | integer`** A file size value.\n\n- `string` — with optional unit suffix: `K` (kilobytes), `M` (megabytes). Example: `100K`, `2M`.\n- `integer` — size in bytes. `0` disables the check.",
       "oneOf": [
         {
           "type": "string",
           "pattern": "^\\d+[KkMm]?$",
-          "description": "string. Size with optional unit suffix: K (kilobytes), M (megabytes). Examples: '100K', '2M', '1024'.",
-          "markdownDescription": "**`string`** Size with optional unit suffix.\n\n- `K` / `k` — kilobytes\n- `M` / `m` — megabytes\n\nExamples: `100K`, `2M`, `1024`."
+          "description": "Size with optional unit suffix: K (kilobytes), M (megabytes).",
+          "markdownDescription": "**`string`** Size with optional unit suffix: K (kilobytes), M (megabytes)."
         },
         {
           "type": "integer",
           "minimum": 0,
-          "description": "integer. Size in bytes. 0 disables the check.",
-          "markdownDescription": "**`integer`** Size in bytes. `0` disables the check."
+          "description": "Size in bytes.",
+          "markdownDescription": "**`integer`** Size in bytes."
         }
-      ]
+      ],
+      "description": "File size — integer bytes or string with K/M suffix.",
+      "markdownDescription": "**`string | integer`** File size value.\n\n- String with suffix: `'512K'`, `'10M'`\n- Integer: bytes (`1048576` = 1 MB)"
     },
     "ExtensionItem": {
-      "title": "Extension item",
-      "description": "string | object. An extension package name or a configuration object.",
-      "markdownDescription": "**`string | object`** An extension package name or a configuration object.",
       "oneOf": [
         {
-          "type": "string",
-          "description": "string. NPM package name of the extension.",
-          "markdownDescription": "**`string`** NPM package name of the extension."
+          "type": "string"
         },
         {
           "type": "object",
-          "required": ["name"],
+          "required": [
+            "name"
+          ],
           "properties": {
             "name": {
-              "type": "string",
-              "description": "string. NPM package name of the extension.",
-              "markdownDescription": "**`string`** NPM package name of the extension."
+              "type": "string"
             }
           },
-          "additionalProperties": true,
-          "description": "object. Extension configuration with name and optional settings.",
-          "markdownDescription": "**`object`** Extension configuration with `name` and optional settings."
+          "additionalProperties": true
         }
-      ]
+      ],
+      "description": "Extension package name or object with name and options.",
+      "markdownDescription": "**`string | {name, ...}`** Extension item.\n\n- String: npm package name\n- Object: `{name: 'package-name', option: value}`"
     },
     "Resources": {
-      "title": "Custom resources",
       "type": "object",
-      "description": "object. Custom scripts, styles, and CSP directives.",
-      "markdownDescription": "**`object`** Custom scripts, styles, and CSP directives.",
       "properties": {
         "script": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "string[]. Paths or URLs to JavaScript files to inject into pages.",
-          "markdownDescription": "**`string[]`** Paths or URLs to JavaScript files to inject into pages."
+          "description": "Paths or URLs to JavaScript files.",
+          "markdownDescription": "**`string[]`** Paths or URLs to JavaScript files (relative to `input`)."
         },
         "style": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "string[]. Paths or URLs to CSS files to inject into pages.",
-          "markdownDescription": "**`string[]`** Paths or URLs to CSS files to inject into pages."
+          "description": "Paths or URLs to CSS files.",
+          "markdownDescription": "**`string[]`** Paths or URLs to CSS files (relative to `input`)."
         },
         "csp": {
           "type": "array",
           "items": {
-            "type": "object",
-            "additionalProperties": true
+            "type": "object"
           },
-          "description": "object[]. Content Security Policy directive overrides.",
-          "markdownDescription": "**`object[]`** Content Security Policy directive overrides.\n\nEach item maps a CSP directive name to allowed sources."
+          "description": "Content Security Policy directive overrides. Each item is an object mapping a directive name to allowed sources.",
+          "markdownDescription": "**`object[]`** Content Security Policy directive overrides. Each item maps a directive (e.g. `script-src`) to allowed sources."
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Custom scripts, stylesheets, and CSP directives.",
+      "markdownDescription": "**`Resources`** Custom assets injected into every page."
     },
     "TemplateConfig": {
-      "title": "Template engine configuration",
       "type": "object",
-      "description": "object. Liquid template engine configuration.",
-      "markdownDescription": "**`object`** Liquid template engine configuration.",
       "properties": {
         "enabled": {
           "type": "boolean",
-          "description": "boolean. Enable or disable the Liquid template engine.",
-          "markdownDescription": "**`boolean`** Enable or disable the Liquid template engine."
+          "markdownDescription": "**`boolean`** Enable or disable the template engine."
         },
         "keepNotVar": {
           "type": "boolean",
-          "description": "boolean. Keep unresolved variable placeholders instead of removing them.",
-          "markdownDescription": "**`boolean`** Keep unresolved variable placeholders instead of removing them."
+          "description": "Keep unresolved variable placeholders instead of removing them.",
+          "markdownDescription": "**`boolean`** Keep unresolved `{{ variable }}` placeholders as-is instead of removing them."
         },
         "legacyConditions": {
           "type": "boolean",
-          "description": "boolean. Use legacy condition syntax.",
-          "markdownDescription": "**`boolean`** Use legacy condition syntax."
+          "description": "Use legacy condition syntax.",
+          "markdownDescription": "**`boolean`** Use legacy Liquid condition syntax (for backwards compatibility)."
         },
         "scopes": {
           "type": "object",
           "properties": {
             "text": {
               "type": "boolean",
-              "description": "boolean. Process template expressions in regular text.",
-              "markdownDescription": "**`boolean`** Process template expressions in regular text."
+              "description": "Process template expressions in regular text.",
+              "markdownDescription": "**`boolean`** Process Liquid expressions in regular text content."
             },
             "code": {
               "type": "boolean",
-              "description": "boolean. Process template expressions inside code blocks.",
-              "markdownDescription": "**`boolean`** Process template expressions inside code blocks."
+              "description": "Process template expressions inside code blocks.",
+              "markdownDescription": "**`boolean`** Process Liquid expressions inside code blocks (backtick or fenced)."
             }
           },
           "additionalProperties": false,
-          "description": "object. Template processing scope configuration.",
-          "markdownDescription": "**`object`** Template processing scope configuration."
+          "markdownDescription": "**`object`** Where to process Liquid expressions.\n\n- `text` **`boolean`** — process in regular text\n- `code` **`boolean`** — process inside code blocks"
         },
         "features": {
           "type": "object",
           "properties": {
             "substitutions": {
               "type": "boolean",
-              "description": "boolean. Enable variable substitution ({{ variable }}).",
-              "markdownDescription": "**`boolean`** Enable variable substitution (`{{ variable }}`)."
+              "description": "Enable variable substitution.",
+              "markdownDescription": "**`boolean`** Enable `{{ var }}` variable substitution."
             },
             "conditions": {
               "oneOf": [
                 {
-                  "type": "boolean",
-                  "description": "boolean. Enable or disable conditional blocks.",
-                  "markdownDescription": "**`boolean`** Enable or disable conditional blocks."
+                  "type": "boolean"
                 },
                 {
                   "type": "string",
-                  "enum": ["strict"],
-                  "description": "string. 'strict' mode is used by the translate command.",
-                  "markdownDescription": "**`string`** `strict` mode is used by the `translate` command."
+                  "enum": [
+                    "strict"
+                  ]
                 }
               ],
-              "description": "boolean | 'strict'. Enable conditional blocks ({% if %}...{% endif %}).",
-              "markdownDescription": "**`boolean | 'strict'`** Enable conditional blocks (`{% if %}...{% endif %}`).\n\n`strict` mode is used by the `translate` command."
+              "description": "Enable conditional blocks. 'strict' mode is used by the translate command.",
+              "markdownDescription": "**`boolean | 'strict'`** Enable `{% if %}` conditional blocks.\n\n`'strict'` mode is required by the `translate` command."
             },
             "cycles": {
               "type": "boolean",
-              "description": "boolean. Enable loop constructs ({% for %}...{% endfor %}).",
-              "markdownDescription": "**`boolean`** Enable loop constructs (`{% for %}...{% endfor %}`)."
+              "description": "Enable loop constructs.",
+              "markdownDescription": "**`boolean`** Enable `{% for %}` loop constructs."
             },
             "cicles": {
               "type": "boolean",
-              "description": "boolean. Alternative spelling of 'cycles'. Enable loop constructs.",
-              "markdownDescription": "**`boolean`** Alternative spelling of `cycles`. Enable loop constructs (`{% for %}...{% endfor %}`)."
+              "description": "Alternative spelling of cycles (used in documentation). Enable loop constructs.",
+              "markdownDescription": "**`boolean`** Alternative spelling of cycles (used in documentation). Enable loop constructs."
             }
           },
           "additionalProperties": false,
-          "description": "object. Template feature flags.",
-          "markdownDescription": "**`object`** Template feature flags."
+          "markdownDescription": "**`object`** Which Liquid features to enable.\n\n- `substitutions` **`boolean`** — `{{ var }}` variable substitution\n- `conditions` **`boolean | 'strict'`** — `{% if %}` blocks\n- `cycles` **`boolean`** — `{% for %}` loops"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Liquid template engine config. Fields: enabled, keepNotVar, legacyConditions, scopes (text, code), features (substitutions, conditions, cycles).",
+      "markdownDescription": "**`TemplateConfig`** Liquid template engine settings.\n\n- `enabled` **`boolean`** — enable/disable\n- `keepNotVar` **`boolean`** — keep unresolved `{{ var }}` placeholders\n- `scopes` **`object`** — where to process: `text`, `code`\n- `features` **`object`** — what to process: `substitutions`, `conditions`, `cycles`"
     },
     "LintConfig": {
-      "title": "Lint configuration",
       "type": "object",
-      "description": "object. YFM lint configuration.",
-      "markdownDescription": "**`object`** YFM lint configuration.",
       "properties": {
         "enabled": {
           "type": "boolean",
-          "description": "boolean. Enable or disable YFM linting.",
-          "markdownDescription": "**`boolean`** Enable or disable YFM linting."
+          "markdownDescription": "**`boolean`** Enable or disable linting during the build."
         },
         "config": {
           "oneOf": [
             {
               "type": "string",
-              "description": "string. Path to an external .yfmlint config file.",
-              "markdownDescription": "**`string`** Path to an external `.yfmlint` config file."
+              "description": "Path to an external .yfmlint config file.",
+              "markdownDescription": "**`string`** Path to an external .yfmlint config file."
             },
             {
               "type": "object",
-              "description": "object. Inline lint rule configuration.",
-              "markdownDescription": "**`object`** Inline lint rule configuration.",
-              "additionalProperties": true
+              "description": "Inline lint rule configuration.",
+              "markdownDescription": "**`object`** Inline lint rule configuration."
             }
           ],
-          "description": "string | object. Lint rules: path to .yfmlint file or inline configuration.",
-          "markdownDescription": "**`string | object`** Lint rules: path to `.yfmlint` file or inline rule configuration object."
+          "markdownDescription": "**`string | object`** Lint configuration.\n\n- String — path to a `.yfmlint` file\n- Object — inline rule configuration (same format as `.yfmlint`)"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "YFM linter configuration.",
+      "markdownDescription": "**`LintConfig`** YFM linter configuration."
     },
     "SearchConfig": {
-      "title": "Search configuration",
       "type": "object",
-      "description": "object. Documentation search configuration.",
-      "markdownDescription": "**`object`** Documentation search configuration.",
       "properties": {
         "enabled": {
           "type": "boolean",
-          "description": "boolean. Enable or disable the search feature.",
           "markdownDescription": "**`boolean`** Enable or disable the search feature."
         },
         "provider": {
           "type": "string",
-          "enum": ["local", "algolia"],
-          "description": "string (enum). Search provider: 'local' or 'algolia'.",
-          "markdownDescription": "**`string (enum)`** Search provider.\n\n| Value | Description |\n|---|---|\n| `local` | Built-in local search |\n| `algolia` | Algolia search service |"
+          "enum": [
+            "local",
+            "algolia"
+          ],
+          "description": "Search provider identifier (local or algolia).",
+          "markdownDescription": "**`'local' | 'algolia'`** Search provider.",
+          "markdownEnumDescriptions": [
+            "**local** — full-text search index generated at build time. No external service required.",
+            "**algolia** — Algolia DocSearch or custom index. Requires `appId`, `apiKey`, `indexName`."
+          ]
         },
         "appId": {
           "type": "string",
-          "description": "string. Algolia Application ID (required when provider=algolia).",
-          "markdownDescription": "**`string`** Algolia Application ID.\n\nRequired when `provider: algolia`."
+          "description": "Algolia Application ID (provider=algolia).",
+          "markdownDescription": "**`string`** Algolia Application ID (provider=algolia)."
         },
         "apiKey": {
           "type": "string",
-          "description": "string. Algolia API Key for indexing (provider=algolia). WARNING: Do not store secrets in config.",
-          "markdownDescription": "**`string`** Algolia API Key for indexing (`provider: algolia`).\n\n> ⚠️ **WARNING:** Do not store secrets in the config file."
+          "sensitive": true,
+          "description": "Algolia API Key for indexing (provider=algolia).",
+          "markdownDescription": "**`string`** Algolia API Key for indexing (provider=algolia)."
         },
         "searchApiKey": {
           "type": "string",
-          "description": "string. Client-side Algolia API key for search queries (provider=algolia).",
-          "markdownDescription": "**`string`** Client-side Algolia API key for search queries (`provider: algolia`)."
+          "description": "Client-side Algolia API key for search queries (provider=algolia).",
+          "markdownDescription": "**`string`** Client-side Algolia API key for search queries (provider=algolia)."
         },
         "indexName": {
           "type": "string",
-          "description": "string. Algolia Index Name (provider=algolia).",
-          "markdownDescription": "**`string`** Algolia Index Name (`provider: algolia`)."
+          "description": "Algolia Index Name (provider=algolia).",
+          "markdownDescription": "**`string`** Algolia Index Name (provider=algolia)."
         },
         "index": {
           "type": "boolean",
-          "description": "boolean. Whether to create and upload the search index (provider=algolia).",
-          "markdownDescription": "**`boolean`** Whether to create and upload the search index (`provider: algolia`)."
+          "description": "Whether to create and upload the search index (provider=algolia).",
+          "markdownDescription": "**`boolean`** Whether to create and upload the search index (provider=algolia)."
         },
         "api": {
           "type": "string",
-          "description": "string. Path to the client-side search API script (provider=algolia).",
-          "markdownDescription": "**`string`** Path to the client-side search API script (`provider: algolia`)."
+          "description": "Path to the client-side search API script (provider=algolia).",
+          "markdownDescription": "**`string`** Path to the client-side search API script (provider=algolia)."
         },
         "tolerance": {
           "type": "integer",
           "minimum": 0,
           "maximum": 2,
-          "description": "integer (0-2). Wildcard search tolerance level (provider=local).",
-          "markdownDescription": "**`integer (0–2)`** Wildcard search tolerance level (`provider: local`).\n\n| Value | Description |\n|---|---|\n| `0` | Exact match |\n| `1` | Trailing wildcard |\n| `2` | Leading and trailing wildcard |"
+          "description": "Wildcard search tolerance level (provider=local). 0 — exact match, 1 — trailing wildcard, 2 — leading and trailing.",
+          "markdownDescription": "**`0 | 1 | 2`** Wildcard tolerance for local search.\n\n- `0` — exact match only\n- `1` — trailing wildcard\n- `2` — leading and trailing wildcard"
         },
         "confidence": {
           "type": "string",
-          "enum": ["phrased", "sparsed"],
-          "description": "string (enum). Search scoring strategy (provider=local).",
-          "markdownDescription": "**`string (enum)`** Search scoring strategy (`provider: local`).\n\n| Value | Description |\n|---|---|\n| `phrased` | Phrase-based scoring |\n| `sparsed` | Sparse matching scoring |"
+          "enum": [
+            "phrased",
+            "sparsed"
+          ],
+          "description": "Search scoring strategy (provider=local).",
+          "markdownDescription": "**`'phrased' | 'sparsed'`** Search scoring strategy for local provider.\n\n- `phrased` — prefer exact phrase matches\n- `sparsed` — allow sparse word matches"
         },
         "confidense": {
           "type": "string",
-          "enum": ["phrased", "sparsed"],
-          "description": "string (enum). Alternative spelling of 'confidence'. Search scoring strategy (provider=local).",
-          "markdownDescription": "**`string (enum)`** Alternative spelling of `confidence`. Search scoring strategy (`provider: local`).\n\n| Value | Description |\n|---|---|\n| `phrased` | Phrase-based scoring |\n| `sparsed` | Sparse matching scoring |"
+          "enum": [
+            "phrased",
+            "sparsed"
+          ],
+          "description": "Alternative spelling of confidence. Search scoring strategy (provider=local).",
+          "markdownDescription": "**`string`** Alternative spelling of confidence. Search scoring strategy (provider=local)."
         },
         "indexSettings": {
           "type": "object",
-          "description": "object. Algolia index settings (provider=algolia). Passed to Algolia setSettings.",
-          "markdownDescription": "**`object`** Algolia index settings (`provider: algolia`). Passed to Algolia `setSettings`.\n\nSupports `searchableAttributes`, `attributesToHighlight`, etc.",
-          "additionalProperties": true
+          "description": "Algolia index settings (provider=algolia). Passed to Algolia setSettings. Supports searchableAttributes, attributesToHighlight, etc.",
+          "additionalProperties": true,
+          "markdownDescription": "**`object`** Algolia index settings passed to `setSettings`. Supports `searchableAttributes`, `attributesToHighlight`, etc."
         },
         "querySettings": {
           "type": "object",
-          "description": "object. Algolia query settings (provider=algolia). Merged into each search request.",
-          "markdownDescription": "**`object`** Algolia query settings (`provider: algolia`). Merged into each search request.\n\nSupports `hitsPerPage`, `attributesToRetrieve`, etc.",
-          "additionalProperties": true
+          "description": "Algolia query settings (provider=algolia). Merged into each search request. Supports hitsPerPage, attributesToRetrieve, etc.",
+          "additionalProperties": true,
+          "markdownDescription": "**`object`** Algolia query settings merged into each search request. Supports `hitsPerPage`, `attributesToRetrieve`, etc."
         }
       },
-      "additionalProperties": true
+      "additionalProperties": true,
+      "description": "Search config. Fields: enabled, provider (local|algolia), tolerance (0-2), confidence (phrased|sparsed), and Algolia-specific fields.",
+      "markdownDescription": "**`SearchConfig`** Documentation search configuration.\n\n- `enabled` **`boolean`** — enable/disable search\n- `provider` **`'local' | 'algolia'`** — search backend\n- `tolerance` **`0 | 1 | 2`** — wildcard tolerance (local only)\n- `confidence` **`'phrased' | 'sparsed'`** — scoring strategy (local only)\n- `appId` / `apiKey` / `indexName` — Algolia credentials"
     },
     "NeuroExpertConfig": {
-      "title": "AI expert widget configuration",
       "type": "object",
-      "description": "object. AI expert widget configuration.",
-      "markdownDescription": "**`object`** AI expert widget configuration.",
       "properties": {
         "projectId": {
           "type": "object",
-          "description": "object. Map of language codes to project IDs. Use 'default' key for fallback.",
-          "markdownDescription": "**`object`** Map of language codes to project IDs. Use `default` key for fallback.",
-          "additionalProperties": true
+          "description": "Map of language codes to project IDs. Use \"default\" key for fallback.",
+          "markdownDescription": "**`object`** Map of language codes to AI expert project IDs. Use `default` as fallback key."
         },
         "hasOutsideClick": {
           "type": "boolean",
-          "description": "boolean. Close the widget when clicking outside of it.",
-          "markdownDescription": "**`boolean`** Close the widget when clicking outside of it."
+          "markdownDescription": "**`boolean`** Close the AI expert widget when the user clicks outside it."
         },
         "parentId": {
           "oneOf": [
             {
-              "type": "string",
-              "description": "string. DOM element ID to mount the widget into.",
-              "markdownDescription": "**`string`** DOM element ID to mount the widget into."
+              "type": "string"
             },
             {
-              "type": "null",
-              "description": "null. Use default mount point.",
-              "markdownDescription": "**`null`** Use default mount point."
+              "type": "null"
             }
           ],
-          "description": "string | null. DOM element ID to mount the widget into. null uses default.",
-          "markdownDescription": "**`string | null`** DOM element ID to mount the widget into. `null` uses the default mount point."
+          "markdownDescription": "**`string | null`** Parent element ID for widget placement. `null` uses the default placement."
         },
         "disabled": {
           "type": "boolean",
-          "description": "boolean. Disable the AI expert widget.",
-          "markdownDescription": "**`boolean`** Disable the AI expert widget."
+          "markdownDescription": "**`boolean`** Disable the AI expert widget globally."
         },
         "customLabel": {
           "type": "object",
-          "description": "Record<string, string | boolean>. Map of language codes to custom widget header labels.",
-          "markdownDescription": "**`Record<string, string | boolean>`** Map of language codes to custom widget header labels.\n\nUse `default` key for fallback. Only for whitelisted projects.",
+          "description": "Map of language codes to custom widget header labels. Use \"default\" key for fallback. Only for whitelisted projects.",
           "additionalProperties": {
             "oneOf": [
               {
@@ -1142,273 +1152,266 @@
                 "type": "boolean"
               }
             ]
-          }
+          },
+          "markdownDescription": "**`object`** Map of language codes to custom widget header labels. Use `default` as fallback key. Only available for whitelisted projects."
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "AI expert widget config. Fields: projectId, hasOutsideClick, parentId, disabled, customLabel.",
+      "markdownDescription": "**`NeuroExpertConfig`** AI expert (Yandex Neuro Expert) widget configuration.\n\n- `projectId` **`object`** — language → project ID map (use `default` as fallback key)\n- `hasOutsideClick` **`boolean`** — close widget on outside click\n- `parentId` **`string | null`** — parent element ID for placement\n- `disabled` **`boolean`** — disable the widget globally\n- `customLabel` **`object`** — language → custom header label map"
     },
     "PublishConfig": {
-      "title": "Publish command configuration",
       "type": "object",
-      "description": "object. S3 publish command configuration.",
-      "markdownDescription": "**`object`** S3 publish command configuration.",
       "properties": {
         "endpoint": {
           "type": "string",
           "format": "uri",
-          "description": "string (uri). S3-compatible storage endpoint URL.",
+          "description": "S3-compatible storage endpoint.",
           "markdownDescription": "**`string (uri)`** S3-compatible storage endpoint URL."
         },
         "bucket": {
           "type": "string",
-          "description": "string. Target S3 bucket name.",
-          "markdownDescription": "**`string`** Target S3 bucket name."
+          "description": "Target bucket name.",
+          "markdownDescription": "**`string`** Target bucket name."
         },
         "prefix": {
           "type": "string",
-          "description": "string. Key prefix inside the bucket.",
-          "markdownDescription": "**`string`** Key prefix inside the bucket."
+          "description": "Key prefix inside the bucket.",
+          "markdownDescription": "**`string`** Key prefix inside the bucket (e.g. `docs/v2/`)."
         },
         "region": {
           "type": "string",
-          "description": "string. S3 region identifier.",
-          "markdownDescription": "**`string`** S3 region identifier."
+          "markdownDescription": "**`string`** Storage region (e.g. `us-east-1`)."
         },
         "accessKeyId": {
           "type": "string",
-          "description": "string. S3 access key ID. WARNING: Do not store secrets in the config file.",
-          "markdownDescription": "**`string`** S3 access key ID.\n\n> ⚠️ **WARNING:** Do not store secrets in the config file. Use environment variables instead."
+          "sensitive": true,
+          "description": "S3 access key ID. WARNING: Do not store secrets in the config file.",
+          "markdownDescription": "**`string`** ⚠️ S3 access key ID. Do not commit secrets — use environment variables."
         },
         "secretAccessKey": {
           "type": "string",
-          "description": "string. S3 secret access key. WARNING: Do not store secrets in the config file.",
-          "markdownDescription": "**`string`** S3 secret access key.\n\n> ⚠️ **WARNING:** Do not store secrets in the config file. Use environment variables instead."
+          "sensitive": true,
+          "description": "S3 secret access key. WARNING: Do not store secrets in the config file.",
+          "markdownDescription": "**`string`** ⚠️ S3 secret access key. Do not commit secrets — use environment variables."
         },
         "hidden": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "string[]. Glob patterns to exclude from upload.",
-          "markdownDescription": "**`string[]`** Glob patterns to exclude from upload."
+          "description": "Glob patterns to exclude from upload.",
+          "markdownDescription": "**`string[]`** Glob patterns for files to exclude from upload."
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "S3 publish config. Fields: endpoint, bucket, prefix, region, accessKeyId, secretAccessKey, hidden.",
+      "markdownDescription": "**`PublishConfig`** S3-compatible storage upload configuration.\n\n- `endpoint` **`string`** — storage endpoint URL\n- `bucket` **`string`** — target bucket name\n- `prefix` **`string`** — key prefix (e.g. `docs/v2/`)\n- `region` **`string`** — storage region\n- `accessKeyId` / `secretAccessKey` **`string`** ⚠️ credentials — use env vars\n- `hidden` **`string[]`** — glob patterns to exclude from upload"
     },
     "YaBugConfig": {
-      "title": "Bug report widget configuration",
       "type": "object",
-      "description": "object. Bug report widget configuration.",
-      "markdownDescription": "**`object`** Bug report widget configuration.",
       "properties": {
         "disabled": {
           "type": "boolean",
-          "description": "boolean. Disable the bug report widget.",
-          "markdownDescription": "**`boolean`** Disable the bug report widget."
+          "description": "Disable the bug report widget.",
+          "markdownDescription": "**`boolean`** Disable the bug-report widget globally."
         },
         "form": {
           "type": "string",
-          "description": "string. Custom bug report form URL or path.",
-          "markdownDescription": "**`string`** Custom bug report form URL or path."
+          "description": "Custom bug report form URL or path.",
+          "markdownDescription": "**`string`** Custom bug-report form URL or path."
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Bug-report widget config. Fields: disabled (boolean), form (string).",
+      "markdownDescription": "**`YaBugConfig`** Bug-report widget (docs-viewer) configuration.\n\n- `disabled` **`boolean`** — disable the widget globally\n- `form` **`string`** — custom bug-report form URL or path"
     },
     "YaFeedbackConfig": {
-      "title": "Feedback widget configuration",
       "type": "object",
-      "description": "object. Feedback widget configuration.",
-      "markdownDescription": "**`object`** Feedback widget configuration.",
       "properties": {
         "ownerId": {
           "oneOf": [
             {
-              "type": "string",
-              "description": "string. Pythia feedback survey owner ID.",
-              "markdownDescription": "**`string`** Pythia feedback survey owner ID."
+              "type": "string"
             },
             {
               "type": "object",
-              "description": "Record<string, string>. Map of language codes to owner IDs. Use 'default' key for fallback.",
-              "markdownDescription": "**`Record<string, string>`** Map of language codes to owner IDs. Use `default` key for fallback.",
+              "description": "Map of language codes to owner IDs. Use \"default\" key for fallback.",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "markdownDescription": "**`object`** Map of language codes to owner IDs. Use \"default\" key for fallback."
             }
           ],
-          "description": "string | object. Pythia feedback survey owner ID.",
-          "markdownDescription": "**`string | Record<string, string>`** Pythia feedback survey owner ID. Object form maps language codes to IDs."
+          "description": "Pythia feedback survey owner ID.",
+          "markdownDescription": "**`string | object`** Pythia feedback survey owner ID. String for a single ID; object maps language codes to IDs."
         },
         "hideHeader": {
           "type": "boolean",
-          "description": "boolean. Hide the feedback widget header.",
-          "markdownDescription": "**`boolean`** Hide the feedback widget header."
+          "description": "Hide the feedback widget header.",
+          "markdownDescription": "**`boolean`** Hide the feedback widget header section."
         },
         "disabled": {
           "type": "boolean",
-          "description": "boolean. Disable the feedback widget.",
-          "markdownDescription": "**`boolean`** Disable the feedback widget."
+          "description": "Disable the feedback widget.",
+          "markdownDescription": "**`boolean`** Disable the Yandex Feedback widget globally."
         },
         "testIds": {
           "type": "object",
-          "description": "object. Test form IDs for A/B testing.",
-          "markdownDescription": "**`object`** Test form IDs for A/B testing.",
-          "additionalProperties": true
+          "description": "Test form IDs for A/B testing.",
+          "additionalProperties": true,
+          "markdownDescription": "**`object`** A/B test form IDs for the feedback widget."
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Yandex Feedback widget config. Fields: ownerId, hideHeader, disabled, testIds.",
+      "markdownDescription": "**`YaFeedbackConfig`** Yandex Feedback (Pythia) widget configuration.\n\n- `ownerId` **`string | object`** — feedback owner ID or language → ID map\n- `hideHeader` **`boolean`** — hide the widget header\n- `disabled` **`boolean`** — disable the widget globally\n- `testIds` **`object`** — A/B test form IDs"
     },
     "DocsViewerConfig": {
-      "title": "Docs-viewer configuration",
       "type": "object",
-      "description": "object. Docs-viewer preview server configuration.",
-      "markdownDescription": "**`object`** Docs-viewer preview server configuration.",
       "properties": {
         "project-name": {
           "type": "string",
-          "pattern": "^[a-z0-9_-]{1,63}$",
-          "description": "string. Project URL slug. Lowercase, alphanumeric, hyphens, underscores. Max 63 chars.",
-          "markdownDescription": "**`string`** Project URL slug.\n\n- Lowercase, alphanumeric, hyphens, underscores\n- Max 63 characters\n- Reserved names: `build`, `docs-assets`, `api`"
+          "description": "Project URL slug. Lowercase, alphanumeric, hyphens, underscores. Max 63 chars. Reserved names: build, docs-assets, api.",
+          "markdownDescription": "**`string`** Project URL slug. Lowercase, alphanumeric, hyphens, underscores. Max 63 chars. Reserved names: build, docs-assets, api."
         },
         "no-index": {
           "type": "boolean",
-          "description": "boolean. Disallow indexing by external search engines.",
-          "markdownDescription": "**`boolean`** Disallow indexing by external search engines (adds `noindex` meta tag)."
+          "description": "Disallow indexing by external search engines.",
+          "markdownDescription": "**`boolean`** Disallow indexing by external search engines."
         },
         "lang": {
           "type": "string",
-          "description": "string. Default language for localization (e.g. 'ru', 'en').",
-          "markdownDescription": "**`string`** Default language for localization.\n\nExamples: `ru`, `en`."
+          "description": "Default language for localization (e.g. \"ru\").",
+          "markdownDescription": "**`string`** Default language for localization (e.g. \"ru\")."
         },
         "langs": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "string[]. Languages shown in the docs UI. First item is the default.",
-          "markdownDescription": "**`string[]`** Languages shown in the docs UI. First item is the default."
+          "description": "Languages shown in the docs UI; first is default.",
+          "markdownDescription": "**`string[]`** Languages shown in the docs UI; first is default."
         },
         "favicon-src": {
           "type": "string",
-          "description": "string. Favicon URL for the browser tab.",
+          "description": "Favicon URL for the browser tab.",
           "markdownDescription": "**`string`** Favicon URL for the browser tab."
         },
         "logo-options": {
           "$ref": "#/definitions/LogoOptions",
-          "description": "LogoOptions. Logo configuration for the docs viewer.",
+          "description": "Logo configuration for the docs viewer.",
           "markdownDescription": "**`LogoOptions`** Logo configuration for the docs viewer."
         },
         "metrika": {
           "oneOf": [
             {
-              "type": "integer",
-              "description": "integer. Single Yandex Metrika counter ID.",
-              "markdownDescription": "**`integer`** Single Yandex Metrika counter ID."
+              "type": "integer"
             },
             {
               "type": "array",
               "items": {
                 "type": "integer"
-              },
-              "description": "integer[]. Multiple Yandex Metrika counter IDs.",
-              "markdownDescription": "**`integer[]`** Multiple Yandex Metrika counter IDs."
+              }
             }
           ],
-          "description": "integer | integer[]. Yandex Metrika counter ID(s).",
+          "description": "Yandex Metrika counter ID(s).",
           "markdownDescription": "**`integer | integer[]`** Yandex Metrika counter ID(s)."
         },
         "themes": {
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["light", "dark"]
+            "enum": [
+              "light",
+              "dark"
+            ]
           },
-          "description": "string[]. Available UI themes. Server-only option. Values: 'light', 'dark'.",
-          "markdownDescription": "**`string[]`** Available UI themes. Server-only option.\n\nAllowed values: `light`, `dark`."
+          "description": "Available themes. Server-only.",
+          "markdownDescription": "**`string[]`** Available themes. Server-only."
         },
         "gtm": {
           "type": "object",
           "properties": {
             "id": {
               "type": "string",
-              "description": "string. Google Tag Manager container ID.",
+              "description": "Google Tag Manager container ID.",
               "markdownDescription": "**`string`** Google Tag Manager container ID."
             },
             "mode": {
               "type": "string",
-              "enum": ["base", "notification"],
-              "description": "string (enum). GTM consent mode: 'base' or 'notification'.",
-              "markdownDescription": "**`string (enum)`** GTM consent mode.\n\n| Value | Description |\n|---|---|\n| `base` | Base consent mode |\n| `notification` | Notification consent mode |"
+              "enum": [
+                "base",
+                "notification"
+              ],
+              "description": "GTM consent mode (base or notification).",
+              "markdownDescription": "**`string`** GTM consent mode (base or notification)."
             }
           },
           "additionalProperties": false,
-          "description": "object. Google Tag Manager settings for the viewer.",
+          "description": "Google Tag Manager settings for the viewer.",
           "markdownDescription": "**`object`** Google Tag Manager settings for the viewer."
         },
         "github-url-prefix": {
           "type": "string",
-          "description": "string. Base URL for GitHub source links.",
-          "markdownDescription": "**`string`** Base URL for GitHub source links.\n\nExample: `https://github.com/org/repo/blob/main`."
+          "description": "Base URL for GitHub source links.",
+          "markdownDescription": "**`string`** Base URL for GitHub source links."
         },
         "logo-link-preview": {
           "type": "string",
-          "description": "string. Logo URL for OpenGraph link previews.",
-          "markdownDescription": "**`string`** Logo URL for OpenGraph link previews."
+          "description": "Logo URL for link previews.",
+          "markdownDescription": "**`string`** Logo URL for link previews."
         },
         "ytm": {
           "type": "object",
           "properties": {
             "id": {
               "type": "integer",
-              "description": "integer. Yandex Turbo Metrika counter ID.",
+              "description": "Yandex Turbo Metrika counter ID.",
               "markdownDescription": "**`integer`** Yandex Turbo Metrika counter ID."
             }
           },
           "additionalProperties": false,
-          "description": "object. Yandex Turbo Metrika configuration.",
+          "description": "Yandex Turbo Metrika configuration.",
           "markdownDescription": "**`object`** Yandex Turbo Metrika configuration."
         },
         "pdf": {
           "type": "boolean",
-          "description": "boolean. Enable PDF generation in docs-build action.",
+          "description": "Enable PDF generation in docs-build action.",
           "markdownDescription": "**`boolean`** Enable PDF generation in docs-build action."
         },
         "support-widget": {
           "$ref": "#/definitions/SupportWidgetConfig",
-          "description": "SupportWidgetConfig. Support chat widget (Yandex Messenger).",
+          "description": "Support chat widget (Yandex Messenger).",
           "markdownDescription": "**`SupportWidgetConfig`** Support chat widget (Yandex Messenger)."
         },
         "logo-src": {
           "type": "string",
-          "description": "string. Legacy logo URL for light theme. Prefer logo-options.src.",
-          "markdownDescription": "**`string`** Legacy logo URL for light theme.\n\n> Prefer `logo-options.src`."
+          "description": "Legacy logo URL for light theme (prefer logo-options.src).",
+          "markdownDescription": "**`string`** Legacy logo URL for light theme (prefer logo-options.src)."
         },
         "logo-dark-src": {
           "type": "string",
-          "description": "string. Legacy logo URL for dark theme. Prefer logo-options.src-dark.",
-          "markdownDescription": "**`string`** Legacy logo URL for dark theme.\n\n> Prefer `logo-options.src-dark`."
+          "description": "Legacy logo URL for dark theme (prefer logo-options.src-dark).",
+          "markdownDescription": "**`string`** Legacy logo URL for dark theme (prefer logo-options.src-dark)."
         },
         "logo-title": {
           "type": "string",
-          "description": "string. Legacy logo title. Prefer logo-options.title.",
-          "markdownDescription": "**`string`** Legacy logo title.\n\n> Prefer `logo-options.title`."
+          "description": "Legacy logo title (prefer logo-options.title).",
+          "markdownDescription": "**`string`** Legacy logo title (prefer logo-options.title)."
         },
         "uxfb": {
           "type": "object",
           "properties": {
             "enabled": {
-              "type": "boolean",
-              "description": "boolean. Enable the UX feedback iframe.",
-              "markdownDescription": "**`boolean`** Enable the UX feedback iframe."
+              "type": "boolean"
             },
             "id": {
-              "type": "string",
-              "description": "string. Yandex Forms form ID.",
-              "markdownDescription": "**`string`** Yandex Forms form ID."
+              "type": "string"
             }
           },
           "additionalProperties": true,
-          "description": "object. UX feedback iframe (Yandex Forms).",
+          "description": "UX feedback iframe (Yandex Forms).",
           "markdownDescription": "**`object`** UX feedback iframe (Yandex Forms)."
         },
         "embed": {
@@ -1417,56 +1420,46 @@
             "type": "object",
             "properties": {
               "host": {
-                "type": "string",
-                "description": "string. Hostname allowed to embed this documentation.",
-                "markdownDescription": "**`string`** Hostname allowed to embed this documentation."
+                "type": "string"
               }
             }
           },
-          "description": "object[]. Allowed embedding hosts (frame-ancestors CSP directive).",
-          "markdownDescription": "**`object[]`** Allowed embedding hosts (`frame-ancestors` CSP directive)."
+          "description": "Allowed embedding hosts (frame-ancestors).",
+          "markdownDescription": "**`object[]`** Allowed embedding hosts (frame-ancestors)."
         },
         "index-page": {
           "type": "object",
           "properties": {
             "title": {
-              "type": "string",
-              "description": "string. Index page title.",
-              "markdownDescription": "**`string`** Index page title."
+              "type": "string"
             },
             "description": {
-              "type": "string",
-              "description": "string. Index page description.",
-              "markdownDescription": "**`string`** Index page description."
+              "type": "string"
             },
             "service-url": {
-              "type": "string",
-              "description": "string. Service URL for the index page.",
-              "markdownDescription": "**`string`** Service URL for the index page."
+              "type": "string"
             },
             "hidden": {
-              "type": "boolean",
-              "description": "boolean. Hide the index page.",
-              "markdownDescription": "**`boolean`** Hide the index page."
+              "type": "boolean"
             }
           },
           "additionalProperties": true,
-          "description": "object. Index page configuration.",
+          "description": "Index page configuration.",
           "markdownDescription": "**`object`** Index page configuration."
         },
         "show-toc-header": {
           "type": "boolean",
-          "description": "boolean. Show the table-of-contents header.",
+          "description": "Show the table-of-contents header.",
           "markdownDescription": "**`boolean`** Show the table-of-contents header."
         },
         "search-by-toc": {
           "type": "boolean",
-          "description": "boolean. Enable search by TOC product.",
+          "description": "Enable search by TOC product.",
           "markdownDescription": "**`boolean`** Enable search by TOC product."
         },
         "protected": {
           "type": "boolean",
-          "description": "boolean. Enable access protection for the project.",
+          "description": "Enable access protection for the project.",
           "markdownDescription": "**`boolean`** Enable access protection for the project."
         },
         "subscription": {
@@ -1476,138 +1469,141 @@
               "type": "object",
               "properties": {
                 "type": {
-                  "type": "string",
-                  "description": "string. Notification type identifier.",
-                  "markdownDescription": "**`string`** Notification type identifier."
+                  "type": "string"
                 }
               },
-              "additionalProperties": false,
-              "description": "object. Notification settings.",
-              "markdownDescription": "**`object`** Notification settings."
+              "additionalProperties": false
             }
           },
           "additionalProperties": false,
-          "description": "object. Subscription and notification settings.",
-          "markdownDescription": "**`object`** Subscription and notification settings."
+          "description": "Subscription/notification settings.",
+          "markdownDescription": "**`object`** Subscription/notification settings."
         },
         "startrek": {
           "type": "object",
           "additionalProperties": true,
-          "description": "object. Startrek integration settings (internal Yandex tool).",
-          "markdownDescription": "**`object`** Startrek integration settings (internal Yandex tool)."
+          "description": "Startrek integration settings (internal).",
+          "markdownDescription": "**`object`** Startrek integration settings (internal)."
+        },
+        "crawler": {
+          "type": "object",
+          "properties": {
+            "exclude": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Exact external URLs to exclude from crawler-manifest.json.",
+                  "markdownDescription": "**`string[]`** Exact external URLs to exclude from crawler-manifest.json."
+                },
+                "regexp": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Regular expression patterns (JS /pattern/flags syntax) matching external URLs to exclude from crawler-manifest.json.",
+                  "markdownDescription": "**`string[]`** Regular expression patterns (JS /pattern/flags syntax) matching external URLs to exclude from crawler-manifest.json."
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "description": "Crawler-manifest filter settings.",
+          "markdownDescription": "**`object`** Crawler-manifest filter settings."
         }
       },
       "additionalProperties": true
     },
     "LogoOptions": {
-      "title": "Logo options",
       "type": "object",
-      "description": "object. Logo configuration for the docs viewer.",
-      "markdownDescription": "**`object`** Logo configuration for the docs viewer.",
       "properties": {
         "src": {
           "oneOf": [
             {
-              "type": "string",
-              "description": "string. Logo image URL for light theme.",
-              "markdownDescription": "**`string`** Logo image URL for light theme."
+              "type": "string"
             },
             {
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              },
-              "description": "Record<string, string>. Map of language codes to logo URLs for light theme.",
-              "markdownDescription": "**`Record<string, string>`** Map of language codes to logo URLs for light theme."
+              }
             }
           ],
-          "description": "string | Record<string, string>. Logo image URL for light theme.",
-          "markdownDescription": "**`string | Record<string, string>`** Logo image URL for light theme. Object form maps language code to URL."
+          "description": "Logo image URL for light theme. Object form maps lang to URL.",
+          "markdownDescription": "**`string | object`** Logo image URL for light theme. Object form maps lang to URL."
         },
         "src-dark": {
           "oneOf": [
             {
-              "type": "string",
-              "description": "string. Logo image URL for dark theme.",
-              "markdownDescription": "**`string`** Logo image URL for dark theme."
+              "type": "string"
             },
             {
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              },
-              "description": "Record<string, string>. Map of language codes to logo URLs for dark theme.",
-              "markdownDescription": "**`Record<string, string>`** Map of language codes to logo URLs for dark theme."
+              }
             }
           ],
-          "description": "string | Record<string, string>. Logo image URL for dark theme.",
-          "markdownDescription": "**`string | Record<string, string>`** Logo image URL for dark theme."
+          "description": "Logo image URL for dark theme.",
+          "markdownDescription": "**`string | object`** Logo image URL for dark theme."
         },
         "src-mobile": {
           "oneOf": [
             {
-              "type": "string",
-              "description": "string. Logo image URL for light theme on mobile.",
-              "markdownDescription": "**`string`** Logo image URL for light theme on mobile."
+              "type": "string"
             },
             {
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              },
-              "description": "Record<string, string>. Map of language codes to mobile logo URLs for light theme.",
-              "markdownDescription": "**`Record<string, string>`** Map of language codes to mobile logo URLs for light theme."
+              }
             }
           ],
-          "description": "string | Record<string, string>. Logo image URL for light theme on mobile.",
-          "markdownDescription": "**`string | Record<string, string>`** Logo image URL for light theme on mobile."
+          "description": "Logo image URL for light theme on mobile.",
+          "markdownDescription": "**`string | object`** Logo image URL for light theme on mobile."
         },
         "src-mobile-dark": {
           "oneOf": [
             {
-              "type": "string",
-              "description": "string. Logo image URL for dark theme on mobile.",
-              "markdownDescription": "**`string`** Logo image URL for dark theme on mobile."
+              "type": "string"
             },
             {
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              },
-              "description": "Record<string, string>. Map of language codes to mobile logo URLs for dark theme.",
-              "markdownDescription": "**`Record<string, string>`** Map of language codes to mobile logo URLs for dark theme."
+              }
             }
           ],
-          "description": "string | Record<string, string>. Logo image URL for dark theme on mobile.",
-          "markdownDescription": "**`string | Record<string, string>`** Logo image URL for dark theme on mobile."
+          "description": "Logo image URL for dark theme on mobile.",
+          "markdownDescription": "**`string | object`** Logo image URL for dark theme on mobile."
         },
         "src-preview": {
           "oneOf": [
             {
-              "type": "string",
-              "description": "string. Logo URL for OpenGraph share preview.",
-              "markdownDescription": "**`string`** Logo URL for OpenGraph share preview."
+              "type": "string"
             },
             {
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              },
-              "description": "Record<string, string>. Map of language codes to preview logo URLs.",
-              "markdownDescription": "**`Record<string, string>`** Map of language codes to preview logo URLs."
+              }
             }
           ],
-          "description": "string | Record<string, string>. Logo for OpenGraph share preview.",
-          "markdownDescription": "**`string | Record<string, string>`** Logo for OpenGraph share preview."
+          "description": "Logo for OpenGraph share preview.",
+          "markdownDescription": "**`string | object`** Logo for OpenGraph share preview."
         },
         "url": {
           "type": "string",
-          "description": "string. Link target when clicking the logo. Supports {lang} placeholder.",
-          "markdownDescription": "**`string`** Link target when clicking the logo. Supports `{lang}` placeholder."
+          "description": "Link target when clicking the logo. Supports {lang} placeholder.",
+          "markdownDescription": "**`string`** Link target when clicking the logo. Supports {lang} placeholder."
         },
         "title": {
           "type": "string",
-          "description": "string. Fallback text when logo image is not set.",
+          "description": "Fallback text when logo image is not set.",
           "markdownDescription": "**`string`** Fallback text when logo image is not set."
         },
         "img-has": {
@@ -1615,103 +1611,87 @@
           "properties": {
             "width": {
               "type": "string",
-              "description": "string. Logo width as a CSS value (e.g. '120px', '8rem').",
-              "markdownDescription": "**`string`** Logo width as a CSS value.\n\nExamples: `120px`, `8rem`."
+              "description": "Logo width (CSS value).",
+              "markdownDescription": "**`string`** Logo width (CSS value)."
             },
             "offset": {
               "type": "boolean",
-              "description": "boolean. Apply offset to logo layout.",
+              "description": "Apply offset to logo layout.",
               "markdownDescription": "**`boolean`** Apply offset to logo layout."
             }
           },
           "additionalProperties": false,
-          "description": "object. Logo layout hints.",
+          "description": "Logo layout hints.",
           "markdownDescription": "**`object`** Logo layout hints."
         }
       },
       "additionalProperties": false
     },
     "SupportWidgetConfig": {
-      "title": "Support widget configuration",
       "type": "object",
-      "description": "object. Support chat widget configuration (Yandex Messenger).",
-      "markdownDescription": "**`object`** Support chat widget configuration (Yandex Messenger).",
       "properties": {
         "bot-guid": {
           "type": "string",
-          "description": "string. Yandex Messenger bot GUID.",
+          "description": "Yandex Messenger bot GUID.",
           "markdownDescription": "**`string`** Yandex Messenger bot GUID."
         },
         "service-id": {
           "type": "string",
-          "description": "string. Yandex Messenger support service ID.",
+          "description": "Yandex Messenger support service ID.",
           "markdownDescription": "**`string`** Yandex Messenger support service ID."
         },
         "disabled": {
           "type": "boolean",
-          "description": "boolean. Disable the support widget.",
+          "description": "Disable the support widget.",
           "markdownDescription": "**`boolean`** Disable the support widget."
         }
       },
       "additionalProperties": true
     },
     "TranslateConfig": {
-      "title": "Translate command configuration",
       "type": "object",
-      "description": "object. Translate command configuration.",
-      "markdownDescription": "**`object`** Translate command configuration.",
       "properties": {
         "provider": {
           "type": "string",
-          "description": "string. Translation service provider identifier.",
-          "markdownDescription": "**`string`** Translation service provider identifier.\n\nExamples: `yandex`, `deepl`."
+          "description": "Translation service provider identifier.",
+          "markdownDescription": "**`string`** Translation service provider identifier."
         },
         "source": {
           "oneOf": [
             {
-              "type": "string",
-              "description": "string. Source language as ISO 639-1 code (e.g. 'en', 'ru').",
-              "markdownDescription": "**`string`** Source language as ISO 639-1 code.\n\nExamples: `en`, `ru`."
+              "type": "string"
             },
             {
               "type": "object",
-              "required": ["language"],
               "properties": {
                 "language": {
-                  "type": "string",
-                  "description": "string. ISO 639-1 language code.",
-                  "markdownDescription": "**`string`** ISO 639-1 language code."
+                  "type": "string"
                 },
                 "locale": {
-                  "type": "string",
-                  "description": "string. Locale code (e.g. 'en-US').",
-                  "markdownDescription": "**`string`** Locale code.\n\nExample: `en-US`."
+                  "type": "string"
                 }
               },
-              "description": "object. Source language as {language, locale} object.",
-              "markdownDescription": "**`object`** Source language as `{language, locale}` object."
+              "required": [
+                "language"
+              ]
             }
           ],
-          "description": "string | object. Source language: ISO 639-1 code or {language, locale} object.",
-          "markdownDescription": "**`string | object`** Source language: ISO 639-1 code string or `{language, locale}` object."
+          "description": "Source language (ISO 639-1 code or {language, locale}).",
+          "markdownDescription": "**`string | object`** Source language.\n\n- String: ISO 639-1 code (`'en'`, `'ru'`)\n- Object: `{language: 'en', locale?: 'US'}`"
         },
         "target": {
           "oneOf": [
             {
-              "type": "string",
-              "description": "string. Single target language code.",
-              "markdownDescription": "**`string`** Single target language code."
+              "type": "string"
             },
             {
               "type": "array",
               "items": {
                 "type": "string"
-              },
-              "description": "string[]. Multiple target language codes.",
-              "markdownDescription": "**`string[]`** Multiple target language codes."
+              }
             }
           ],
-          "description": "string | string[]. Target language(s) to translate to.",
+          "description": "Target language(s) to translate to.",
           "markdownDescription": "**`string | string[]`** Target language(s) to translate to."
         },
         "files": {
@@ -1719,7 +1699,7 @@
           "items": {
             "type": "string"
           },
-          "description": "string[]. Explicit list of files or filter-lists to translate.",
+          "description": "Explicit list of files/filter-lists to translate.",
           "markdownDescription": "**`string[]`** Explicit list of files or filter-lists to translate."
         },
         "include": {
@@ -1727,7 +1707,7 @@
           "items": {
             "type": "string"
           },
-          "description": "string[]. Glob patterns or paths for files to include in translation.",
+          "description": "Glob patterns or paths for files to include.",
           "markdownDescription": "**`string[]`** Glob patterns or paths for files to include in translation."
         },
         "exclude": {
@@ -1735,60 +1715,63 @@
           "items": {
             "type": "string"
           },
-          "description": "string[]. Glob patterns or paths for files to exclude from translation.",
+          "description": "Glob patterns or paths for files to exclude.",
           "markdownDescription": "**`string[]`** Glob patterns or paths for files to exclude from translation."
         },
         "vars": {
           "type": "object",
-          "description": "object. Variables passed directly to the translation pipeline.",
-          "markdownDescription": "**`object`** Variables passed directly to the translation pipeline.",
-          "additionalProperties": true
+          "description": "Variables passed directly to the translation pipeline.",
+          "markdownDescription": "**`object`** Variables passed to the translation pipeline (overrides presets)."
         },
         "dryRun": {
           "type": "boolean",
-          "description": "boolean. Calculate translation quota without executing the translation.",
+          "description": "Calculate quota without executing translation.",
           "markdownDescription": "**`boolean`** Calculate translation quota without executing the translation."
         },
         "useSource": {
           "type": "boolean",
-          "description": "boolean. Use original text as translation result (debug mode, no API calls).",
-          "markdownDescription": "**`boolean`** Use original text as translation result (debug mode, no API calls)."
+          "description": "Use original text as translation result (debug mode).",
+          "markdownDescription": "**`boolean`** Use the original source text as the translation output (debug mode)."
         },
         "schema": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "string[]. Paths to custom translate schema files.",
+          "description": "Paths to custom translate schema files.",
           "markdownDescription": "**`string[]`** Paths to custom translate schema files."
         },
         "filter": {
           "type": "boolean",
-          "description": "boolean. Only translate files resolved from toc.yaml.",
-          "markdownDescription": "**`boolean`** Only translate files resolved from `toc.yaml`."
+          "description": "Only translate files resolved from toc.yaml.",
+          "markdownDescription": "**`boolean`** Only translate files resolved from toc.yaml."
         },
         "noRefResolve": {
           "type": "boolean",
-          "description": "boolean. Disable $ref resolving in OpenAPI during extract phase.",
-          "markdownDescription": "**`boolean`** Disable `$ref` resolving in OpenAPI during extract phase."
+          "description": "Disable $ref resolving in OpenAPI during extract.",
+          "markdownDescription": "**`boolean`** Disable $ref resolving in OpenAPI during extract."
         },
         "folder": {
           "type": "string",
-          "description": "string. Yandex Cloud folder ID (provider-specific).",
+          "description": "Yandex Cloud folder ID (provider-specific).",
           "markdownDescription": "**`string`** Yandex Cloud folder ID (provider-specific)."
         },
         "glossary": {
           "type": "string",
-          "description": "string. Path to glossary YAML file (provider-specific).",
-          "markdownDescription": "**`string`** Path to glossary YAML file (provider-specific)."
+          "description": "Path to glossary YAML file (provider-specific).",
+          "markdownDescription": "**`string`** Path to a glossary YAML file (provider-specific)."
         },
         "auth": {
           "type": "string",
-          "description": "string. Authorization token for translation API. WARNING: Do not store secrets in config.",
-          "markdownDescription": "**`string`** Authorization token for translation API (provider-specific).\n\n> ⚠️ **WARNING:** Do not store secrets in the config file."
+          "sensitive": true,
+          "description": "Authorization token for translation API (provider-specific).",
+          "markdownDescription": "**`string`** ⚠️ Authorization token for the translation API. Use environment variables instead of storing here."
         }
       },
-      "additionalProperties": true
+      "additionalProperties": true,
+      "description": "Translate command config. Fields: provider, source, target, files, include, exclude, vars, dryRun, useSource, and provider-specific fields.",
+      "markdownDescription": "**`TranslateConfig`** Configuration for the `translate` command.\n\n- `provider` **`string`** — translation service identifier\n- `source` **`string | object`** — source language (`'en'` or `{language, locale?}`)\n- `target` **`string | string[]`** — target language(s)\n- `files` **`string[]`** — explicit file list\n- `include` / `exclude` **`string[]`** — glob filters\n- `dryRun` **`boolean`** — calculate quota without translating\n- `useSource` **`boolean`** — use original text as output (debug)"
     }
-  }
+  },
+  "markdownDescription": "Diplodoc build configuration file (`.yfm` or `.yfm.yaml`).\nControls the documentation build: input/output paths, language, output format, VCS integration, linting, search, extensions, and much more.\n```yaml input: ./docs output: ./build lang: en outputFormat: html ```"
 }
