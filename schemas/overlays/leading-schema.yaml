@@ -1,0 +1,113 @@
+title: Diplodoc (index.yaml)
+markdownDescription: >-
+  Diplodoc leading page file (`index.yaml`).
+
+  A leading page is a structured landing page for a documentation section.
+  It can display a title, description, navigation links, and arbitrary
+  page-constructor blocks.
+
+  ```yaml
+  title: Getting Started
+  description: Learn how to set up and use My Product.
+  links:
+    - title: Quickstart
+      description: Up and running in 5 minutes.
+      href: quickstart.md
+    - title: Concepts
+      description: Core concepts and architecture.
+      href: concepts/index.yaml
+  ```
+
+properties:
+  title:
+    description: Main heading of the leading page. Supports conditional text items.
+    markdownDescription: "**`string | TextItems`** Main heading displayed at the top of the leading page.\n\nCan be a plain string or a conditional `TextItem` array:\n```yaml\ntitle: My Section\n```"
+  description:
+    description: Short description shown below the title. Supports conditional text items.
+    markdownDescription: "**`string | TextItems`** Short description shown below the title on the leading page."
+  meta:
+    description: Page metadata (SEO fields, resources, access rules).
+    markdownDescription: "**`object`** Page metadata — SEO, resources, and access control. Uses the same fields as Markdown frontmatter."
+    defaultSnippets:
+      - label: SEO metadata
+        body:
+          title: "${1:Page title for SEO}"
+          description: "${2:Page description for SEO}"
+          noIndex: false
+    properties:
+      title:
+        markdownDescription: "**`string`** SEO title override (takes precedence over the top-level `title`)."
+      description:
+        markdownDescription: "**`string`** SEO description override."
+      noIndex:
+        markdownDescription: "**`boolean`** Prevent search engine indexing of this page."
+      keywords:
+        markdownDescription: "**`string[]`** Keywords for the `<meta name=\"keywords\">` tag."
+      canonical:
+        markdownDescription: "**`string (uri)`** Canonical URL (`<link rel=\"canonical\">`)."
+      copyright:
+        markdownDescription: "**`string`** Copyright owner string."
+      script:
+        markdownDescription: "**`string[]`** Script files to inject on this page only."
+      style:
+        markdownDescription: "**`string[]`** Stylesheet files to inject on this page only."
+      restricted-access:
+        markdownDescription: "**`string[][]`** Access restriction rules — same format as frontmatter."
+  nav:
+    description: Breadcrumb / navigation override for this leading page.
+    markdownDescription: "**`object`** Navigation breadcrumb override for this leading page."
+    properties:
+      title:
+        description: Title used in the breadcrumb navigation for this section.
+        markdownDescription: "**`string`** Title shown in the breadcrumb navigation for this section (overrides the TOC entry name)."
+  links:
+    description: Navigation link cards displayed on the leading page.
+    markdownDescription: "**`object[]`** Navigation link cards shown on the leading page. Each card has a title, optional description, and an `href`.\n\n```yaml\nlinks:\n  - title: Quickstart\n    description: Up and running in 5 minutes.\n    href: quickstart.md\n```"
+    items:
+      description: A single navigation link card.
+      markdownDescription: "**`object`** A navigation link card on the leading page."
+      defaultSnippets:
+        - label: Link card
+          body:
+            title: "${1:Card title}"
+            description: "${2:Card description}"
+            href: "${3:page.md}"
+      properties:
+        title:
+          description: Card title text.
+          markdownDescription: "**`string`** Card title text. Supports conditional `TextItems`."
+        description:
+          description: Card description text shown below the title.
+          markdownDescription: "**`string`** Card description shown below the title. Supports conditional `TextItems`."
+        href:
+          description: Relative path to the target page or section.
+          markdownDescription: "**`string`** Relative path to the target `.md` page or `index.yaml` section."
+        when:
+          description: Liquid condition. Card is hidden when false.
+          markdownDescription: "**`string | boolean`** Liquid condition — card is hidden when the expression is falsy."
+
+definitions:
+  TextItems:
+    description: Plain string or array of conditional text items.
+    markdownDescription: "**`string | TextItem[]`** Text value — either a plain string or a list of conditional text items (the first item whose `when` condition is truthy is used)."
+  TextItem:
+    description: Conditional text item — the first item whose 'when' is truthy is used.
+    markdownDescription: "**`TextItem`** Conditional text item. The first item in the array whose `when` evaluates to `true` is displayed.\n\n```yaml\ntitle:\n  - text: Internal title\n    when: env == 'internal'\n  - text: Public title\n```"
+    properties:
+      text:
+        description: Text content to display when the condition is met.
+        markdownDescription: "**`string | string[]`** Text content shown when `when` is truthy. **Required.**"
+      when:
+        description: Liquid condition. This item is used when the expression is truthy.
+        markdownDescription: "**`string | boolean`** Liquid condition. This item is selected when the expression is truthy."
+  Alternate:
+    description: Alternate language version of this page.
+    markdownDescription: "**`Alternate`** Alternate language version for `<link rel=\"alternate\">`."
+    properties:
+      href:
+        markdownDescription: "**`string (uri)`** URL of the alternate page."
+      hreflang:
+        markdownDescription: "**`string`** Language code (e.g. `en`, `ru`)."
+  MetaItem:
+    description: Custom HTML meta tag definition.
+    markdownDescription: "**`MetaItem`** Custom `<meta>` tag — requires `content` plus one of `name`, `property`, or `http-equiv`."

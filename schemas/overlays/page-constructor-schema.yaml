@@ -1,0 +1,6 @@
+title: Diplodoc (page-constructor)
+markdownDescription: >-
+  Diplodoc page-constructor file.
+
+  Defines a structured landing page using block components from
+  `@gravity-ui/page-constructor`.

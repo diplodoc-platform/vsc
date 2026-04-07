@@ -1,0 +1,584 @@
+{
+  "title": "Diplodoc (.yfmlint)",
+  "type": "object",
+  "properties": {
+    "default": {
+      "type": "boolean",
+      "description": "Default state for all rules. false disables all rules unless individually overridden.",
+      "markdownDescription": "**`boolean`** Default enabled state for **all** rules.\n\n- `true` — all rules are enabled at their default level unless overridden\n- `false` — all rules are disabled unless individually overridden\n\nUseful for an allowlist approach: set `default: false`, then enable only specific rules."
+    },
+    "log-levels": {
+      "type": "object",
+      "description": "Override the log level for specific rules without changing their enabled state.",
+      "properties": {
+        "MD001": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD002": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD003": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD004": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD005": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD006": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD007": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD009": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD010": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD011": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD012": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD013": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD014": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD018": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD019": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD020": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD021": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD022": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD023": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD024": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD025": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD026": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD027": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD028": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD029": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD030": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD031": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD032": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD033": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD034": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD035": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD036": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD037": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD038": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD039": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD040": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD041": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD042": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD043": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD044": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD045": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD046": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD047": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "MD048": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM001": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM002": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM003": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM004": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM005": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM006": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM007": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM008": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM009": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM010": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM011": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM012": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM013": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM014": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM015": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM016": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "YFM017": {
+          "$ref": "#/definitions/LogLevel"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/definitions/LogLevel"
+      },
+      "markdownDescription": "**`object`** Override the log/severity level for specific rules.\n\nLevels: `error` · `warn` · `info` · `disabled`\n\n```yaml\nlog-levels:\n  MD013: warn\n  YFM003: error\n```"
+    },
+    "MD001": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "heading-increment: Heading levels should only increment by one level at a time.",
+      "markdownDescription": "**`RuleValue`** **MD001** `heading-increment` — Heading levels must only increment by one level at a time.\n\nBad: `## H2` followed immediately by `#### H4`."
+    },
+    "MD002": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "first-heading-h1: First heading should be a top-level heading.",
+      "markdownDescription": "**`RuleValue`** **MD002** `first-heading-h1` — The first heading in a document must be a top-level `#` heading."
+    },
+    "MD003": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "heading-style: Heading style should be consistent.",
+      "markdownDescription": "**`RuleValue`** **MD003** `heading-style` — Heading style must be consistent throughout the document (atx `#` or setext `===`)."
+    },
+    "MD004": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "ul-style: Unordered list style should be consistent.",
+      "markdownDescription": "**`RuleValue`** **MD004** `ul-style` — Unordered list marker style must be consistent (`-`, `*`, or `+`)."
+    },
+    "MD005": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "list-indent: Inconsistent indentation for list items at the same level.",
+      "markdownDescription": "**`RuleValue`** list-indent: Inconsistent indentation for list items at the same level."
+    },
+    "MD006": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "ul-start-left: Consider starting bulleted lists at the beginning of the line.",
+      "markdownDescription": "**`RuleValue`** ul-start-left: Consider starting bulleted lists at the beginning of the line."
+    },
+    "MD007": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "ul-indent: Unordered list indentation.",
+      "markdownDescription": "**`RuleValue`** **MD007** `ul-indent` — Unordered list items must be indented consistently."
+    },
+    "MD009": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-trailing-spaces: Trailing spaces.",
+      "markdownDescription": "**`RuleValue`** no-trailing-spaces: Trailing spaces."
+    },
+    "MD010": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-hard-tabs: Hard tabs.",
+      "markdownDescription": "**`RuleValue`** no-hard-tabs: Hard tabs."
+    },
+    "MD011": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-reversed-links: Reversed link syntax.",
+      "markdownDescription": "**`RuleValue`** no-reversed-links: Reversed link syntax."
+    },
+    "MD012": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-multiple-blanks: Multiple consecutive blank lines.",
+      "markdownDescription": "**`RuleValue`** no-multiple-blanks: Multiple consecutive blank lines."
+    },
+    "MD013": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "line-length: Line length should not exceed a maximum.",
+      "markdownDescription": "**`RuleValue`** **MD013** `line-length` — Lines must not exceed the configured maximum length (default: 80).\n\nOften disabled in documentation projects."
+    },
+    "MD014": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "commands-show-output: Dollar signs used before commands without showing output.",
+      "markdownDescription": "**`RuleValue`** commands-show-output: Dollar signs used before commands without showing output."
+    },
+    "MD018": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-missing-space-atx: No space after hash on atx style heading.",
+      "markdownDescription": "**`RuleValue`** no-missing-space-atx: No space after hash on atx style heading."
+    },
+    "MD019": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-multiple-space-atx: Multiple spaces after hash on atx style heading.",
+      "markdownDescription": "**`RuleValue`** no-multiple-space-atx: Multiple spaces after hash on atx style heading."
+    },
+    "MD020": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-missing-space-closed-atx: No space inside hashes on closed atx style heading.",
+      "markdownDescription": "**`RuleValue`** no-missing-space-closed-atx: No space inside hashes on closed atx style heading."
+    },
+    "MD021": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-multiple-space-closed-atx: Multiple spaces inside hashes on closed atx style heading.",
+      "markdownDescription": "**`RuleValue`** no-multiple-space-closed-atx: Multiple spaces inside hashes on closed atx style heading."
+    },
+    "MD022": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "blanks-around-headings: Headings should be surrounded by blank lines.",
+      "markdownDescription": "**`RuleValue`** **MD022** `blanks-around-headings` — Headings must have a blank line before and after them."
+    },
+    "MD023": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "heading-start-left: Headings must start at the beginning of the line.",
+      "markdownDescription": "**`RuleValue`** heading-start-left: Headings must start at the beginning of the line."
+    },
+    "MD024": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-duplicate-heading: Multiple headings with the same content.",
+      "markdownDescription": "**`RuleValue`** **MD024** `no-duplicate-heading` — Document must not have multiple headings with identical text."
+    },
+    "MD025": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "single-h1: Only one top-level heading per document.",
+      "markdownDescription": "**`RuleValue`** **MD025** `single-h1` — Each document should have exactly one `#` top-level heading."
+    },
+    "MD026": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-trailing-punctuation: Trailing punctuation in heading.",
+      "markdownDescription": "**`RuleValue`** no-trailing-punctuation: Trailing punctuation in heading."
+    },
+    "MD027": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-multiple-space-blockquote: Multiple spaces after blockquote symbol.",
+      "markdownDescription": "**`RuleValue`** no-multiple-space-blockquote: Multiple spaces after blockquote symbol."
+    },
+    "MD028": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-blanks-blockquote: Blank line inside blockquote.",
+      "markdownDescription": "**`RuleValue`** no-blanks-blockquote: Blank line inside blockquote."
+    },
+    "MD029": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "ol-prefix: Ordered list item prefix.",
+      "markdownDescription": "**`RuleValue`** ol-prefix: Ordered list item prefix."
+    },
+    "MD030": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "list-marker-space: Spaces after list markers.",
+      "markdownDescription": "**`RuleValue`** list-marker-space: Spaces after list markers."
+    },
+    "MD031": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "blanks-around-fences: Fenced code blocks should be surrounded by blank lines.",
+      "markdownDescription": "**`RuleValue`** blanks-around-fences: Fenced code blocks should be surrounded by blank lines."
+    },
+    "MD032": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "blanks-around-lists: Lists should be surrounded by blank lines.",
+      "markdownDescription": "**`RuleValue`** blanks-around-lists: Lists should be surrounded by blank lines."
+    },
+    "MD033": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-inline-html: Inline HTML is controlled by allowHtml config.",
+      "markdownDescription": "**`RuleValue`** **MD033** `no-inline-html` — Raw HTML tags inside Markdown. Controlled automatically by the `allowHtml` build config."
+    },
+    "MD034": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-bare-urls: Bare URL used.",
+      "markdownDescription": "**`RuleValue`** no-bare-urls: Bare URL used."
+    },
+    "MD035": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "hr-style: Horizontal rule style.",
+      "markdownDescription": "**`RuleValue`** hr-style: Horizontal rule style."
+    },
+    "MD036": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-emphasis-as-heading: Emphasis used instead of a heading.",
+      "markdownDescription": "**`RuleValue`** no-emphasis-as-heading: Emphasis used instead of a heading."
+    },
+    "MD037": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-space-in-emphasis: Spaces inside emphasis markers.",
+      "markdownDescription": "**`RuleValue`** no-space-in-emphasis: Spaces inside emphasis markers."
+    },
+    "MD038": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-space-in-code: Spaces inside code span elements.",
+      "markdownDescription": "**`RuleValue`** no-space-in-code: Spaces inside code span elements."
+    },
+    "MD039": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-space-in-links: Spaces inside link text.",
+      "markdownDescription": "**`RuleValue`** no-space-in-links: Spaces inside link text."
+    },
+    "MD040": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "fenced-code-language: Fenced code blocks should declare a language.",
+      "markdownDescription": "**`RuleValue`** **MD040** `fenced-code-language` — Fenced code blocks should specify a language for syntax highlighting.\n\n````md\n```javascript\nconst x = 1;\n```\n````"
+    },
+    "MD041": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "first-line-h1: First line should be a top-level heading.",
+      "markdownDescription": "**`RuleValue`** **MD041** `first-line-h1` — The first line of the document should be a `#` heading.\n\nOften disabled when pages use frontmatter `title`."
+    },
+    "MD042": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-empty-links: No empty links.",
+      "markdownDescription": "**`RuleValue`** no-empty-links: No empty links."
+    },
+    "MD043": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "required-headings: Required heading structure.",
+      "markdownDescription": "**`RuleValue`** required-headings: Required heading structure."
+    },
+    "MD044": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "proper-names: Proper names should have the correct capitalization.",
+      "markdownDescription": "**`RuleValue`** proper-names: Proper names should have the correct capitalization."
+    },
+    "MD045": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-alt-text: Images should have alternate text.",
+      "markdownDescription": "**`RuleValue`** no-alt-text: Images should have alternate text."
+    },
+    "MD046": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "code-block-style: Code block style.",
+      "markdownDescription": "**`RuleValue`** code-block-style: Code block style."
+    },
+    "MD047": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "single-trailing-newline: Files should end with a single newline character.",
+      "markdownDescription": "**`RuleValue`** single-trailing-newline: Files should end with a single newline character."
+    },
+    "MD048": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "code-fence-style: Code fence style.",
+      "markdownDescription": "**`RuleValue`** code-fence-style: Code fence style."
+    },
+    "YFM001": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/definitions/LogLevel"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "level": {
+              "$ref": "#/definitions/LogLevel"
+            },
+            "maximum": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 100
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "description": "inline-code-length: Inline code span exceeds maximum length.",
+      "markdownDescription": "**`boolean | LogLevel | object`** **YFM001** `inline-code-length` — Inline code spans must not exceed the maximum character length.\n\nObject form lets you set `maximum`:\n```yaml\nYFM001:\n  level: warn\n  maximum: 100\n```"
+    },
+    "YFM002": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-header-found-for-link: Link anchor references a heading that does not exist.",
+      "markdownDescription": "**`RuleValue`** **YFM002** `no-header-found-for-link` — Anchor fragments in links (e.g. `page.md#section`) must reference an existing heading."
+    },
+    "YFM003": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "unreachable-link: Linked file does not exist or is not included in the TOC.",
+      "markdownDescription": "**`RuleValue`** **YFM003** `unreachable-link` — All internal links must point to files that exist **and** are reachable via the TOC."
+    },
+    "YFM004": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "table-not-closed: YFM table block is missing a closing token.",
+      "markdownDescription": "**`RuleValue`** **YFM004** `table-not-closed` — Every `{% list type=... %}` table block must have a matching `{% endlist %}`."
+    },
+    "YFM005": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "tab-list-not-closed: Tab list is missing a closing token.",
+      "markdownDescription": "**`RuleValue`** **YFM005** `tab-list-not-closed` — Every `{% list tabs %}` block must have a matching `{% endlist %}`."
+    },
+    "YFM006": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "term-definition-duplicated: Same term is defined more than once.",
+      "markdownDescription": "**`RuleValue`** **YFM006** `term-definition-duplicated` — Each term (`[*key]: ...`) must be defined only once per file."
+    },
+    "YFM007": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "term-used-without-definition: Term is referenced but never defined.",
+      "markdownDescription": "**`RuleValue`** **YFM007** `term-used-without-definition` — Every term reference (`{[key]}`) must have a corresponding definition."
+    },
+    "YFM008": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "term-inside-definition-not-allowed: Term reference inside its own definition.",
+      "markdownDescription": "**`RuleValue`** **YFM008** `term-inside-definition-not-allowed` — A term definition must not reference itself."
+    },
+    "YFM009": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "no-term-definition-in-content: Term definitions must be at the end of the file.",
+      "markdownDescription": "**`RuleValue`** **YFM009** `no-term-definition-in-content` — Term definitions (`[*key]: ...`) must appear at the **end** of the file, after all content."
+    },
+    "YFM010": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "unreachable-autotitle-anchor: Auto-generated title anchor is unreachable.",
+      "markdownDescription": "**`RuleValue`** **YFM010** `unreachable-autotitle-anchor` — An auto-generated heading anchor is not reachable via any link in the project."
+    },
+    "YFM011": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "max-svg-size: SVG file exceeds the maximum allowed file size.",
+      "markdownDescription": "**`RuleValue`** **YFM011** `max-svg-size` — SVG assets must not exceed the configured size limit (from `content.maxInlineSvgSize`)."
+    },
+    "YFM012": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "max-html-size: Output HTML file size exceeds the limit.",
+      "markdownDescription": "**`RuleValue`** **YFM012** `max-html-size` — Generated HTML page must not exceed the configured size limit (from `content.maxHtmlSize`).",
+      "doNotSuggest": true
+    },
+    "YFM013": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "max-asset-size: Single asset file size exceeds the limit.",
+      "markdownDescription": "**`RuleValue`** **YFM013** `max-asset-size` — Asset files must not exceed the configured size limit (from `content.maxAssetSize`).",
+      "doNotSuggest": true
+    },
+    "YFM014": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "anchor-as-filepath: Anchor used as file path in an include directive.",
+      "readOnly": true,
+      "markdownDescription": "**`RuleValue`** **YFM014** `anchor-as-filepath` *(build-time)* — A `#anchor` fragment was mistakenly used as a file path in an `{% include %}` directive.",
+      "doNotSuggest": true
+    },
+    "YFM015": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "anchor-not-found: Anchor referenced in an include was not found.",
+      "readOnly": true,
+      "markdownDescription": "**`RuleValue`** **YFM015** `anchor-not-found` *(build-time)* — The anchor fragment specified in an include was not found in the target file.",
+      "doNotSuggest": true
+    },
+    "YFM016": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "self-include: A file includes itself.",
+      "readOnly": true,
+      "markdownDescription": "**`RuleValue`** **YFM016** `self-include` *(build-time)* — A file must not include itself (circular include).",
+      "doNotSuggest": true
+    },
+    "YFM017": {
+      "$ref": "#/definitions/RuleValue",
+      "description": "invalid-frontmatter: Frontmatter block has invalid YAML (e.g. duplicated keys).",
+      "readOnly": true,
+      "markdownDescription": "**`RuleValue`** **YFM017** `invalid-frontmatter` *(build-time)* — The frontmatter YAML block contains invalid syntax (e.g. duplicate mapping keys).",
+      "doNotSuggest": true
+    }
+  },
+  "additionalProperties": {
+    "$ref": "#/definitions/RuleValue"
+  },
+  "definitions": {
+    "LogLevel": {
+      "type": "string",
+      "enum": [
+        "error",
+        "warn",
+        "info",
+        "disabled"
+      ],
+      "description": "Rule severity level: error | warn | info | disabled.",
+      "markdownDescription": "**`string`** Rule severity level.",
+      "markdownEnumDescriptions": [
+        "**error** — rule violation causes the build to fail (exit code 1).",
+        "**warn** — rule violation is reported but the build succeeds.",
+        "**info** — rule violation is logged as information only.",
+        "**disabled** — rule is completely silenced."
+      ]
+    },
+    "RuleValue": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/definitions/LogLevel"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "level": {
+              "$ref": "#/definitions/LogLevel"
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "description": "Rule value: true/false, a log level string, or an object with level and rule-specific options.",
+      "markdownDescription": "**`boolean | LogLevel | object`** Rule configuration.\n\n- `true` — enable at default level\n- `false` — disable\n- `'error'` / `'warn'` / `'info'` / `'disabled'` — set level\n- Object — set level plus rule-specific options:\n  ```yaml\n  level: warn\n  # rule-specific options here\n  ```"
+    }
+  },
+  "markdownDescription": "YFM lint configuration file (`.yfmlint`).\nControls which Markdown and YFM rules are enabled and at what severity level.\n```yaml # Disable all rules by default, then enable only what you need default: false MD013: false       # line-length — disable YFM003: warn       # unreachable-link — warn YFM001:\n  level: error\n  maximum: 80      # inline code max length\n```"
+}

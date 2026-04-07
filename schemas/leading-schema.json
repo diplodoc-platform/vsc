@@ -1,0 +1,386 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://diplodoc.com/schemas/leading/draft-01/schema#",
+  "title": "Diplodoc (index.yaml)",
+  "type": "object",
+  "properties": {
+    "title": {
+      "$ref": "#/definitions/TextItems",
+      "description": "Main heading of the leading page. Supports conditional text items.",
+      "markdownDescription": "**`string | TextItems`** Main heading displayed at the top of the leading page.\n\nCan be a plain string or a conditional `TextItem` array:\n```yaml\ntitle: My Section\n```"
+    },
+    "description": {
+      "$ref": "#/definitions/TextItems",
+      "description": "Short description shown below the title. Supports conditional text items.",
+      "markdownDescription": "**`string | TextItems`** Short description shown below the title on the leading page."
+    },
+    "meta": {
+      "type": "object",
+      "description": "Page metadata (SEO fields, resources, access rules).",
+      "properties": {
+        "title": {
+          "$ref": "#/definitions/TextItems",
+          "description": "SEO title override (takes precedence over the top-level title).",
+          "markdownDescription": "**`string`** SEO title override (takes precedence over the top-level `title`)."
+        },
+        "description": {
+          "$ref": "#/definitions/TextItems",
+          "description": "SEO description override.",
+          "markdownDescription": "**`string`** SEO description override."
+        },
+        "noIndex": {
+          "type": "boolean",
+          "description": "Adds noindex/nofollow meta tag to prevent search engine indexing.",
+          "markdownDescription": "**`boolean`** Prevent search engine indexing of this page."
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Keywords for the meta keywords tag.",
+          "markdownDescription": "**`string[]`** Keywords for the `<meta name=\"keywords\">` tag."
+        },
+        "canonical": {
+          "type": "string",
+          "format": "uri",
+          "description": "Canonical URL for the page.",
+          "markdownDescription": "**`string (uri)`** Canonical URL (`<link rel=\"canonical\">`)."
+        },
+        "copyright": {
+          "type": "string",
+          "description": "Copyright owner string.",
+          "markdownDescription": "**`string`** Copyright owner string."
+        },
+        "alternate": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Alternate"
+          },
+          "description": "Alternate language versions of this page.",
+          "markdownDescription": "**`Alternate[]`** Alternate language versions of this page."
+        },
+        "metadata": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MetaItem"
+              }
+            },
+            {
+              "type": "object"
+            }
+          ],
+          "description": "Custom meta tags (array of {name/property, content} or key-value hash).",
+          "markdownDescription": "**`MetaItem[] | object`** Custom meta tags (array of {name/property, content} or key-value hash)."
+        },
+        "restricted-access": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": "Access restriction rules.",
+          "markdownDescription": "**`string[][]`** Access restriction rules — same format as frontmatter."
+        },
+        "script": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Script file paths or URLs to include on this page.",
+          "markdownDescription": "**`string[]`** Script files to inject on this page only."
+        },
+        "style": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Stylesheet file paths or URLs to include on this page.",
+          "markdownDescription": "**`string[]`** Stylesheet files to inject on this page only."
+        },
+        "csp": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "Content Security Policy directive overrides for this page.",
+          "markdownDescription": "**`object[]`** Content Security Policy directive overrides for this page."
+        },
+        "resources": {
+          "type": "object",
+          "properties": {
+            "script": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "csp": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "description": "Per-page resources (legacy, prefer top-level script/style/csp).",
+          "markdownDescription": "**`object`** Per-page resources (legacy, prefer top-level script/style/csp)."
+        },
+        "vcsPath": {
+          "type": "string",
+          "description": "VCS file path override.",
+          "markdownDescription": "**`string`** VCS file path override."
+        },
+        "sourcePath": {
+          "type": "string",
+          "description": "Source file path (usually set by the build system).",
+          "markdownDescription": "**`string`** Source file path (usually set by the build system)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last modification timestamp from VCS (system-generated).",
+          "markdownDescription": "**`string`** Last modification timestamp from VCS (system-generated)."
+        },
+        "author": {
+          "$ref": "#/definitions/Contributor",
+          "description": "Page author from VCS (system-generated).",
+          "markdownDescription": "**`Contributor`** Page author from VCS (system-generated)."
+        },
+        "contributors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Contributor"
+          },
+          "description": "Page contributors from VCS (system-generated).",
+          "markdownDescription": "**`Contributor[]`** Page contributors from VCS (system-generated)."
+        },
+        "editable": {
+          "type": "boolean",
+          "description": "Whether the document is editable (system-generated).",
+          "markdownDescription": "**`boolean`** Whether the document is editable (system-generated)."
+        },
+        "__system": {
+          "type": "object",
+          "description": "System variables from presets (only when addSystemMeta is enabled).",
+          "markdownDescription": "**`object`** System variables from presets (only when addSystemMeta is enabled)."
+        },
+        "__metadata": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MetaItem"
+          },
+          "description": "Metadata items from presets (only when addMetadataMeta is enabled).",
+          "markdownDescription": "**`MetaItem[]`** Metadata items from presets (only when addMetadataMeta is enabled)."
+        }
+      },
+      "additionalProperties": true,
+      "markdownDescription": "**`object`** Page metadata — SEO, resources, and access control. Uses the same fields as Markdown frontmatter.",
+      "defaultSnippets": [
+        {
+          "label": "SEO metadata",
+          "body": {
+            "title": "${1:Page title for SEO}",
+            "description": "${2:Page description for SEO}",
+            "noIndex": false
+          }
+        }
+      ]
+    },
+    "nav": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "$ref": "#/definitions/TextItems",
+          "description": "Title used in the breadcrumb navigation for this section.",
+          "markdownDescription": "**`string`** Title shown in the breadcrumb navigation for this section (overrides the TOC entry name)."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Breadcrumb / navigation override for this leading page.",
+      "markdownDescription": "**`object`** Navigation breadcrumb override for this leading page."
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "$ref": "#/definitions/TextItems",
+            "description": "Card title text.",
+            "markdownDescription": "**`string`** Card title text. Supports conditional `TextItems`."
+          },
+          "description": {
+            "$ref": "#/definitions/TextItems",
+            "description": "Card description text shown below the title.",
+            "markdownDescription": "**`string`** Card description shown below the title. Supports conditional `TextItems`."
+          },
+          "href": {
+            "type": "string",
+            "format": "url",
+            "description": "Relative path to the target page or section.",
+            "markdownDescription": "**`string`** Relative path to the target `.md` page or `index.yaml` section."
+          },
+          "when": {
+            "type": [
+              "string",
+              "boolean"
+            ],
+            "description": "Liquid condition. Card is hidden when false.",
+            "markdownDescription": "**`string | boolean`** Liquid condition — card is hidden when the expression is falsy."
+          }
+        },
+        "additionalProperties": true,
+        "description": "A single navigation link card.",
+        "markdownDescription": "**`object`** A navigation link card on the leading page.",
+        "defaultSnippets": [
+          {
+            "label": "Link card",
+            "body": {
+              "title": "${1:Card title}",
+              "description": "${2:Card description}",
+              "href": "${3:page.md}"
+            }
+          }
+        ]
+      },
+      "description": "Navigation link cards displayed on the leading page.",
+      "markdownDescription": "**`object[]`** Navigation link cards shown on the leading page. Each card has a title, optional description, and an `href`.\n\n```yaml\nlinks:\n  - title: Quickstart\n    description: Up and running in 5 minutes.\n    href: quickstart.md\n```"
+    }
+  },
+  "additionalProperties": true,
+  "definitions": {
+    "TextItems": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/TextItem"
+              }
+            ]
+          }
+        }
+      ],
+      "description": "Plain string or array of conditional text items.",
+      "markdownDescription": "**`string | TextItem[]`** Text value — either a plain string or a list of conditional text items (the first item whose `when` condition is truthy is used)."
+    },
+    "TextItem": {
+      "type": "object",
+      "description": "Conditional text item — the first item whose 'when' is truthy is used.",
+      "properties": {
+        "text": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "description": "Text content to display when the condition is met.",
+          "markdownDescription": "**`string | string[]`** Text content shown when `when` is truthy. **Required.**"
+        },
+        "when": {
+          "type": [
+            "string",
+            "boolean"
+          ],
+          "description": "Liquid condition. This item is used when the expression is truthy.",
+          "markdownDescription": "**`string | boolean`** Liquid condition. This item is selected when the expression is truthy."
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "additionalProperties": true,
+      "markdownDescription": "**`TextItem`** Conditional text item. The first item in the array whose `when` evaluates to `true` is displayed.\n\n```yaml\ntitle:\n  - text: Internal title\n    when: env == 'internal'\n  - text: Public title\n```"
+    },
+    "Alternate": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string",
+          "format": "uri",
+          "markdownDescription": "**`string (uri)`** URL of the alternate page."
+        },
+        "hreflang": {
+          "type": "string",
+          "markdownDescription": "**`string`** Language code (e.g. `en`, `ru`)."
+        }
+      },
+      "required": [
+        "href"
+      ],
+      "additionalProperties": false,
+      "description": "Alternate language version of this page.",
+      "markdownDescription": "**`Alternate`** Alternate language version for `<link rel=\"alternate\">`."
+    },
+    "MetaItem": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "property": {
+          "type": "string"
+        },
+        "http-equiv": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "content"
+      ],
+      "additionalProperties": false,
+      "description": "Custom HTML meta tag definition.",
+      "markdownDescription": "**`MetaItem`** Custom `<meta>` tag — requires `content` plus one of `name`, `property`, or `http-equiv`."
+    },
+    "Contributor": {
+      "type": "object",
+      "properties": {
+        "avatar": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "login": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "markdownDescription": "Diplodoc leading page file (`index.yaml`).\nA leading page is a structured landing page for a documentation section. It can display a title, description, navigation links, and arbitrary page-constructor blocks.\n```yaml title: Getting Started description: Learn how to set up and use My Product. links:\n  - title: Quickstart\n    description: Up and running in 5 minutes.\n    href: quickstart.md\n  - title: Concepts\n    description: Core concepts and architecture.\n    href: concepts/index.yaml\n```"
+}

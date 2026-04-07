@@ -1,0 +1,2694 @@
+{
+  "definitions": {
+    "TextItems": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "children": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "when": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "divider",
+            "quote",
+            "event",
+            "post",
+            "extended-features-block",
+            "promo-features-block",
+            "slider-block",
+            "questions-block",
+            "header-block",
+            "banner-block",
+            "companies-block",
+            "media-block",
+            "map-block",
+            "info-block",
+            "table-block",
+            "tabs-block",
+            "price-detailed",
+            "header-slider-block",
+            "cards-with-image-block",
+            "icons-block",
+            "card-layout-block",
+            "content-layout-block",
+            "share-block",
+            "filter-block",
+            "form-block"
+          ]
+        }
+      },
+      "select": {
+        "$data": "0/type"
+      }
+    },
+    "cards": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "when": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "media-card",
+            "banner-card",
+            "price-detailed",
+            "background-card",
+            "quote",
+            "basic-card",
+            "layout-item",
+            "price-card",
+            "image-card"
+          ]
+        }
+      },
+      "select": {
+        "$data": "0/type"
+      }
+    }
+  },
+  "properties": {
+    "meta": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "$ref": "#/definitions/TextItems"
+        },
+        "description": {
+          "$ref": "#/definitions/TextItems"
+        },
+        "noIndex": {
+          "type": "boolean"
+        }
+      }
+    },
+    "animated": {
+      "type": "boolean"
+    },
+    "logo": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "icon"
+          ],
+          "properties": {
+            "icon": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "when": {
+                      "type": "string"
+                    },
+                    "alt": {
+                      "type": "string"
+                    },
+                    "disableCompress": {
+                      "type": "boolean"
+                    },
+                    "loading": {
+                      "type": "string",
+                      "enum": [
+                        "eager",
+                        "lazy"
+                      ]
+                    },
+                    "fetchPriority": {
+                      "type": "string",
+                      "enum": [
+                        "high",
+                        "low",
+                        "auto"
+                      ]
+                    },
+                    "src": {
+                      "type": "string",
+                      "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                    },
+                    "style": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [],
+                      "properties": {
+                        "backgroundColor": {
+                          "type": "string"
+                        },
+                        "height": {
+                          "type": [
+                            "string",
+                            "number"
+                          ]
+                        },
+                        "width": {
+                          "type": [
+                            "string",
+                            "number"
+                          ]
+                        },
+                        "color": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "src"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "desktop",
+                    "mobile"
+                  ],
+                  "properties": {
+                    "when": {
+                      "type": "string"
+                    },
+                    "alt": {
+                      "type": "string"
+                    },
+                    "disableCompress": {
+                      "type": "boolean"
+                    },
+                    "loading": {
+                      "type": "string",
+                      "enum": [
+                        "eager",
+                        "lazy"
+                      ]
+                    },
+                    "fetchPriority": {
+                      "type": "string",
+                      "enum": [
+                        "high",
+                        "low",
+                        "auto"
+                      ]
+                    },
+                    "desktop": {
+                      "type": "string",
+                      "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                    },
+                    "tablet": {
+                      "type": "string",
+                      "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                    },
+                    "mobile": {
+                      "type": "string",
+                      "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                    }
+                  }
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "when": {
+                        "type": "string"
+                      },
+                      "alt": {
+                        "type": "string"
+                      },
+                      "disableCompress": {
+                        "type": "boolean"
+                      },
+                      "loading": {
+                        "type": "string",
+                        "enum": [
+                          "eager",
+                          "lazy"
+                        ]
+                      },
+                      "fetchPriority": {
+                        "type": "string",
+                        "enum": [
+                          "high",
+                          "low",
+                          "auto"
+                        ]
+                      },
+                      "src": {
+                        "type": "string",
+                        "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                      },
+                      "style": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [],
+                        "properties": {
+                          "backgroundColor": {
+                            "type": "string"
+                          },
+                          "height": {
+                            "type": [
+                              "string",
+                              "number"
+                            ]
+                          },
+                          "width": {
+                            "type": [
+                              "string",
+                              "number"
+                            ]
+                          },
+                          "color": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "src"
+                    ]
+                  }
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "desktop",
+                      "mobile"
+                    ],
+                    "properties": {
+                      "when": {
+                        "type": "string"
+                      },
+                      "alt": {
+                        "type": "string"
+                      },
+                      "disableCompress": {
+                        "type": "boolean"
+                      },
+                      "loading": {
+                        "type": "string",
+                        "enum": [
+                          "eager",
+                          "lazy"
+                        ]
+                      },
+                      "fetchPriority": {
+                        "type": "string",
+                        "enum": [
+                          "high",
+                          "low",
+                          "auto"
+                        ]
+                      },
+                      "desktop": {
+                        "type": "string",
+                        "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                      },
+                      "tablet": {
+                        "type": "string",
+                        "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                      },
+                      "mobile": {
+                        "type": "string",
+                        "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "text": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "light"
+          ],
+          "properties": {
+            "light": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "icon"
+              ],
+              "properties": {
+                "icon": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "when": {
+                          "type": "string"
+                        },
+                        "alt": {
+                          "type": "string"
+                        },
+                        "disableCompress": {
+                          "type": "boolean"
+                        },
+                        "loading": {
+                          "type": "string",
+                          "enum": [
+                            "eager",
+                            "lazy"
+                          ]
+                        },
+                        "fetchPriority": {
+                          "type": "string",
+                          "enum": [
+                            "high",
+                            "low",
+                            "auto"
+                          ]
+                        },
+                        "src": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        },
+                        "style": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [],
+                          "properties": {
+                            "backgroundColor": {
+                              "type": "string"
+                            },
+                            "height": {
+                              "type": [
+                                "string",
+                                "number"
+                              ]
+                            },
+                            "width": {
+                              "type": [
+                                "string",
+                                "number"
+                              ]
+                            },
+                            "color": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "required": [
+                        "src"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "desktop",
+                        "mobile"
+                      ],
+                      "properties": {
+                        "when": {
+                          "type": "string"
+                        },
+                        "alt": {
+                          "type": "string"
+                        },
+                        "disableCompress": {
+                          "type": "boolean"
+                        },
+                        "loading": {
+                          "type": "string",
+                          "enum": [
+                            "eager",
+                            "lazy"
+                          ]
+                        },
+                        "fetchPriority": {
+                          "type": "string",
+                          "enum": [
+                            "high",
+                            "low",
+                            "auto"
+                          ]
+                        },
+                        "desktop": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        },
+                        "tablet": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        },
+                        "mobile": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "when": {
+                            "type": "string"
+                          },
+                          "alt": {
+                            "type": "string"
+                          },
+                          "disableCompress": {
+                            "type": "boolean"
+                          },
+                          "loading": {
+                            "type": "string",
+                            "enum": [
+                              "eager",
+                              "lazy"
+                            ]
+                          },
+                          "fetchPriority": {
+                            "type": "string",
+                            "enum": [
+                              "high",
+                              "low",
+                              "auto"
+                            ]
+                          },
+                          "src": {
+                            "type": "string",
+                            "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                          },
+                          "style": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [],
+                            "properties": {
+                              "backgroundColor": {
+                                "type": "string"
+                              },
+                              "height": {
+                                "type": [
+                                  "string",
+                                  "number"
+                                ]
+                              },
+                              "width": {
+                                "type": [
+                                  "string",
+                                  "number"
+                                ]
+                              },
+                              "color": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "required": [
+                          "src"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "desktop",
+                          "mobile"
+                        ],
+                        "properties": {
+                          "when": {
+                            "type": "string"
+                          },
+                          "alt": {
+                            "type": "string"
+                          },
+                          "disableCompress": {
+                            "type": "boolean"
+                          },
+                          "loading": {
+                            "type": "string",
+                            "enum": [
+                              "eager",
+                              "lazy"
+                            ]
+                          },
+                          "fetchPriority": {
+                            "type": "string",
+                            "enum": [
+                              "high",
+                              "low",
+                              "auto"
+                            ]
+                          },
+                          "desktop": {
+                            "type": "string",
+                            "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                          },
+                          "tablet": {
+                            "type": "string",
+                            "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                          },
+                          "mobile": {
+                            "type": "string",
+                            "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "text": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              }
+            },
+            "dark": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "icon"
+              ],
+              "properties": {
+                "icon": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "when": {
+                          "type": "string"
+                        },
+                        "alt": {
+                          "type": "string"
+                        },
+                        "disableCompress": {
+                          "type": "boolean"
+                        },
+                        "loading": {
+                          "type": "string",
+                          "enum": [
+                            "eager",
+                            "lazy"
+                          ]
+                        },
+                        "fetchPriority": {
+                          "type": "string",
+                          "enum": [
+                            "high",
+                            "low",
+                            "auto"
+                          ]
+                        },
+                        "src": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        },
+                        "style": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [],
+                          "properties": {
+                            "backgroundColor": {
+                              "type": "string"
+                            },
+                            "height": {
+                              "type": [
+                                "string",
+                                "number"
+                              ]
+                            },
+                            "width": {
+                              "type": [
+                                "string",
+                                "number"
+                              ]
+                            },
+                            "color": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "required": [
+                        "src"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "desktop",
+                        "mobile"
+                      ],
+                      "properties": {
+                        "when": {
+                          "type": "string"
+                        },
+                        "alt": {
+                          "type": "string"
+                        },
+                        "disableCompress": {
+                          "type": "boolean"
+                        },
+                        "loading": {
+                          "type": "string",
+                          "enum": [
+                            "eager",
+                            "lazy"
+                          ]
+                        },
+                        "fetchPriority": {
+                          "type": "string",
+                          "enum": [
+                            "high",
+                            "low",
+                            "auto"
+                          ]
+                        },
+                        "desktop": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        },
+                        "tablet": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        },
+                        "mobile": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "when": {
+                            "type": "string"
+                          },
+                          "alt": {
+                            "type": "string"
+                          },
+                          "disableCompress": {
+                            "type": "boolean"
+                          },
+                          "loading": {
+                            "type": "string",
+                            "enum": [
+                              "eager",
+                              "lazy"
+                            ]
+                          },
+                          "fetchPriority": {
+                            "type": "string",
+                            "enum": [
+                              "high",
+                              "low",
+                              "auto"
+                            ]
+                          },
+                          "src": {
+                            "type": "string",
+                            "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                          },
+                          "style": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [],
+                            "properties": {
+                              "backgroundColor": {
+                                "type": "string"
+                              },
+                              "height": {
+                                "type": [
+                                  "string",
+                                  "number"
+                                ]
+                              },
+                              "width": {
+                                "type": [
+                                  "string",
+                                  "number"
+                                ]
+                              },
+                              "color": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "required": [
+                          "src"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "desktop",
+                          "mobile"
+                        ],
+                        "properties": {
+                          "when": {
+                            "type": "string"
+                          },
+                          "alt": {
+                            "type": "string"
+                          },
+                          "disableCompress": {
+                            "type": "boolean"
+                          },
+                          "loading": {
+                            "type": "string",
+                            "enum": [
+                              "eager",
+                              "lazy"
+                            ]
+                          },
+                          "fetchPriority": {
+                            "type": "string",
+                            "enum": [
+                              "high",
+                              "low",
+                              "auto"
+                            ]
+                          },
+                          "desktop": {
+                            "type": "string",
+                            "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                          },
+                          "tablet": {
+                            "type": "string",
+                            "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                          },
+                          "mobile": {
+                            "type": "string",
+                            "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "text": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "header": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "leftItems"
+      ],
+      "properties": {
+        "leftItems": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "properties": {
+                  "when": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "icon": {
+                    "type": "string",
+                    "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                  },
+                  "iconSize": {
+                    "type": "number"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "link",
+                      "button",
+                      "dropdown"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "target": {
+                    "type": "string"
+                  },
+                  "arrow": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "text",
+                  "url"
+                ],
+                "properties": {
+                  "when": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "urlTitle": {
+                    "type": "string"
+                  },
+                  "primary": {
+                    "type": "boolean"
+                  },
+                  "size": {
+                    "type": "string",
+                    "enum": [
+                      "xs",
+                      "ns",
+                      "s",
+                      "n",
+                      "m",
+                      "l",
+                      "xl",
+                      "head",
+                      "promo"
+                    ]
+                  },
+                  "theme": {
+                    "type": "string",
+                    "enum": [
+                      "normal",
+                      "action",
+                      "outlined",
+                      "outlined-info",
+                      "outlined-danger",
+                      "raised",
+                      "flat",
+                      "flat-info",
+                      "flat-danger",
+                      "flat-secondary",
+                      "clear",
+                      "normal-contrast",
+                      "outlined-contrast",
+                      "flat-contrast",
+                      "link",
+                      "pseudo",
+                      "pseudo-special",
+                      "websearch",
+                      "normal-dark",
+                      "normal-special",
+                      "accent",
+                      "dark-grey",
+                      "app-store",
+                      "google-play",
+                      "scale",
+                      "github",
+                      "monochrome"
+                    ]
+                  },
+                  "img": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "data"
+                        ],
+                        "properties": {
+                          "data": {
+                            "type": "string"
+                          },
+                          "position": {
+                            "type": "string",
+                            "enum": [
+                              "left",
+                              "right"
+                            ]
+                          },
+                          "alt": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "analyticsEvents": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "string"
+                        },
+                        "required": [
+                          "name"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "counters": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [],
+                            "properties": {
+                              "include": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "exclude": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          "context": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "required": [
+                            "name"
+                          ],
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string"
+                            },
+                            "counters": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [],
+                              "properties": {
+                                "include": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                },
+                                "exclude": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            },
+                            "context": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "target": {
+                    "type": "string",
+                    "enum": [
+                      "_self",
+                      "_blank",
+                      "_parent",
+                      "_top"
+                    ]
+                  },
+                  "width": {
+                    "type": "string",
+                    "enum": [
+                      "auto",
+                      "max"
+                    ]
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "link",
+                      "button",
+                      "dropdown"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "items"
+                ],
+                "properties": {
+                  "when": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "icon": {
+                    "type": "string",
+                    "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                  },
+                  "iconSize": {
+                    "type": "number"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "link",
+                      "button",
+                      "dropdown"
+                    ]
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "text"
+                      ],
+                      "properties": {
+                        "when": {
+                          "type": "string"
+                        },
+                        "text": {
+                          "type": "string"
+                        },
+                        "icon": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        },
+                        "iconSize": {
+                          "type": "number"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "link",
+                            "button",
+                            "dropdown"
+                          ]
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "target": {
+                          "type": "string"
+                        },
+                        "arrow": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "rightItems": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "properties": {
+                  "when": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "icon": {
+                    "type": "string",
+                    "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                  },
+                  "iconSize": {
+                    "type": "number"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "link",
+                      "button",
+                      "dropdown"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "target": {
+                    "type": "string"
+                  },
+                  "arrow": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "text",
+                  "url"
+                ],
+                "properties": {
+                  "when": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "urlTitle": {
+                    "type": "string"
+                  },
+                  "primary": {
+                    "type": "boolean"
+                  },
+                  "size": {
+                    "type": "string",
+                    "enum": [
+                      "xs",
+                      "ns",
+                      "s",
+                      "n",
+                      "m",
+                      "l",
+                      "xl",
+                      "head",
+                      "promo"
+                    ]
+                  },
+                  "theme": {
+                    "type": "string",
+                    "enum": [
+                      "normal",
+                      "action",
+                      "outlined",
+                      "outlined-info",
+                      "outlined-danger",
+                      "raised",
+                      "flat",
+                      "flat-info",
+                      "flat-danger",
+                      "flat-secondary",
+                      "clear",
+                      "normal-contrast",
+                      "outlined-contrast",
+                      "flat-contrast",
+                      "link",
+                      "pseudo",
+                      "pseudo-special",
+                      "websearch",
+                      "normal-dark",
+                      "normal-special",
+                      "accent",
+                      "dark-grey",
+                      "app-store",
+                      "google-play",
+                      "scale",
+                      "github",
+                      "monochrome"
+                    ]
+                  },
+                  "img": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "data"
+                        ],
+                        "properties": {
+                          "data": {
+                            "type": "string"
+                          },
+                          "position": {
+                            "type": "string",
+                            "enum": [
+                              "left",
+                              "right"
+                            ]
+                          },
+                          "alt": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "analyticsEvents": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "string"
+                        },
+                        "required": [
+                          "name"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "counters": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [],
+                            "properties": {
+                              "include": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "exclude": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          "context": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "required": [
+                            "name"
+                          ],
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string"
+                            },
+                            "counters": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [],
+                              "properties": {
+                                "include": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                },
+                                "exclude": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            },
+                            "context": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "target": {
+                    "type": "string",
+                    "enum": [
+                      "_self",
+                      "_blank",
+                      "_parent",
+                      "_top"
+                    ]
+                  },
+                  "width": {
+                    "type": "string",
+                    "enum": [
+                      "auto",
+                      "max"
+                    ]
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "link",
+                      "button",
+                      "dropdown"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "items"
+                ],
+                "properties": {
+                  "when": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "icon": {
+                    "type": "string",
+                    "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                  },
+                  "iconSize": {
+                    "type": "number"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "link",
+                      "button",
+                      "dropdown"
+                    ]
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "text"
+                      ],
+                      "properties": {
+                        "when": {
+                          "type": "string"
+                        },
+                        "text": {
+                          "type": "string"
+                        },
+                        "icon": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        },
+                        "iconSize": {
+                          "type": "number"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "link",
+                            "button",
+                            "dropdown"
+                          ]
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "target": {
+                          "type": "string"
+                        },
+                        "arrow": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "iconSize": {
+          "type": "number"
+        }
+      }
+    },
+    "blocks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/children"
+      }
+    },
+    "menu": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string"
+        }
+      }
+    },
+    "background": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "animated": {
+              "type": "boolean"
+            },
+            "image": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "when": {
+                      "type": "string"
+                    },
+                    "alt": {
+                      "type": "string"
+                    },
+                    "disableCompress": {
+                      "type": "boolean"
+                    },
+                    "loading": {
+                      "type": "string",
+                      "enum": [
+                        "eager",
+                        "lazy"
+                      ]
+                    },
+                    "fetchPriority": {
+                      "type": "string",
+                      "enum": [
+                        "high",
+                        "low",
+                        "auto"
+                      ]
+                    },
+                    "src": {
+                      "type": "string",
+                      "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                    },
+                    "style": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [],
+                      "properties": {
+                        "backgroundColor": {
+                          "type": "string"
+                        },
+                        "height": {
+                          "type": [
+                            "string",
+                            "number"
+                          ]
+                        },
+                        "width": {
+                          "type": [
+                            "string",
+                            "number"
+                          ]
+                        },
+                        "color": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "src"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "desktop",
+                    "mobile"
+                  ],
+                  "properties": {
+                    "when": {
+                      "type": "string"
+                    },
+                    "alt": {
+                      "type": "string"
+                    },
+                    "disableCompress": {
+                      "type": "boolean"
+                    },
+                    "loading": {
+                      "type": "string",
+                      "enum": [
+                        "eager",
+                        "lazy"
+                      ]
+                    },
+                    "fetchPriority": {
+                      "type": "string",
+                      "enum": [
+                        "high",
+                        "low",
+                        "auto"
+                      ]
+                    },
+                    "desktop": {
+                      "type": "string",
+                      "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                    },
+                    "tablet": {
+                      "type": "string",
+                      "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                    },
+                    "mobile": {
+                      "type": "string",
+                      "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                    }
+                  }
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "when": {
+                        "type": "string"
+                      },
+                      "alt": {
+                        "type": "string"
+                      },
+                      "disableCompress": {
+                        "type": "boolean"
+                      },
+                      "loading": {
+                        "type": "string",
+                        "enum": [
+                          "eager",
+                          "lazy"
+                        ]
+                      },
+                      "fetchPriority": {
+                        "type": "string",
+                        "enum": [
+                          "high",
+                          "low",
+                          "auto"
+                        ]
+                      },
+                      "src": {
+                        "type": "string",
+                        "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                      },
+                      "style": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [],
+                        "properties": {
+                          "backgroundColor": {
+                            "type": "string"
+                          },
+                          "height": {
+                            "type": [
+                              "string",
+                              "number"
+                            ]
+                          },
+                          "width": {
+                            "type": [
+                              "string",
+                              "number"
+                            ]
+                          },
+                          "color": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "src"
+                    ]
+                  }
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "desktop",
+                      "mobile"
+                    ],
+                    "properties": {
+                      "when": {
+                        "type": "string"
+                      },
+                      "alt": {
+                        "type": "string"
+                      },
+                      "disableCompress": {
+                        "type": "boolean"
+                      },
+                      "loading": {
+                        "type": "string",
+                        "enum": [
+                          "eager",
+                          "lazy"
+                        ]
+                      },
+                      "fetchPriority": {
+                        "type": "string",
+                        "enum": [
+                          "high",
+                          "low",
+                          "auto"
+                        ]
+                      },
+                      "desktop": {
+                        "type": "string",
+                        "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                      },
+                      "tablet": {
+                        "type": "string",
+                        "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                      },
+                      "mobile": {
+                        "type": "string",
+                        "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "color": {
+              "type": "string"
+            },
+            "video": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "src"
+              ],
+              "properties": {
+                "src": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "loop": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "start"
+                      ],
+                      "properties": {
+                        "start": {
+                          "type": "number"
+                        },
+                        "end": {
+                          "type": "number"
+                        }
+                      }
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "default",
+                    "player"
+                  ]
+                },
+                "muted": {
+                  "type": "boolean"
+                },
+                "autoplay": {
+                  "type": "boolean"
+                },
+                "elapsedTime": {
+                  "type": "number"
+                },
+                "playButton": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "default",
+                        "text"
+                      ]
+                    },
+                    "theme": {
+                      "type": "string",
+                      "enum": [
+                        "blue",
+                        "grey"
+                      ]
+                    },
+                    "text": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "controls": {
+                  "type": "string",
+                  "enum": [
+                    "default",
+                    "custom"
+                  ]
+                },
+                "customControlsOptions": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "with-mute-button",
+                        "with-play-pause-button"
+                      ]
+                    },
+                    "muteButtonShown": {
+                      "type": "boolean"
+                    },
+                    "positioning": {
+                      "type": "string",
+                      "enum": [
+                        "center",
+                        "left",
+                        "right"
+                      ]
+                    }
+                  }
+                },
+                "ariaLabel": {
+                  "type": "string"
+                },
+                "contain": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "height": {
+              "type": "number"
+            },
+            "size": {
+              "type": "string",
+              "enum": [
+                "contain",
+                "cover"
+              ]
+            },
+            "parallax": {
+              "type": "boolean"
+            },
+            "fullWidthMedia": {
+              "type": "boolean"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "light"
+          ],
+          "properties": {
+            "light": {
+              "additionalProperties": false,
+              "properties": {
+                "animated": {
+                  "type": "boolean"
+                },
+                "image": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "when": {
+                          "type": "string"
+                        },
+                        "alt": {
+                          "type": "string"
+                        },
+                        "disableCompress": {
+                          "type": "boolean"
+                        },
+                        "loading": {
+                          "type": "string",
+                          "enum": [
+                            "eager",
+                            "lazy"
+                          ]
+                        },
+                        "fetchPriority": {
+                          "type": "string",
+                          "enum": [
+                            "high",
+                            "low",
+                            "auto"
+                          ]
+                        },
+                        "src": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        },
+                        "style": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [],
+                          "properties": {
+                            "backgroundColor": {
+                              "type": "string"
+                            },
+                            "height": {
+                              "type": [
+                                "string",
+                                "number"
+                              ]
+                            },
+                            "width": {
+                              "type": [
+                                "string",
+                                "number"
+                              ]
+                            },
+                            "color": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "required": [
+                        "src"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "desktop",
+                        "mobile"
+                      ],
+                      "properties": {
+                        "when": {
+                          "type": "string"
+                        },
+                        "alt": {
+                          "type": "string"
+                        },
+                        "disableCompress": {
+                          "type": "boolean"
+                        },
+                        "loading": {
+                          "type": "string",
+                          "enum": [
+                            "eager",
+                            "lazy"
+                          ]
+                        },
+                        "fetchPriority": {
+                          "type": "string",
+                          "enum": [
+                            "high",
+                            "low",
+                            "auto"
+                          ]
+                        },
+                        "desktop": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        },
+                        "tablet": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        },
+                        "mobile": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "when": {
+                            "type": "string"
+                          },
+                          "alt": {
+                            "type": "string"
+                          },
+                          "disableCompress": {
+                            "type": "boolean"
+                          },
+                          "loading": {
+                            "type": "string",
+                            "enum": [
+                              "eager",
+                              "lazy"
+                            ]
+                          },
+                          "fetchPriority": {
+                            "type": "string",
+                            "enum": [
+                              "high",
+                              "low",
+                              "auto"
+                            ]
+                          },
+                          "src": {
+                            "type": "string",
+                            "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                          },
+                          "style": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [],
+                            "properties": {
+                              "backgroundColor": {
+                                "type": "string"
+                              },
+                              "height": {
+                                "type": [
+                                  "string",
+                                  "number"
+                                ]
+                              },
+                              "width": {
+                                "type": [
+                                  "string",
+                                  "number"
+                                ]
+                              },
+                              "color": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "required": [
+                          "src"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "desktop",
+                          "mobile"
+                        ],
+                        "properties": {
+                          "when": {
+                            "type": "string"
+                          },
+                          "alt": {
+                            "type": "string"
+                          },
+                          "disableCompress": {
+                            "type": "boolean"
+                          },
+                          "loading": {
+                            "type": "string",
+                            "enum": [
+                              "eager",
+                              "lazy"
+                            ]
+                          },
+                          "fetchPriority": {
+                            "type": "string",
+                            "enum": [
+                              "high",
+                              "low",
+                              "auto"
+                            ]
+                          },
+                          "desktop": {
+                            "type": "string",
+                            "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                          },
+                          "tablet": {
+                            "type": "string",
+                            "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                          },
+                          "mobile": {
+                            "type": "string",
+                            "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "color": {
+                  "type": "string"
+                },
+                "video": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "src"
+                  ],
+                  "properties": {
+                    "src": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "loop": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "start"
+                          ],
+                          "properties": {
+                            "start": {
+                              "type": "number"
+                            },
+                            "end": {
+                              "type": "number"
+                            }
+                          }
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "default",
+                        "player"
+                      ]
+                    },
+                    "muted": {
+                      "type": "boolean"
+                    },
+                    "autoplay": {
+                      "type": "boolean"
+                    },
+                    "elapsedTime": {
+                      "type": "number"
+                    },
+                    "playButton": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "default",
+                            "text"
+                          ]
+                        },
+                        "theme": {
+                          "type": "string",
+                          "enum": [
+                            "blue",
+                            "grey"
+                          ]
+                        },
+                        "text": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "controls": {
+                      "type": "string",
+                      "enum": [
+                        "default",
+                        "custom"
+                      ]
+                    },
+                    "customControlsOptions": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "with-mute-button",
+                            "with-play-pause-button"
+                          ]
+                        },
+                        "muteButtonShown": {
+                          "type": "boolean"
+                        },
+                        "positioning": {
+                          "type": "string",
+                          "enum": [
+                            "center",
+                            "left",
+                            "right"
+                          ]
+                        }
+                      }
+                    },
+                    "ariaLabel": {
+                      "type": "string"
+                    },
+                    "contain": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "height": {
+                  "type": "number"
+                },
+                "size": {
+                  "type": "string",
+                  "enum": [
+                    "contain",
+                    "cover"
+                  ]
+                },
+                "parallax": {
+                  "type": "boolean"
+                },
+                "fullWidthMedia": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "dark": {
+              "additionalProperties": false,
+              "properties": {
+                "animated": {
+                  "type": "boolean"
+                },
+                "image": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "when": {
+                          "type": "string"
+                        },
+                        "alt": {
+                          "type": "string"
+                        },
+                        "disableCompress": {
+                          "type": "boolean"
+                        },
+                        "loading": {
+                          "type": "string",
+                          "enum": [
+                            "eager",
+                            "lazy"
+                          ]
+                        },
+                        "fetchPriority": {
+                          "type": "string",
+                          "enum": [
+                            "high",
+                            "low",
+                            "auto"
+                          ]
+                        },
+                        "src": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        },
+                        "style": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [],
+                          "properties": {
+                            "backgroundColor": {
+                              "type": "string"
+                            },
+                            "height": {
+                              "type": [
+                                "string",
+                                "number"
+                              ]
+                            },
+                            "width": {
+                              "type": [
+                                "string",
+                                "number"
+                              ]
+                            },
+                            "color": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "required": [
+                        "src"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "desktop",
+                        "mobile"
+                      ],
+                      "properties": {
+                        "when": {
+                          "type": "string"
+                        },
+                        "alt": {
+                          "type": "string"
+                        },
+                        "disableCompress": {
+                          "type": "boolean"
+                        },
+                        "loading": {
+                          "type": "string",
+                          "enum": [
+                            "eager",
+                            "lazy"
+                          ]
+                        },
+                        "fetchPriority": {
+                          "type": "string",
+                          "enum": [
+                            "high",
+                            "low",
+                            "auto"
+                          ]
+                        },
+                        "desktop": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        },
+                        "tablet": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        },
+                        "mobile": {
+                          "type": "string",
+                          "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "when": {
+                            "type": "string"
+                          },
+                          "alt": {
+                            "type": "string"
+                          },
+                          "disableCompress": {
+                            "type": "boolean"
+                          },
+                          "loading": {
+                            "type": "string",
+                            "enum": [
+                              "eager",
+                              "lazy"
+                            ]
+                          },
+                          "fetchPriority": {
+                            "type": "string",
+                            "enum": [
+                              "high",
+                              "low",
+                              "auto"
+                            ]
+                          },
+                          "src": {
+                            "type": "string",
+                            "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                          },
+                          "style": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [],
+                            "properties": {
+                              "backgroundColor": {
+                                "type": "string"
+                              },
+                              "height": {
+                                "type": [
+                                  "string",
+                                  "number"
+                                ]
+                              },
+                              "width": {
+                                "type": [
+                                  "string",
+                                  "number"
+                                ]
+                              },
+                              "color": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "required": [
+                          "src"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "desktop",
+                          "mobile"
+                        ],
+                        "properties": {
+                          "when": {
+                            "type": "string"
+                          },
+                          "alt": {
+                            "type": "string"
+                          },
+                          "disableCompress": {
+                            "type": "boolean"
+                          },
+                          "loading": {
+                            "type": "string",
+                            "enum": [
+                              "eager",
+                              "lazy"
+                            ]
+                          },
+                          "fetchPriority": {
+                            "type": "string",
+                            "enum": [
+                              "high",
+                              "low",
+                              "auto"
+                            ]
+                          },
+                          "desktop": {
+                            "type": "string",
+                            "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                          },
+                          "tablet": {
+                            "type": "string",
+                            "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                          },
+                          "mobile": {
+                            "type": "string",
+                            "pattern": "^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "color": {
+                  "type": "string"
+                },
+                "video": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "src"
+                  ],
+                  "properties": {
+                    "src": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "loop": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "start"
+                          ],
+                          "properties": {
+                            "start": {
+                              "type": "number"
+                            },
+                            "end": {
+                              "type": "number"
+                            }
+                          }
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "default",
+                        "player"
+                      ]
+                    },
+                    "muted": {
+                      "type": "boolean"
+                    },
+                    "autoplay": {
+                      "type": "boolean"
+                    },
+                    "elapsedTime": {
+                      "type": "number"
+                    },
+                    "playButton": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "default",
+                            "text"
+                          ]
+                        },
+                        "theme": {
+                          "type": "string",
+                          "enum": [
+                            "blue",
+                            "grey"
+                          ]
+                        },
+                        "text": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "controls": {
+                      "type": "string",
+                      "enum": [
+                        "default",
+                        "custom"
+                      ]
+                    },
+                    "customControlsOptions": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "with-mute-button",
+                            "with-play-pause-button"
+                          ]
+                        },
+                        "muteButtonShown": {
+                          "type": "boolean"
+                        },
+                        "positioning": {
+                          "type": "string",
+                          "enum": [
+                            "center",
+                            "left",
+                            "right"
+                          ]
+                        }
+                      }
+                    },
+                    "ariaLabel": {
+                      "type": "string"
+                    },
+                    "contain": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "height": {
+                  "type": "number"
+                },
+                "size": {
+                  "type": "string",
+                  "enum": [
+                    "contain",
+                    "cover"
+                  ]
+                },
+                "parallax": {
+                  "type": "boolean"
+                },
+                "fullWidthMedia": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$id": "self",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "blocks"
+  ],
+  "title": "Diplodoc (page-constructor)",
+  "markdownDescription": "Diplodoc page-constructor file.\nDefines a structured landing page using block components from `@gravity-ui/page-constructor`."
+}

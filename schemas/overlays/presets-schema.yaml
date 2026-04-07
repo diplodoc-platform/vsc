@@ -1,0 +1,48 @@
+title: Diplodoc (presets.yaml)
+markdownDescription: >-
+  Diplodoc presets file (`presets.yaml`).
+
+  Defines named sets of template variables used in Liquid expressions
+  inside `.md` files and `toc.yaml`.
+
+  The `default` preset is always applied. Additional presets are activated
+  via `varsPreset` in `.yfm` or the `--vars-preset` CLI flag.
+
+  ```yaml
+  default:
+    version: '2.0'
+    env: production
+
+  internal:
+    env: internal
+    show_drafts: true
+
+  i18n:
+    en:
+      greeting: Hello
+    ru:
+      greeting: Привет
+  ```
+
+properties:
+  default:
+    description: Default preset — always applied to every build regardless of varsPreset.
+    markdownDescription: "**`object`** Default preset — **always applied** to every build regardless of the `varsPreset` setting.\n\nDefine your baseline variables here. Other presets are deep-merged on top.\n\n```yaml\ndefault:\n  version: '2.0'\n  product_name: My Docs\n```"
+    defaultSnippets:
+      - label: Default preset with common variables
+        body:
+          version: "${1:1.0}"
+          product_name: "${2:My Product}"
+          env: "${3:production}"
+
+definitions:
+  preset:
+    description: A named set of template variables. Variables are accessible as {{ var_name }} in Markdown and toc.yaml.
+    markdownDescription: "**`object`** A named set of template variables.\n\nVariables are available in Liquid expressions as `{{ var_name }}`.\n\nThe special `i18n` key holds per-language variable overrides:\n```yaml\ni18n:\n  en:\n    greeting: Hello\n  ru:\n    greeting: Привет\n```"
+    properties:
+      i18n:
+        description: Per-language variable overrides. Keys are language codes, values are variable maps.
+        markdownDescription: "**`object`** Per-language variable overrides.\n\nKeys are language codes (e.g. `en`, `ru`). Each value is a map of variable names to their values for that language.\n\nVariable resolution order: `i18n[currentLang]` → preset root → `default` preset."
+  property:
+    description: "Preset variable value: string, number, or nested object."
+    markdownDescription: "**`string | number | object`** Preset variable value.\n\n- **string** — text value, supports Markdown inline syntax (`translate: md`)\n- **number** — numeric value\n- **object** — nested variable namespace (access as `{{ parent.child }}`)"
