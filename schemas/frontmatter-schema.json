@@ -1,421 +1,485 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Markdown frontmatter schema",
+  "$id": "https://diplodoc.com/schemas/frontmatter/draft-01/schema#",
+  "title": "Diplodoc (frontmatter)",
   "description": "YAML frontmatter block at the top of .md files (between --- delimiters). Defines page metadata, SEO fields, resources, and access rules.",
-  "markdownDescription": "YAML frontmatter block at the top of `.md` files (between `---` delimiters).",
   "type": "object",
-  "additionalProperties": true,
   "properties": {
     "title": {
       "type": "string",
-      "description": "string. Page title for HTML head and SEO.",
-      "markdownDescription": "**`string`** Page title for HTML head and SEO."
+      "description": "Page title for HTML head and SEO.",
+      "markdownDescription": "**`string`** Page title used in the browser tab, navigation sidebar, and SEO `<title>` tag.\n\nOverrides the first `#` heading for display purposes."
     },
     "description": {
       "type": "string",
-      "description": "string. Meta description for SEO.",
-      "markdownDescription": "**`string`** Meta description for SEO."
+      "description": "Meta description for SEO.",
+      "markdownDescription": "**`string`** Meta description for SEO (`<meta name=\"description\">`). Shown in search engine snippets."
     },
     "keywords": {
       "type": "array",
-      "items": { "type": "string" },
-      "description": "string[]. Keywords for the meta keywords tag.",
-      "markdownDescription": "**`string[]`** Keywords for the meta keywords tag."
+      "items": {
+        "type": "string"
+      },
+      "description": "Keywords for the meta keywords tag.",
+      "markdownDescription": "**`string[]`** Keywords for the `<meta name=\"keywords\">` tag.\n\n```yaml\nkeywords:\n  - cloud\n  - storage\n  - s3\n```"
     },
     "noIndex": {
       "type": "boolean",
-      "description": "boolean. Adds noindex/nofollow meta tag to prevent search engine indexing.",
-      "markdownDescription": "**`boolean`** Adds `noindex`/`nofollow` meta tag to prevent search engine indexing."
+      "description": "Adds noindex/nofollow meta tag to prevent search engine indexing.",
+      "markdownDescription": "**`boolean`** Adds `<meta name=\"robots\" content=\"noindex, nofollow\">` to prevent search engine indexing of this page."
     },
     "canonical": {
       "type": "string",
       "format": "uri",
-      "description": "string (uri). Canonical URL for the page.",
-      "markdownDescription": "**`string (uri)`** Canonical URL for the page."
+      "description": "Canonical URL for the page.",
+      "markdownDescription": "**`string (uri)`** Canonical URL for this page (`<link rel=\"canonical\">`).\n\nUse when the same content is accessible at multiple URLs."
     },
     "copyright": {
       "type": "string",
-      "description": "string. Copyright owner string.",
-      "markdownDescription": "**`string`** Copyright owner string."
+      "description": "Copyright owner string.",
+      "markdownDescription": "**`string`** Copyright owner string added to the page footer."
     },
     "alternate": {
       "type": "array",
-      "items": { "$ref": "#/definitions/Alternate" },
-      "description": "Alternate[]. Alternate language versions of this page.",
-      "markdownDescription": "**`Alternate[]`** Alternate language versions of this page."
+      "items": {
+        "$ref": "#/definitions/Alternate"
+      },
+      "description": "Alternate language versions of this page.",
+      "markdownDescription": "**`Alternate[]`** Alternate language versions of this page (`<link rel=\"alternate\" hreflang=\"...\">`). Each item must have `href` and optionally `hreflang`.",
+      "defaultSnippets": [
+        {
+          "label": "Add alternate language version",
+          "body": [
+            {
+              "href": "${1:https://example.com/en/page}",
+              "hreflang": "${2:en}"
+            }
+          ]
+        }
+      ]
     },
     "metadata": {
       "oneOf": [
         {
           "type": "array",
-          "items": { "$ref": "#/definitions/MetaItem" },
-          "description": "MetaItem[]. Array of custom meta tag definitions.",
-          "markdownDescription": "**`MetaItem[]`** Array of custom meta tag definitions."
+          "items": {
+            "$ref": "#/definitions/MetaItem"
+          }
         },
         {
-          "type": "object",
-          "description": "object. Key-value map of meta tag names to content values.",
-          "markdownDescription": "**`object`** Key-value map of meta tag names to content values."
+          "type": "object"
         }
       ],
-      "description": "MetaItem[] | object. Custom meta tags.",
-      "markdownDescription": "**`MetaItem[] | object`** Custom meta tags. Array of `{name/property, content}` objects or a key-value hash."
+      "description": "Custom meta tags. Array of {name/property, content} objects or a key-value hash.",
+      "markdownDescription": "**`MetaItem[] | object`** Custom HTML `<meta>` tags.\n\n**Array form** — explicit tag definitions: ```yaml metadata:\n  - name: author\n    content: John Doe\n  - property: og:image\n    content: https://example.com/image.png\n``` **Object form** — shorthand key→value: ```yaml metadata:\n  author: John Doe\n```"
     },
     "interface": {
       "type": "object",
-      "additionalProperties": true,
       "properties": {
         "toc": {
           "type": "boolean",
-          "description": "boolean. Show/hide the table of contents sidebar.",
-          "markdownDescription": "**`boolean`** Show/hide the table of contents sidebar."
+          "description": "Show/hide the table of contents sidebar.",
+          "markdownDescription": "**`boolean`** Show (`true`) or hide (`false`) the table-of-contents sidebar on this page."
         },
         "toc-header": {
           "type": "boolean",
-          "description": "boolean. Show/hide the TOC header section.",
-          "markdownDescription": "**`boolean`** Show/hide the TOC header section."
+          "description": "Show/hide the TOC header section.",
+          "markdownDescription": "**`boolean`** Show or hide the section above the TOC (project name / logo)."
         },
         "search": {
           "type": "boolean",
-          "description": "boolean. Show/hide the search input.",
-          "markdownDescription": "**`boolean`** Show/hide the search input."
+          "description": "Show/hide the search input.",
+          "markdownDescription": "**`boolean`** Show or hide the search input on this page."
         },
         "feedback": {
           "type": "boolean",
-          "description": "boolean. Show/hide feedback controls.",
-          "markdownDescription": "**`boolean`** Show/hide feedback controls."
+          "description": "Show/hide feedback controls.",
+          "markdownDescription": "**`boolean`** Show or hide the like / dislike feedback controls."
         },
         "favicon-src": {
           "type": "string",
-          "description": "string. Custom favicon URL for this page.",
-          "markdownDescription": "**`string`** Custom favicon URL for this page."
+          "description": "Custom favicon URL for this page.",
+          "markdownDescription": "**`string`** URL to a custom favicon shown in the browser tab for this page only."
         }
       },
-      "description": "object. Per-page UI overrides (takes precedence over .yfm config).",
-      "markdownDescription": "**`object`** Per-page UI overrides (takes precedence over `.yfm` config)."
+      "additionalProperties": true,
+      "description": "Per-page UI overrides (takes precedence over .yfm config).",
+      "markdownDescription": "**`object`** Per-page UI element visibility overrides. Takes precedence over the global `.yfm` config.",
+      "defaultSnippets": [
+        {
+          "label": "Configure page UI",
+          "body": {
+            "toc": "${1:true}",
+            "search": "${2:true}",
+            "feedback": "${3:true}"
+          }
+        }
+      ]
     },
     "resources": {
       "$ref": "#/definitions/Resources",
-      "description": "Resources. Per-page resources (legacy — prefer top-level script/style/csp).",
-      "markdownDescription": "**`Resources`** Per-page resources (legacy — prefer top-level `script`/`style`/`csp`)."
+      "description": "Per-page resources (legacy, prefer top-level script/style/csp).",
+      "markdownDescription": "**`Resources`** Legacy per-page resource injection. Prefer top-level `script`, `style`, `csp`."
     },
     "script": {
       "type": "array",
-      "items": { "type": "string" },
-      "description": "string[]. Script file paths or URLs to include on this page.",
-      "markdownDescription": "**`string[]`** Script file paths or URLs to include on this page."
+      "items": {
+        "type": "string"
+      },
+      "description": "Script file paths or URLs to include on this page.",
+      "markdownDescription": "**`string[]`** JavaScript files to inject into this page only.\n\n```yaml\nscript:\n  - _assets/custom.js\n```"
     },
     "style": {
       "type": "array",
-      "items": { "type": "string" },
-      "description": "string[]. Stylesheet file paths or URLs to include on this page.",
-      "markdownDescription": "**`string[]`** Stylesheet file paths or URLs to include on this page."
+      "items": {
+        "type": "string"
+      },
+      "description": "Stylesheet file paths or URLs to include on this page.",
+      "markdownDescription": "**`string[]`** CSS files to inject into this page only.\n\n```yaml\nstyle:\n  - _assets/custom.css\n```"
     },
     "csp": {
       "type": "array",
-      "items": { "type": "object" },
-      "description": "object[]. Content Security Policy directive overrides for this page.",
-      "markdownDescription": "**`object[]`** Content Security Policy directive overrides for this page."
+      "items": {
+        "type": "object"
+      },
+      "description": "Content Security Policy directive overrides for this page.",
+      "markdownDescription": "**`object[]`** Content Security Policy directive overrides for this page.\n\nEach item is an object mapping a directive name to an array of allowed sources."
     },
-    "stage": {
+    "vcsPath": {
       "type": "string",
-      "enum": ["new", "preview", "tech-preview", "skip"],
-      "description": "'new' | 'preview' | 'tech-preview' | 'skip'. Document lifecycle stage.",
-      "markdownDescription": "**`'new' | 'preview' | 'tech-preview' | 'skip'`** Document lifecycle stage.\n\n- `new` — new document\n- `preview` — available in preview\n- `tech-preview` — available in tech preview\n- `skip` — excluded from build"
+      "description": "VCS file path override (duplicated keys allowed for this field).",
+      "markdownDescription": "**`string`** Override the VCS path shown in the page header \"Edit on GitHub\" link."
+    },
+    "sourcePath": {
+      "type": "string",
+      "description": "Source file path (usually set by the build system).",
+      "markdownDescription": "**`string`** Source file path — usually set automatically by the build pipeline. Do not set manually."
     },
     "restricted-access": {
       "type": "array",
       "items": {
         "type": "array",
-        "items": { "type": "string" }
+        "items": {
+          "type": "string"
+        }
       },
-      "description": "string[][]. Access restriction rules. Each item is an array of conditions that must all be satisfied.",
-      "markdownDescription": "**`string[][]`** Access restriction rules. Each item is an array of conditions that must all be satisfied."
+      "description": "Access restriction rules. Each item is an array of conditions that must all be satisfied.",
+      "markdownDescription": "**`string[][]`** Access restriction rules.\nEach inner array is a list of conditions joined by AND; outer items are joined by OR. The user must match at least one inner array fully to access the page.\n```yaml restricted-access:\n  - [role:admin]\n  - [role:editor, group:docs-team]\n```"
     },
-    "vcsPath": {
+    "stage": {
       "type": "string",
-      "description": "string. VCS file path override.",
-      "markdownDescription": "**`string`** VCS file path override."
-    },
-    "sourcePath": {
-      "type": "string",
-      "description": "string. Source file path (usually set by the build system).",
-      "markdownDescription": "**`string`** Source file path (usually set by the build system)."
-    },
-    "editable": {
-      "type": "boolean",
-      "description": "boolean. Whether the document is editable (system-generated by doc-transform).",
-      "markdownDescription": "**`boolean`** Whether the document is editable (system-generated by doc-transform)."
-    },
-    "theme": {
-      "type": "string",
-      "description": "string. Path to generated theme CSS (system-generated in md2md output).",
-      "markdownDescription": "**`string`** Path to generated theme CSS (system-generated in md2md output)."
-    },
-    "author": {
-      "$ref": "#/definitions/Contributor",
-      "description": "Contributor. Page author from VCS (system-generated).",
-      "markdownDescription": "**`Contributor`** Page author from VCS (system-generated)."
-    },
-    "contributors": {
-      "type": "array",
-      "items": { "$ref": "#/definitions/Contributor" },
-      "description": "Contributor[]. Page contributors from VCS (system-generated).",
-      "markdownDescription": "**`Contributor[]`** Page contributors from VCS (system-generated)."
-    },
-    "updatedAt": {
-      "type": "string",
-      "description": "string. Last modification timestamp from VCS (system-generated).",
-      "markdownDescription": "**`string`** Last modification timestamp from VCS (system-generated)."
-    },
-    "__system": {
-      "type": "object",
-      "description": "object. System variables from presets (only when addSystemMeta is enabled).",
-      "markdownDescription": "**`object`** System variables from presets (only when `addSystemMeta` is enabled)."
-    },
-    "__metadata": {
-      "type": "array",
-      "items": { "$ref": "#/definitions/MetaItem" },
-      "description": "MetaItem[]. Metadata items from presets (only when addMetadataMeta is enabled).",
-      "markdownDescription": "**`MetaItem[]`** Metadata items from presets (only when `addMetadataMeta` is enabled)."
+      "enum": [
+        "new",
+        "preview",
+        "tech-preview",
+        "skip"
+      ],
+      "description": "Document lifecycle stage (inherited from toc.yaml or set manually).",
+      "markdownDescription": "**`'new' | 'preview' | 'tech-preview' | 'skip'`** Document lifecycle stage.\n\nInherited from the parent `toc.yaml` entry; override here for this page only.",
+      "markdownEnumDescriptions": [
+        "New document. Visible only in **preview** and **tech-preview** builds. Excluded from production.",
+        "Preview stage. Visible in preview and tech-preview builds. Excluded from production unless explicitly enabled.",
+        "Tech-preview stage. Visible only in tech-preview builds.",
+        "Excluded from all builds — the page is skipped entirely."
+      ]
     },
     "queryParameters": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
         "iframes": {
           "type": "array",
           "items": {
             "type": "object",
-            "additionalProperties": false,
             "properties": {
-              "domain": { "type": "string" },
-              "parameters": { "type": "array" }
-            }
+              "domain": {
+                "type": "string"
+              },
+              "parameters": {
+                "type": "array"
+              }
+            },
+            "additionalProperties": false
           },
-          "description": "object[]. Iframe query parameter forwarding rules.",
-          "markdownDescription": "**`object[]`** Iframe query parameter forwarding rules."
+          "description": "Per-domain iframe query parameter forwarding rules.",
+          "markdownDescription": "**`object[]`** Per-domain forwarding rules.\n\nEach item:\n- `domain` **`string`** — iframe host domain to match\n- `parameters` **`array`** — query parameter names to forward"
         }
       },
-      "description": "object. Per-page query parameter forwarding rules for embedded iframes.",
-      "markdownDescription": "**`object`** Per-page query parameter forwarding rules for embedded iframes."
+      "additionalProperties": false,
+      "description": "Per-page query parameter forwarding rules for embedded iframes.",
+      "markdownDescription": "**`object`** Per-page query parameter forwarding rules for `<iframe>` embeds.\n\n- `iframes` **`object[]`** — per-domain forwarding rules (each item: `domain: string`, `parameters: array`)"
     },
     "docs-viewer": {
       "type": "object",
-      "additionalProperties": true,
       "properties": {
         "noIndex": {
           "type": "boolean",
-          "description": "boolean. Disallow indexing by external search engines (viewer-level override).",
+          "description": "Disallow indexing by external search engines (viewer-level override).",
           "markdownDescription": "**`boolean`** Disallow indexing by external search engines (viewer-level override)."
         }
       },
-      "description": "object. Per-page docs-viewer overrides.",
-      "markdownDescription": "**`object`** Per-page docs-viewer overrides."
+      "additionalProperties": true,
+      "description": "Per-page docs-viewer overrides.",
+      "markdownDescription": "**`object`** Per-page docs-viewer overrides.\n\n- `noIndex` **`boolean`** — disallow external search engine indexing"
     },
     "yabug": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
         "disabled": {
           "type": "boolean",
-          "description": "boolean. Disable the bug report widget on this page.",
-          "markdownDescription": "**`boolean`** Disable the bug report widget on this page."
+          "markdownDescription": "**`boolean`** Disable the bug-report widget on this page."
         },
         "form": {
           "type": "string",
-          "description": "string. Custom bug report form ID.",
-          "markdownDescription": "**`string`** Custom bug report form ID."
+          "markdownDescription": "**`string`** Custom bug report form ID or URL."
         }
       },
-      "description": "object. Per-page bug report widget overrides.",
-      "markdownDescription": "**`object`** Per-page bug report widget overrides."
+      "additionalProperties": false,
+      "description": "Per-page bug report widget overrides.",
+      "markdownDescription": "**`object`** Per-page bug-report widget overrides.\n\n- `disabled` **`boolean`** — disable the widget on this page\n- `form` **`string`** — custom form ID"
     },
     "yafeedback": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
         "ownerId": {
           "oneOf": [
-            { "type": "string" },
-            { "type": "object", "additionalProperties": { "type": "string" } }
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
           ],
-          "description": "string | object. Feedback widget owner ID or per-language map.",
-          "markdownDescription": "**`string | object`** Feedback widget owner ID or per-language map."
+          "markdownDescription": "**`string | object`** Feedback widget owner ID. String for a single ID; object maps language codes to IDs."
         },
         "hideHeader": {
           "type": "boolean",
-          "description": "boolean. Hide the feedback widget header.",
-          "markdownDescription": "**`boolean`** Hide the feedback widget header."
+          "markdownDescription": "**`boolean`** Hide the feedback widget header section."
         },
         "disabled": {
           "type": "boolean",
-          "description": "boolean. Disable the feedback widget on this page.",
-          "markdownDescription": "**`boolean`** Disable the feedback widget on this page."
+          "markdownDescription": "**`boolean`** Disable the Yandex Feedback widget on this page."
         },
         "testIds": {
           "type": "object",
           "additionalProperties": true,
-          "description": "object. Test IDs for the feedback widget.",
-          "markdownDescription": "**`object`** Test IDs for the feedback widget."
+          "markdownDescription": "**`object`** A/B test form IDs for the feedback widget."
         }
       },
-      "description": "object. Per-page Yandex Feedback (Pythia) widget overrides.",
-      "markdownDescription": "**`object`** Per-page Yandex Feedback (Pythia) widget overrides."
+      "additionalProperties": false,
+      "description": "Per-page Yandex Feedback (Pythia) widget overrides.",
+      "markdownDescription": "**`object`** Per-page Yandex Feedback widget overrides.\n\n- `ownerId` **`string | object`** — owner ID or per-language map\n- `hideHeader` **`boolean`** — hide widget header\n- `disabled` **`boolean`** — disable widget\n- `testIds` **`object`** — A/B test IDs"
     },
     "neuroExpert": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
         "projectId": {
           "type": "object",
-          "description": "object. Map of language codes to project IDs.",
-          "markdownDescription": "**`object`** Map of language codes to project IDs."
+          "description": "Map of language codes to project IDs.",
+          "markdownDescription": "**`object`** Map of language codes to AI expert project IDs (e.g. `{en: 'proj-123'}`)."
         },
         "hasOutsideClick": {
           "type": "boolean",
-          "description": "boolean. Close the widget when clicking outside.",
-          "markdownDescription": "**`boolean`** Close the widget when clicking outside."
+          "markdownDescription": "**`boolean`** Close the AI expert widget when the user clicks outside it."
         },
         "parentId": {
           "oneOf": [
-            { "type": "string" },
-            { "type": "null" }
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
           ],
-          "description": "string | null. Parent element ID for widget placement.",
-          "markdownDescription": "**`string | null`** Parent element ID for widget placement."
+          "markdownDescription": "**`string | null`** Parent element ID for widget placement. `null` uses the default."
         },
         "disabled": {
           "type": "boolean",
-          "description": "boolean. Disable the AI expert widget on this page.",
           "markdownDescription": "**`boolean`** Disable the AI expert widget on this page."
         },
         "customLabel": {
           "type": "object",
+          "description": "Map of language codes to custom widget header labels. Use \"default\" key for fallback. Only for whitelisted projects.",
           "additionalProperties": {
             "oneOf": [
-              { "type": "string" },
-              { "type": "boolean" }
+              {
+                "type": "string"
+              },
+              {
+                "type": "boolean"
+              }
             ]
           },
-          "description": "object. Map of language codes to custom widget header labels.",
-          "markdownDescription": "**`object`** Map of language codes to custom widget header labels. Use `default` key for fallback."
+          "markdownDescription": "**`object`** Map of language codes to custom widget header labels. Use `default` as fallback key."
         }
       },
-      "description": "object. Per-page AI expert widget overrides.",
-      "markdownDescription": "**`object`** Per-page AI expert widget overrides."
+      "additionalProperties": false,
+      "description": "Per-page AI expert widget overrides.",
+      "markdownDescription": "**`object`** Per-page AI expert widget overrides.\n\n- `projectId` **`object`** — language → project ID map\n- `hasOutsideClick` **`boolean`** — close on outside click\n- `parentId` **`string | null`** — parent element ID\n- `disabled` **`boolean`** — disable widget\n- `customLabel` **`object`** — language → label map"
+    },
+    "editable": {
+      "type": "boolean",
+      "description": "Whether the document is editable (system-generated by doc-transform).",
+      "markdownDescription": "**`boolean`** *(system-generated)* Whether the document has a VCS edit link. Set automatically by `doc-transform`.",
+      "doNotSuggest": true
+    },
+    "theme": {
+      "type": "string",
+      "description": "Path to generated theme CSS (system-generated in md2md output).",
+      "markdownDescription": "**`string`** *(system-generated)* Path to the generated theme CSS file. Set automatically in `md` output format.",
+      "doNotSuggest": true
+    },
+    "author": {
+      "$ref": "#/definitions/Contributor",
+      "description": "Page author from VCS (system-generated).",
+      "markdownDescription": "**`Contributor`** *(system-generated)* Page author resolved from VCS history.",
+      "doNotSuggest": true
+    },
+    "contributors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Contributor"
+      },
+      "description": "Page contributors from VCS (system-generated).",
+      "markdownDescription": "**`Contributor[]`** *(system-generated)* List of page contributors resolved from VCS history.",
+      "doNotSuggest": true
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "Last modification timestamp from VCS (system-generated).",
+      "markdownDescription": "**`string`** *(system-generated)* ISO 8601 timestamp of the last VCS commit touching this file.",
+      "doNotSuggest": true
+    },
+    "__system": {
+      "type": "object",
+      "description": "System variables from presets (only when addSystemMeta is enabled).",
+      "markdownDescription": "**`object`** *(system-generated)* Preset variables injected when `addSystemMeta: true` is set in `.yfm`.",
+      "doNotSuggest": true
+    },
+    "__metadata": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/MetaItem"
+      },
+      "description": "Metadata items from presets (only when addMetadataMeta is enabled).",
+      "markdownDescription": "**`MetaItem[]`** *(system-generated)* Metadata items from presets injected when `addMetadataMeta: true` is set.",
+      "doNotSuggest": true
     }
   },
+  "additionalProperties": true,
   "definitions": {
     "Alternate": {
       "type": "object",
-      "description": "Alternate. Alternate language version of the page.",
-      "markdownDescription": "**`Alternate`** Alternate language version of the page.",
-      "required": ["href"],
-      "additionalProperties": false,
       "properties": {
         "href": {
           "type": "string",
           "format": "uri",
-          "description": "string (uri). URL of the alternate page.",
-          "markdownDescription": "**`string (uri)`** URL of the alternate page."
+          "markdownDescription": "**`string (uri)`** Absolute URL of the alternate page."
         },
         "hreflang": {
           "type": "string",
-          "description": "string. Language code of the alternate page.",
-          "markdownDescription": "**`string`** Language code of the alternate page (e.g. `en`, `ru`)."
+          "markdownDescription": "**`string`** BCP-47 language code (e.g. `en`, `ru`, `zh-Hans`)."
         }
-      }
+      },
+      "required": [
+        "href"
+      ],
+      "additionalProperties": false,
+      "description": "Alternate language version of this page.",
+      "markdownDescription": "**`Alternate`** Alternate language version of this page for `<link rel=\"alternate\">`."
     },
     "MetaItem": {
       "type": "object",
-      "description": "MetaItem. Custom HTML meta tag definition.",
-      "markdownDescription": "**`MetaItem`** Custom HTML meta tag definition.",
-      "required": ["content"],
-      "additionalProperties": false,
       "properties": {
         "name": {
           "type": "string",
-          "description": "string. Meta tag name attribute.",
-          "markdownDescription": "**`string`** Meta tag `name` attribute (e.g. `title`, `copyright`)."
+          "description": "Meta tag name attribute (e.g. \"title\", \"copyright\").",
+          "markdownDescription": "**`string`** `name` attribute of the meta tag (e.g. `author`, `copyright`, `robots`)."
         },
         "property": {
           "type": "string",
-          "description": "string. Meta tag property attribute.",
-          "markdownDescription": "**`string`** Meta tag `property` attribute (e.g. `og:title`, `article:section`)."
+          "description": "Meta tag property attribute (e.g. \"og:title\", \"article:section\").",
+          "markdownDescription": "**`string`** `property` attribute — used for Open Graph tags (e.g. `og:title`, `og:image`)."
         },
         "http-equiv": {
           "type": "string",
-          "description": "string. Meta tag http-equiv attribute.",
-          "markdownDescription": "**`string`** Meta tag `http-equiv` attribute (e.g. `content-type`, `refresh`)."
+          "description": "Meta tag http-equiv attribute (e.g. \"content-type\", \"refresh\").",
+          "markdownDescription": "**`string`** `http-equiv` attribute (e.g. `content-type`, `refresh`, `X-UA-Compatible`)."
         },
         "content": {
           "type": "string",
-          "description": "string. Meta tag content value.",
-          "markdownDescription": "**`string`** Meta tag content value."
+          "description": "Meta tag content value.",
+          "markdownDescription": "**`string`** Content value of the meta tag. **Required.**"
         }
-      }
+      },
+      "required": [
+        "content"
+      ],
+      "additionalProperties": false,
+      "description": "Custom HTML meta tag definition.",
+      "markdownDescription": "**`MetaItem`** One custom HTML `<meta>` tag. Must have exactly one of `name`, `property`, or `http-equiv`, plus `content`."
     },
     "Contributor": {
       "type": "object",
-      "description": "Contributor. VCS contributor information.",
-      "markdownDescription": "**`Contributor`** VCS contributor information.",
-      "additionalProperties": false,
       "properties": {
         "avatar": {
           "type": "string",
-          "description": "string. Avatar URL.",
-          "markdownDescription": "**`string`** Avatar URL."
+          "markdownDescription": "**`string`** Avatar image URL."
         },
         "email": {
           "type": "string",
           "format": "email",
-          "description": "string (email). Email address.",
-          "markdownDescription": "**`string (email)`** Email address."
+          "markdownDescription": "**`string (email)`** Contributor email address."
         },
         "login": {
           "type": "string",
-          "description": "string. VCS login.",
-          "markdownDescription": "**`string`** VCS login."
+          "markdownDescription": "**`string`** VCS login / username."
         },
         "name": {
           "type": "string",
-          "description": "string. Display name.",
           "markdownDescription": "**`string`** Display name."
         },
         "url": {
           "type": "string",
           "format": "uri",
-          "description": "string (uri). Profile URL.",
-          "markdownDescription": "**`string (uri)`** Profile URL."
+          "markdownDescription": "**`string (uri)`** Profile URL (e.g. GitHub profile)."
         }
-      }
+      },
+      "additionalProperties": false,
+      "description": "VCS contributor information (system-generated).",
+      "markdownDescription": "**`Contributor`** VCS contributor record — populated automatically from Git history."
     },
     "Resources": {
       "type": "object",
-      "description": "Resources. Legacy per-page resources definition.",
-      "markdownDescription": "**`Resources`** Legacy per-page resources definition.",
-      "additionalProperties": false,
       "properties": {
         "script": {
           "type": "array",
-          "items": { "type": "string" },
-          "description": "string[]. Script file paths or URLs.",
-          "markdownDescription": "**`string[]`** Script file paths or URLs."
+          "items": {
+            "type": "string"
+          },
+          "markdownDescription": "**`string[]`** JavaScript file paths or URLs."
         },
         "style": {
           "type": "array",
-          "items": { "type": "string" },
-          "description": "string[]. Stylesheet file paths or URLs.",
-          "markdownDescription": "**`string[]`** Stylesheet file paths or URLs."
+          "items": {
+            "type": "string"
+          },
+          "markdownDescription": "**`string[]`** CSS file paths or URLs."
         },
         "csp": {
           "type": "array",
-          "items": { "type": "object" },
-          "description": "object[]. Content Security Policy directives.",
+          "items": {
+            "type": "object"
+          },
           "markdownDescription": "**`object[]`** Content Security Policy directives."
         }
-      }
+      },
+      "additionalProperties": false,
+      "description": "Legacy per-page resources definition.",
+      "markdownDescription": "**`Resources`** *(legacy)* Per-page CSS/JS/CSP resources. Prefer top-level `script`, `style`, `csp` fields."
     }
-  }
+  },
+  "markdownDescription": "YAML frontmatter block at the very top of a `.md` file (between `---` delimiters).\nDefines page metadata, SEO fields, per-page UI overrides, and access rules.\n```yaml --- title: My page description: Short description for SEO --- ```"
 }

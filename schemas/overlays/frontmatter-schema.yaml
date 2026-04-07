@@ -1,0 +1,209 @@
+title: Diplodoc (frontmatter)
+markdownDescription: >-
+  YAML frontmatter block at the very top of a `.md` file (between `---` delimiters).
+
+  Defines page metadata, SEO fields, per-page UI overrides, and access rules.
+
+  ```yaml
+  ---
+  title: My page
+  description: Short description for SEO
+  ---
+  ```
+properties:
+  title:
+    markdownDescription: "**`string`** Page title used in the browser tab, navigation sidebar, and SEO `<title>` tag.\n\nOverrides the first `#` heading for display purposes."
+  description:
+    markdownDescription: "**`string`** Meta description for SEO (`<meta name=\"description\">`). Shown in search engine snippets."
+  keywords:
+    markdownDescription: "**`string[]`** Keywords for the `<meta name=\"keywords\">` tag.\n\n```yaml\nkeywords:\n  - cloud\n  - storage\n  - s3\n```"
+  noIndex:
+    markdownDescription: "**`boolean`** Adds `<meta name=\"robots\" content=\"noindex, nofollow\">` to prevent search engine indexing of this page."
+  canonical:
+    markdownDescription: "**`string (uri)`** Canonical URL for this page (`<link rel=\"canonical\">`).\n\nUse when the same content is accessible at multiple URLs."
+  copyright:
+    markdownDescription: "**`string`** Copyright owner string added to the page footer."
+  alternate:
+    markdownDescription: "**`Alternate[]`** Alternate language versions of this page (`<link rel=\"alternate\" hreflang=\"...\">`). Each item must have `href` and optionally `hreflang`."
+    defaultSnippets:
+      - label: Add alternate language version
+        body:
+          - href: "${1:https://example.com/en/page}"
+            hreflang: "${2:en}"
+  metadata:
+    markdownDescription: >-
+      **`MetaItem[] | object`** Custom HTML `<meta>` tags.
+
+
+      **Array form** — explicit tag definitions:
+      ```yaml
+      metadata:
+        - name: author
+          content: John Doe
+        - property: og:image
+          content: https://example.com/image.png
+      ```
+      **Object form** — shorthand key→value:
+      ```yaml
+      metadata:
+        author: John Doe
+      ```
+  interface:
+    markdownDescription: "**`object`** Per-page UI element visibility overrides. Takes precedence over the global `.yfm` config."
+    defaultSnippets:
+      - label: Configure page UI
+        body:
+          toc: "${1:true}"
+          search: "${2:true}"
+          feedback: "${3:true}"
+    properties:
+      toc:
+        markdownDescription: "**`boolean`** Show (`true`) or hide (`false`) the table-of-contents sidebar on this page."
+      toc-header:
+        markdownDescription: "**`boolean`** Show or hide the section above the TOC (project name / logo)."
+      search:
+        markdownDescription: "**`boolean`** Show or hide the search input on this page."
+      feedback:
+        markdownDescription: "**`boolean`** Show or hide the like / dislike feedback controls."
+      favicon-src:
+        markdownDescription: "**`string`** URL to a custom favicon shown in the browser tab for this page only."
+  resources:
+    markdownDescription: "**`Resources`** Legacy per-page resource injection. Prefer top-level `script`, `style`, `csp`."
+  script:
+    markdownDescription: "**`string[]`** JavaScript files to inject into this page only.\n\n```yaml\nscript:\n  - _assets/custom.js\n```"
+  style:
+    markdownDescription: "**`string[]`** CSS files to inject into this page only.\n\n```yaml\nstyle:\n  - _assets/custom.css\n```"
+  csp:
+    markdownDescription: "**`object[]`** Content Security Policy directive overrides for this page.\n\nEach item is an object mapping a directive name to an array of allowed sources."
+  stage:
+    markdownDescription: "**`'new' | 'preview' | 'tech-preview' | 'skip'`** Document lifecycle stage.\n\nInherited from the parent `toc.yaml` entry; override here for this page only."
+    markdownEnumDescriptions:
+      - "New document. Visible only in **preview** and **tech-preview** builds. Excluded from production."
+      - "Preview stage. Visible in preview and tech-preview builds. Excluded from production unless explicitly enabled."
+      - "Tech-preview stage. Visible only in tech-preview builds."
+      - "Excluded from all builds — the page is skipped entirely."
+  restricted-access:
+    markdownDescription: >-
+      **`string[][]`** Access restriction rules.
+
+      Each inner array is a list of conditions joined by AND; outer items are joined by OR.
+      The user must match at least one inner array fully to access the page.
+
+      ```yaml
+      restricted-access:
+        - [role:admin]
+        - [role:editor, group:docs-team]
+      ```
+  vcsPath:
+    markdownDescription: "**`string`** Override the VCS path shown in the page header \"Edit on GitHub\" link."
+  sourcePath:
+    markdownDescription: "**`string`** Source file path — usually set automatically by the build pipeline. Do not set manually."
+  queryParameters:
+    markdownDescription: "**`object`** Per-page query parameter forwarding rules for `<iframe>` embeds.\n\n- `iframes` **`object[]`** — per-domain forwarding rules (each item: `domain: string`, `parameters: array`)"
+    properties:
+      iframes:
+        description: Per-domain iframe query parameter forwarding rules.
+        markdownDescription: "**`object[]`** Per-domain forwarding rules.\n\nEach item:\n- `domain` **`string`** — iframe host domain to match\n- `parameters` **`array`** — query parameter names to forward"
+  editable:
+    markdownDescription: "**`boolean`** *(system-generated)* Whether the document has a VCS edit link. Set automatically by `doc-transform`."
+    doNotSuggest: true
+  theme:
+    markdownDescription: "**`string`** *(system-generated)* Path to the generated theme CSS file. Set automatically in `md` output format."
+    doNotSuggest: true
+  author:
+    markdownDescription: "**`Contributor`** *(system-generated)* Page author resolved from VCS history."
+    doNotSuggest: true
+  contributors:
+    markdownDescription: "**`Contributor[]`** *(system-generated)* List of page contributors resolved from VCS history."
+    doNotSuggest: true
+  updatedAt:
+    markdownDescription: "**`string`** *(system-generated)* ISO 8601 timestamp of the last VCS commit touching this file."
+    doNotSuggest: true
+  __system:
+    markdownDescription: "**`object`** *(system-generated)* Preset variables injected when `addSystemMeta: true` is set in `.yfm`."
+    doNotSuggest: true
+  __metadata:
+    markdownDescription: "**`MetaItem[]`** *(system-generated)* Metadata items from presets injected when `addMetadataMeta: true` is set."
+    doNotSuggest: true
+  docs-viewer:
+    markdownDescription: "**`object`** Per-page docs-viewer overrides.\n\n- `noIndex` **`boolean`** — disallow external search engine indexing"
+    properties:
+      noIndex:
+        markdownDescription: "**`boolean`** Disallow indexing by external search engines (viewer-level override)."
+  yabug:
+    markdownDescription: "**`object`** Per-page bug-report widget overrides.\n\n- `disabled` **`boolean`** — disable the widget on this page\n- `form` **`string`** — custom form ID"
+    properties:
+      disabled:
+        markdownDescription: "**`boolean`** Disable the bug-report widget on this page."
+      form:
+        markdownDescription: "**`string`** Custom bug report form ID or URL."
+  yafeedback:
+    markdownDescription: "**`object`** Per-page Yandex Feedback widget overrides.\n\n- `ownerId` **`string | object`** — owner ID or per-language map\n- `hideHeader` **`boolean`** — hide widget header\n- `disabled` **`boolean`** — disable widget\n- `testIds` **`object`** — A/B test IDs"
+    properties:
+      ownerId:
+        markdownDescription: "**`string | object`** Feedback widget owner ID. String for a single ID; object maps language codes to IDs."
+      hideHeader:
+        markdownDescription: "**`boolean`** Hide the feedback widget header section."
+      disabled:
+        markdownDescription: "**`boolean`** Disable the Yandex Feedback widget on this page."
+      testIds:
+        markdownDescription: "**`object`** A/B test form IDs for the feedback widget."
+  neuroExpert:
+    markdownDescription: "**`object`** Per-page AI expert widget overrides.\n\n- `projectId` **`object`** — language → project ID map\n- `hasOutsideClick` **`boolean`** — close on outside click\n- `parentId` **`string | null`** — parent element ID\n- `disabled` **`boolean`** — disable widget\n- `customLabel` **`object`** — language → label map"
+    properties:
+      projectId:
+        markdownDescription: "**`object`** Map of language codes to AI expert project IDs (e.g. `{en: 'proj-123'}`)."
+      hasOutsideClick:
+        markdownDescription: "**`boolean`** Close the AI expert widget when the user clicks outside it."
+      parentId:
+        markdownDescription: "**`string | null`** Parent element ID for widget placement. `null` uses the default."
+      disabled:
+        markdownDescription: "**`boolean`** Disable the AI expert widget on this page."
+      customLabel:
+        markdownDescription: "**`object`** Map of language codes to custom widget header labels. Use `default` as fallback key."
+
+definitions:
+  Alternate:
+    description: Alternate language version of this page.
+    markdownDescription: "**`Alternate`** Alternate language version of this page for `<link rel=\"alternate\">`."
+    properties:
+      href:
+        markdownDescription: "**`string (uri)`** Absolute URL of the alternate page."
+      hreflang:
+        markdownDescription: "**`string`** BCP-47 language code (e.g. `en`, `ru`, `zh-Hans`)."
+  MetaItem:
+    description: Custom HTML meta tag definition.
+    markdownDescription: "**`MetaItem`** One custom HTML `<meta>` tag. Must have exactly one of `name`, `property`, or `http-equiv`, plus `content`."
+    properties:
+      name:
+        markdownDescription: "**`string`** `name` attribute of the meta tag (e.g. `author`, `copyright`, `robots`)."
+      property:
+        markdownDescription: "**`string`** `property` attribute — used for Open Graph tags (e.g. `og:title`, `og:image`)."
+      http-equiv:
+        markdownDescription: "**`string`** `http-equiv` attribute (e.g. `content-type`, `refresh`, `X-UA-Compatible`)."
+      content:
+        markdownDescription: "**`string`** Content value of the meta tag. **Required.**"
+  Contributor:
+    description: VCS contributor information (system-generated).
+    markdownDescription: "**`Contributor`** VCS contributor record — populated automatically from Git history."
+    properties:
+      avatar:
+        markdownDescription: "**`string`** Avatar image URL."
+      email:
+        markdownDescription: "**`string (email)`** Contributor email address."
+      login:
+        markdownDescription: "**`string`** VCS login / username."
+      name:
+        markdownDescription: "**`string`** Display name."
+      url:
+        markdownDescription: "**`string (uri)`** Profile URL (e.g. GitHub profile)."
+  Resources:
+    description: Legacy per-page resources definition.
+    markdownDescription: "**`Resources`** *(legacy)* Per-page CSS/JS/CSP resources. Prefer top-level `script`, `style`, `csp` fields."
+    properties:
+      script:
+        markdownDescription: "**`string[]`** JavaScript file paths or URLs."
+      style:
+        markdownDescription: "**`string[]`** CSS file paths or URLs."
+      csp:
+        markdownDescription: "**`object[]`** Content Security Policy directives."
