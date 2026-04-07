@@ -145,11 +145,11 @@
   "dependencies": {
     "@diplodoc/latex-extension": "^1.4.1",
     "@diplodoc/mermaid-extension": "^2.0.0",
-    "@diplodoc/transform": "^4.72.0",
+    "@diplodoc/transform": "^4.73.2",
     "@diplodoc/yfmlint": "^1.6.0",
     "@gravity-ui/components": "^4.18.0",
     "@gravity-ui/markdown-editor": "^15.37.0",
-    "@gravity-ui/uikit": "^7.35.2",
+    "@gravity-ui/uikit": "^7.36.1",
     "ajv": "^8.18.0",
     "highlight.js": "^11.11.1",
     "lowlight": "^3.3.0",
