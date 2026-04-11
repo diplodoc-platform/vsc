@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.1](https://github.com/diplodoc-platform/vsc/compare/package-template-v1.0.0...package-template-v1.0.1) (2026-04-07)
+## [0.0.1](https://github.com/diplodoc-platform/vsc/compare/package-template-v0.0.0...package-template-v0.0.1) (2026-04-07)
 
 
 ### Bug Fixes
