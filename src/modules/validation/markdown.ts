@@ -1,64 +1,53 @@
 import * as path from 'path';
-import * as vscode from 'vscode';
-import { LogLevels, yfmlint } from '@diplodoc/yfmlint';
+import {yfmlint} from '@diplodoc/yfmlint';
+import defaultPlugins from '@diplodoc/transform/lib/plugins';
+import changelogPlugin from '@diplodoc/transform/lib/plugins/changelog';
+import checkboxPlugin from '@diplodoc/transform/lib/plugins/checkbox';
+import cutPlugin from '@diplodoc/transform/lib/plugins/cut';
+import filePlugin from '@diplodoc/transform/lib/plugins/file';
+import imagesPlugin from '@diplodoc/transform/lib/plugins/images';
+import includesPlugin from '@diplodoc/transform/lib/plugins/includes';
+import linksPlugin from '@diplodoc/transform/lib/plugins/links';
+import {toDiagnostics} from './utils';
+import {PluginMessage} from '../types';
 
-// Transform plugins enable the full rule set (YFM002-YFM011):
-// without them, only YFM001 (inline code length) fires because the other
-// rules depend on token attributes set by transform plugins in isLintRun mode.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const transformPlugins: unknown[] = require('@diplodoc/transform/lib/plugins');
+const allPlugins = [
+    ...defaultPlugins,
+    changelogPlugin,
+    checkboxPlugin,
+    cutPlugin,
+    filePlugin,
+    imagesPlugin,
+    includesPlugin,
+    linksPlugin,
+];
 
-export async function validateMarkdown(document: vscode.TextDocument): Promise<vscode.Diagnostic[]> {
+export async function validateMarkdown(document: import('vscode').TextDocument) {
     const content = document.getText();
     const filePath = document.fileName;
-    const root = resolveRoot(filePath);
+    const root = path.dirname(filePath);
+    const pluginMessages: PluginMessage[] = [];
 
-    const errors = await yfmlint(content, filePath, {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        plugins: transformPlugins as any[],
+    const lintErrors = await yfmlint(content, filePath, {
+        plugins: allPlugins,
         pluginOptions: {
             path: filePath,
             root,
+            log: {
+                error(message: string) {
+                    pluginMessages.push({level: 'error', message});
+                },
+                warn(message: string) {
+                    pluginMessages.push({level: 'warn', message});
+                },
+                info(message: string) {
+                    pluginMessages.push({level: 'info', message});
+                },
+            },
         },
     });
 
-    if (!errors?.length) {
-        return [];
-    }
+    const errors = [...(lintErrors || []), ...pluginMessages];
 
-    return errors.map((err) => {
-        const line = Math.max(0, (err.lineNumber ?? 1) - 1);
-        const col = err.errorRange ? err.errorRange[0] - 1 : 0;
-        const len = err.errorRange?.[1] ?? 0;
-        const lineText = document.lineAt(line).text;
-        const endCol = len > 0 ? col + len : lineText.length;
-
-        const severity =
-            err.level === LogLevels.ERROR
-                ? vscode.DiagnosticSeverity.Error
-                : vscode.DiagnosticSeverity.Warning;
-
-        const parts: string[] = [err.ruleDescription];
-        if (err.errorDetail) parts.push(`[${err.errorDetail}]`);
-        if (err.errorContext) parts.push(`[Context: "${err.errorContext}"]`);
-
-        const diag = new vscode.Diagnostic(
-            new vscode.Range(line, col, line, endCol),
-            parts.join(' '),
-            severity,
-        );
-        diag.code = err.ruleNames[0];
-        diag.source = 'diplodoc';
-        return diag;
-    });
-}
-
-/**
- * Find the workspace root for the given file path.
- * Used by transform plugins to resolve relative links (YFM003).
- * Falls back to the file's own directory if no workspace folder contains it.
- */
-function resolveRoot(filePath: string): string {
-    const folder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(filePath));
-    return folder?.uri.fsPath ?? path.dirname(filePath);
+    return toDiagnostics(errors, document);
 }

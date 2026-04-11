@@ -9,8 +9,10 @@ items:
     href: latex.md
   - name: Notes
     href: notes.md
-  - name: Page constructor
+  - name: Page constructor MD
     href: pc.md
+  - name: Page constructor YAML
+    href: pc.yaml
   - name: Features
     href: features.md
   - name: Level 1

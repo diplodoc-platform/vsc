@@ -1,0 +1,6 @@
+common:
+  - from: /old-page
+    to: /new-page
+  - from: /legacy/docs
+    to: /docs/latest
+    unknownField: bad

@@ -60,42 +60,35 @@
         "id": "yaml",
         "filenames": [
           ".yfm",
-          ".yfmlint"
+          ".yfmlint",
+          "toc.yaml",
+          "presets.yaml",
+          "redirects.yaml",
+          "theme.yaml"
         ],
         "extensions": [
           ".yfm",
           ".yfmlint"
         ]
+      },
+      {
+        "id": "markdown",
+        "extensions": [
+          ".md",
+          ".markdown"
+        ]
       }
     ],
-    "yamlValidation": [
+    "grammars": [
       {
-        "fileMatch": "**/toc.yaml",
-        "url": "./schemas/toc-schema.json"
-      },
-      {
-        "fileMatch": "**/.yfm",
-        "url": "./schemas/yfm-schema.json"
-      },
-      {
-        "fileMatch": "**/.yfm.yaml",
-        "url": "./schemas/yfm-schema.json"
-      },
-      {
-        "fileMatch": "**/presets.yaml",
-        "url": "./schemas/presets-schema.json"
-      },
-      {
-        "fileMatch": "**/redirects.yaml",
-        "url": "./schemas/redirects-schema.json"
-      },
-      {
-        "fileMatch": "**/.yfmlint",
-        "url": "./schemas/yfmlint-schema.json"
-      },
-      {
-        "fileMatch": "**/index.yaml",
-        "url": "./schemas/leading-schema.json"
+        "path": "./syntaxes/markdown-page-constructor.json",
+        "scopeName": "markdown.pc.codeblock",
+        "injectTo": [
+          "text.html.markdown"
+        ],
+        "embeddedLanguages": {
+          "meta.embedded.block.yaml": "yaml"
+        }
       }
     ],
     "menus": {
@@ -150,14 +143,15 @@
     "@gravity-ui/components": "^4.18.0",
     "@gravity-ui/markdown-editor": "^15.37.0",
     "@gravity-ui/uikit": "^7.35.2",
-    "ajv": "^8.18.0",
     "highlight.js": "^11.11.1",
+    "js-yaml": "^4.1.1",
     "lowlight": "^3.3.0",
     "markdown-it": "^13.0.2",
     "punycode": "^2.3.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "url": "^0.11.4"
+    "url": "^0.11.4",
+    "yaml-language-server": "^1.21.0"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",

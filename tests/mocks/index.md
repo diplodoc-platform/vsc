@@ -1,7 +1,8 @@
 ---
-neuroExpert:
-    projectId:
-        default: rrrr
+interface:
+    toc: true
+    search: true
+    feedback: true
 ---
 # Test Includes
 

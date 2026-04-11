@@ -1,4 +1,5 @@
 title: Diplodoc (frontmatter)
+additionalProperties: false
 markdownDescription: >-
   YAML frontmatter block at the very top of a `.md` file (between `---` delimiters).
 

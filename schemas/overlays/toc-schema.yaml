@@ -1,4 +1,5 @@
 title: Diplodoc (toc.yaml)
+additionalProperties: false
 markdownDescription: >-
   Diplodoc table-of-contents file (`toc.yaml`).
 
@@ -128,12 +129,20 @@ definitions:
         markdownDescription: "**`string | boolean`** Liquid condition — badge is hidden when the expression is falsy."
 
   TocItem:
+    additionalProperties: false
     description: A single navigation item — either a page link, a section, or a TOC include.
     markdownDescription: "**`TocItem`** Navigation entry. Must be one of:\n- **Page** — has `href`\n- **Section** — has `items` (and optionally `name`)\n- **Include** — has `include`"
     properties:
       name:
         description: Display name of the item in the navigation sidebar.
         markdownDescription: "**`string`** Display name in the navigation sidebar."
+      href:
+        description: Relative path to the target .md file or URL.
+        markdownDescription: "**`string`** Relative path to the `.md` page or an external URL."
+        type: string
+      include:
+        description: Include directive to merge another toc.yaml.
+        markdownDescription: "**`Include`** Directive to include another `toc.yaml` into this navigation tree."
       expanded:
         description: Whether this section starts expanded in the sidebar.
         markdownDescription: "**`boolean`** Start this section expanded in the sidebar (`true`) or collapsed (`false`)."
