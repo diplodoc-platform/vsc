@@ -1,28 +1,15 @@
 # AGENTS.md - Package Template
 
-This file is part of the `@diplodoc/package-template` package. After running `./init.sh`, the template section below will be removed, and only the package-specific section will remain.
+This file is part of the `@diplodoc/vsc` package. After running `./init.sh`, the template section below will be removed, and only the package-specific section will remain.
 
 ## Template Overview
 
-The `@diplodoc/package-template` provides a starting point for creating new packages in the Diplodoc metapackage. It includes:
+The `@diplodoc/vsc` provides a starting point for creating new packages in the Diplodoc metapackage. It includes:
 
 - TypeScript configuration extending `@diplodoc/tsconfig`
 - Build setup with esbuild
 - Basic package structure
 - Scripts for building and type checking
-
-## Template Usage
-
-1. Clone the template repository
-2. Run `./init.sh <package-name>` to initialize
-3. The script will:
-   - Replace `package-template` with your package name
-   - Initialize linting via `@diplodoc/lint init`
-   - Install dependencies
-   - Remove template files
-
-<!-- END TEMPLATE SECTION -->
-<!-- ============================================================================ -->
 
 # AGENTS.md
 

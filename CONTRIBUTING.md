@@ -1,4 +1,4 @@
-# Contributing to @diplodoc/package-template
+# Contributing to @diplodoc/vsc
 
 Thank you for your interest in contributing! This document provides guidelines and instructions for contributing to this project.
 
@@ -29,8 +29,8 @@ This project adheres to a code of conduct that all contributors are expected to 
 
 1. **Fork and clone the repository**:
    ```bash
-   git clone https://github.com/diplodoc-platform/package-template.git
-   cd package-template
+   git clone https://github.com/diplodoc-platform/vsc.git
+   cd vsc
    ```
 
 2. **Install dependencies**:
