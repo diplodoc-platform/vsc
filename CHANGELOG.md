@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.0](https://github.com/diplodoc-platform/vsc/compare/package-template-v0.0.1...package-template-v0.1.0) (2026-04-11)
+
+
+### Features
+
+* added validation ([4d8afc0](https://github.com/diplodoc-platform/vsc/commit/4d8afc0af860af348f1ac1485d26841c61a16bbc))
+
 ## [0.0.1](https://github.com/diplodoc-platform/vsc/compare/package-template-v0.0.0...package-template-v0.0.1) (2026-04-07)
 
 
