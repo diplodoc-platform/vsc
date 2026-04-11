@@ -9,7 +9,7 @@ const ROOT = join(__dirname, '..');
 const OVERLAYS = join(ROOT, 'schemas/overlays');
 const OUTPUT = join(ROOT, 'schemas');
 
-const CLI_KEYS = new Set(['translate', 'selectCases', 'optionName']);
+const CLI_KEYS = new Set(['translate', 'optionName']);
 
 const SCHEMAS = [
     ['frontmatter-schema', 'frontmatter-schema.yaml'],
@@ -90,6 +90,10 @@ function inferTypeLabel(schema) {
         return labels.length ? labels.join(' | ') : null;
     }
 
+    if (schema.enum) {
+        return schema.enum.map(v => `'${v}'`).join(' | ');
+    }
+
     if (schema.type) {
         const types = Array.isArray(schema.type) ? schema.type : [schema.type];
 
@@ -98,10 +102,67 @@ function inferTypeLabel(schema) {
             return itemLabel ? `${itemLabel}[]` : 'array';
         }
 
+        if (types.includes('object')) {
+            if (schema.title) {
+                return schema.title;
+            }
+
+            if (schema.properties) {
+                const keys = Object.keys(schema.properties);
+
+                if (keys.length <= 4) {
+                    return `{${keys.join(', ')}}`;
+                }
+
+                return `{${keys.slice(0, 3).join(', ')}, ...}`;
+            }
+
+            return null;
+        }
+
         return types.join(' | ');
     }
 
     return null;
+}
+
+function convertSelectToOneOf(obj) {
+    if (Array.isArray(obj)) {
+        return obj.map(convertSelectToOneOf);
+    }
+
+    if (obj !== null && typeof obj === 'object') {
+        const result = {};
+
+        for (const [k, v] of Object.entries(obj)) {
+            result[k] = convertSelectToOneOf(v);
+        }
+
+        if (result.select && result.selectCases) {
+            const dataPath = result.select.$data;
+
+            if (dataPath) {
+                const propName = dataPath.split('/').pop();
+                const allOf = [];
+
+                for (const [caseValue, caseSchema] of Object.entries(result.selectCases)) {
+                    allOf.push({
+                        if: {properties: {[propName]: {const: caseValue}}},
+                        then: convertSelectToOneOf(caseSchema),
+                    });
+                }
+
+                result.allOf = allOf;
+            }
+
+            delete result.select;
+            delete result.selectCases;
+        }
+
+        return result;
+    }
+
+    return obj;
 }
 
 function addMarkdownDescriptions(obj) {
@@ -116,11 +177,47 @@ function addMarkdownDescriptions(obj) {
             result[k] = addMarkdownDescriptions(v);
         }
 
-        if (result.description && typeof result.description === 'string' && !result.markdownDescription) {
-            const desc = result.description.trim();
-            result.description = desc;
+        if (!result.markdownDescription) {
             const typeLabel = inferTypeLabel(result);
-            result.markdownDescription = typeLabel ? `**\`${typeLabel}\`** ${desc}` : desc;
+
+            if (result.description && typeof result.description === 'string') {
+                const desc = result.description.trim();
+                
+                result.description = desc;
+                result.markdownDescription = typeLabel ? `**\`${typeLabel}\`** ${desc}` : desc;
+            } else if (typeLabel && typeof result.type === 'string') {
+                result.markdownDescription = `**\`${typeLabel}\`**`;
+            }
+        }
+
+        return result;
+    }
+
+    return obj;
+}
+
+/**
+ * Post-process: replace generic **`object`** in markdownDescription with inferred type.
+ * This fixes overlay descriptions that use `object` as placeholder.
+ */
+function fixObjectTypeLabels(obj) {
+    if (Array.isArray(obj)) {
+        return obj.map(fixObjectTypeLabels);
+    }
+
+    if (obj !== null && typeof obj === 'object') {
+        const result = {};
+
+        for (const [k, v] of Object.entries(obj)) {
+            result[k] = fixObjectTypeLabels(v);
+        }
+
+        if (result.markdownDescription && typeof result.markdownDescription === 'string' &&
+            result.markdownDescription.includes('`object`')) {
+            const typeLabel = inferTypeLabel(result);
+            if (typeLabel) {
+                result.markdownDescription = result.markdownDescription.replace(/`object`/g, `\`${typeLabel}\``);
+            }
         }
 
         return result;
@@ -161,6 +258,7 @@ function processSchema(name, cliFile, cliSchemas) {
 
     let schema = load(readFileSync(cliPath, 'utf8'));
     schema = stripCliKeys(schema);
+    schema = convertSelectToOneOf(schema);
     schema = addMarkdownDescriptions(schema);
 
     const overlayPath = join(OVERLAYS, `${name}.yaml`);
@@ -168,6 +266,7 @@ function processSchema(name, cliFile, cliSchemas) {
     if (existsSync(overlayPath)) {
         const overlay = load(readFileSync(overlayPath, 'utf8'));
         schema = deepMerge(schema, overlay);
+        schema = fixObjectTypeLabels(schema);
         console.log(`  overlay applied: ${name}.yaml`);
     }
 

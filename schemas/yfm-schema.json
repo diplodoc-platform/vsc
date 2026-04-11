@@ -110,13 +110,16 @@
     "linkifyTlds": {
       "oneOf": [
         {
-          "type": "string"
+          "type": "string",
+          "markdownDescription": "**`string`**"
         },
         {
           "type": "array",
           "items": {
-            "type": "string"
-          }
+            "type": "string",
+            "markdownDescription": "**`string`**"
+          },
+          "markdownDescription": "**`string[]`**"
         }
       ],
       "description": "TLD configuration for the linkify plugin.",
@@ -125,7 +128,8 @@
     "ignore": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "markdownDescription": "**`string`**"
       },
       "description": "Glob patterns for paths to exclude from processing.",
       "markdownDescription": "**`string[]`** Glob patterns for files/directories to exclude from processing.\n\n```yaml\nignore:\n  - '**/draft/**'\n  - '**/*.tmp.md'\n```"
@@ -140,6 +144,7 @@
           "tech-preview",
           "skip"
         ],
+        "markdownDescription": "**`'new' | 'preview' | 'tech-preview' | 'skip'`**",
         "markdownEnumDescriptions": [
           "Exclude pages tagged `new`.",
           "Exclude pages tagged `preview`.",
@@ -191,13 +196,15 @@
     "vcs": {
       "oneOf": [
         {
-          "type": "boolean"
+          "type": "boolean",
+          "markdownDescription": "**`boolean`**"
         },
         {
           "type": "object",
           "properties": {
             "enabled": {
-              "type": "boolean"
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
             },
             "endpoint": {
               "type": "string",
@@ -227,13 +234,15 @@
             "scopes": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "markdownDescription": "**`string`**"
               },
               "description": "VCS scopes (from arcadia-vcs).",
               "markdownDescription": "**`string[]`** VCS scopes (from arcadia-vcs)."
             }
           },
-          "additionalProperties": true
+          "additionalProperties": true,
+          "markdownDescription": "**`{enabled, endpoint, owner, ...}`**"
         }
       ],
       "description": "Enable or disable the VCS connector. Object form accepts extension-specific fields.",
@@ -270,22 +279,27 @@
     "authors": {
       "oneOf": [
         {
-          "type": "boolean"
+          "type": "boolean",
+          "markdownDescription": "**`boolean`**"
         },
         {
           "type": "object",
           "properties": {
             "enabled": {
-              "type": "boolean"
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
             },
             "ignore": {
               "type": "array",
               "items": {
-                "type": "string"
-              }
+                "type": "string",
+                "markdownDescription": "**`string`**"
+              },
+              "markdownDescription": "**`string[]`**"
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "markdownDescription": "**`{enabled, ignore}`**"
         }
       ],
       "description": "Collect per-file authors from VCS.",
@@ -294,22 +308,27 @@
     "contributors": {
       "oneOf": [
         {
-          "type": "boolean"
+          "type": "boolean",
+          "markdownDescription": "**`boolean`**"
         },
         {
           "type": "object",
           "properties": {
             "enabled": {
-              "type": "boolean"
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
             },
             "ignore": {
               "type": "array",
               "items": {
-                "type": "string"
-              }
+                "type": "string",
+                "markdownDescription": "**`string`**"
+              },
+              "markdownDescription": "**`string[]`**"
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "markdownDescription": "**`{enabled, ignore}`**"
         }
       ],
       "description": "Collect per-file contributors from VCS.",
@@ -318,7 +337,8 @@
     "template": {
       "oneOf": [
         {
-          "type": "boolean"
+          "type": "boolean",
+          "markdownDescription": "**`boolean`**"
         },
         {
           "$ref": "#/definitions/TemplateConfig"
@@ -347,7 +367,8 @@
     "lint": {
       "oneOf": [
         {
-          "type": "boolean"
+          "type": "boolean",
+          "markdownDescription": "**`boolean`**"
         },
         {
           "$ref": "#/definitions/LintConfig"
@@ -404,7 +425,7 @@
       },
       "additionalProperties": false,
       "description": "Viewer interface visibility flags.",
-      "markdownDescription": "**`object`** Global UI visibility flags. Per-page `interface` frontmatter overrides these values.\n\nAvailable fields:\n- `toc` — show/hide the sidebar\n- `toc-header` — show/hide the TOC header section\n- `search` — show/hide the search input\n- `feedback` — show/hide like/dislike controls\n- `favicon-src` — custom favicon URL"
+      "markdownDescription": "**`{toc, toc-header, search, ...}`** Global UI visibility flags. Per-page `interface` frontmatter overrides these values.\n\nAvailable fields:\n- `toc` — show/hide the sidebar\n- `toc-header` — show/hide the TOC header section\n- `search` — show/hide the search input\n- `feedback` — show/hide like/dislike controls\n- `favicon-src` — custom favicon URL"
     },
     "feedbackUrl": {
       "type": "string",
@@ -430,10 +451,12 @@
     "theme": {
       "oneOf": [
         {
-          "type": "string"
+          "type": "string",
+          "markdownDescription": "**`string`**"
         },
         {
-          "type": "null"
+          "type": "null",
+          "markdownDescription": "**`null`**"
         }
       ],
       "description": "Override the base brand color or disable theming. null disables theme.yaml processing.",
@@ -442,7 +465,8 @@
     "search": {
       "oneOf": [
         {
-          "type": "boolean"
+          "type": "boolean",
+          "markdownDescription": "**`boolean`**"
         },
         {
           "$ref": "#/definitions/SearchConfig"
@@ -478,13 +502,15 @@
     "pdf": {
       "oneOf": [
         {
-          "type": "boolean"
+          "type": "boolean",
+          "markdownDescription": "**`boolean`**"
         },
         {
           "type": "object",
           "properties": {
             "enabled": {
-              "type": "boolean"
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
             },
             "hiddenPolicy": {
               "type": "boolean",
@@ -492,7 +518,8 @@
               "markdownDescription": "**`boolean`** Exclude hidden TOC items from PDF output."
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "markdownDescription": "**`{enabled, hiddenPolicy}`**"
         }
       ],
       "description": "Configure PDF output generation.",
@@ -529,7 +556,7 @@
       },
       "additionalProperties": false,
       "description": "Fine-tune Markdown preprocessing for md output format.",
-      "markdownDescription": "**`object`** Markdown preprocessing flags for `md` output format only.\n\n- `hashIncludes` **`boolean`** — replace include paths with content hashes\n- `mergeIncludes` **`boolean`** — inline `{% include %}` directives\n- `mergeAutotitles` **`boolean`** — merge auto-generated heading anchors\n- `mergeSvg` **`boolean`** — inline SVG `<img>` as `<svg>` blocks\n- `disableMetaMaxLineWidth` **`boolean`** — disable metadata line-width limit"
+      "markdownDescription": "**`{hashIncludes, mergeIncludes, mergeAutotitles, ...}`** Markdown preprocessing flags for `md` output format only.\n\n- `hashIncludes` **`boolean`** — replace include paths with content hashes\n- `mergeIncludes` **`boolean`** — inline `{% include %}` directives\n- `mergeAutotitles` **`boolean`** — merge auto-generated heading anchors\n- `mergeSvg` **`boolean`** — inline SVG `<img>` as `<svg>` blocks\n- `disableMetaMaxLineWidth` **`boolean`** — disable metadata line-width limit"
     },
     "mergeIncludes": {
       "type": "boolean",
@@ -561,7 +588,7 @@
         }
       },
       "additionalProperties": false,
-      "markdownDescription": "**`object`** Content size limits and processing options.\n\n- `maxInlineSvgSize` **`string | integer`** — max SVG size for inline embedding\n- `maxHtmlSize` **`string | integer`** — max rendered HTML page size\n- `maxAssetSize` **`string | integer`** — max asset file size (`0` = no limit)\n- `multilineTermDefinitions` **`boolean`** — allow multi-line term definitions",
+      "markdownDescription": "**`{maxInlineSvgSize, maxHtmlSize, maxAssetSize, multilineTermDefinitions}`** Content size limits and processing options.\n\n- `maxInlineSvgSize` **`string | integer`** — max SVG size for inline embedding\n- `maxHtmlSize` **`string | integer`** — max rendered HTML page size\n- `maxAssetSize` **`string | integer`** — max asset file size (`0` = no limit)\n- `multilineTermDefinitions` **`boolean`** — allow multi-line term definitions",
       "defaultSnippets": [
         {
           "label": "Set content size limits",
@@ -596,10 +623,12 @@
     "changelogs": {
       "oneOf": [
         {
-          "type": "boolean"
+          "type": "boolean",
+          "markdownDescription": "**`boolean`**"
         },
         {
-          "type": "string"
+          "type": "string",
+          "markdownDescription": "**`string`**"
         }
       ],
       "description": "Enable changelog generation. String value selects the format.",
@@ -616,13 +645,16 @@
       "markdownDescription": "**`boolean`** Remove `.html` extension from all generated internal links."
     },
     "rawAddMeta": {
-      "type": "boolean"
+      "type": "boolean",
+      "markdownDescription": "**`boolean`**"
     },
     "addResourcesMeta": {
-      "type": "boolean"
+      "type": "boolean",
+      "markdownDescription": "**`boolean`**"
     },
     "addMetadataMeta": {
-      "type": "boolean"
+      "type": "boolean",
+      "markdownDescription": "**`boolean`**"
     },
     "analytics": {
       "type": "object",
@@ -648,17 +680,17 @@
             }
           },
           "additionalProperties": false,
-          "markdownDescription": "**`object`** Google Tag Manager settings.\n\n- `id` **`string`** — GTM container ID (e.g. `GTM-XXXXXX`)\n- `mode` **`'base' | 'notification'`** — consent mode"
+          "markdownDescription": "**`{id, mode}`** Google Tag Manager settings.\n\n- `id` **`string`** — GTM container ID (e.g. `GTM-XXXXXX`)\n- `mode` **`'base' | 'notification'`** — consent mode"
         }
       },
       "additionalProperties": true,
       "description": "Web analytics configuration (e.g. Google Tag Manager).",
-      "markdownDescription": "**`object`** Web analytics configuration.\n\n- `gtm` **`object`** — Google Tag Manager (`id: string`, `mode: 'base' | 'notification'`)"
+      "markdownDescription": "**`{gtm}`** Web analytics configuration.\n\n- `gtm` **`{gtm}`** — Google Tag Manager (`id: string`, `mode: 'base' | 'notification'`)"
     },
     "neuroExpert": {
       "$ref": "#/definitions/NeuroExpertConfig",
       "description": "AI expert widget configuration.",
-      "markdownDescription": "**`NeuroExpertConfig`** AI expert widget global configuration.\n\n- `projectId` **`object`** — language → project ID map\n- `hasOutsideClick` **`boolean`** — close on outside click\n- `parentId` **`string | null`** — parent element ID\n- `disabled` **`boolean`** — disable widget globally\n- `customLabel` **`object`** — language → custom header label map"
+      "markdownDescription": "**`NeuroExpertConfig`** AI expert widget global configuration.\n\n- `projectId` **`NeuroExpertConfig`** — language → project ID map\n- `hasOutsideClick` **`boolean`** — close on outside click\n- `parentId` **`string | null`** — parent element ID\n- `disabled` **`boolean`** — disable widget globally\n- `customLabel` **`NeuroExpertConfig`** — language → custom header label map"
     },
     "yabug": {
       "$ref": "#/definitions/YaBugConfig",
@@ -668,7 +700,7 @@
     "yafeedback": {
       "$ref": "#/definitions/YaFeedbackConfig",
       "description": "Feedback widget configuration (docs-viewer).",
-      "markdownDescription": "**`YaFeedbackConfig`** Yandex Feedback (Pythia) widget global configuration.\n\n- `ownerId` **`string | object`** — feedback owner ID or per-language map\n- `hideHeader` **`boolean`** — hide widget header\n- `disabled` **`boolean`** — disable widget globally\n- `testIds` **`object`** — A/B test form IDs"
+      "markdownDescription": "**`YaFeedbackConfig`** Yandex Feedback (Pythia) widget global configuration.\n\n- `ownerId` **`string | object`** — feedback owner ID or per-language map\n- `hideHeader` **`boolean`** — hide widget header\n- `disabled` **`boolean`** — disable widget globally\n- `testIds` **`YaFeedbackConfig`** — A/B test form IDs"
     },
     "docs-viewer": {
       "$ref": "#/definitions/DocsViewerConfig",
@@ -708,7 +740,7 @@
       },
       "additionalProperties": false,
       "description": "Custom error/access-denied page configuration.",
-      "markdownDescription": "**`object`** Custom error and access-denied page configuration.\n\n- `accessDenied` **`object`** — custom 403 page settings\n- `notFound` **`object`** — custom 404 page settings\n- `serverError` **`object`** — custom 500 page settings"
+      "markdownDescription": "**`{accessDenied, notFound, serverError}`** Custom error and access-denied page configuration.\n\n- `accessDenied` **`{accessDenied, notFound, serverError}`** — custom 403 page settings\n- `notFound` **`{accessDenied, notFound, serverError}`** — custom 404 page settings\n- `serverError` **`{accessDenied, notFound, serverError}`** — custom 500 page settings"
     },
     "queryParameters": {
       "type": "object",
@@ -719,19 +751,23 @@
             "type": "object",
             "properties": {
               "domain": {
-                "type": "string"
+                "type": "string",
+                "markdownDescription": "**`string`**"
               },
               "parameters": {
-                "type": "array"
+                "type": "array",
+                "markdownDescription": "**`array`**"
               }
             },
-            "additionalProperties": false
-          }
+            "additionalProperties": false,
+            "markdownDescription": "**`{domain, parameters}`**"
+          },
+          "markdownDescription": "**`{domain, parameters}[]`**"
         }
       },
       "additionalProperties": false,
       "description": "Query parameter forwarding rules for embedded iframes.",
-      "markdownDescription": "**`object`** Global query parameter forwarding rules for `<iframe>` embeds."
+      "markdownDescription": "**`{iframes}`** Global query parameter forwarding rules for `<iframe>` embeds."
     },
     "build": {
       "type": "object",
@@ -804,7 +840,8 @@
     "LangItem": {
       "oneOf": [
         {
-          "type": "string"
+          "type": "string",
+          "markdownDescription": "**`string`**"
         },
         {
           "type": "object",
@@ -813,16 +850,20 @@
           ],
           "properties": {
             "lang": {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             "tld": {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             "href": {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "markdownDescription": "**`{lang, tld, href}`**"
         }
       ],
       "description": "Language code or extended language object.",
@@ -831,16 +872,19 @@
     "Toggleable": {
       "oneOf": [
         {
-          "type": "boolean"
+          "type": "boolean",
+          "markdownDescription": "**`boolean`**"
         },
         {
           "type": "object",
           "properties": {
             "enabled": {
-              "type": "boolean"
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "markdownDescription": "**`{enabled}`**"
         }
       ],
       "description": "Boolean or object with an enabled flag.",
@@ -867,7 +911,8 @@
     "ExtensionItem": {
       "oneOf": [
         {
-          "type": "string"
+          "type": "string",
+          "markdownDescription": "**`string`**"
         },
         {
           "type": "object",
@@ -876,10 +921,12 @@
           ],
           "properties": {
             "name": {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             }
           },
-          "additionalProperties": true
+          "additionalProperties": true,
+          "markdownDescription": "**`{name}`**"
         }
       ],
       "description": "Extension package name or object with name and options.",
@@ -891,7 +938,8 @@
         "script": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "markdownDescription": "**`string`**"
           },
           "description": "Paths or URLs to JavaScript files.",
           "markdownDescription": "**`string[]`** Paths or URLs to JavaScript files (relative to `input`)."
@@ -899,7 +947,8 @@
         "style": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "markdownDescription": "**`string`**"
           },
           "description": "Paths or URLs to CSS files.",
           "markdownDescription": "**`string[]`** Paths or URLs to CSS files (relative to `input`)."
@@ -914,8 +963,8 @@
         }
       },
       "additionalProperties": false,
-      "description": "Custom scripts, stylesheets, and CSP directives.",
-      "markdownDescription": "**`Resources`** Custom assets injected into every page."
+      "markdownDescription": "**`Resources`** Custom assets injected into every page.",
+      "description": "Custom scripts, stylesheets, and CSP directives."
     },
     "TemplateConfig": {
       "type": "object",
@@ -949,7 +998,7 @@
             }
           },
           "additionalProperties": false,
-          "markdownDescription": "**`object`** Where to process Liquid expressions.\n\n- `text` **`boolean`** — process in regular text\n- `code` **`boolean`** — process inside code blocks"
+          "markdownDescription": "**`{text, code}`** Where to process Liquid expressions.\n\n- `text` **`boolean`** — process in regular text\n- `code` **`boolean`** — process inside code blocks"
         },
         "features": {
           "type": "object",
@@ -962,13 +1011,15 @@
             "conditions": {
               "oneOf": [
                 {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "markdownDescription": "**`boolean`**"
                 },
                 {
                   "type": "string",
                   "enum": [
                     "strict"
-                  ]
+                  ],
+                  "markdownDescription": "**`'strict'`**"
                 }
               ],
               "description": "Enable conditional blocks. 'strict' mode is used by the translate command.",
@@ -986,12 +1037,12 @@
             }
           },
           "additionalProperties": false,
-          "markdownDescription": "**`object`** Which Liquid features to enable.\n\n- `substitutions` **`boolean`** — `{{ var }}` variable substitution\n- `conditions` **`boolean | 'strict'`** — `{% if %}` blocks\n- `cycles` **`boolean`** — `{% for %}` loops"
+          "markdownDescription": "**`{substitutions, conditions, cycles, cicles}`** Which Liquid features to enable.\n\n- `substitutions` **`boolean`** — `{{ var }}` variable substitution\n- `conditions` **`boolean | 'strict'`** — `{% if %}` blocks\n- `cycles` **`boolean`** — `{% for %}` loops"
         }
       },
       "additionalProperties": false,
-      "description": "Liquid template engine config. Fields: enabled, keepNotVar, legacyConditions, scopes (text, code), features (substitutions, conditions, cycles).",
-      "markdownDescription": "**`TemplateConfig`** Liquid template engine settings.\n\n- `enabled` **`boolean`** — enable/disable\n- `keepNotVar` **`boolean`** — keep unresolved `{{ var }}` placeholders\n- `scopes` **`object`** — where to process: `text`, `code`\n- `features` **`object`** — what to process: `substitutions`, `conditions`, `cycles`"
+      "markdownDescription": "**`TemplateConfig`** Liquid template engine settings.\n\n- `enabled` **`boolean`** — enable/disable\n- `keepNotVar` **`boolean`** — keep unresolved `{{ var }}` placeholders\n- `scopes` **`{enabled, keepNotVar, legacyConditions, ...}`** — where to process: `text`, `code`\n- `features` **`{enabled, keepNotVar, legacyConditions, ...}`** — what to process: `substitutions`, `conditions`, `cycles`",
+      "description": "Liquid template engine config. Fields: enabled, keepNotVar, legacyConditions, scopes (text, code), features (substitutions, conditions, cycles)."
     },
     "LintConfig": {
       "type": "object",
@@ -1010,15 +1061,15 @@
             {
               "type": "object",
               "description": "Inline lint rule configuration.",
-              "markdownDescription": "**`object`** Inline lint rule configuration."
+              "markdownDescription": "Inline lint rule configuration."
             }
           ],
           "markdownDescription": "**`string | object`** Lint configuration.\n\n- String — path to a `.yfmlint` file\n- Object — inline rule configuration (same format as `.yfmlint`)"
         }
       },
       "additionalProperties": false,
-      "description": "YFM linter configuration.",
-      "markdownDescription": "**`LintConfig`** YFM linter configuration."
+      "markdownDescription": "**`LintConfig`** YFM linter configuration.",
+      "description": "YFM linter configuration."
     },
     "SearchConfig": {
       "type": "object",
@@ -1094,7 +1145,7 @@
             "sparsed"
           ],
           "description": "Alternative spelling of confidence. Search scoring strategy (provider=local).",
-          "markdownDescription": "**`string`** Alternative spelling of confidence. Search scoring strategy (provider=local)."
+          "markdownDescription": "**`'phrased' | 'sparsed'`** Alternative spelling of confidence. Search scoring strategy (provider=local)."
         },
         "indexSettings": {
           "type": "object",
@@ -1110,8 +1161,8 @@
         }
       },
       "additionalProperties": true,
-      "description": "Search config. Fields: enabled, provider (local|algolia), tolerance (0-2), confidence (phrased|sparsed), and Algolia-specific fields.",
-      "markdownDescription": "**`SearchConfig`** Documentation search configuration.\n\n- `enabled` **`boolean`** — enable/disable search\n- `provider` **`'local' | 'algolia'`** — search backend\n- `tolerance` **`0 | 1 | 2`** — wildcard tolerance (local only)\n- `confidence` **`'phrased' | 'sparsed'`** — scoring strategy (local only)\n- `appId` / `apiKey` / `indexName` — Algolia credentials"
+      "markdownDescription": "**`SearchConfig`** Documentation search configuration.\n\n- `enabled` **`boolean`** — enable/disable search\n- `provider` **`'local' | 'algolia'`** — search backend\n- `tolerance` **`0 | 1 | 2`** — wildcard tolerance (local only)\n- `confidence` **`'phrased' | 'sparsed'`** — scoring strategy (local only)\n- `appId` / `apiKey` / `indexName` — Algolia credentials",
+      "description": "Search config. Fields: enabled, provider (local|algolia), tolerance (0-2), confidence (phrased|sparsed), and Algolia-specific fields."
     },
     "NeuroExpertConfig": {
       "type": "object",
@@ -1128,10 +1179,12 @@
         "parentId": {
           "oneOf": [
             {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             {
-              "type": "null"
+              "type": "null",
+              "markdownDescription": "**`null`**"
             }
           ],
           "markdownDescription": "**`string | null`** Parent element ID for widget placement. `null` uses the default placement."
@@ -1146,10 +1199,12 @@
           "additionalProperties": {
             "oneOf": [
               {
-                "type": "string"
+                "type": "string",
+                "markdownDescription": "**`string`**"
               },
               {
-                "type": "boolean"
+                "type": "boolean",
+                "markdownDescription": "**`boolean`**"
               }
             ]
           },
@@ -1157,8 +1212,8 @@
         }
       },
       "additionalProperties": false,
-      "description": "AI expert widget config. Fields: projectId, hasOutsideClick, parentId, disabled, customLabel.",
-      "markdownDescription": "**`NeuroExpertConfig`** AI expert (Yandex Neuro Expert) widget configuration.\n\n- `projectId` **`object`** — language → project ID map (use `default` as fallback key)\n- `hasOutsideClick` **`boolean`** — close widget on outside click\n- `parentId` **`string | null`** — parent element ID for placement\n- `disabled` **`boolean`** — disable the widget globally\n- `customLabel` **`object`** — language → custom header label map"
+      "markdownDescription": "**`NeuroExpertConfig`** AI expert (Yandex Neuro Expert) widget configuration.\n\n- `projectId` **`{projectId, hasOutsideClick, parentId, ...}`** — language → project ID map (use `default` as fallback key)\n- `hasOutsideClick` **`boolean`** — close widget on outside click\n- `parentId` **`string | null`** — parent element ID for placement\n- `disabled` **`boolean`** — disable the widget globally\n- `customLabel` **`{projectId, hasOutsideClick, parentId, ...}`** — language → custom header label map",
+      "description": "AI expert widget config. Fields: projectId, hasOutsideClick, parentId, disabled, customLabel."
     },
     "PublishConfig": {
       "type": "object",
@@ -1198,15 +1253,16 @@
         "hidden": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "markdownDescription": "**`string`**"
           },
           "description": "Glob patterns to exclude from upload.",
           "markdownDescription": "**`string[]`** Glob patterns for files to exclude from upload."
         }
       },
       "additionalProperties": false,
-      "description": "S3 publish config. Fields: endpoint, bucket, prefix, region, accessKeyId, secretAccessKey, hidden.",
-      "markdownDescription": "**`PublishConfig`** S3-compatible storage upload configuration.\n\n- `endpoint` **`string`** — storage endpoint URL\n- `bucket` **`string`** — target bucket name\n- `prefix` **`string`** — key prefix (e.g. `docs/v2/`)\n- `region` **`string`** — storage region\n- `accessKeyId` / `secretAccessKey` **`string`** ⚠️ credentials — use env vars\n- `hidden` **`string[]`** — glob patterns to exclude from upload"
+      "markdownDescription": "**`PublishConfig`** S3-compatible storage upload configuration.\n\n- `endpoint` **`string`** — storage endpoint URL\n- `bucket` **`string`** — target bucket name\n- `prefix` **`string`** — key prefix (e.g. `docs/v2/`)\n- `region` **`string`** — storage region\n- `accessKeyId` / `secretAccessKey` **`string`** ⚠️ credentials — use env vars\n- `hidden` **`string[]`** — glob patterns to exclude from upload",
+      "description": "S3 publish config. Fields: endpoint, bucket, prefix, region, accessKeyId, secretAccessKey, hidden."
     },
     "YaBugConfig": {
       "type": "object",
@@ -1223,8 +1279,8 @@
         }
       },
       "additionalProperties": false,
-      "description": "Bug-report widget config. Fields: disabled (boolean), form (string).",
-      "markdownDescription": "**`YaBugConfig`** Bug-report widget (docs-viewer) configuration.\n\n- `disabled` **`boolean`** — disable the widget globally\n- `form` **`string`** — custom bug-report form URL or path"
+      "markdownDescription": "**`YaBugConfig`** Bug-report widget (docs-viewer) configuration.\n\n- `disabled` **`boolean`** — disable the widget globally\n- `form` **`string`** — custom bug-report form URL or path",
+      "description": "Bug-report widget config. Fields: disabled (boolean), form (string)."
     },
     "YaFeedbackConfig": {
       "type": "object",
@@ -1232,15 +1288,17 @@
         "ownerId": {
           "oneOf": [
             {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             {
               "type": "object",
               "description": "Map of language codes to owner IDs. Use \"default\" key for fallback.",
               "additionalProperties": {
-                "type": "string"
+                "type": "string",
+                "markdownDescription": "**`string`**"
               },
-              "markdownDescription": "**`object`** Map of language codes to owner IDs. Use \"default\" key for fallback."
+              "markdownDescription": "Map of language codes to owner IDs. Use \"default\" key for fallback."
             }
           ],
           "description": "Pythia feedback survey owner ID.",
@@ -1264,8 +1322,8 @@
         }
       },
       "additionalProperties": false,
-      "description": "Yandex Feedback widget config. Fields: ownerId, hideHeader, disabled, testIds.",
-      "markdownDescription": "**`YaFeedbackConfig`** Yandex Feedback (Pythia) widget configuration.\n\n- `ownerId` **`string | object`** — feedback owner ID or language → ID map\n- `hideHeader` **`boolean`** — hide the widget header\n- `disabled` **`boolean`** — disable the widget globally\n- `testIds` **`object`** — A/B test form IDs"
+      "markdownDescription": "**`YaFeedbackConfig`** Yandex Feedback (Pythia) widget configuration.\n\n- `ownerId` **`string | object`** — feedback owner ID or language → ID map\n- `hideHeader` **`boolean`** — hide the widget header\n- `disabled` **`boolean`** — disable the widget globally\n- `testIds` **`{ownerId, hideHeader, disabled, testIds}`** — A/B test form IDs",
+      "description": "Yandex Feedback widget config. Fields: ownerId, hideHeader, disabled, testIds."
     },
     "DocsViewerConfig": {
       "type": "object",
@@ -1288,7 +1346,8 @@
         "langs": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "markdownDescription": "**`string`**"
           },
           "description": "Languages shown in the docs UI; first is default.",
           "markdownDescription": "**`string[]`** Languages shown in the docs UI; first is default."
@@ -1306,13 +1365,16 @@
         "metrika": {
           "oneOf": [
             {
-              "type": "integer"
+              "type": "integer",
+              "markdownDescription": "**`integer`**"
             },
             {
               "type": "array",
               "items": {
-                "type": "integer"
-              }
+                "type": "integer",
+                "markdownDescription": "**`integer`**"
+              },
+              "markdownDescription": "**`integer[]`**"
             }
           ],
           "description": "Yandex Metrika counter ID(s).",
@@ -1325,10 +1387,11 @@
             "enum": [
               "light",
               "dark"
-            ]
+            ],
+            "markdownDescription": "**`'light' | 'dark'`**"
           },
           "description": "Available themes. Server-only.",
-          "markdownDescription": "**`string[]`** Available themes. Server-only."
+          "markdownDescription": "**`'light' | 'dark'[]`** Available themes. Server-only."
         },
         "gtm": {
           "type": "object",
@@ -1345,12 +1408,12 @@
                 "notification"
               ],
               "description": "GTM consent mode (base or notification).",
-              "markdownDescription": "**`string`** GTM consent mode (base or notification)."
+              "markdownDescription": "**`'base' | 'notification'`** GTM consent mode (base or notification)."
             }
           },
           "additionalProperties": false,
           "description": "Google Tag Manager settings for the viewer.",
-          "markdownDescription": "**`object`** Google Tag Manager settings for the viewer."
+          "markdownDescription": "**`{id, mode}`** Google Tag Manager settings for the viewer."
         },
         "github-url-prefix": {
           "type": "string",
@@ -1373,7 +1436,7 @@
           },
           "additionalProperties": false,
           "description": "Yandex Turbo Metrika configuration.",
-          "markdownDescription": "**`object`** Yandex Turbo Metrika configuration."
+          "markdownDescription": "**`{id}`** Yandex Turbo Metrika configuration."
         },
         "pdf": {
           "type": "boolean",
@@ -1404,15 +1467,17 @@
           "type": "object",
           "properties": {
             "enabled": {
-              "type": "boolean"
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
             },
             "id": {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             }
           },
           "additionalProperties": true,
           "description": "UX feedback iframe (Yandex Forms).",
-          "markdownDescription": "**`object`** UX feedback iframe (Yandex Forms)."
+          "markdownDescription": "**`{enabled, id}`** UX feedback iframe (Yandex Forms)."
         },
         "embed": {
           "type": "array",
@@ -1420,32 +1485,38 @@
             "type": "object",
             "properties": {
               "host": {
-                "type": "string"
+                "type": "string",
+                "markdownDescription": "**`string`**"
               }
-            }
+            },
+            "markdownDescription": "**`{host}`**"
           },
           "description": "Allowed embedding hosts (frame-ancestors).",
-          "markdownDescription": "**`object[]`** Allowed embedding hosts (frame-ancestors)."
+          "markdownDescription": "**`{host}[]`** Allowed embedding hosts (frame-ancestors)."
         },
         "index-page": {
           "type": "object",
           "properties": {
             "title": {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             "description": {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             "service-url": {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             "hidden": {
-              "type": "boolean"
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
             }
           },
           "additionalProperties": true,
           "description": "Index page configuration.",
-          "markdownDescription": "**`object`** Index page configuration."
+          "markdownDescription": "**`{title, description, service-url, hidden}`** Index page configuration."
         },
         "show-toc-header": {
           "type": "boolean",
@@ -1469,21 +1540,23 @@
               "type": "object",
               "properties": {
                 "type": {
-                  "type": "string"
+                  "type": "string",
+                  "markdownDescription": "**`string`**"
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": false,
+              "markdownDescription": "**`{type}`**"
             }
           },
           "additionalProperties": false,
           "description": "Subscription/notification settings.",
-          "markdownDescription": "**`object`** Subscription/notification settings."
+          "markdownDescription": "**`{notifications}`** Subscription/notification settings."
         },
         "startrek": {
           "type": "object",
           "additionalProperties": true,
           "description": "Startrek integration settings (internal).",
-          "markdownDescription": "**`object`** Startrek integration settings (internal)."
+          "markdownDescription": "Startrek integration settings (internal)."
         },
         "crawler": {
           "type": "object",
@@ -1494,7 +1567,8 @@
                 "url": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "markdownDescription": "**`string`**"
                   },
                   "description": "Exact external URLs to exclude from crawler-manifest.json.",
                   "markdownDescription": "**`string[]`** Exact external URLs to exclude from crawler-manifest.json."
@@ -1502,21 +1576,24 @@
                 "regexp": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "markdownDescription": "**`string`**"
                   },
                   "description": "Regular expression patterns (JS /pattern/flags syntax) matching external URLs to exclude from crawler-manifest.json.",
                   "markdownDescription": "**`string[]`** Regular expression patterns (JS /pattern/flags syntax) matching external URLs to exclude from crawler-manifest.json."
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": false,
+              "markdownDescription": "**`{url, regexp}`**"
             }
           },
           "additionalProperties": false,
           "description": "Crawler-manifest filter settings.",
-          "markdownDescription": "**`object`** Crawler-manifest filter settings."
+          "markdownDescription": "**`{exclude}`** Crawler-manifest filter settings."
         }
       },
-      "additionalProperties": true
+      "additionalProperties": true,
+      "markdownDescription": "**`{project-name, no-index, lang, ...}`**"
     },
     "LogoOptions": {
       "type": "object",
@@ -1524,77 +1601,87 @@
         "src": {
           "oneOf": [
             {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             {
               "type": "object",
               "additionalProperties": {
-                "type": "string"
+                "type": "string",
+                "markdownDescription": "**`string`**"
               }
             }
           ],
           "description": "Logo image URL for light theme. Object form maps lang to URL.",
-          "markdownDescription": "**`string | object`** Logo image URL for light theme. Object form maps lang to URL."
+          "markdownDescription": "**`string`** Logo image URL for light theme. Object form maps lang to URL."
         },
         "src-dark": {
           "oneOf": [
             {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             {
               "type": "object",
               "additionalProperties": {
-                "type": "string"
+                "type": "string",
+                "markdownDescription": "**`string`**"
               }
             }
           ],
           "description": "Logo image URL for dark theme.",
-          "markdownDescription": "**`string | object`** Logo image URL for dark theme."
+          "markdownDescription": "**`string`** Logo image URL for dark theme."
         },
         "src-mobile": {
           "oneOf": [
             {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             {
               "type": "object",
               "additionalProperties": {
-                "type": "string"
+                "type": "string",
+                "markdownDescription": "**`string`**"
               }
             }
           ],
           "description": "Logo image URL for light theme on mobile.",
-          "markdownDescription": "**`string | object`** Logo image URL for light theme on mobile."
+          "markdownDescription": "**`string`** Logo image URL for light theme on mobile."
         },
         "src-mobile-dark": {
           "oneOf": [
             {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             {
               "type": "object",
               "additionalProperties": {
-                "type": "string"
+                "type": "string",
+                "markdownDescription": "**`string`**"
               }
             }
           ],
           "description": "Logo image URL for dark theme on mobile.",
-          "markdownDescription": "**`string | object`** Logo image URL for dark theme on mobile."
+          "markdownDescription": "**`string`** Logo image URL for dark theme on mobile."
         },
         "src-preview": {
           "oneOf": [
             {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             {
               "type": "object",
               "additionalProperties": {
-                "type": "string"
+                "type": "string",
+                "markdownDescription": "**`string`**"
               }
             }
           ],
           "description": "Logo for OpenGraph share preview.",
-          "markdownDescription": "**`string | object`** Logo for OpenGraph share preview."
+          "markdownDescription": "**`string`** Logo for OpenGraph share preview."
         },
         "url": {
           "type": "string",
@@ -1622,10 +1709,11 @@
           },
           "additionalProperties": false,
           "description": "Logo layout hints.",
-          "markdownDescription": "**`object`** Logo layout hints."
+          "markdownDescription": "**`{width, offset}`** Logo layout hints."
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "markdownDescription": "**`{src, src-dark, src-mobile, ...}`**"
     },
     "SupportWidgetConfig": {
       "type": "object",
@@ -1646,7 +1734,8 @@
           "markdownDescription": "**`boolean`** Disable the support widget."
         }
       },
-      "additionalProperties": true
+      "additionalProperties": true,
+      "markdownDescription": "**`{bot-guid, service-id, disabled}`**"
     },
     "TranslateConfig": {
       "type": "object",
@@ -1659,21 +1748,25 @@
         "source": {
           "oneOf": [
             {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             {
               "type": "object",
               "properties": {
                 "language": {
-                  "type": "string"
+                  "type": "string",
+                  "markdownDescription": "**`string`**"
                 },
                 "locale": {
-                  "type": "string"
+                  "type": "string",
+                  "markdownDescription": "**`string`**"
                 }
               },
               "required": [
                 "language"
-              ]
+              ],
+              "markdownDescription": "**`{language, locale}`**"
             }
           ],
           "description": "Source language (ISO 639-1 code or {language, locale}).",
@@ -1682,13 +1775,16 @@
         "target": {
           "oneOf": [
             {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             {
               "type": "array",
               "items": {
-                "type": "string"
-              }
+                "type": "string",
+                "markdownDescription": "**`string`**"
+              },
+              "markdownDescription": "**`string[]`**"
             }
           ],
           "description": "Target language(s) to translate to.",
@@ -1697,7 +1793,8 @@
         "files": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "markdownDescription": "**`string`**"
           },
           "description": "Explicit list of files/filter-lists to translate.",
           "markdownDescription": "**`string[]`** Explicit list of files or filter-lists to translate."
@@ -1705,7 +1802,8 @@
         "include": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "markdownDescription": "**`string`**"
           },
           "description": "Glob patterns or paths for files to include.",
           "markdownDescription": "**`string[]`** Glob patterns or paths for files to include in translation."
@@ -1713,7 +1811,8 @@
         "exclude": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "markdownDescription": "**`string`**"
           },
           "description": "Glob patterns or paths for files to exclude.",
           "markdownDescription": "**`string[]`** Glob patterns or paths for files to exclude from translation."
@@ -1736,7 +1835,8 @@
         "schema": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "markdownDescription": "**`string`**"
           },
           "description": "Paths to custom translate schema files.",
           "markdownDescription": "**`string[]`** Paths to custom translate schema files."
@@ -1769,8 +1869,8 @@
         }
       },
       "additionalProperties": true,
-      "description": "Translate command config. Fields: provider, source, target, files, include, exclude, vars, dryRun, useSource, and provider-specific fields.",
-      "markdownDescription": "**`TranslateConfig`** Configuration for the `translate` command.\n\n- `provider` **`string`** — translation service identifier\n- `source` **`string | object`** — source language (`'en'` or `{language, locale?}`)\n- `target` **`string | string[]`** — target language(s)\n- `files` **`string[]`** — explicit file list\n- `include` / `exclude` **`string[]`** — glob filters\n- `dryRun` **`boolean`** — calculate quota without translating\n- `useSource` **`boolean`** — use original text as output (debug)"
+      "markdownDescription": "**`TranslateConfig`** Configuration for the `translate` command.\n\n- `provider` **`string`** — translation service identifier\n- `source` **`string | object`** — source language (`'en'` or `{language, locale?}`)\n- `target` **`string | string[]`** — target language(s)\n- `files` **`string[]`** — explicit file list\n- `include` / `exclude` **`string[]`** — glob filters\n- `dryRun` **`boolean`** — calculate quota without translating\n- `useSource` **`boolean`** — use original text as output (debug)",
+      "description": "Translate command config. Fields: provider, source, target, files, include, exclude, vars, dryRun, useSource, and provider-specific fields."
     }
   },
   "markdownDescription": "Diplodoc build configuration file (`.yfm` or `.yfm.yaml`).\nControls the documentation build: input/output paths, language, output format, VCS integration, linting, search, extensions, and much more.\n```yaml input: ./docs output: ./build lang: en outputFormat: html ```"

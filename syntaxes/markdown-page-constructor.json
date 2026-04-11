@@ -1,0 +1,28 @@
+{
+    "scopeName": "markdown.pc.codeblock",
+    "injectionSelector": "L:text.html.markdown",
+    "patterns": [
+        {
+            "include": "#pc-block"
+        }
+    ],
+    "repository": {
+        "pc-block": {
+            "begin": "^(:::)\\s+(page-constructor)\\s*$",
+            "end": "^(:::)\\s*$",
+            "beginCaptures": {
+                "1": {"scope": "punctuation.definition.block.pc"},
+                "2": {"scope": "keyword.control.pc"}
+            },
+            "endCaptures": {
+                "1": {"scope": "punctuation.definition.block.pc"}
+            },
+            "contentName": "meta.embedded.block.yaml",
+            "patterns": [
+                {
+                    "include": "source.yaml"
+                }
+            ]
+        }
+    }
+}

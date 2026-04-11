@@ -12,6 +12,14 @@ meta:
 
 ## YFM Notes (работает в wysiwyg)
 
+<a href="/root_folder/path_to_file">Ссылка</a>
+
+My favorite search engine is [Yandex][1].
+
+[1]: ./ssss/ "The best search engine"
+
+[ddd](./sss.md)
+
 привет
 
 {% note alert "Note" %}
@@ -24,7 +32,7 @@ meta:
 
 Подсказка. Это полезный совет.
 
-{% endnote %}
+
 
 {% note warning "Warning" %}
 
@@ -40,7 +48,7 @@ meta:
 
 ## YFM Tabs (работает в wysiwyg)
 
-{% list tabs %}
+{% lis %}
 
 - Tab A
 
@@ -54,7 +62,6 @@ meta:
 
   Содержимое третьей вкладки.
 
-{% endlist %}
 
 ## YFM Cut / Spoiler (работает в wysiwyg)
 
@@ -62,7 +69,6 @@ meta:
 
 Этот текст скрыт под спойлером. Нажмите чтобы раскрыть.
 
-{% endcut %}
 
 ## LaTeX / Math (работает в wysiwyg)
 
