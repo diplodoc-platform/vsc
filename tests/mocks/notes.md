@@ -1,11 +1,19 @@
 # Notes
 
-{% note info "Note" %}
+{% list tabs radio %}
 
-This is info.
+- Название радиобаттона 1
 
-{% endnote %}
+  Текст радиобаттона 1  
 
-| | |
-| --- | --- |
-| | |
+- Название радиобаттона 1
+
+  Текст радиобаттона 2
+
+{% endlist %}
+
+::: page-constructor
+blocks:
+:::
+
+text

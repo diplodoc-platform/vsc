@@ -1,0 +1,21 @@
+# Source (bundled by esbuild)
+src/**
+tests/**
+scripts/**
+
+# Config
+tsconfig.json
+esbuild.js
+.gitignore
+.eslintrc*
+.prettierrc*
+.editorconfig
+
+# Dependencies (bundled into build/index.js)
+node_modules/**
+
+# Dev artifacts
+coverage/**
+*.vsix
+.DS_Store
+.vscode/**

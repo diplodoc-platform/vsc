@@ -198,7 +198,7 @@
       "additionalProperties": {
         "$ref": "#/definitions/LogLevel"
       },
-      "markdownDescription": "**`object`** Override the log/severity level for specific rules.\n\nLevels: `error` · `warn` · `info` · `disabled`\n\n```yaml\nlog-levels:\n  MD013: warn\n  YFM003: error\n```"
+      "markdownDescription": "**`{MD001, MD002, MD003, ...}`** Override the log/severity level for specific rules.\n\nLevels: `error` · `warn` · `info` · `disabled`\n\n```yaml\nlog-levels:\n  MD013: warn\n  YFM003: error\n```"
     },
     "MD001": {
       "$ref": "#/definitions/RuleValue",
@@ -423,7 +423,8 @@
     "YFM001": {
       "oneOf": [
         {
-          "type": "boolean"
+          "type": "boolean",
+          "markdownDescription": "**`boolean`**"
         },
         {
           "$ref": "#/definitions/LogLevel"
@@ -437,10 +438,12 @@
             "maximum": {
               "type": "integer",
               "minimum": 1,
-              "default": 100
+              "default": 100,
+              "markdownDescription": "**`integer`**"
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "markdownDescription": "**`{level, maximum}`**"
         }
       ],
       "description": "inline-code-length: Inline code span exceeds maximum length.",
@@ -549,8 +552,8 @@
         "info",
         "disabled"
       ],
-      "description": "Rule severity level: error | warn | info | disabled.",
       "markdownDescription": "**`string`** Rule severity level.",
+      "description": "Rule severity level: error | warn | info | disabled.",
       "markdownEnumDescriptions": [
         "**error** — rule violation causes the build to fail (exit code 1).",
         "**warn** — rule violation is reported but the build succeeds.",
@@ -561,7 +564,8 @@
     "RuleValue": {
       "oneOf": [
         {
-          "type": "boolean"
+          "type": "boolean",
+          "markdownDescription": "**`boolean`**"
         },
         {
           "$ref": "#/definitions/LogLevel"
@@ -573,7 +577,8 @@
               "$ref": "#/definitions/LogLevel"
             }
           },
-          "additionalProperties": true
+          "additionalProperties": true,
+          "markdownDescription": "**`{level}`**"
         }
       ],
       "description": "Rule value: true/false, a log level string, or an object with level and rule-specific options.",

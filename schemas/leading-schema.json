@@ -36,7 +36,8 @@
         "keywords": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "markdownDescription": "**`string`**"
           },
           "description": "Keywords for the meta keywords tag.",
           "markdownDescription": "**`string[]`** Keywords for the `<meta name=\"keywords\">` tag."
@@ -66,22 +67,25 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/MetaItem"
-              }
+              },
+              "markdownDescription": "**`MetaItem[]`**"
             },
             {
               "type": "object"
             }
           ],
           "description": "Custom meta tags (array of {name/property, content} or key-value hash).",
-          "markdownDescription": "**`MetaItem[] | object`** Custom meta tags (array of {name/property, content} or key-value hash)."
+          "markdownDescription": "**`MetaItem[]`** Custom meta tags (array of {name/property, content} or key-value hash)."
         },
         "restricted-access": {
           "type": "array",
           "items": {
             "type": "array",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "markdownDescription": "**`string`**"
+            },
+            "markdownDescription": "**`string[]`**"
           },
           "description": "Access restriction rules.",
           "markdownDescription": "**`string[][]`** Access restriction rules — same format as frontmatter."
@@ -89,7 +93,8 @@
         "script": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "markdownDescription": "**`string`**"
           },
           "description": "Script file paths or URLs to include on this page.",
           "markdownDescription": "**`string[]`** Script files to inject on this page only."
@@ -97,7 +102,8 @@
         "style": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "markdownDescription": "**`string`**"
           },
           "description": "Stylesheet file paths or URLs to include on this page.",
           "markdownDescription": "**`string[]`** Stylesheet files to inject on this page only."
@@ -108,7 +114,7 @@
             "type": "object"
           },
           "description": "Content Security Policy directive overrides for this page.",
-          "markdownDescription": "**`object[]`** Content Security Policy directive overrides for this page."
+          "markdownDescription": "**`array`** Content Security Policy directive overrides for this page."
         },
         "resources": {
           "type": "object",
@@ -116,25 +122,30 @@
             "script": {
               "type": "array",
               "items": {
-                "type": "string"
-              }
+                "type": "string",
+                "markdownDescription": "**`string`**"
+              },
+              "markdownDescription": "**`string[]`**"
             },
             "style": {
               "type": "array",
               "items": {
-                "type": "string"
-              }
+                "type": "string",
+                "markdownDescription": "**`string`**"
+              },
+              "markdownDescription": "**`string[]`**"
             },
             "csp": {
               "type": "array",
               "items": {
                 "type": "object"
-              }
+              },
+              "markdownDescription": "**`array`**"
             }
           },
           "additionalProperties": false,
           "description": "Per-page resources (legacy, prefer top-level script/style/csp).",
-          "markdownDescription": "**`object`** Per-page resources (legacy, prefer top-level script/style/csp)."
+          "markdownDescription": "**`{script, style, csp}`** Per-page resources (legacy, prefer top-level script/style/csp)."
         },
         "vcsPath": {
           "type": "string",
@@ -172,7 +183,7 @@
         "__system": {
           "type": "object",
           "description": "System variables from presets (only when addSystemMeta is enabled).",
-          "markdownDescription": "**`object`** System variables from presets (only when addSystemMeta is enabled)."
+          "markdownDescription": "System variables from presets (only when addSystemMeta is enabled)."
         },
         "__metadata": {
           "type": "array",
@@ -184,7 +195,7 @@
         }
       },
       "additionalProperties": true,
-      "markdownDescription": "**`object`** Page metadata — SEO, resources, and access control. Uses the same fields as Markdown frontmatter.",
+      "markdownDescription": "**`{title, description, noIndex, ...}`** Page metadata — SEO, resources, and access control. Uses the same fields as Markdown frontmatter.",
       "defaultSnippets": [
         {
           "label": "SEO metadata",
@@ -206,8 +217,8 @@
         }
       },
       "additionalProperties": false,
-      "description": "Breadcrumb / navigation override for this leading page.",
-      "markdownDescription": "**`object`** Navigation breadcrumb override for this leading page."
+      "markdownDescription": "**`{title}`** Navigation breadcrumb override for this leading page.",
+      "description": "Breadcrumb / navigation override for this leading page."
     },
     "links": {
       "type": "array",
@@ -227,8 +238,8 @@
           "href": {
             "type": "string",
             "format": "url",
-            "description": "Relative path to the target page or section.",
-            "markdownDescription": "**`string`** Relative path to the target `.md` page or `index.yaml` section."
+            "markdownDescription": "**`string`** Relative path to the target `.md` page or `index.yaml` section.",
+            "description": "Relative path to the target page or section."
           },
           "when": {
             "type": [
@@ -240,8 +251,8 @@
           }
         },
         "additionalProperties": true,
+        "markdownDescription": "**`{title, description, href, when}`** A navigation link card on the leading page.",
         "description": "A single navigation link card.",
-        "markdownDescription": "**`object`** A navigation link card on the leading page.",
         "defaultSnippets": [
           {
             "label": "Link card",
@@ -253,29 +264,32 @@
           }
         ]
       },
-      "description": "Navigation link cards displayed on the leading page.",
-      "markdownDescription": "**`object[]`** Navigation link cards shown on the leading page. Each card has a title, optional description, and an `href`.\n\n```yaml\nlinks:\n  - title: Quickstart\n    description: Up and running in 5 minutes.\n    href: quickstart.md\n```"
+      "markdownDescription": "**`object[]`** Navigation link cards shown on the leading page. Each card has a title, optional description, and an `href`.\n\n```yaml\nlinks:\n  - title: Quickstart\n    description: Up and running in 5 minutes.\n    href: quickstart.md\n```",
+      "description": "Navigation link cards displayed on the leading page."
     }
   },
-  "additionalProperties": true,
+  "additionalProperties": false,
   "definitions": {
     "TextItems": {
       "oneOf": [
         {
-          "type": "string"
+          "type": "string",
+          "markdownDescription": "**`string`**"
         },
         {
           "type": "array",
           "items": {
             "oneOf": [
               {
-                "type": "string"
+                "type": "string",
+                "markdownDescription": "**`string`**"
               },
               {
                 "$ref": "#/definitions/TextItem"
               }
             ]
-          }
+          },
+          "markdownDescription": "**`string | TextItem[]`**"
         }
       ],
       "description": "Plain string or array of conditional text items.",
@@ -288,13 +302,16 @@
         "text": {
           "oneOf": [
             {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             {
               "type": "array",
               "items": {
-                "type": "string"
-              }
+                "type": "string",
+                "markdownDescription": "**`string`**"
+              },
+              "markdownDescription": "**`string[]`**"
             }
           ],
           "description": "Text content to display when the condition is met.",
@@ -332,54 +349,64 @@
         "href"
       ],
       "additionalProperties": false,
-      "description": "Alternate language version of this page.",
-      "markdownDescription": "**`Alternate`** Alternate language version for `<link rel=\"alternate\">`."
+      "markdownDescription": "**`Alternate`** Alternate language version for `<link rel=\"alternate\">`.",
+      "description": "Alternate language version of this page."
     },
     "MetaItem": {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "markdownDescription": "**`string`**"
         },
         "property": {
-          "type": "string"
+          "type": "string",
+          "markdownDescription": "**`string`**"
         },
         "http-equiv": {
-          "type": "string"
+          "type": "string",
+          "markdownDescription": "**`string`**"
         },
         "content": {
-          "type": "string"
+          "type": "string",
+          "markdownDescription": "**`string`**"
         }
       },
       "required": [
         "content"
       ],
       "additionalProperties": false,
-      "description": "Custom HTML meta tag definition.",
-      "markdownDescription": "**`MetaItem`** Custom `<meta>` tag — requires `content` plus one of `name`, `property`, or `http-equiv`."
+      "markdownDescription": "**`MetaItem`** Custom `<meta>` tag — requires `content` plus one of `name`, `property`, or `http-equiv`.",
+      "description": "Custom HTML meta tag definition."
     },
     "Contributor": {
       "type": "object",
       "properties": {
         "avatar": {
-          "type": "string"
+          "type": "string",
+          "markdownDescription": "**`string`**"
         },
         "email": {
           "type": "string",
-          "format": "email"
+          "format": "email",
+          "markdownDescription": "**`string`**"
         },
         "login": {
-          "type": "string"
+          "type": "string",
+          "markdownDescription": "**`string`**"
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "markdownDescription": "**`string`**"
         },
         "url": {
           "type": "string",
-          "format": "uri"
+          "format": "uri",
+          "markdownDescription": "**`string`**"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "markdownDescription": "**`{avatar, email, login, ...}`**"
     }
   },
   "markdownDescription": "Diplodoc leading page file (`index.yaml`).\nA leading page is a structured landing page for a documentation section. It can display a title, description, navigation links, and arbitrary page-constructor blocks.\n```yaml title: Getting Started description: Learn how to set up and use My Product. links:\n  - title: Quickstart\n    description: Up and running in 5 minutes.\n    href: quickstart.md\n  - title: Concepts\n    description: Core concepts and architecture.\n    href: concepts/index.yaml\n```"

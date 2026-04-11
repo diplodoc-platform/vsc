@@ -6,158 +6,158 @@
   "properties": {
     "base-brand": {
       "type": "string",
-      "description": "Primary brand color used for highlights, active states, and accents.",
-      "markdownDescription": "**`string (CSS color)`** Primary brand color — used for highlights, active indicators, focus rings, and key accents throughout the UI."
+      "markdownDescription": "**`string (CSS color)`** Primary brand color — used for highlights, active indicators, focus rings, and key accents throughout the UI.",
+      "description": "Primary brand color used for highlights, active states, and accents."
     },
     "base-selection": {
       "type": "string",
-      "description": "Background color for selected/active navigation items.",
-      "markdownDescription": "**`string (CSS color)`** Background color for the selected / active state of navigation items and interactive elements."
+      "markdownDescription": "**`string (CSS color)`** Background color for the selected / active state of navigation items and interactive elements.",
+      "description": "Background color for selected/active navigation items."
     },
     "base-background": {
       "type": "string",
-      "description": "Main page background color.",
-      "markdownDescription": "**`string (CSS color)`** Main page background color (applied to `<body>`)."
+      "markdownDescription": "**`string (CSS color)`** Main page background color (applied to `<body>`).",
+      "description": "Main page background color."
     },
     "text-primary": {
       "type": "string",
-      "description": "Primary text color for body text and headings.",
-      "markdownDescription": "**`string (CSS color)`** Primary text color — used for body text, headings, and most readable content."
+      "markdownDescription": "**`string (CSS color)`** Primary text color — used for body text, headings, and most readable content.",
+      "description": "Primary text color for body text and headings."
     },
     "text-secondary": {
       "type": "string",
-      "description": "Secondary/muted text color for captions, labels, and helper text.",
-      "markdownDescription": "**`string (CSS color)`** Secondary (muted) text color — used for captions, labels, breadcrumbs, and other supporting text."
+      "markdownDescription": "**`string (CSS color)`** Secondary (muted) text color — used for captions, labels, breadcrumbs, and other supporting text.",
+      "description": "Secondary/muted text color for captions, labels, and helper text."
     },
     "base-simple-hover": {
       "type": "string",
-      "description": "Hover background color for simple interactive elements (buttons, menu items).",
-      "markdownDescription": "**`string (CSS color)`** Hover background applied to simple interactive elements like menu items and icon buttons."
+      "markdownDescription": "**`string (CSS color)`** Hover background applied to simple interactive elements like menu items and icon buttons.",
+      "description": "Hover background color for simple interactive elements (buttons, menu items)."
     },
     "line-generic": {
       "type": "string",
-      "description": "Default border/divider/separator line color.",
-      "markdownDescription": "**`string (CSS color)`** Default color for borders, dividers, and horizontal rules (`<hr>`)."
+      "markdownDescription": "**`string (CSS color)`** Default color for borders, dividers, and horizontal rules (`<hr>`).",
+      "description": "Default border/divider/separator line color."
     },
     "note-info-background": {
       "type": "string",
-      "description": "Background color for informational note/callout blocks.",
-      "markdownDescription": "**`string (CSS color)`** Background of `{% note info %}` callout blocks."
+      "markdownDescription": "**`string (CSS color)`** Background of `{% note info %}` callout blocks.",
+      "description": "Background color for informational note/callout blocks."
     },
     "note-tip-background": {
       "type": "string",
-      "description": "Background color for tip/hint note blocks.",
-      "markdownDescription": "**`string (CSS color)`** Background of `{% note tip %}` callout blocks."
+      "markdownDescription": "**`string (CSS color)`** Background of `{% note tip %}` callout blocks.",
+      "description": "Background color for tip/hint note blocks."
     },
     "note-warning-background": {
       "type": "string",
-      "description": "Background color for warning note blocks.",
-      "markdownDescription": "**`string (CSS color)`** Background of `{% note warning %}` callout blocks."
+      "markdownDescription": "**`string (CSS color)`** Background of `{% note warning %}` callout blocks.",
+      "description": "Background color for warning note blocks."
     },
     "note-important-background": {
       "type": "string",
-      "description": "Background color for important/critical note blocks.",
-      "markdownDescription": "**`string (CSS color)`** Background of `{% note important %}` / `{% note alert %}` callout blocks."
+      "markdownDescription": "**`string (CSS color)`** Background of `{% note important %}` / `{% note alert %}` callout blocks.",
+      "description": "Background color for important/critical note blocks."
     },
     "quote": {
       "type": "string",
-      "description": "Text or border color for blockquote elements.",
-      "markdownDescription": "**`string (CSS color)`** Color applied to blockquote `>` elements — typically the left border accent."
+      "markdownDescription": "**`string (CSS color)`** Color applied to blockquote `>` elements — typically the left border accent.",
+      "description": "Text or border color for blockquote elements."
     },
     "tab-active": {
       "type": "string",
-      "description": "Active tab indicator color (underline or background).",
-      "markdownDescription": "**`string (CSS color)`** Color of the active tab indicator (usually the bottom border or background of the selected tab)."
+      "markdownDescription": "**`string (CSS color)`** Color of the active tab indicator (usually the bottom border or background of the selected tab).",
+      "description": "Active tab indicator color (underline or background)."
     },
     "tab-text": {
       "type": "string",
-      "description": "Default text color of tab labels.",
-      "markdownDescription": "**`string (CSS color)`** Default text color of tab labels in `{% list tabs %}` blocks."
+      "markdownDescription": "**`string (CSS color)`** Default text color of tab labels in `{% list tabs %}` blocks.",
+      "description": "Default text color of tab labels."
     },
     "tab-text-hover": {
       "type": "string",
-      "description": "Text color of tab labels on hover.",
-      "markdownDescription": "**`string (CSS color)`** Text color of tab labels when hovered."
+      "markdownDescription": "**`string (CSS color)`** Text color of tab labels when hovered.",
+      "description": "Text color of tab labels on hover."
     },
     "link": {
       "type": "string",
-      "description": "Default hyperlink color.",
-      "markdownDescription": "**`string (CSS color)`** Default color for hyperlinks (`<a>`)."
+      "markdownDescription": "**`string (CSS color)`** Default color for hyperlinks (`<a>`).",
+      "description": "Default hyperlink color."
     },
     "link-hover": {
       "type": "string",
-      "description": "Hyperlink color on hover.",
-      "markdownDescription": "**`string (CSS color)`** Color for hyperlinks on hover/focus."
+      "markdownDescription": "**`string (CSS color)`** Color for hyperlinks on hover/focus.",
+      "description": "Hyperlink color on hover."
     },
     "term-dfn-background": {
       "type": "string",
-      "description": "Background color for term definition tooltip popups.",
-      "markdownDescription": "**`string (CSS color)`** Background of the tooltip popup shown when hovering over a defined term (`[*term]: definition`)."
+      "markdownDescription": "**`string (CSS color)`** Background of the tooltip popup shown when hovering over a defined term (`[*term]: definition`).",
+      "description": "Background color for term definition tooltip popups."
     },
     "code": {
       "type": "string",
-      "description": "Text color inside fenced code blocks.",
-      "markdownDescription": "**`string (CSS color)`** Text color inside fenced code blocks (` ``` ` blocks)."
+      "markdownDescription": "**`string (CSS color)`** Text color inside fenced code blocks (` ``` ` blocks).",
+      "description": "Text color inside fenced code blocks."
     },
     "code-background": {
       "type": "string",
-      "description": "Background color of fenced code blocks.",
-      "markdownDescription": "**`string (CSS color)`** Background color of fenced code blocks."
+      "markdownDescription": "**`string (CSS color)`** Background color of fenced code blocks.",
+      "description": "Background color of fenced code blocks."
     },
     "inline-code": {
       "type": "string",
-      "description": "Text color of inline code spans.",
-      "markdownDescription": "**`string (CSS color)`** Text color of inline code spans (`` `code` ``)."
+      "markdownDescription": "**`string (CSS color)`** Text color of inline code spans (`` `code` ``).",
+      "description": "Text color of inline code spans."
     },
     "inline-code-background": {
       "type": "string",
-      "description": "Background color of inline code spans.",
-      "markdownDescription": "**`string (CSS color)`** Background color of inline code spans (`` `code` ``)."
+      "markdownDescription": "**`string (CSS color)`** Background color of inline code spans (`` `code` ``).",
+      "description": "Background color of inline code spans."
     },
     "table": {
       "type": "string",
-      "description": "Default text color inside tables.",
-      "markdownDescription": "**`string (CSS color)`** Default text color inside table cells."
+      "markdownDescription": "**`string (CSS color)`** Default text color inside table cells.",
+      "description": "Default text color inside tables."
     },
     "table-row-background": {
       "type": "string",
-      "description": "Alternating (zebra-stripe) row background in tables.",
-      "markdownDescription": "**`string (CSS color)`** Background color for alternating (even) rows in tables."
+      "markdownDescription": "**`string (CSS color)`** Background color for alternating (even) rows in tables.",
+      "description": "Alternating (zebra-stripe) row background in tables."
     },
     "table-background": {
       "type": "string",
-      "description": "Default table cell / header background.",
-      "markdownDescription": "**`string (CSS color)`** Default background for table cells and the table header row."
+      "markdownDescription": "**`string (CSS color)`** Default background for table cells and the table header row.",
+      "description": "Default table cell / header background."
     },
     "table-border": {
       "type": "string",
-      "description": "Table border/grid line color.",
-      "markdownDescription": "**`string (CSS color)`** Color of table border lines and cell dividers."
+      "markdownDescription": "**`string (CSS color)`** Color of table border lines and cell dividers.",
+      "description": "Table border/grid line color."
     },
     "mini-toc-border": {
       "type": "string",
-      "description": "Border/accent line color of the mini table-of-contents sidebar.",
-      "markdownDescription": "**`string (CSS color)`** Left border color of the mini TOC (on-page heading navigator) sidebar."
+      "markdownDescription": "**`string (CSS color)`** Left border color of the mini TOC (on-page heading navigator) sidebar.",
+      "description": "Border/accent line color of the mini table-of-contents sidebar."
     },
     "mini-toc": {
       "type": "string",
-      "description": "Default text color of mini TOC heading links.",
-      "markdownDescription": "**`string (CSS color)`** Default text color of links in the mini TOC sidebar."
+      "markdownDescription": "**`string (CSS color)`** Default text color of links in the mini TOC sidebar.",
+      "description": "Default text color of mini TOC heading links."
     },
     "mini-toc-hover": {
       "type": "string",
-      "description": "Text color of mini TOC links on hover.",
-      "markdownDescription": "**`string (CSS color)`** Text color of mini TOC links on hover."
+      "markdownDescription": "**`string (CSS color)`** Text color of mini TOC links on hover.",
+      "description": "Text color of mini TOC links on hover."
     },
     "mini-toc-active": {
       "type": "string",
-      "description": "Text color of the currently active mini TOC heading link.",
-      "markdownDescription": "**`string (CSS color)`** Text color of the currently-visible (active) heading link in the mini TOC."
+      "markdownDescription": "**`string (CSS color)`** Text color of the currently-visible (active) heading link in the mini TOC.",
+      "description": "Text color of the currently active mini TOC heading link."
     },
     "mini-toc-active-border": {
       "type": "string",
-      "description": "Accent border color for the active mini TOC heading link.",
-      "markdownDescription": "**`string (CSS color)`** Left border/indicator color for the active heading in the mini TOC sidebar."
+      "markdownDescription": "**`string (CSS color)`** Left border/indicator color for the active heading in the mini TOC sidebar.",
+      "description": "Accent border color for the active mini TOC heading link."
     },
     "light": {
       "$ref": "#/definitions/ColorProperties",
@@ -197,163 +197,163 @@
       "properties": {
         "base-brand": {
           "type": "string",
-          "description": "Primary brand color.",
-          "markdownDescription": "**`string (CSS color)`** Primary brand color for this theme variant."
+          "markdownDescription": "**`string (CSS color)`** Primary brand color for this theme variant.",
+          "description": "Primary brand color."
         },
         "base-selection": {
           "type": "string",
-          "description": "Background for selected/active elements.",
-          "markdownDescription": "**`string (CSS color)`** Background of selected/active elements."
+          "markdownDescription": "**`string (CSS color)`** Background of selected/active elements.",
+          "description": "Background for selected/active elements."
         },
         "base-background": {
           "type": "string",
-          "description": "Main page background.",
-          "markdownDescription": "**`string (CSS color)`** Main page background color."
+          "markdownDescription": "**`string (CSS color)`** Main page background color.",
+          "description": "Main page background."
         },
         "text-primary": {
           "type": "string",
-          "description": "Primary text color.",
-          "markdownDescription": "**`string (CSS color)`** Primary text color."
+          "markdownDescription": "**`string (CSS color)`** Primary text color.",
+          "description": "Primary text color."
         },
         "text-secondary": {
           "type": "string",
-          "description": "Secondary/muted text color.",
-          "markdownDescription": "**`string (CSS color)`** Secondary (muted) text color."
+          "markdownDescription": "**`string (CSS color)`** Secondary (muted) text color.",
+          "description": "Secondary/muted text color."
         },
         "base-simple-hover": {
           "type": "string",
-          "description": "Hover background for interactive elements.",
-          "markdownDescription": "**`string (CSS color)`** Hover background for simple interactive elements."
+          "markdownDescription": "**`string (CSS color)`** Hover background for simple interactive elements.",
+          "description": "Hover background for interactive elements."
         },
         "line-generic": {
           "type": "string",
-          "description": "Default border/divider color.",
-          "markdownDescription": "**`string (CSS color)`** Default border and divider color."
+          "markdownDescription": "**`string (CSS color)`** Default border and divider color.",
+          "description": "Default border/divider color."
         },
         "note-info-background": {
           "type": "string",
-          "description": "Info note background.",
-          "markdownDescription": "**`string (CSS color)`** Background of info callout blocks."
+          "markdownDescription": "**`string (CSS color)`** Background of info callout blocks.",
+          "description": "Info note background."
         },
         "note-tip-background": {
           "type": "string",
-          "description": "Tip note background.",
-          "markdownDescription": "**`string (CSS color)`** Background of tip callout blocks."
+          "markdownDescription": "**`string (CSS color)`** Background of tip callout blocks.",
+          "description": "Tip note background."
         },
         "note-warning-background": {
           "type": "string",
-          "description": "Warning note background.",
-          "markdownDescription": "**`string (CSS color)`** Background of warning callout blocks."
+          "markdownDescription": "**`string (CSS color)`** Background of warning callout blocks.",
+          "description": "Warning note background."
         },
         "note-important-background": {
           "type": "string",
-          "description": "Important note background.",
-          "markdownDescription": "**`string (CSS color)`** Background of important callout blocks."
+          "markdownDescription": "**`string (CSS color)`** Background of important callout blocks.",
+          "description": "Important note background."
         },
         "quote": {
           "type": "string",
-          "description": "Blockquote color.",
-          "markdownDescription": "**`string (CSS color)`** Blockquote accent color."
+          "markdownDescription": "**`string (CSS color)`** Blockquote accent color.",
+          "description": "Blockquote color."
         },
         "tab-active": {
           "type": "string",
-          "description": "Active tab indicator color.",
-          "markdownDescription": "**`string (CSS color)`** Active tab indicator."
+          "markdownDescription": "**`string (CSS color)`** Active tab indicator.",
+          "description": "Active tab indicator color."
         },
         "tab-text": {
           "type": "string",
-          "description": "Tab label text color.",
-          "markdownDescription": "**`string (CSS color)`** Tab label text."
+          "markdownDescription": "**`string (CSS color)`** Tab label text.",
+          "description": "Tab label text color."
         },
         "tab-text-hover": {
           "type": "string",
-          "description": "Tab label hover color.",
-          "markdownDescription": "**`string (CSS color)`** Tab label text on hover."
+          "markdownDescription": "**`string (CSS color)`** Tab label text on hover.",
+          "description": "Tab label hover color."
         },
         "link": {
           "type": "string",
-          "description": "Link color.",
-          "markdownDescription": "**`string (CSS color)`** Hyperlink color."
+          "markdownDescription": "**`string (CSS color)`** Hyperlink color.",
+          "description": "Link color."
         },
         "link-hover": {
           "type": "string",
-          "description": "Link hover color.",
-          "markdownDescription": "**`string (CSS color)`** Hyperlink color on hover."
+          "markdownDescription": "**`string (CSS color)`** Hyperlink color on hover.",
+          "description": "Link hover color."
         },
         "term-dfn-background": {
           "type": "string",
-          "description": "Term definition tooltip background.",
-          "markdownDescription": "**`string (CSS color)`** Term definition tooltip background."
+          "markdownDescription": "**`string (CSS color)`** Term definition tooltip background.",
+          "description": "Term definition tooltip background."
         },
         "code": {
           "type": "string",
-          "description": "Code block text color.",
-          "markdownDescription": "**`string (CSS color)`** Fenced code block text color."
+          "markdownDescription": "**`string (CSS color)`** Fenced code block text color.",
+          "description": "Code block text color."
         },
         "code-background": {
           "type": "string",
-          "description": "Code block background.",
-          "markdownDescription": "**`string (CSS color)`** Fenced code block background."
+          "markdownDescription": "**`string (CSS color)`** Fenced code block background.",
+          "description": "Code block background."
         },
         "inline-code": {
           "type": "string",
-          "description": "Inline code text color.",
-          "markdownDescription": "**`string (CSS color)`** Inline code span text color."
+          "markdownDescription": "**`string (CSS color)`** Inline code span text color.",
+          "description": "Inline code text color."
         },
         "inline-code-background": {
           "type": "string",
-          "description": "Inline code background.",
-          "markdownDescription": "**`string (CSS color)`** Inline code span background."
+          "markdownDescription": "**`string (CSS color)`** Inline code span background.",
+          "description": "Inline code background."
         },
         "table": {
           "type": "string",
-          "description": "Table text color.",
-          "markdownDescription": "**`string (CSS color)`** Table cell text color."
+          "markdownDescription": "**`string (CSS color)`** Table cell text color.",
+          "description": "Table text color."
         },
         "table-row-background": {
           "type": "string",
-          "description": "Alternating table row background.",
-          "markdownDescription": "**`string (CSS color)`** Alternating table row background (zebra striping)."
+          "markdownDescription": "**`string (CSS color)`** Alternating table row background (zebra striping).",
+          "description": "Alternating table row background."
         },
         "table-background": {
           "type": "string",
-          "description": "Table header/default cell background.",
-          "markdownDescription": "**`string (CSS color)`** Table header and default cell background."
+          "markdownDescription": "**`string (CSS color)`** Table header and default cell background.",
+          "description": "Table header/default cell background."
         },
         "table-border": {
           "type": "string",
-          "description": "Table border color.",
-          "markdownDescription": "**`string (CSS color)`** Table border and cell divider color."
+          "markdownDescription": "**`string (CSS color)`** Table border and cell divider color.",
+          "description": "Table border color."
         },
         "mini-toc-border": {
           "type": "string",
-          "description": "Mini TOC sidebar border color.",
-          "markdownDescription": "**`string (CSS color)`** Mini TOC left border accent."
+          "markdownDescription": "**`string (CSS color)`** Mini TOC left border accent.",
+          "description": "Mini TOC sidebar border color."
         },
         "mini-toc": {
           "type": "string",
-          "description": "Mini TOC link text color.",
-          "markdownDescription": "**`string (CSS color)`** Mini TOC link text."
+          "markdownDescription": "**`string (CSS color)`** Mini TOC link text.",
+          "description": "Mini TOC link text color."
         },
         "mini-toc-hover": {
           "type": "string",
-          "description": "Mini TOC link hover color.",
-          "markdownDescription": "**`string (CSS color)`** Mini TOC link text on hover."
+          "markdownDescription": "**`string (CSS color)`** Mini TOC link text on hover.",
+          "description": "Mini TOC link hover color."
         },
         "mini-toc-active": {
           "type": "string",
-          "description": "Active mini TOC link color.",
-          "markdownDescription": "**`string (CSS color)`** Active heading link in the mini TOC."
+          "markdownDescription": "**`string (CSS color)`** Active heading link in the mini TOC.",
+          "description": "Active mini TOC link color."
         },
         "mini-toc-active-border": {
           "type": "string",
-          "description": "Active mini TOC link border color.",
-          "markdownDescription": "**`string (CSS color)`** Active heading indicator border in the mini TOC."
+          "markdownDescription": "**`string (CSS color)`** Active heading indicator border in the mini TOC.",
+          "description": "Active mini TOC link border color."
         }
       },
       "additionalProperties": false,
-      "description": "Theme-specific color property overrides.",
-      "markdownDescription": "**`ColorProperties`** Color property overrides for a specific theme variant (light or dark). All values are CSS color expressions."
+      "markdownDescription": "**`ColorProperties`** Color property overrides for a specific theme variant (light or dark). All values are CSS color expressions.",
+      "description": "Theme-specific color property overrides."
     }
   },
   "markdownDescription": "Diplodoc theme configuration file.\nOverride brand colors and UI element colors for the documentation viewer. All values are CSS color expressions (hex, `rgb()`, `var(--...)`, etc.).\nTop-level properties set **both** light and dark themes simultaneously. Use `light:` and `dark:` sections to set theme-specific values.\n```yaml base-brand: '#005BFF' light:\n  base-background: '#FFFFFF'\ndark:\n  base-background: '#22262E'\n```"
