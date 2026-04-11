@@ -12,16 +12,16 @@ const browserPolyfills = {
 const nodeShims = {
     name: 'node-shims',
     setup(build) {
-        build.onResolve({filter: /^(punycode|url)$/}, (args) => ({
+        build.onResolve({ filter: /^(punycode|url)$/ }, (args) => ({
             path: browserPolyfills[args.path],
         }));
 
-        build.onResolve({filter: /^(fs|path|process)$/}, (args) => ({
+        build.onResolve({ filter: /^(fs|path|process)$/ }, (args) => ({
             path: args.path,
             namespace: 'node-shims',
         }));
 
-        build.onLoad({filter: /.*/, namespace: 'node-shims'}, (args) => {
+        build.onLoad({ filter: /.*/, namespace: 'node-shims' }, (args) => {
             if (args.path === 'process') {
                 return {
                     contents: `
@@ -47,6 +47,36 @@ const nodeShims = {
 
 const ctx = isWatch ? esbuild.context : (opts) => esbuild.build(opts).then(r => r);
 
+// yaml-language-server bundle fixes:
+// 1. Stub heavy/unused deps (prettier for formatting, request-light for remote schemas)
+// 2. Redirect vscode-json-languageservice UMD deep imports to ESM equivalents
+//    (yaml-language-server does require("vscode-json-languageservice/lib/umd/...") which
+//    contains UMD factory wrappers that esbuild can't statically resolve)
+const yamlServerFixes = {
+    name: 'yaml-server-fixes',
+    setup(build) {
+        // Redirect UMD → ESM for vscode-json-languageservice deep imports
+        build.onResolve({filter: /vscode-json-languageservice\/lib\/umd\//}, (args) => {
+            const esmPath = args.path.replace('/lib/umd/', '/lib/esm/');
+            return {path: require.resolve(esmPath)};
+        });
+        // Stub out prettier (only used for formatting, we never call doFormat())
+        build.onResolve({filter: /^prettier/}, (args) => ({
+            path: args.path,
+            namespace: 'stub',
+        }));
+        // Stub out request-light (only used for fetching remote schemas)
+        build.onResolve({filter: /^request-light$/}, (args) => ({
+            path: args.path,
+            namespace: 'stub',
+        }));
+        build.onLoad({filter: /.*/, namespace: 'stub'}, () => ({
+            contents: 'module.exports = {};',
+            loader: 'js',
+        }));
+    },
+};
+
 const builds = [];
 
 // Extension host — bundled as CJS Node.js module.
@@ -62,7 +92,9 @@ if (target === 'ext' || target === 'all') {
             target: 'node18',
             format: 'cjs',
             sourcemap: true,
-            loader: {'.json': 'json'},
+            plugins: [yamlServerFixes],
+            mainFields: ['module', 'main'],
+            loader: { '.json': 'json' },
         }).then(c => isWatch ? c.watch() : c),
     );
 }
@@ -74,10 +106,10 @@ const webviewBase = {
     format: 'iife',
     sourcemap: false,
     plugins: [
-            nodeShims,
-            sassPlugin({filter: /\.module\.scss$/, type: 'local-css'}),
-            sassPlugin(),
-        ],
+        nodeShims,
+        sassPlugin({ filter: /\.module\.scss$/, type: 'local-css' }),
+        sassPlugin(),
+    ],
     define: {
         'process.env.NODE_ENV': '"production"',
         global: 'window',

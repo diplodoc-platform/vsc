@@ -5,7 +5,8 @@
     "vcs": {
       "oneOf": [
         {
-          "type": "boolean"
+          "type": "boolean",
+          "markdownDescription": "**`boolean`**"
         },
         {
           "$ref": "#/definitions/VcsConfig"
@@ -28,7 +29,8 @@
       "type": "array",
       "items": {
         "$ref": "#/definitions/Redirect"
-      }
+      },
+      "markdownDescription": "**`Redirect[]`**"
     }
   },
   "definitions": {
@@ -40,13 +42,13 @@
       "properties": {
         "initialCommit": {
           "type": "string",
-          "description": "Commit SHA used as the start of the Git history scan for renames.",
-          "markdownDescription": "**`string`** Git commit SHA to use as the starting point when scanning history for file renames. Commits older than this are ignored."
+          "markdownDescription": "**`string`** Git commit SHA to use as the starting point when scanning history for file renames. Commits older than this are ignored.",
+          "description": "Commit SHA used as the start of the Git history scan for renames."
         }
       },
       "additionalProperties": false,
-      "description": "VCS redirect tracking configuration.",
-      "markdownDescription": "**`VcsConfig`** VCS-based redirect tracking configuration."
+      "markdownDescription": "**`VcsConfig`** VCS-based redirect tracking configuration.",
+      "description": "VCS redirect tracking configuration."
     },
     "Redirect": {
       "type": "object",
@@ -57,18 +59,18 @@
       "properties": {
         "from": {
           "type": "string",
-          "description": "Old URL path to redirect from (relative, without leading slash).",
-          "markdownDescription": "**`string`** Old URL path to redirect **from** (e.g. `old/page.html`). Relative to the docs root, without a leading `/`."
+          "markdownDescription": "**`string`** Old URL path to redirect **from** (e.g. `old/page.html`). Relative to the docs root, without a leading `/`.",
+          "description": "Old URL path to redirect from (relative, without leading slash)."
         },
         "to": {
           "type": "string",
-          "description": "New URL path to redirect to (relative, without leading slash).",
-          "markdownDescription": "**`string`** New URL path to redirect **to** (e.g. `new/page.html`). Relative to the docs root, without a leading `/`."
+          "markdownDescription": "**`string`** New URL path to redirect **to** (e.g. `new/page.html`). Relative to the docs root, without a leading `/`.",
+          "description": "New URL path to redirect to (relative, without leading slash)."
         }
       },
       "additionalProperties": false,
-      "description": "A single redirect rule mapping an old URL path to a new one.",
-      "markdownDescription": "**`Redirect`** A single URL redirect rule.\n\nBoth `from` and `to` are paths relative to the documentation root (without leading `/`)."
+      "markdownDescription": "**`Redirect`** A single URL redirect rule.\n\nBoth `from` and `to` are paths relative to the documentation root (without leading `/`).",
+      "description": "A single redirect rule mapping an old URL path to a new one."
     }
   },
   "markdownDescription": "Diplodoc redirects file (`redirects.yaml`).\nDefines URL redirects that are applied during the `publish` step. Each redirect maps a set of old paths to a new path.\n```yaml # Simple redirect old/path.md:\n  - from: old/path.html\n    to: new/path.html\n\n# VCS-based redirects (track file renames via Git history) vcs: true ```"

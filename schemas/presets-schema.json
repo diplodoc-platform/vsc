@@ -7,7 +7,7 @@
     "default": {
       "$ref": "#/definitions/preset",
       "description": "Default preset — always applied to every build regardless of varsPreset.",
-      "markdownDescription": "**`object`** Default preset — **always applied** to every build regardless of the `varsPreset` setting.\n\nDefine your baseline variables here. Other presets are deep-merged on top.\n\n```yaml\ndefault:\n  version: '2.0'\n  product_name: My Docs\n```",
+      "markdownDescription": "**`preset`** Default preset — **always applied** to every build regardless of the `varsPreset` setting.\n\nDefine your baseline variables here. Other presets are deep-merged on top.\n\n```yaml\ndefault:\n  version: '2.0'\n  product_name: My Docs\n```",
       "defaultSnippets": [
         {
           "label": "Default preset with common variables",
@@ -41,16 +41,18 @@
         }
       },
       "additionalProperties": true,
-      "description": "A named set of template variables. Variables are accessible as {{ var_name }} in Markdown and toc.yaml.",
-      "markdownDescription": "**`object`** A named set of template variables.\n\nVariables are available in Liquid expressions as `{{ var_name }}`.\n\nThe special `i18n` key holds per-language variable overrides:\n```yaml\ni18n:\n  en:\n    greeting: Hello\n  ru:\n    greeting: Привет\n```"
+      "markdownDescription": "**`{i18n}`** A named set of template variables.\n\nVariables are available in Liquid expressions as `{{ var_name }}`.\n\nThe special `i18n` key holds per-language variable overrides:\n```yaml\ni18n:\n  en:\n    greeting: Hello\n  ru:\n    greeting: Привет\n```",
+      "description": "A named set of template variables. Variables are accessible as {{ var_name }} in Markdown and toc.yaml."
     },
     "property": {
       "oneOf": [
         {
-          "type": "string"
+          "type": "string",
+          "markdownDescription": "**`string`**"
         },
         {
-          "type": "number"
+          "type": "number",
+          "markdownDescription": "**`number`**"
         },
         {
           "type": "object",

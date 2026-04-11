@@ -18,7 +18,8 @@
     "keywords": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "markdownDescription": "**`string`**"
       },
       "description": "Keywords for the meta keywords tag.",
       "markdownDescription": "**`string[]`** Keywords for the `<meta name=\"keywords\">` tag.\n\n```yaml\nkeywords:\n  - cloud\n  - storage\n  - s3\n```"
@@ -64,7 +65,8 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/MetaItem"
-          }
+          },
+          "markdownDescription": "**`MetaItem[]`**"
         },
         {
           "type": "object"
@@ -104,7 +106,7 @@
       },
       "additionalProperties": true,
       "description": "Per-page UI overrides (takes precedence over .yfm config).",
-      "markdownDescription": "**`object`** Per-page UI element visibility overrides. Takes precedence over the global `.yfm` config.",
+      "markdownDescription": "**`{toc, toc-header, search, ...}`** Per-page UI element visibility overrides. Takes precedence over the global `.yfm` config.",
       "defaultSnippets": [
         {
           "label": "Configure page UI",
@@ -124,7 +126,8 @@
     "script": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "markdownDescription": "**`string`**"
       },
       "description": "Script file paths or URLs to include on this page.",
       "markdownDescription": "**`string[]`** JavaScript files to inject into this page only.\n\n```yaml\nscript:\n  - _assets/custom.js\n```"
@@ -132,7 +135,8 @@
     "style": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "markdownDescription": "**`string`**"
       },
       "description": "Stylesheet file paths or URLs to include on this page.",
       "markdownDescription": "**`string[]`** CSS files to inject into this page only.\n\n```yaml\nstyle:\n  - _assets/custom.css\n```"
@@ -160,8 +164,10 @@
       "items": {
         "type": "array",
         "items": {
-          "type": "string"
-        }
+          "type": "string",
+          "markdownDescription": "**`string`**"
+        },
+        "markdownDescription": "**`string[]`**"
       },
       "description": "Access restriction rules. Each item is an array of conditions that must all be satisfied.",
       "markdownDescription": "**`string[][]`** Access restriction rules.\nEach inner array is a list of conditions joined by AND; outer items are joined by OR. The user must match at least one inner array fully to access the page.\n```yaml restricted-access:\n  - [role:admin]\n  - [role:editor, group:docs-team]\n```"
@@ -192,21 +198,24 @@
             "type": "object",
             "properties": {
               "domain": {
-                "type": "string"
+                "type": "string",
+                "markdownDescription": "**`string`**"
               },
               "parameters": {
-                "type": "array"
+                "type": "array",
+                "markdownDescription": "**`array`**"
               }
             },
-            "additionalProperties": false
+            "additionalProperties": false,
+            "markdownDescription": "**`{domain, parameters}`**"
           },
-          "description": "Per-domain iframe query parameter forwarding rules.",
-          "markdownDescription": "**`object[]`** Per-domain forwarding rules.\n\nEach item:\n- `domain` **`string`** — iframe host domain to match\n- `parameters` **`array`** — query parameter names to forward"
+          "markdownDescription": "**`object[]`** Per-domain forwarding rules.\n\nEach item:\n- `domain` **`string`** — iframe host domain to match\n- `parameters` **`array`** — query parameter names to forward",
+          "description": "Per-domain iframe query parameter forwarding rules."
         }
       },
       "additionalProperties": false,
       "description": "Per-page query parameter forwarding rules for embedded iframes.",
-      "markdownDescription": "**`object`** Per-page query parameter forwarding rules for `<iframe>` embeds.\n\n- `iframes` **`object[]`** — per-domain forwarding rules (each item: `domain: string`, `parameters: array`)"
+      "markdownDescription": "**`{iframes}`** Per-page query parameter forwarding rules for `<iframe>` embeds.\n\n- `iframes` **`object[]`** — per-domain forwarding rules (each item: `domain: string`, `parameters: array`)"
     },
     "docs-viewer": {
       "type": "object",
@@ -219,7 +228,7 @@
       },
       "additionalProperties": true,
       "description": "Per-page docs-viewer overrides.",
-      "markdownDescription": "**`object`** Per-page docs-viewer overrides.\n\n- `noIndex` **`boolean`** — disallow external search engine indexing"
+      "markdownDescription": "**`{noIndex}`** Per-page docs-viewer overrides.\n\n- `noIndex` **`boolean`** — disallow external search engine indexing"
     },
     "yabug": {
       "type": "object",
@@ -235,7 +244,7 @@
       },
       "additionalProperties": false,
       "description": "Per-page bug report widget overrides.",
-      "markdownDescription": "**`object`** Per-page bug-report widget overrides.\n\n- `disabled` **`boolean`** — disable the widget on this page\n- `form` **`string`** — custom form ID"
+      "markdownDescription": "**`{disabled, form}`** Per-page bug-report widget overrides.\n\n- `disabled` **`boolean`** — disable the widget on this page\n- `form` **`string`** — custom form ID"
     },
     "yafeedback": {
       "type": "object",
@@ -243,12 +252,14 @@
         "ownerId": {
           "oneOf": [
             {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             {
               "type": "object",
               "additionalProperties": {
-                "type": "string"
+                "type": "string",
+                "markdownDescription": "**`string`**"
               }
             }
           ],
@@ -270,7 +281,7 @@
       },
       "additionalProperties": false,
       "description": "Per-page Yandex Feedback (Pythia) widget overrides.",
-      "markdownDescription": "**`object`** Per-page Yandex Feedback widget overrides.\n\n- `ownerId` **`string | object`** — owner ID or per-language map\n- `hideHeader` **`boolean`** — hide widget header\n- `disabled` **`boolean`** — disable widget\n- `testIds` **`object`** — A/B test IDs"
+      "markdownDescription": "**`{ownerId, hideHeader, disabled, testIds}`** Per-page Yandex Feedback widget overrides.\n\n- `ownerId` **`string | object`** — owner ID or per-language map\n- `hideHeader` **`boolean`** — hide widget header\n- `disabled` **`boolean`** — disable widget\n- `testIds` **`{ownerId, hideHeader, disabled, testIds}`** — A/B test IDs"
     },
     "neuroExpert": {
       "type": "object",
@@ -287,10 +298,12 @@
         "parentId": {
           "oneOf": [
             {
-              "type": "string"
+              "type": "string",
+              "markdownDescription": "**`string`**"
             },
             {
-              "type": "null"
+              "type": "null",
+              "markdownDescription": "**`null`**"
             }
           ],
           "markdownDescription": "**`string | null`** Parent element ID for widget placement. `null` uses the default."
@@ -305,10 +318,12 @@
           "additionalProperties": {
             "oneOf": [
               {
-                "type": "string"
+                "type": "string",
+                "markdownDescription": "**`string`**"
               },
               {
-                "type": "boolean"
+                "type": "boolean",
+                "markdownDescription": "**`boolean`**"
               }
             ]
           },
@@ -317,7 +332,7 @@
       },
       "additionalProperties": false,
       "description": "Per-page AI expert widget overrides.",
-      "markdownDescription": "**`object`** Per-page AI expert widget overrides.\n\n- `projectId` **`object`** — language → project ID map\n- `hasOutsideClick` **`boolean`** — close on outside click\n- `parentId` **`string | null`** — parent element ID\n- `disabled` **`boolean`** — disable widget\n- `customLabel` **`object`** — language → label map"
+      "markdownDescription": "**`{projectId, hasOutsideClick, parentId, ...}`** Per-page AI expert widget overrides.\n\n- `projectId` **`{projectId, hasOutsideClick, parentId, ...}`** — language → project ID map\n- `hasOutsideClick` **`boolean`** — close on outside click\n- `parentId` **`string | null`** — parent element ID\n- `disabled` **`boolean`** — disable widget\n- `customLabel` **`{projectId, hasOutsideClick, parentId, ...}`** — language → label map"
     },
     "editable": {
       "type": "boolean",
@@ -368,7 +383,7 @@
       "doNotSuggest": true
     }
   },
-  "additionalProperties": true,
+  "additionalProperties": false,
   "definitions": {
     "Alternate": {
       "type": "object",
@@ -387,8 +402,8 @@
         "href"
       ],
       "additionalProperties": false,
-      "description": "Alternate language version of this page.",
-      "markdownDescription": "**`Alternate`** Alternate language version of this page for `<link rel=\"alternate\">`."
+      "markdownDescription": "**`Alternate`** Alternate language version of this page for `<link rel=\"alternate\">`.",
+      "description": "Alternate language version of this page."
     },
     "MetaItem": {
       "type": "object",
@@ -418,8 +433,8 @@
         "content"
       ],
       "additionalProperties": false,
-      "description": "Custom HTML meta tag definition.",
-      "markdownDescription": "**`MetaItem`** One custom HTML `<meta>` tag. Must have exactly one of `name`, `property`, or `http-equiv`, plus `content`."
+      "markdownDescription": "**`MetaItem`** One custom HTML `<meta>` tag. Must have exactly one of `name`, `property`, or `http-equiv`, plus `content`.",
+      "description": "Custom HTML meta tag definition."
     },
     "Contributor": {
       "type": "object",
@@ -448,8 +463,8 @@
         }
       },
       "additionalProperties": false,
-      "description": "VCS contributor information (system-generated).",
-      "markdownDescription": "**`Contributor`** VCS contributor record — populated automatically from Git history."
+      "markdownDescription": "**`Contributor`** VCS contributor record — populated automatically from Git history.",
+      "description": "VCS contributor information (system-generated)."
     },
     "Resources": {
       "type": "object",
@@ -457,14 +472,16 @@
         "script": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "markdownDescription": "**`string`**"
           },
           "markdownDescription": "**`string[]`** JavaScript file paths or URLs."
         },
         "style": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "markdownDescription": "**`string`**"
           },
           "markdownDescription": "**`string[]`** CSS file paths or URLs."
         },
@@ -477,8 +494,8 @@
         }
       },
       "additionalProperties": false,
-      "description": "Legacy per-page resources definition.",
-      "markdownDescription": "**`Resources`** *(legacy)* Per-page CSS/JS/CSP resources. Prefer top-level `script`, `style`, `csp` fields."
+      "markdownDescription": "**`Resources`** *(legacy)* Per-page CSS/JS/CSP resources. Prefer top-level `script`, `style`, `csp` fields.",
+      "description": "Legacy per-page resources definition."
     }
   },
   "markdownDescription": "YAML frontmatter block at the very top of a `.md` file (between `---` delimiters).\nDefines page metadata, SEO fields, per-page UI overrides, and access rules.\n```yaml --- title: My page description: Short description for SEO --- ```"

@@ -1,4 +1,5 @@
 title: Diplodoc (index.yaml)
+additionalProperties: false
 markdownDescription: >-
   Diplodoc leading page file (`index.yaml`).
 
