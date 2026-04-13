@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.1 (2026-04-13)
+
+## What's Changed
+* fix: fixed vsix update by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/28
+* fix: fixed vsix by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/30
+* fix: fixed vsix update by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/31
+* fix: fixed vsix update by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/32
+* fix: fixed vsix update by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/33
+
+
+**Full Changelog**: https://github.com/diplodoc-platform/vsc/compare/v0.2.0...v0.2.1
+
 ## 0.2.0 (2026-04-13)
 
 ## What's Changed
