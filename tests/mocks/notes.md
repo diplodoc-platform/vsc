@@ -1,17 +1,9 @@
 # Notes
 
-{% list tas radio %}
+{% note warnng %}
 
-- Название радиобаттона 1
+{% list tabs %}
 
-  Текст радиобаттона 1
-
-- Название радиобаттона 1
-
-  Текст радиобаттона 2
+{% endnote %}
 
 {% endlist %}
-
-::: page-constructor
-blocks:
-:::
