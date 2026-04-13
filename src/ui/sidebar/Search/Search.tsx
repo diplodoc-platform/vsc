@@ -1,5 +1,6 @@
-import {t} from '../../../i18n';
 import {TextInput} from '@gravity-ui/uikit';
+
+import {t} from '../../../i18n';
 
 interface SearchProps {
     fileName: string;
@@ -9,7 +10,7 @@ interface SearchProps {
 export function Search({fileName, setFileName}: SearchProps) {
     return (
         <TextInput
-            size='l'
+            size="l"
             placeholder={t('sidebar.search_placeholder')}
             autoComplete={true}
             hasClear={true}

@@ -1,6 +1,8 @@
-import styles from './FilesList.module.scss';
 import {List, Text} from '@gravity-ui/uikit';
+
 import {getFilesMap} from '../../utils';
+
+import styles from './FilesList.module.scss';
 
 interface FilesListProps {
     fileName: string;
@@ -15,19 +17,17 @@ export function FilesList({fileName, files, onFileClick}: FilesListProps) {
         <div className={styles.filesList}>
             {Array.from(filesMap.entries()).map(([dir, files]) => (
                 <div key={dir}>
-                    {dir !== '' &&
-                        <Text variant='body-2' className={styles.dir}>
+                    {dir !== '' && (
+                        <Text variant="body-2" className={styles.dir}>
                             {dir + ':'}
                         </Text>
-                    }
+                    )}
                     <List
                         itemClassName={styles.fileItem}
                         itemsClassName={styles.filesItems}
                         items={files}
                         renderItem={(file: string) => (
-                            <Text variant='body-2'>
-                                {file.split('/').pop()}
-                            </Text>
+                            <Text variant="body-2">{file.split('/').pop()}</Text>
                         )}
                         virtualized={false}
                         onItemClick={(file: string) => onFileClick(file)}

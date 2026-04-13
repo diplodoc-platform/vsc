@@ -1,8 +1,12 @@
+import type {CompletionList} from 'vscode-languageserver-types';
+import type {SchemaType} from './yaml-service';
+import type {Content} from '../types';
+
 import * as vscode from 'vscode';
-import {InsertTextFormat, CompletionList} from 'vscode-languageserver-types';
-import {getConfiguredService, createVirtualDocument, SchemaType} from './yaml-service';
+import {InsertTextFormat} from 'vscode-languageserver-types';
+
+import {createVirtualDocument, getConfiguredService} from './yaml-service';
 import {findBlockAtPosition, toBlockPosition, toVscodeRange} from './position';
-import {Content} from '../types';
 
 type LspCompletionItem = CompletionList['items'][number];
 
@@ -15,30 +19,36 @@ function convertCompletionItem(item: LspCompletionItem, block: Content): vscode.
     vscodeItem.detail = item.detail;
     vscodeItem.documentation = item.documentation
         ? new vscode.MarkdownString(
-            typeof item.documentation === 'string'
-                ? item.documentation
-                : item.documentation.value,
-        )
+              typeof item.documentation === 'string'
+                  ? item.documentation
+                  : item.documentation.value,
+          )
         : undefined;
 
     if (item.textEdit) {
         if ('range' in item.textEdit) {
             vscodeItem.range = toVscodeRange(item.textEdit.range, block.startLine);
-            vscodeItem.insertText = item.insertTextFormat === InsertTextFormat.Snippet
-                ? new vscode.SnippetString(item.textEdit.newText)
-                : item.textEdit.newText;
+            vscodeItem.insertText =
+                item.insertTextFormat === InsertTextFormat.Snippet
+                    ? new vscode.SnippetString(item.textEdit.newText)
+                    : item.textEdit.newText;
         }
     } else if (item.insertText) {
-        vscodeItem.insertText = item.insertTextFormat === InsertTextFormat.Snippet
-            ? new vscode.SnippetString(item.insertText)
-            : item.insertText;
+        vscodeItem.insertText =
+            item.insertTextFormat === InsertTextFormat.Snippet
+                ? new vscode.SnippetString(item.insertText)
+                : item.insertText;
     }
 
     return vscodeItem;
 }
 
 export class YamlCompletionProvider implements vscode.CompletionItemProvider {
-    constructor(private readonly getBlocks: (document: vscode.TextDocument) => Content[]) {}
+    private readonly getBlocks: (document: vscode.TextDocument) => Content[];
+
+    constructor(getBlocks: (document: vscode.TextDocument) => Content[]) {
+        this.getBlocks = getBlocks;
+    }
 
     async provideCompletionItems(
         document: vscode.TextDocument,
@@ -61,6 +71,6 @@ export class YamlCompletionProvider implements vscode.CompletionItemProvider {
             return [];
         }
 
-        return completions.items.map(item => convertCompletionItem(item, block));
+        return completions.items.map((item) => convertCompletionItem(item, block));
     }
 }

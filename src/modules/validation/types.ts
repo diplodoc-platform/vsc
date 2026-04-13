@@ -1,4 +1,4 @@
-import {yfmlint} from "@diplodoc/yfmlint";
+import type {yfmlint} from '@diplodoc/yfmlint';
 
 export type YfmLintError = NonNullable<Awaited<ReturnType<typeof yfmlint>>>[number];
 

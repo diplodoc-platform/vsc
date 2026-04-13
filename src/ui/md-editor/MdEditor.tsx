@@ -1,20 +1,19 @@
 import {
-    useMarkdownEditor,
     MarkdownEditorView,
+    useMarkdownEditor,
     wysiwygToolbarConfigs,
 } from '@gravity-ui/markdown-editor';
 import {Math as MathExtension} from '@gravity-ui/markdown-editor/extensions/additional/Math/index.js';
 import {Mermaid as MermaidExtension} from '@gravity-ui/markdown-editor/extensions/additional/Mermaid/index.js';
-import {configure, ThemeProvider, ToasterProvider, Toaster} from '@gravity-ui/uikit';
-import styles from './MdEditor.module.scss';
+import {ThemeProvider, Toaster, ToasterProvider, configure} from '@gravity-ui/uikit';
 import {useEffect, useMemo, useRef, useState} from 'react';
+
 import {debounce} from '../utils';
 import {ErrorBoundary} from '../error/ErrorBoundary';
 import {useVscodeTheme} from '../useVscodeTheme';
-import {useShortcuts, editorShortcuts} from '../shortcuts';
-import '@gravity-ui/uikit/styles/fonts.css';
-import '@gravity-ui/uikit/styles/styles.css';
-import '@gravity-ui/markdown-editor/styles/styles.css';
+import {editorShortcuts, useShortcuts} from '../shortcuts';
+
+import styles from './MdEditor.module.scss';
 
 configure({
     lang: (document.documentElement.lang || 'en') as 'ru' | 'en',
@@ -82,31 +81,34 @@ function MdEditor() {
     });
 
     const sendChange = useMemo(
-        () => debounce(() => {
-            if (isSettingContent.current) {
-                return;
-            }
+        () =>
+            debounce(() => {
+                if (isSettingContent.current) {
+                    return;
+                }
 
-            vscodeApi.postMessage({command: 'change', text: editor.getValue()});
-        }, 300),
+                vscodeApi.postMessage({command: 'change', text: editor.getValue()});
+            }, 300),
         [editor],
     );
 
     useEffect(() => {
         editor.on('change', sendChange);
-        
+
         return () => editor.off('change', sendChange);
     }, [editor, sendChange]);
 
     useEffect(() => {
         function onMessage(event: MessageEvent) {
-            const {command, text, fileName: name, ratio} = event.data ?? {};
+            const {command, text, fileName: name} = event.data ?? {};
 
             if (command === 'setContent') {
                 setFileName(name ?? '');
                 isSettingContent.current = true;
                 editor.replace(text ?? '');
-                setTimeout(() => { isSettingContent.current = false; }, 350);
+                setTimeout(() => {
+                    isSettingContent.current = false;
+                }, 350);
             }
         }
 
@@ -116,15 +118,18 @@ function MdEditor() {
         return () => window.removeEventListener('message', onMessage);
     }, [editor]);
 
-    const commands = useMemo(() => [
-        ...editorShortcuts,
-        {
-            action: 'save',
-            key: 's',
-            cmdOrCtrl: true,
-            handler: () => vscodeApi.postMessage({command: 'save', text: editor.getValue()}),
-        },
-    ], [editor]);
+    const commands = useMemo(
+        () => [
+            ...editorShortcuts,
+            {
+                action: 'save',
+                key: 's',
+                cmdOrCtrl: true,
+                handler: () => vscodeApi.postMessage({command: 'save', text: editor.getValue()}),
+            },
+        ],
+        [editor],
+    );
 
     useShortcuts(editor, commands);
 

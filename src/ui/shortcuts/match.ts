@@ -14,8 +14,8 @@ export function matchesShortcut(event: KeyboardEvent, shortcut: ShortcutKeys): b
 
     return (
         keyMatch &&
-        !!shortcut.cmdOrCtrl === cmdOrCtrl &&
-        !!shortcut.shift === event.shiftKey &&
-        !!shortcut.alt === event.altKey
+        Boolean(shortcut.cmdOrCtrl) === cmdOrCtrl &&
+        Boolean(shortcut.shift) === event.shiftKey &&
+        Boolean(shortcut.alt) === event.altKey
     );
 }

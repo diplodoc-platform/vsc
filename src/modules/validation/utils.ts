@@ -1,15 +1,27 @@
-import * as vscode from 'vscode';
-import {PluginMessage, ValidationMessage, YfmLintError} from './types';
+import type {PluginMessage, ValidationMessage, YfmLintError} from './types';
 
-export function toDiagnostics(errors: ValidationMessage[], document: vscode.TextDocument): vscode.Diagnostic[] {
+import * as vscode from 'vscode';
+
+export function toDiagnostics(
+    errors: ValidationMessage[],
+    document: vscode.TextDocument,
+): vscode.Diagnostic[] {
     return errors.map((error) => toDiagnostic(error, document));
 }
 
-export function toDiagnostic(error: ValidationMessage, document: vscode.TextDocument): vscode.Diagnostic {
-    return isYfmLintError(error) ? toLintDiagnostic(error, document) : toPluginDiagnostic(error, document);
+export function toDiagnostic(
+    error: ValidationMessage,
+    document: vscode.TextDocument,
+): vscode.Diagnostic {
+    return isYfmLintError(error)
+        ? toLintDiagnostic(error, document)
+        : toPluginDiagnostic(error, document);
 }
 
-export function toLintDiagnostic(error: YfmLintError, document: vscode.TextDocument): vscode.Diagnostic {
+export function toLintDiagnostic(
+    error: YfmLintError,
+    document: vscode.TextDocument,
+): vscode.Diagnostic {
     const range = getLintRange(error, document);
     const diagnostic = new vscode.Diagnostic(range, formatLintMessage(error), getSeverity(error));
 
@@ -19,7 +31,10 @@ export function toLintDiagnostic(error: YfmLintError, document: vscode.TextDocum
     return diagnostic;
 }
 
-export function toPluginDiagnostic(error: PluginMessage, document: vscode.TextDocument): vscode.Diagnostic {
+export function toPluginDiagnostic(
+    error: PluginMessage,
+    document: vscode.TextDocument,
+): vscode.Diagnostic {
     const diagnostic = new vscode.Diagnostic(
         getPluginRange(error, document),
         formatPluginMessage(error),
@@ -99,7 +114,10 @@ function getPluginRange(error: PluginMessage, document: vscode.TextDocument): vs
         return findDirectiveRange(document, /^\s*{%\s*cut\b/, /^\s*{%\s*endcut\s*%}/);
     }
 
-    if (message.startsWith('Changelog block must be closed') || message.startsWith('Changelog close tag in not found')) {
+    if (
+        message.startsWith('Changelog block must be closed') ||
+        message.startsWith('Changelog close tag in not found')
+    ) {
         return findDirectiveRange(document, /^\s*{%\s*changelog\b/, /^\s*{%\s*endchangelog\s*%}/);
     }
 
@@ -167,7 +185,10 @@ function findIncludeRange(message: string, document: vscode.TextDocument): vscod
         return fullLineRange(0, document);
     }
 
-    return findTextRange(document, match[1]) ?? findDirectiveRange(document, /^\s*{%\s*include\b/, /^$/);
+    return (
+        findTextRange(document, match[1]) ??
+        findDirectiveRange(document, /^\s*{%\s*include\b/, /^$/)
+    );
 }
 
 function findDirectiveRange(
@@ -240,6 +261,7 @@ function fullLineRange(line: number, document: vscode.TextDocument): vscode.Rang
 }
 
 function stripAnsi(value: string): string {
+    // eslint-disable-next-line no-control-regex
     return value.replace(/\u001B\[[0-9;]*m/g, '');
 }
 
