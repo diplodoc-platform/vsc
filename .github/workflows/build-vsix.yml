@@ -19,27 +19,40 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.YC_UI_BOT_GITHUB_TOKEN }}
 
+      - name: Skip if last commit is vsix update
+        id: check
+        run: |
+          MSG=$(git log -1 --format='%s')
+          if [[ "$MSG" == chore:\ update\ *.vsix ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup Node.js
+        if: steps.check.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: 'npm'
 
       - name: Install latest npm (>= 11.5.1)
+        if: steps.check.outputs.skip != 'true'
         run: |
           [ "$(printf '%s\n' "11.5.1" "$(npm -v)" | sort -V | head -n1)" = "11.5.1" ] || npm install -g npm@11.5.1
         shell: bash
 
       - name: Install dependencies
+        if: steps.check.outputs.skip != 'true'
         run: npm ci
 
       - name: Build extension
+        if: steps.check.outputs.skip != 'true'
         run: |
           rm -f *.vsix
           npm run compile
           npm run vsce
 
       - name: Commit .vsix
+        if: steps.check.outputs.skip != 'true'
         run: |
           git config --global user.email "95919151+yc-ui-bot@users.noreply.github.com"
           git config --global user.name "yc-ui-bot"
