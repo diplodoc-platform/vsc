@@ -8,7 +8,7 @@ import {Mermaid as MermaidExtension} from '@gravity-ui/markdown-editor/extension
 import {configure, ThemeProvider, ToasterProvider, Toaster} from '@gravity-ui/uikit';
 import styles from './MdEditor.module.scss';
 import {useEffect, useMemo, useRef, useState} from 'react';
-import {debounce} from './utils';
+import {debounce} from '../utils';
 import {ErrorBoundary} from '../error/ErrorBoundary';
 import {useVscodeTheme} from '../useVscodeTheme';
 import {useShortcuts, editorShortcuts} from '../shortcuts';

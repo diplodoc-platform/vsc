@@ -1,6 +1,9 @@
 {
     "sidebar": {
-        "welcome": "Добро пожаловать в Diplodoc"
+        "welcome": "Добро пожаловать в Diplodoc",
+        "search_placeholder": "Найти файл...",
+        "empty_placeholder": "Файлы не найдены",
+        "init": "Инициализировать пустой проект"
     },
     "editor": {
         "error": "Ошибка редактора"

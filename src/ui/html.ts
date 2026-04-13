@@ -37,3 +37,7 @@ export function getBaseHtml(
         </html>
     `;
 }
+
+export function getEmptyHtml() {
+    return '<div style="padding:16px;color:red">root element not found</div>';
+}

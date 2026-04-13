@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import {getBaseHtml} from '../../ui/utils/html';
+import {getBaseHtml} from '../../ui/html';
 
 export class MdEditor {
     private _panel?: vscode.WebviewPanel;
@@ -17,10 +17,58 @@ export class MdEditor {
             return;
         }
 
+        this._createPanel();
+        this._syncActiveEditor();
+    }
+
+    async showFile(uri: vscode.Uri, column: vscode.ViewColumn = vscode.ViewColumn.One) {
+        const document = await vscode.workspace.openTextDocument(uri);
+        const isNewPanel = !this._panel;
+
+        if (!this._panel) {
+            this._createPanel(column);
+        } else {
+            this._panel.reveal(column);
+        }
+
+        if (column === vscode.ViewColumn.Beside) {
+            await vscode.window.showTextDocument(document, {
+                preview: true,
+                preserveFocus: true,
+                viewColumn: vscode.ViewColumn.One,
+            });
+        }
+
+        const editor = vscode.window.visibleTextEditors.find(
+            (e) => e.document.uri.toString() === uri.toString()
+        );
+
+        if (editor) {
+            this.syncFromEditor(editor);
+        } else {
+            this._currentDocUri = uri;
+            const rawText = document.getText();
+            const fileName = uri.fsPath.split('/').pop() ?? '';
+            const {frontmatter, content} = this._extractFrontmatter(rawText);
+            this._frontmatter = frontmatter;
+
+            this._panel!.title = fileName
+                ? `Diplodoc Markdown Editor: ${fileName}`
+                : 'Diplodoc Markdown Editor';
+
+            if (isNewPanel) {
+                this._pendingSync = {text: content, fileName};
+            } else {
+                this._panel!.webview.postMessage({command: 'setContent', text: content, fileName});
+            }
+        }
+    }
+
+    private _createPanel(column: vscode.ViewColumn = vscode.ViewColumn.Beside) {
         this._panel = vscode.window.createWebviewPanel(
             'diplodoc-md-editor',
             'Diplodoc Markdown Editor',
-            vscode.ViewColumn.Beside,
+            column,
             {
                 enableScripts: true,
                 retainContextWhenHidden: true,
@@ -41,8 +89,6 @@ export class MdEditor {
         this._panel.onDidDispose(() => {
             this._panel = undefined;
         });
-
-        this._syncActiveEditor();
     }
 
     syncFromEditor(editor: vscode.TextEditor) {
@@ -75,7 +121,7 @@ export class MdEditor {
         if (match) {
             return {
                 frontmatter: match[1],
-                content: text.slice(match[1].length)
+                content: text.slice(match[1].length),
             };
         }
 
@@ -116,7 +162,7 @@ export class MdEditor {
                 if (message.text) {
                     await this._applyToDocument(message.text);
                 }
-                
+
                 await this._saveDocument();
             }
         });

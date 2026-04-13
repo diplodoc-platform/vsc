@@ -1,11 +1,14 @@
 import {createRoot} from 'react-dom/client';
-import {Sidebar} from './Sidebar';
+import {App} from './Sidebar/Sidebar';
+import {getEmptyHtml} from '../html';
+import '@gravity-ui/uikit/styles/fonts.css';
+import '@gravity-ui/uikit/styles/styles.css';
 import '../globals.scss';
 
 const container = document.getElementById('sidebar');
 
 if (container) {
-    createRoot(container).render(<Sidebar />);
+    createRoot(container).render(<App />);
 } else {
-    document.body.innerHTML = '<div style="padding:16px;color:red">root element not found</div>';
+    document.body.innerHTML = getEmptyHtml();
 }

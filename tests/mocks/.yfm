@@ -6,4 +6,7 @@ neuroExpert:
 
 interface:
     toc: true
-  
+    
+docs-viewer:
+    lang: ru
+    
