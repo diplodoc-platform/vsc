@@ -1,3 +1,6 @@
+import type {PluginMessage} from './types';
+import type {TextDocument} from 'vscode';
+
 import * as path from 'path';
 import {yfmlint} from '@diplodoc/yfmlint';
 import defaultPlugins from '@diplodoc/transform/lib/plugins';
@@ -8,8 +11,8 @@ import filePlugin from '@diplodoc/transform/lib/plugins/file';
 import imagesPlugin from '@diplodoc/transform/lib/plugins/images';
 import includesPlugin from '@diplodoc/transform/lib/plugins/includes';
 import linksPlugin from '@diplodoc/transform/lib/plugins/links';
+
 import {toDiagnostics} from './utils';
-import {PluginMessage} from './types';
 
 const allPlugins = [
     ...defaultPlugins,
@@ -22,7 +25,7 @@ const allPlugins = [
     linksPlugin,
 ];
 
-export async function validateMarkdown(document: import('vscode').TextDocument) {
+export async function validateMarkdown(document: TextDocument) {
     const content = document.getText();
     const filePath = document.fileName;
     const root = path.dirname(filePath);

@@ -1,17 +1,22 @@
+import type {MdEditor} from '../md-editor/editor';
+import type {TocEditor} from '../toc-editor/editor';
+
 import * as vscode from 'vscode';
+
 import {getBaseHtml} from '../../ui/html';
-import {MdEditor} from '../md-editor/editor';
-import {TocEditor} from '../toc-editor/editor';
 
 export class Sidebar implements vscode.WebviewViewProvider {
-    private _view?: vscode.WebviewView;
     isUpdatingFromWebview = false;
+    private readonly _extensionUri: vscode.Uri;
+    private readonly _mdEditor: MdEditor;
+    private readonly _tocEditor: TocEditor;
+    private _view?: vscode.WebviewView;
 
-    constructor(
-        private readonly _extensionUri: vscode.Uri,
-        private readonly _mdEditor: MdEditor,
-        private readonly _tocEditor: TocEditor,
-    ) {}
+    constructor(extensionUri: vscode.Uri, mdEditor: MdEditor, tocEditor: TocEditor) {
+        this._extensionUri = extensionUri;
+        this._mdEditor = mdEditor;
+        this._tocEditor = tocEditor;
+    }
 
     resolveWebviewView(webviewView: vscode.WebviewView) {
         this._view = webviewView;
@@ -24,10 +29,10 @@ export class Sidebar implements vscode.WebviewViewProvider {
         };
 
         const scriptUri = webviewView.webview.asWebviewUri(
-            vscode.Uri.joinPath(buildUri, 'index.js')
+            vscode.Uri.joinPath(buildUri, 'index.js'),
         );
         const styleUri = webviewView.webview.asWebviewUri(
-            vscode.Uri.joinPath(buildUri, 'index.css')
+            vscode.Uri.joinPath(buildUri, 'index.css'),
         );
 
         webviewView.webview.html = getBaseHtml(
@@ -35,7 +40,7 @@ export class Sidebar implements vscode.WebviewViewProvider {
             scriptUri,
             styleUri,
             webviewView.webview.cspSource,
-            vscode.env.language
+            vscode.env.language,
         );
 
         webviewView.webview.onDidReceiveMessage(async (message) => {
@@ -82,6 +87,16 @@ export class Sidebar implements vscode.WebviewViewProvider {
         });
     }
 
+    syncFromEditor(editor: vscode.TextEditor) {
+        if (!this._view?.visible) {
+            return;
+        }
+
+        const text = editor.document.getText();
+        const fileName = editor.document.fileName.split('/').pop() ?? '';
+        this._view.webview.postMessage({command: 'setContent', text, fileName});
+    }
+
     private async _getMarkdownFiles(): Promise<string[]> {
         const [mdUris, tocUris] = await Promise.all([
             vscode.workspace.findFiles('**/*.md', '**/node_modules/**'),
@@ -89,7 +104,7 @@ export class Sidebar implements vscode.WebviewViewProvider {
         ]);
 
         return [...mdUris, ...tocUris]
-            .map(uri => {
+            .map((uri) => {
                 const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
 
                 if (workspaceFolder) {
@@ -116,16 +131,6 @@ export class Sidebar implements vscode.WebviewViewProvider {
         }
     }
 
-    syncFromEditor(editor: vscode.TextEditor) {
-        if (!this._view?.visible) {
-            return;
-        }
-
-        const text = editor.document.getText();
-        const fileName = editor.document.fileName.split('/').pop() ?? '';
-        this._view.webview.postMessage({command: 'setContent', text, fileName});
-    }
-
     private _syncActiveEditor() {
         const editor = vscode.window.activeTextEditor;
 
@@ -147,7 +152,7 @@ export class Sidebar implements vscode.WebviewViewProvider {
             const edit = new vscode.WorkspaceEdit();
             const fullRange = new vscode.Range(
                 editor.document.positionAt(0),
-                editor.document.positionAt(editor.document.getText().length)
+                editor.document.positionAt(editor.document.getText().length),
             );
 
             edit.replace(editor.document.uri, fullRange, text);

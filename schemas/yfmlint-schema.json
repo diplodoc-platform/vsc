@@ -538,6 +538,10 @@
       "readOnly": true,
       "markdownDescription": "**`RuleValue`** **YFM017** `invalid-frontmatter` *(build-time)* — The frontmatter YAML block contains invalid syntax (e.g. duplicate mapping keys).",
       "doNotSuggest": true
+    },
+    "YFM020": {
+      "description": "invalid-yfm-directive: YFM directive is unknown or has invalid syntax.",
+      "markdownDescription": "**`boolean | LogLevel | object`** **YFM020** `invalid-yfm-directive` — Reports unknown or malformed `{% ... %}` directives.\n\nObject form lets you whitelist custom directives:\n```yaml\nYFM020:\n  level: warn\n  customDirectives:\n    - diagram\n    - mermaid\n```\nBoth `{% diagram %}` and `{% enddiagram %}` will be allowed."
     }
   },
   "additionalProperties": {

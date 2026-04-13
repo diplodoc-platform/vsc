@@ -3,7 +3,7 @@ import type {EditorInstance} from './ui/shortcuts/types';
 type ElementType = 'table' | 'note';
 
 export function insertElement(type: ElementType): string {
-    const elements = { 
+    const elements = {
         table: '| Cell content | Cell content |\n| --- | --- |\n| Cell content | Cell content |',
         note: '{% note info "Note title" %}\n\nAdd content for note\n\n{% endnote %}',
     };
@@ -12,6 +12,7 @@ export function insertElement(type: ElementType): string {
 }
 
 export function insertAtCursor(editor: EditorInstance, text: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const cm = (editor as any).markupEditor?.cm;
 
     if (!cm) {

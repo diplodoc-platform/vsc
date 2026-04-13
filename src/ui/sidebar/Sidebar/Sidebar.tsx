@@ -1,11 +1,13 @@
-import styles from './Sidebar.module.scss';
+import {Button, ThemeProvider, Toaster, ToasterProvider} from '@gravity-ui/uikit';
+import {useEffect, useState} from 'react';
+
 import {FilesList} from '../FilesList/FilesList';
 import {useVscodeTheme} from '../../useVscodeTheme';
 import {ErrorBoundary} from '../../error/ErrorBoundary';
-import {Button, ThemeProvider, Toaster, ToasterProvider} from '@gravity-ui/uikit';
 import {t} from '../../../i18n';
-import {useEffect, useState} from 'react';
-import { Search } from '../Search/Search';
+import {Search} from '../Search/Search';
+
+import styles from './Sidebar.module.scss';
 
 declare const acquireVsCodeApi: () => {
     postMessage: (message: unknown) => void;
@@ -41,7 +43,7 @@ export function Sidebar() {
         <div className={styles.sidebar}>
             <Search fileName={fileName} setFileName={setFileName} />
             <FilesList fileName={fileName} files={files} onFileClick={handleFileClick} />
-            <Button size='l' view='action' className={styles.initButton}>
+            <Button size="l" view="action" className={styles.initButton}>
                 {t('sidebar.init')}
             </Button>
         </div>

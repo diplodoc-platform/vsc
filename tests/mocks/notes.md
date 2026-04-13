@@ -1,6 +1,6 @@
 # Notes
 
-{% list tabs radio %}
+{% list tas radio %}
 
 - Название радиобаттона 1
 

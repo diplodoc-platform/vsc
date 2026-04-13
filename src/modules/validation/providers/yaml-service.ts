@@ -1,4 +1,6 @@
-import {getLanguageService, LanguageService, LanguageSettings} from 'yaml-language-server';
+import type {LanguageService, LanguageSettings} from 'yaml-language-server';
+
+import {getLanguageService} from 'yaml-language-server';
 import {TextDocument} from 'vscode-languageserver-textdocument';
 
 import pageConstructorSchema from '../../../../schemas/page-constructor-schema.json';
@@ -50,11 +52,6 @@ export const SCHEMA_NAMES: Record<SchemaType, string> = Object.fromEntries(
 let service: LanguageService | null = null;
 let versionCounter = 0;
 
-/**
- * Returns a singleton LanguageService with ALL schemas registered.
- * Each schema is matched by virtual document URI (diplodoc://<type>.yaml).
- * This avoids race conditions from reconfiguring per-request.
- */
 export function getConfiguredService(): LanguageService {
     if (!service) {
         service = getLanguageService({
@@ -84,10 +81,5 @@ export function getConfiguredService(): LanguageService {
 }
 
 export function createVirtualDocument(content: string, schemaType: SchemaType): TextDocument {
-    return TextDocument.create(
-        `diplodoc://${schemaType}.yaml`,
-        'yaml',
-        ++versionCounter,
-        content,
-    );
+    return TextDocument.create(`diplodoc://${schemaType}.yaml`, 'yaml', ++versionCounter, content);
 }

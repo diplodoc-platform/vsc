@@ -1,11 +1,11 @@
-import * as vscode from 'vscode';
+import type * as vscode from 'vscode';
 
 export function getBaseHtml(
     id: string,
     scriptUri: vscode.Uri,
     styleUri: vscode.Uri,
     cspSource: string,
-    lang: string = 'en'
+    lang = 'en',
 ): string {
     return `
         <!DOCTYPE html>

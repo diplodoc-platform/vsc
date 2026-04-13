@@ -1,6 +1,10 @@
-import {Component, ReactNode} from 'react';
-import styles from './ErrorBoundary.module.scss';
+import type {ReactNode} from 'react';
+
+import {Component} from 'react';
+
 import {t} from '../../i18n';
+
+import styles from './ErrorBoundary.module.scss';
 
 interface Props {
     children: ReactNode;
@@ -11,11 +15,11 @@ interface State {
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-    state: State = {error: null};
-
     static getDerivedStateFromError(error: Error): State {
         return {error};
     }
+
+    state: State = {error: null};
 
     render() {
         if (this.state.error) {

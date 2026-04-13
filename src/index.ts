@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+
 import {MdEditor} from './modules/md-editor/editor';
 import {Sidebar} from './modules/main/sidebar';
 import * as validation from './modules/validation';
@@ -12,7 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
     const sidebar = new Sidebar(context.extensionUri, mdEditor, tocEditor);
 
     context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider('diplodoc-extension-view', sidebar)
+        vscode.window.registerWebviewViewProvider('diplodoc-extension-view', sidebar),
     );
 
     context.subscriptions.push(
@@ -25,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
 
             mdEditor.show();
             mdEditor.syncFromEditor(editor);
-        })
+        }),
     );
 
     context.subscriptions.push(
@@ -38,7 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
 
             tocEditor.show();
             tocEditor.syncFromEditor(editor);
-        })
+        }),
     );
 
     context.subscriptions.push(
@@ -47,11 +48,11 @@ export function activate(context: vscode.ExtensionContext) {
             if (activeEditor && activeEditor.document.languageId === 'markdown') {
                 const position = activeEditor.selection.active;
 
-                activeEditor.edit(editBuilder => {
+                activeEditor.edit((editBuilder) => {
                     editBuilder.insert(position, insertElement('table'));
                 });
             }
-        })
+        }),
     );
 
     context.subscriptions.push(
@@ -61,31 +62,31 @@ export function activate(context: vscode.ExtensionContext) {
             if (activeEditor && activeEditor.document.languageId === 'markdown') {
                 const position = activeEditor.selection.active;
 
-                activeEditor.edit(editBuilder => {
+                activeEditor.edit((editBuilder) => {
                     editBuilder.insert(position, insertElement('note'));
                 });
             }
-        })
+        }),
     );
 
     context.subscriptions.push(
-        vscode.window.onDidChangeActiveTextEditor(editor => {
+        vscode.window.onDidChangeActiveTextEditor((editor) => {
             if (editor && editor.document.languageId === 'markdown') {
                 mdEditor.syncFromEditor(editor);
             }
-        })
+        }),
     );
 
     context.subscriptions.push(
-        vscode.window.onDidChangeActiveTextEditor(editor => {
+        vscode.window.onDidChangeActiveTextEditor((editor) => {
             if (editor && editor.document.fileName === 'toc.yaml') {
                 tocEditor.syncFromEditor(editor);
             }
-        })
+        }),
     );
 
     context.subscriptions.push(
-        vscode.workspace.onDidChangeTextDocument(event => {
+        vscode.workspace.onDidChangeTextDocument((event) => {
             const activeEditor = vscode.window.activeTextEditor;
             if (
                 activeEditor &&
@@ -96,8 +97,8 @@ export function activate(context: vscode.ExtensionContext) {
                     mdEditor.syncFromEditor(activeEditor);
                 }
             }
-        })
+        }),
     );
 }
 
-export function deactivate() { }
+export function deactivate() {}
