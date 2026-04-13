@@ -43,12 +43,11 @@ jobs:
         run: |
           git config --global user.email "95919151+yc-ui-bot@users.noreply.github.com"
           git config --global user.name "yc-ui-bot"
-          git rm -f --ignore-unmatch *.vsix
-          VSIX_FILE=$(ls *.vsix)
-          git add "$VSIX_FILE"
+          git add -A -- '*.vsix'
           if git diff --cached --quiet; then
             echo "::info::.vsix is up to date"
           else
-            git commit -m "chore: update $VSIX_FILE" --no-verify
+            VSIX_FILE=$(git diff --cached --name-only --diff-filter=A)
+            git commit -m "chore: update ${VSIX_FILE:-vsix}" --no-verify
             git push
           fi

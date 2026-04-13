@@ -52,7 +52,7 @@ jobs:
           GH_TOKEN: ${{ secrets.YC_UI_BOT_GITHUB_TOKEN }}
         run: |
           npm ci
+          rm -f *.vsix
           npm run compile
           npm run vsce
-          VSIX_FILE=$(ls *.vsix)
-          gh release upload ${{ steps.release.outputs.tag_name }} "$VSIX_FILE"
+          gh release upload ${{ steps.release.outputs.tag_name }} *.vsix
