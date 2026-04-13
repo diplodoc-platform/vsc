@@ -48,6 +48,9 @@ export async function validateMarkdown(document: TextDocument) {
                 },
             },
         },
+        lintConfig: {
+            default: true,
+        },
     });
 
     const errors = [...(lintErrors || []), ...pluginMessages];

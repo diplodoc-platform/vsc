@@ -2,6 +2,31 @@ import type {PluginMessage, ValidationMessage, YfmLintError} from './types';
 
 import * as vscode from 'vscode';
 
+const DIRECTIVE_HANDLERS: Array<{
+    message: RegExp;
+    open: RegExp;
+    close?: RegExp;
+}> = [
+    {message: /^Note must be closed/, open: /{%\s*note\b[^%]*%}/, close: /{%\s*endnote\s*%}/},
+    {message: /^Cut must be closed/, open: /{%\s*cut\b[^%]*%}/, close: /{%\s*endcut\s*%}/},
+    {
+        message: /^Changelog block must be closed|^Changelog close tag/,
+        open: /{%\s*changelog\b[^%]*%}/,
+        close: /{%\s*endchangelog\s*%}/,
+    },
+    {
+        message: /^Condition block must be closed/,
+        open: /{%\s*if\b[^%]*%}/,
+        close: /{%\s*endif\s*%}/,
+    },
+    {message: /^For block must be closed/, open: /{%\s*for\b[^%]*%}/, close: /{%\s*endfor\s*%}/},
+    {message: /^Incorrect syntax for notes/, open: /{%\s*note\b[^%]*%}/},
+    {message: /^Incorrect syntax in if condition/, open: /{%\s*if\b[^%]*%}/},
+    {message: /^If block must be opened before close/, open: /{%\s*endif\s*%}/},
+    {message: /^For block must be opened before close/, open: /{%\s*endfor\s*%}/},
+    {message: /^Circular includes:/, open: /{%\s*include\b[^%]*%}/, close: /^$/},
+];
+
 export function toDiagnostics(
     errors: ValidationMessage[],
     document: vscode.TextDocument,
@@ -90,11 +115,7 @@ function getLintRange(error: YfmLintError, document: vscode.TextDocument): vscod
 function getPluginRange(error: PluginMessage, document: vscode.TextDocument): vscode.Range {
     const message = stripAnsi(error.message);
 
-    if (message.startsWith('Link is unreachable: ')) {
-        return findLinkRange(message, document);
-    }
-
-    if (message.startsWith('Title not found: ')) {
+    if (message.startsWith('Link is unreachable: ') || message.startsWith('Title not found: ')) {
         return findLinkRange(message, document);
     }
 
@@ -106,27 +127,16 @@ function getPluginRange(error: PluginMessage, document: vscode.TextDocument): vs
         return findIncludeRange(message, document);
     }
 
-    if (message.startsWith('Note must be closed')) {
-        return findDirectiveRange(document, /^\s*{%\s*note\b/, /^\s*{%\s*endnote\s*%}/);
-    }
-
-    if (message.startsWith('Cut must be closed')) {
-        return findDirectiveRange(document, /^\s*{%\s*cut\b/, /^\s*{%\s*endcut\s*%}/);
-    }
-
-    if (
-        message.startsWith('Changelog block must be closed') ||
-        message.startsWith('Changelog close tag in not found')
-    ) {
-        return findDirectiveRange(document, /^\s*{%\s*changelog\b/, /^\s*{%\s*endchangelog\s*%}/);
-    }
-
     if (message.startsWith('Empty link in ')) {
         return findRegexRange(document, /\[[^\]]*]\(\)/);
     }
 
-    if (message.startsWith('Circular includes: ')) {
-        return findDirectiveRange(document, /^\s*{%\s*include\b/, /^$/);
+    for (const handler of DIRECTIVE_HANDLERS) {
+        if (handler.message.test(message)) {
+            return handler.close
+                ? findDirectiveRange(document, handler.open, handler.close)
+                : findRegexRange(document, handler.open);
+        }
     }
 
     return fullLineRange(0, document);
@@ -191,6 +201,16 @@ function findIncludeRange(message: string, document: vscode.TextDocument): vscod
     );
 }
 
+function matchRange(lineText: string, line: number, pattern: RegExp): vscode.Range | null {
+    const match = pattern.exec(lineText);
+
+    if (!match) {
+        return null;
+    }
+
+    return new vscode.Range(line, match.index, line, match.index + match[0].length);
+}
+
 function findDirectiveRange(
     document: vscode.TextDocument,
     openPattern: RegExp,
@@ -211,13 +231,20 @@ function findDirectiveRange(
         }
     }
 
-    if (stack.length > 0) {
-        return fullLineRange(stack[stack.length - 1], document);
+    const targetLine = stack.length > 0 ? stack[stack.length - 1] : undefined;
+
+    if (targetLine !== undefined) {
+        return (
+            matchRange(document.lineAt(targetLine).text, targetLine, openPattern) ??
+            fullLineRange(targetLine, document)
+        );
     }
 
     for (let line = 0; line < document.lineCount; line++) {
-        if (openPattern.test(document.lineAt(line).text)) {
-            return fullLineRange(line, document);
+        const range = matchRange(document.lineAt(line).text, line, openPattern);
+
+        if (range) {
+            return range;
         }
     }
 
