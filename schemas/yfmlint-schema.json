@@ -193,6 +193,9 @@
         },
         "YFM017": {
           "$ref": "#/definitions/LogLevel"
+        },
+        "YFM020": {
+          "$ref": "#/definitions/LogLevel"
         }
       },
       "additionalProperties": {
@@ -540,6 +543,34 @@
       "doNotSuggest": true
     },
     "YFM020": {
+      "oneOf": [
+        {
+          "type": "boolean",
+          "markdownDescription": "**`boolean`**"
+        },
+        {
+          "$ref": "#/definitions/LogLevel"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "level": {
+              "$ref": "#/definitions/LogLevel"
+            },
+            "customDirectives": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "markdownDescription": "**`string`**"
+              },
+              "description": "Custom directive names to allow (e.g. diagram, mermaid). Both opening ({% name %}) and closing ({% endname %}) forms are whitelisted.",
+              "markdownDescription": "**`string[]`** Custom directive names to allow (e.g. diagram, mermaid). Both opening ({% name %}) and closing ({% endname %}) forms are whitelisted."
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "**`{level, customDirectives}`**"
+        }
+      ],
       "description": "invalid-yfm-directive: YFM directive is unknown or has invalid syntax.",
       "markdownDescription": "**`boolean | LogLevel | object`** **YFM020** `invalid-yfm-directive` — Reports unknown or malformed `{% ... %}` directives.\n\nObject form lets you whitelist custom directives:\n```yaml\nYFM020:\n  level: warn\n  customDirectives:\n    - diagram\n    - mermaid\n```\nBoth `{% diagram %}` and `{% enddiagram %}` will be allowed."
     }
