@@ -27,7 +27,7 @@ function resolve(obj: Record<string, unknown>, key: string): string {
         if (typeof current !== 'object' || current === null) return key;
         current = (current as Record<string, unknown>)[part];
     }
-    
+
     return typeof current === 'string' ? current : key;
 }
 

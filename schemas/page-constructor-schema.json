@@ -74,41 +74,6 @@
                   {
                     "type": "string",
                     "markdownDescription": "**`string`**"
-                  },
-                  {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "text"
-                    ],
-                    "properties": {
-                      "text": {
-                        "type": "string",
-                        "markdownDescription": "**`string`**"
-                      },
-                      "textSize": {
-                        "type": "string",
-                        "enum": [
-                          "s",
-                          "m",
-                          "l"
-                        ],
-                        "markdownDescription": "**`'s' | 'm' | 'l'`**"
-                      },
-                      "url": {
-                        "type": "string",
-                        "markdownDescription": "**`string`**"
-                      },
-                      "urlTitle": {
-                        "type": "string",
-                        "markdownDescription": "**`string`**"
-                      },
-                      "resetMargin": {
-                        "type": "boolean",
-                        "markdownDescription": "**`boolean`**"
-                      }
-                    },
-                    "markdownDescription": "**`{text, textSize, url, ...}`**"
                   }
                 ]
               },
@@ -45716,6 +45681,12 @@
           },
           "markdownDescription": "**`{light, dark}`**"
         }
+      ]
+    },
+    "when": {
+      "type": [
+        "string",
+        "boolean"
       ]
     }
   },

@@ -12,16 +12,16 @@ const browserPolyfills = {
 const nodeShims = {
     name: 'node-shims',
     setup(build) {
-        build.onResolve({ filter: /^(punycode|url)$/ }, (args) => ({
+        build.onResolve({filter: /^(punycode|url)$/}, (args) => ({
             path: browserPolyfills[args.path],
         }));
 
-        build.onResolve({ filter: /^(fs|path|process)$/ }, (args) => ({
+        build.onResolve({filter: /^(fs|path|process)$/}, (args) => ({
             path: args.path,
             namespace: 'node-shims',
         }));
 
-        build.onLoad({ filter: /.*/, namespace: 'node-shims' }, (args) => {
+        build.onLoad({filter: /.*/, namespace: 'node-shims'}, (args) => {
             if (args.path === 'process') {
                 return {
                     contents: `
@@ -45,7 +45,7 @@ const nodeShims = {
     },
 };
 
-const ctx = isWatch ? esbuild.context : (opts) => esbuild.build(opts).then(r => r);
+const ctx = isWatch ? esbuild.context : (opts) => esbuild.build(opts).then((r) => r);
 
 const yamlServerFixes = {
     name: 'yaml-server-fixes',
@@ -84,8 +84,8 @@ if (target === 'ext' || target === 'all') {
             sourcemap: true,
             plugins: [yamlServerFixes],
             mainFields: ['module', 'main'],
-            loader: { '.json': 'json' },
-        }).then(c => isWatch ? c.watch() : c),
+            loader: {'.json': 'json'},
+        }).then((c) => (isWatch ? c.watch() : c)),
     );
 }
 
@@ -95,11 +95,7 @@ const webviewBase = {
     target: 'es2020',
     format: 'iife',
     sourcemap: false,
-    plugins: [
-        nodeShims,
-        sassPlugin({ filter: /\.module\.scss$/, type: 'local-css' }),
-        sassPlugin(),
-    ],
+    plugins: [nodeShims, sassPlugin({filter: /\.module\.scss$/, type: 'local-css'}), sassPlugin()],
     define: {
         'process.env.NODE_ENV': '"production"',
         global: 'window',
@@ -122,7 +118,7 @@ if (target === 'webview' || target === 'all') {
             ...webviewBase,
             entryPoints: ['src/ui/md-editor/index.tsx'],
             outdir: 'build/md-editor',
-        }).then(c => isWatch ? c.watch() : c),
+        }).then((c) => (isWatch ? c.watch() : c)),
     );
 }
 
@@ -133,7 +129,7 @@ if (target === 'webview' || target === 'all') {
             ...webviewBase,
             entryPoints: ['src/ui/toc-editor/index.tsx'],
             outdir: 'build/toc-editor',
-        }).then(c => isWatch ? c.watch() : c),
+        }).then((c) => (isWatch ? c.watch() : c)),
     );
 }
 
@@ -143,7 +139,7 @@ if (target === 'webview' || target === 'all') {
             ...webviewBase,
             entryPoints: ['src/ui/sidebar/index.tsx'],
             outdir: 'build/sidebar',
-        }).then(c => isWatch ? c.watch() : c),
+        }).then((c) => (isWatch ? c.watch() : c)),
     );
 }
 

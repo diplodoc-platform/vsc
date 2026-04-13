@@ -1,12 +1,20 @@
-import {useEffect} from 'react';
-import {matchesShortcut} from './match';
 import type {EditorCommand, EditorInstance} from './types';
+
+import {useEffect} from 'react';
+
+import {matchesShortcut} from './match';
 
 export function useShortcuts(editor: EditorInstance, commands: EditorCommand[]) {
     useEffect(() => {
         function onKeyDown(event: KeyboardEvent) {
             for (const cmd of commands) {
-                if (cmd.key && matchesShortcut(event, cmd as Required<Pick<EditorCommand, 'key'>> & EditorCommand)) {
+                if (
+                    cmd.key &&
+                    matchesShortcut(
+                        event,
+                        cmd as Required<Pick<EditorCommand, 'key'>> & EditorCommand,
+                    )
+                ) {
                     event.preventDefault();
                     cmd.handler(editor);
 
@@ -25,7 +33,7 @@ export function useShortcuts(editor: EditorInstance, commands: EditorCommand[]) 
             const {command, action} = event.data ?? {};
 
             if (command === 'action') {
-                const cmd = commands.find(c => c.action === action);
+                const cmd = commands.find((c) => c.action === action);
                 cmd?.handler(editor);
             }
         }

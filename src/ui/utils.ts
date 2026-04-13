@@ -30,7 +30,7 @@ export function getFilesMap(fileName: string, files: string[]) {
         if (a === '') {
             return -1;
         }
-        
+
         if (b === '') {
             return 1;
         }

@@ -657,35 +657,25 @@
       "markdownDescription": "**`boolean`**"
     },
     "analytics": {
-      "type": "object",
+      "$ref": "#/definitions/AnalyticsConfig",
+      "markdownDescription": "**`AnalyticsConfig`** Web analytics configuration.\n\n- `gtm` **`AnalyticsConfig`** — Google Tag Manager (`id: string`, `mode: 'base' | 'notification'`)",
       "properties": {
         "gtm": {
-          "type": "object",
+          "markdownDescription": "**`object`** Google Tag Manager settings.\n\n- `id` **`string`** — GTM container ID (e.g. `GTM-XXXXXX`)\n- `mode` **`'base' | 'notification'`** — consent mode",
           "properties": {
             "id": {
-              "type": "string",
               "markdownDescription": "**`string`** GTM container ID (e.g. `GTM-XXXXXX`)."
             },
             "mode": {
-              "type": "string",
-              "enum": [
-                "base",
-                "notification"
-              ],
               "markdownDescription": "**`'base' | 'notification'`** GTM consent mode.",
               "markdownEnumDescriptions": [
                 "Base consent mode — basic analytics.",
                 "Notification consent mode — additional consent signals."
               ]
             }
-          },
-          "additionalProperties": false,
-          "markdownDescription": "**`{id, mode}`** Google Tag Manager settings.\n\n- `id` **`string`** — GTM container ID (e.g. `GTM-XXXXXX`)\n- `mode` **`'base' | 'notification'`** — consent mode"
+          }
         }
-      },
-      "additionalProperties": true,
-      "description": "Web analytics configuration (e.g. Google Tag Manager).",
-      "markdownDescription": "**`{gtm}`** Web analytics configuration.\n\n- `gtm` **`{gtm}`** — Google Tag Manager (`id: string`, `mode: 'base' | 'notification'`)"
+      }
     },
     "neuroExpert": {
       "$ref": "#/definitions/NeuroExpertConfig",
@@ -1871,6 +1861,134 @@
       "additionalProperties": true,
       "markdownDescription": "**`TranslateConfig`** Configuration for the `translate` command.\n\n- `provider` **`string`** — translation service identifier\n- `source` **`string | object`** — source language (`'en'` or `{language, locale?}`)\n- `target` **`string | string[]`** — target language(s)\n- `files` **`string[]`** — explicit file list\n- `include` / `exclude` **`string[]`** — glob filters\n- `dryRun` **`boolean`** — calculate quota without translating\n- `useSource` **`boolean`** — use original text as output (debug)",
       "description": "Translate command config. Fields: provider, source, target, files, include, exclude, vars, dryRun, useSource, and provider-specific fields."
+    },
+    "AnalyticsConfig": {
+      "description": "Web analytics configuration (e.g. Google Tag Manager).",
+      "type": "object",
+      "properties": {
+        "gtm": {
+          "$ref": "#/definitions/AnalyticsGtmConfig"
+        },
+        "metrika": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AnalyticsMetrikaConfig"
+          },
+          "markdownDescription": "**`AnalyticsMetrikaConfig[]`**"
+        }
+      },
+      "additionalProperties": true,
+      "markdownDescription": "**`{gtm, metrika}`** Web analytics configuration (e.g. Google Tag Manager)."
+    },
+    "AnalyticsGtmConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "markdownDescription": "**`string`**"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "base",
+            "notification"
+          ],
+          "markdownDescription": "**`'base' | 'notification'`**"
+        }
+      },
+      "markdownDescription": "**`{id, mode}`**"
+    },
+    "AnalyticsMetrikaConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "markdownDescription": "**`integer`**"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "accurateTrackBounce": {
+              "type": [
+                "boolean",
+                "number"
+              ]
+            },
+            "childIframe": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            },
+            "clickmap": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            },
+            "defer": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            },
+            "ecommerce": {
+              "oneOf": [
+                {
+                  "type": "boolean",
+                  "markdownDescription": "**`boolean`**"
+                },
+                {
+                  "type": "string",
+                  "markdownDescription": "**`string`**"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "markdownDescription": "**`string`**"
+                  },
+                  "markdownDescription": "**`string[]`**"
+                }
+              ]
+            },
+            "trackHash": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            },
+            "trackLinks": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            },
+            "trustedDomains": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "markdownDescription": "**`string`**"
+              },
+              "markdownDescription": "**`string[]`**"
+            },
+            "webvisor": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            },
+            "triggerEvent": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            },
+            "sendTitle": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            },
+            "ssr": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            }
+          },
+          "markdownDescription": "**`{accurateTrackBounce, childIframe, clickmap, ...}`**"
+        }
+      },
+      "markdownDescription": "**`{id, params}`**"
     }
   },
   "markdownDescription": "Diplodoc build configuration file (`.yfm` or `.yfm.yaml`).\nControls the documentation build: input/output paths, language, output format, VCS integration, linting, search, extensions, and much more.\n```yaml input: ./docs output: ./build lang: en outputFormat: html ```"

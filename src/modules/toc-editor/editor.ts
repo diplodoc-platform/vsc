@@ -1,12 +1,16 @@
 import * as vscode from 'vscode';
+
 import {getBaseHtml} from '../../ui/html';
 
 export class TocEditor {
+    isUpdatingFromWebview = false;
+    private readonly _extensionUri: vscode.Uri;
     private _panel?: vscode.WebviewPanel;
     private _currentDocUri?: vscode.Uri;
-    isUpdatingFromWebview = false;
 
-    constructor(private readonly _extensionUri: vscode.Uri) {}
+    constructor(extensionUri: vscode.Uri) {
+        this._extensionUri = extensionUri;
+    }
 
     show() {
         if (this._panel) {
@@ -21,10 +25,10 @@ export class TocEditor {
 
     async showFile(uri: vscode.Uri, column: vscode.ViewColumn = vscode.ViewColumn.One) {
         const document = await vscode.workspace.openTextDocument(uri);
-        if (!this._panel) {
-            this._createPanel(column);
-        } else {
+        if (this._panel) {
             this._panel.reveal(column);
+        } else {
+            this._createPanel(column);
         }
 
         if (column === vscode.ViewColumn.Beside) {
@@ -36,7 +40,7 @@ export class TocEditor {
         }
 
         const editor = vscode.window.visibleTextEditors.find(
-            (e) => e.document.uri.toString() === uri.toString()
+            (e) => e.document.uri.toString() === uri.toString(),
         );
 
         if (editor) {
@@ -46,12 +50,32 @@ export class TocEditor {
             const text = document.getText();
             const fileName = uri.fsPath.split('/').pop() ?? '';
 
-            this._panel!.title = fileName
-                ? `Diplodoc TOC Editor: ${fileName}`
-                : 'Diplodoc TOC Editor';
+            if (this._panel) {
+                this._panel.title = fileName
+                    ? `Diplodoc TOC Editor: ${fileName}`
+                    : 'Diplodoc TOC Editor';
 
-            this._panel!.webview.postMessage({command: 'setContent', text, fileName});
+                this._panel.webview.postMessage({command: 'setContent', text, fileName});
+            }
         }
+    }
+
+    syncFromEditor(editor: vscode.TextEditor) {
+        if (!this._panel) {
+            return;
+        }
+
+        this._currentDocUri = editor.document.uri;
+        const text = editor.document.getText();
+        const fileName = editor.document.fileName.split('/').pop() ?? '';
+
+        this._panel.title = fileName ? `Diplodoc TOC Editor: ${fileName}` : 'Diplodoc TOC Editor';
+
+        this._panel.webview.postMessage({
+            command: 'setContent',
+            text,
+            fileName,
+        });
     }
 
     private _createPanel(column: vscode.ViewColumn = vscode.ViewColumn.Beside) {
@@ -65,7 +89,7 @@ export class TocEditor {
                 localResourceRoots: [
                     vscode.Uri.joinPath(this._extensionUri, 'build', 'toc-editor'),
                 ],
-            }
+            },
         );
 
         const icon = vscode.Uri.joinPath(this._extensionUri, 'assets', 'diplodoc-logo-colored.svg');
@@ -81,42 +105,18 @@ export class TocEditor {
         });
     }
 
-    syncFromEditor(editor: vscode.TextEditor) {
-        if (!this._panel) {
-            return;
-        }
-
-        this._currentDocUri = editor.document.uri;
-        const text = editor.document.getText();
-        const fileName = editor.document.fileName.split('/').pop() ?? '';
-
-        this._panel.title = fileName
-            ? `Diplodoc TOC Editor: ${fileName}`
-            : 'Diplodoc TOC Editor';
-
-        this._panel.webview.postMessage({
-            command: 'setContent',
-            text,
-            fileName,
-        });
-    }
-
     private _setupWebview(webview: vscode.Webview) {
         const buildUri = vscode.Uri.joinPath(this._extensionUri, 'build', 'toc-editor');
 
-        const scriptUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(buildUri, 'index.js')
-        );
-        const styleUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(buildUri, 'index.css')
-        );
+        const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(buildUri, 'index.js'));
+        const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(buildUri, 'index.css'));
 
         webview.html = getBaseHtml(
             'toc-editor',
             scriptUri,
             styleUri,
             webview.cspSource,
-            vscode.env.language
+            vscode.env.language,
         );
 
         webview.onDidReceiveMessage(async (message) => {
@@ -147,7 +147,7 @@ export class TocEditor {
             const edit = new vscode.WorkspaceEdit();
             const fullRange = new vscode.Range(
                 document.positionAt(0),
-                document.positionAt(document.getText().length)
+                document.positionAt(document.getText().length),
             );
 
             edit.replace(this._currentDocUri, fullRange, text);
