@@ -1,4 +1,4 @@
-import {Content} from "../types";
+import {Content} from "./types";
 
 export function parseContent(content: string) {
     const {fmContent, bodyContent, fmLineCount} = extractFrontmatter(content);

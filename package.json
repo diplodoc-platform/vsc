@@ -142,7 +142,7 @@
     "@diplodoc/yfmlint": "^1.6.0",
     "@gravity-ui/components": "^4.18.0",
     "@gravity-ui/markdown-editor": "^15.37.0",
-    "@gravity-ui/uikit": "^7.35.2",
+    "@gravity-ui/uikit": "^7.37.0",
     "highlight.js": "^11.11.1",
     "js-yaml": "^4.1.1",
     "lowlight": "^3.3.0",

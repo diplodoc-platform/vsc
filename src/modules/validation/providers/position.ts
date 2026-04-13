@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import {Position as LspPosition} from 'vscode-languageserver-types';
-import {Content} from '../../types';
+import {Content} from '../types';
 
 export function findBlockAtPosition(
     blocks: Content[],

@@ -3,12 +3,13 @@ $color: #63D590;
 :root .g-root_theme_dark,
 :root .g-root_theme_light {
     --g-color-base-brand: #{$color};
-    --g-color-base-brand-hover: #4ec77a;
+    --g-color-base-brand-hover: #4eEC7A;
     --g-color-base-selection: rgba(99, 213, 144, 0.15);
     --g-color-base-selection-hover: rgba(99, 213, 144, 0.25);
     --g-color-line-brand: #{$color};
     --g-color-text-brand: #{$color};
     --g-color-text-brand-heavy: #{$color};
+    --g-color-button: white;
 
     --g-color-base-background: var(--vscode-editor-background);
     --g-color-base-float: var(--vscode-editorWidget-background, var(--vscode-editor-background));

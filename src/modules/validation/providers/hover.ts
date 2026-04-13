@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import {MarkupContent, MarkedString} from 'vscode-languageserver-types';
 import {getConfiguredService, createVirtualDocument, SchemaType, SCHEMA_NAMES} from './yaml-service';
 import {findBlockAtPosition, toBlockPosition} from './position';
-import {Content} from '../../types';
+import {Content} from '../types';
 
 /** Replace empty "Source: [](diplodoc://...)" links with readable schema name */
 function fixSourceLink(markdown: string): string {

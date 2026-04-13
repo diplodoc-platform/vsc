@@ -3,7 +3,7 @@ import * as path from 'path';
 import {parseContent} from './parser';
 import {validateMarkdown} from './markdown';
 import {validatePageConstructor} from './page-constructor';
-import {Content} from '../types';
+import {Content} from './types';
 import {load as yamlLoad} from 'js-yaml';
 import {YamlHoverProvider} from './providers/hover';
 import {YamlCompletionProvider} from './providers/completion';
@@ -75,9 +75,7 @@ function resolveYamlSchema(document: vscode.TextDocument): SchemaType | null {
         if (typeof parsed === 'object' && parsed !== null && 'blocks' in parsed) {
             return fileName === 'index.yaml' ? 'leading' : 'pc';
         }
-    } catch {
-        // Invalid YAML — skip
-    }
+    } catch {}
 
     return null;
 }
