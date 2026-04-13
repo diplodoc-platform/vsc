@@ -52,8 +52,8 @@ jobs:
           GH_TOKEN: ${{ secrets.YC_UI_BOT_GITHUB_TOKEN }}
         run: |
           set -e
-          PR_BRANCH=$(echo '${{ steps.release.outputs.pr }}' | jq -r '.headBranchName')
-          git checkout "$PR_BRANCH"
+          git fetch origin
+          git checkout ${{ steps.release.outputs['pr--headBranchName'] }}
           npm ci
           npm run compile
           npm run vsce
