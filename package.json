@@ -172,7 +172,7 @@
     "@types/vscode": "^1.110.0",
     "@vitest/coverage-v8": "^4.1.4",
     "@vscode/vsce": "^3.7.1",
-    "esbuild": "^0.27.4",
+    "esbuild": "^0.28.0",
     "esbuild-sass-plugin": "^3.7.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
