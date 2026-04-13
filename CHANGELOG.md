@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.0 (2026-04-13)
+
+## What's Changed
+* feat: sidebar updated by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/20
+* feat: added workflows and tests by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/22
+* fix: updated workflows by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/23
+* chore: fixed node-version by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/24
+* chore: fixed release by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/25
+* fix(deps): Update @diplodoc/yfmlint@1.7.0 by @yc-ui-bot in https://github.com/diplodoc-platform/vsc/pull/26
+* chore(schemas): update schemas from @diplodoc/cli by @yc-ui-bot in https://github.com/diplodoc-platform/vsc/pull/27
+
+## New Contributors
+* @yc-ui-bot made their first contribution in https://github.com/diplodoc-platform/vsc/pull/26
+
+**Full Changelog**: https://github.com/diplodoc-platform/vsc/compare/v0.1.0...v0.2.0
+
 ## 0.1.0 (2026-04-11)
 
 
