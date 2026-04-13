@@ -1,18 +1,17 @@
-import * as vscode from 'vscode';
-import {MarkupContent, MarkedString} from 'vscode-languageserver-types';
-import {getConfiguredService, createVirtualDocument, SchemaType, SCHEMA_NAMES} from './yaml-service';
-import {findBlockAtPosition, toBlockPosition} from './position';
-import {Content} from '../types';
+import type {MarkedString, MarkupContent} from 'vscode-languageserver-types';
+import type {SchemaType} from './yaml-service';
+import type {Content} from '../types';
 
-/** Replace empty "Source: [](diplodoc://...)" links with readable schema name */
+import * as vscode from 'vscode';
+
+import {SCHEMA_NAMES, createVirtualDocument, getConfiguredService} from './yaml-service';
+import {findBlockAtPosition, toBlockPosition} from './position';
+
 function fixSourceLink(markdown: string): string {
-    return markdown.replace(
-        /Source: \[]\(diplodoc:\/\/(\w+)-schema\)/,
-        (_match, type: string) => {
-            const name = SCHEMA_NAMES[type as SchemaType];
-            return name ? `Source: ${name}` : '';
-        },
-    );
+    return markdown.replace(/Source: \[]\(diplodoc:\/\/(\w+)-schema\)/, (_match, type: string) => {
+        const name = SCHEMA_NAMES[type as SchemaType];
+        return name ? `Source: ${name}` : '';
+    });
 }
 
 function convertContents(
@@ -21,9 +20,7 @@ function convertContents(
     let text: string;
 
     if (Array.isArray(contents)) {
-        text = contents
-            .map(c => (typeof c === 'string' ? c : c.value))
-            .join('\n\n');
+        text = contents.map((c) => (typeof c === 'string' ? c : c.value)).join('\n\n');
     } else if (typeof contents === 'string') {
         text = contents;
     } else {
@@ -34,7 +31,11 @@ function convertContents(
 }
 
 export class YamlHoverProvider implements vscode.HoverProvider {
-    constructor(private readonly getBlocks: (document: vscode.TextDocument) => Content[]) {}
+    private readonly getBlocks: (document: vscode.TextDocument) => Content[];
+
+    constructor(getBlocks: (document: vscode.TextDocument) => Content[]) {
+        this.getBlocks = getBlocks;
+    }
 
     async provideHover(
         document: vscode.TextDocument,

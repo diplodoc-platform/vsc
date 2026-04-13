@@ -19,7 +19,10 @@ declare module '*.svg' {
 }
 
 declare module '@gravity-ui/markdown-editor/extensions/additional/Math/index.js' {
-    export {Math, MathOptions} from '@gravity-ui/markdown-editor/extensions/additional/Math/index.js';
+    export {
+        Math,
+        MathOptions,
+    } from '@gravity-ui/markdown-editor/extensions/additional/Math/index.js';
 }
 
 declare module '@gravity-ui/markdown-editor/extensions/additional/Mermaid/index.js' {

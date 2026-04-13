@@ -1,21 +1,17 @@
-import * as vscode from 'vscode';
-import {Position as LspPosition} from 'vscode-languageserver-types';
-import {Content} from '../types';
+import type {Position as LspPosition} from 'vscode-languageserver-types';
+import type {Content} from '../types';
 
-export function findBlockAtPosition(
-    blocks: Content[],
-    position: vscode.Position,
-): Content | null {
-    return blocks.find(block =>
-        position.line >= block.startLine &&
-        position.line <= block.endLine,
-    ) ?? null;
+import * as vscode from 'vscode';
+
+export function findBlockAtPosition(blocks: Content[], position: vscode.Position): Content | null {
+    return (
+        blocks.find(
+            (block) => position.line >= block.startLine && position.line <= block.endLine,
+        ) ?? null
+    );
 }
 
-export function toBlockPosition(
-    position: vscode.Position,
-    block: Content,
-): LspPosition {
+export function toBlockPosition(position: vscode.Position, block: Content): LspPosition {
     return {
         line: position.line - block.startLine,
         character: position.character,

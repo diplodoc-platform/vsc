@@ -26,7 +26,7 @@
 }
 
 .fileItem {
-    padding: 2px 8px !important;
+    padding: 2px 8px !important; /* stylelint-disable-line declaration-no-important */
     border-radius: 4px;
     cursor: pointer;
 }

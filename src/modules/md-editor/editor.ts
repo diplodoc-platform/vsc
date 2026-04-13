@@ -1,14 +1,18 @@
 import * as vscode from 'vscode';
+
 import {getBaseHtml} from '../../ui/html';
 
 export class MdEditor {
+    isUpdatingFromWebview = false;
+    private readonly _extensionUri: vscode.Uri;
     private _panel?: vscode.WebviewPanel;
     private _currentDocUri?: vscode.Uri;
     private _pendingSync?: {text: string; fileName: string};
     private _frontmatter = '';
-    isUpdatingFromWebview = false;
 
-    constructor(private readonly _extensionUri: vscode.Uri) {}
+    constructor(extensionUri: vscode.Uri) {
+        this._extensionUri = extensionUri;
+    }
 
     show() {
         if (this._panel) {
@@ -25,10 +29,10 @@ export class MdEditor {
         const document = await vscode.workspace.openTextDocument(uri);
         const isNewPanel = !this._panel;
 
-        if (!this._panel) {
-            this._createPanel(column);
-        } else {
+        if (this._panel) {
             this._panel.reveal(column);
+        } else {
+            this._createPanel(column);
         }
 
         if (column === vscode.ViewColumn.Beside) {
@@ -40,7 +44,7 @@ export class MdEditor {
         }
 
         const editor = vscode.window.visibleTextEditors.find(
-            (e) => e.document.uri.toString() === uri.toString()
+            (e) => e.document.uri.toString() === uri.toString(),
         );
 
         if (editor) {
@@ -52,43 +56,18 @@ export class MdEditor {
             const {frontmatter, content} = this._extractFrontmatter(rawText);
             this._frontmatter = frontmatter;
 
-            this._panel!.title = fileName
-                ? `Diplodoc Markdown Editor: ${fileName}`
-                : 'Diplodoc Markdown Editor';
+            if (this._panel) {
+                this._panel.title = fileName
+                    ? `Diplodoc Markdown Editor: ${fileName}`
+                    : 'Diplodoc Markdown Editor';
+            }
 
             if (isNewPanel) {
                 this._pendingSync = {text: content, fileName};
             } else {
-                this._panel!.webview.postMessage({command: 'setContent', text: content, fileName});
+                this._panel?.webview.postMessage({command: 'setContent', text: content, fileName});
             }
         }
-    }
-
-    private _createPanel(column: vscode.ViewColumn = vscode.ViewColumn.Beside) {
-        this._panel = vscode.window.createWebviewPanel(
-            'diplodoc-md-editor',
-            'Diplodoc Markdown Editor',
-            column,
-            {
-                enableScripts: true,
-                retainContextWhenHidden: true,
-                localResourceRoots: [
-                    vscode.Uri.joinPath(this._extensionUri, 'build', 'md-editor'),
-                ],
-            }
-        );
-
-        const icon = vscode.Uri.joinPath(this._extensionUri, 'assets', 'diplodoc-logo-colored.svg');
-        this._panel.iconPath = {
-            light: icon,
-            dark: icon,
-        };
-
-        this._setupWebview(this._panel.webview);
-
-        this._panel.onDidDispose(() => {
-            this._panel = undefined;
-        });
     }
 
     syncFromEditor(editor: vscode.TextEditor) {
@@ -115,6 +94,35 @@ export class MdEditor {
         });
     }
 
+    postAction(action: string) {
+        this._panel?.webview.postMessage({command: 'action', action});
+    }
+
+    private _createPanel(column: vscode.ViewColumn = vscode.ViewColumn.Beside) {
+        this._panel = vscode.window.createWebviewPanel(
+            'diplodoc-md-editor',
+            'Diplodoc Markdown Editor',
+            column,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+                localResourceRoots: [vscode.Uri.joinPath(this._extensionUri, 'build', 'md-editor')],
+            },
+        );
+
+        const icon = vscode.Uri.joinPath(this._extensionUri, 'assets', 'diplodoc-logo-colored.svg');
+        this._panel.iconPath = {
+            light: icon,
+            dark: icon,
+        };
+
+        this._setupWebview(this._panel.webview);
+
+        this._panel.onDidDispose(() => {
+            this._panel = undefined;
+        });
+    }
+
     private _extractFrontmatter(text: string): {frontmatter: string; content: string} {
         const match = text.match(/^(---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$))/);
 
@@ -131,19 +139,15 @@ export class MdEditor {
     private _setupWebview(webview: vscode.Webview) {
         const buildUri = vscode.Uri.joinPath(this._extensionUri, 'build', 'md-editor');
 
-        const scriptUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(buildUri, 'index.js')
-        );
-        const styleUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(buildUri, 'index.css')
-        );
+        const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(buildUri, 'index.js'));
+        const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(buildUri, 'index.css'));
 
         webview.html = getBaseHtml(
             'md-editor',
             scriptUri,
             styleUri,
             webview.cspSource,
-            vscode.env.language
+            vscode.env.language,
         );
 
         webview.onDidReceiveMessage(async (message) => {
@@ -177,10 +181,6 @@ export class MdEditor {
         await document.save();
     }
 
-    postAction(action: string) {
-        this._panel?.webview.postMessage({command: 'action', action});
-    }
-
     private _syncActiveEditor() {
         const editor = vscode.window.activeTextEditor;
 
@@ -202,7 +202,7 @@ export class MdEditor {
             const edit = new vscode.WorkspaceEdit();
             const fullRange = new vscode.Range(
                 document.positionAt(0),
-                document.positionAt(document.getText().length)
+                document.positionAt(document.getText().length),
             );
 
             edit.replace(this._currentDocUri, fullRange, this._frontmatter + text);

@@ -1,6 +1,5 @@
 import {useEffect, useState} from 'react';
 
-
 function detectTheme(): 'dark' | 'light' {
     const kind = document.body.getAttribute('data-vscode-theme-kind');
 
@@ -23,7 +22,7 @@ export function useVscodeTheme(): 'dark' | 'light' {
             attributes: true,
             attributeFilter: ['data-vscode-theme-kind'],
         });
-        
+
         return () => observer.disconnect();
     }, []);
 

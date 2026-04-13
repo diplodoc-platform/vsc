@@ -1,8 +1,12 @@
+import type {Diagnostic as LspDiagnostic} from 'vscode-languageserver-types';
+import type {SchemaType} from './yaml-service';
+import type {Content} from '../types';
+
 import * as vscode from 'vscode';
-import {Diagnostic as LspDiagnostic, DiagnosticSeverity as LspSeverity} from 'vscode-languageserver-types';
-import {getConfiguredService, createVirtualDocument, SchemaType} from './yaml-service';
+import {DiagnosticSeverity as LspSeverity} from 'vscode-languageserver-types';
+
+import {createVirtualDocument, getConfiguredService} from './yaml-service';
 import {toVscodeRange} from './position';
-import {Content} from '../types';
 
 const TYPE_MISMATCH_RE = /^Incorrect type\./;
 const MISSING_PROPERTY_RE = /^Missing property/;
@@ -38,7 +42,7 @@ export async function getDiagnostics(
     const doc = createVirtualDocument(content.content, schemaType);
     const lspDiags = await ls.doValidation(doc, false);
 
-    return lspDiags.map(d => {
+    return lspDiags.map((d) => {
         const range = toVscodeRange(d.range, content.startLine);
         return new vscode.Diagnostic(range, d.message, diagnosticSeverity(d));
     });

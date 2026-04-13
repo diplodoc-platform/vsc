@@ -1,20 +1,21 @@
-import {defineConfig} from 'vitest/config';
+import {coverageConfigDefaults, defineConfig} from 'vitest/config';
 
 export default defineConfig({
     test: {
-        include: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
-        exclude: ['node_modules', 'build'],
+        setupFiles: ['./src/test-setup.ts', './src/require.ts'],
+        environment: 'node',
+        include: [
+            'src/**/*.{test,spec}.ts',
+        ],
+        exclude: ['node_modules'],
         coverage: {
-            enabled: true,
+            all: true,
             provider: 'v8',
-            include: ['src'],
-            exclude: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
+            include: ['src/**'],
+            exclude: ['assets/**', 'tests/**', ...coverageConfigDefaults.exclude],
+            excludeAfterRemap: true,
+            reporter: ['text', 'json', 'html', 'lcov'],
         },
+        testTimeout: 60000,
     },
 });
-
-
-
-
-
-
