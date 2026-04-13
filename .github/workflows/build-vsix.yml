@@ -35,14 +35,16 @@ jobs:
 
       - name: Build extension
         run: |
+          rm -f *.vsix
           npm run compile
           npm run vsce
 
       - name: Commit .vsix
         run: |
-          VSIX_FILE=$(ls *.vsix)
           git config --global user.email "95919151+yc-ui-bot@users.noreply.github.com"
           git config --global user.name "yc-ui-bot"
+          git rm -f --ignore-unmatch *.vsix
+          VSIX_FILE=$(ls *.vsix)
           git add "$VSIX_FILE"
           if git diff --cached --quiet; then
             echo "::info::.vsix is up to date"
