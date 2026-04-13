@@ -1,0 +1,53 @@
+name: Update Schemas
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-schemas:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.YC_UI_BOT_GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update schemas
+        run: npm run merge-schemas
+
+      - name: Create and publish PR
+        env:
+          GH_TOKEN: ${{ secrets.YC_UI_BOT_GITHUB_TOKEN }}
+        run: |
+          set -e
+
+          if [[ -z $(git diff --stat -- schemas/) ]]; then
+            echo "::info::Schemas are up to date"
+            exit 0
+          fi
+
+          git config --global user.email "95919151+yc-ui-bot@users.noreply.github.com"
+          git config --global user.name "yc-ui-bot"
+
+          BRANCH_NAME="ci/update-schemas"
+          git push -f origin :$BRANCH_NAME || true
+          git checkout -b $BRANCH_NAME
+          git add schemas/*.json
+          git commit -m "chore(schemas): update schemas from @diplodoc/cli" --no-verify
+          git push -u origin $BRANCH_NAME
+
+          gh pr create --title "chore(schemas): update schemas from @diplodoc/cli" --body "Automated schema update from diplodoc-platform/cli" --base master
