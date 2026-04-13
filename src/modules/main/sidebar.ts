@@ -1,11 +1,17 @@
 import * as vscode from 'vscode';
-import {getBaseHtml} from '../../ui/utils/html';
+import {getBaseHtml} from '../../ui/html';
+import {MdEditor} from '../md-editor/editor';
+import {TocEditor} from '../toc-editor/editor';
 
 export class Sidebar implements vscode.WebviewViewProvider {
     private _view?: vscode.WebviewView;
     isUpdatingFromWebview = false;
 
-    constructor(private readonly _extensionUri: vscode.Uri) { }
+    constructor(
+        private readonly _extensionUri: vscode.Uri,
+        private readonly _mdEditor: MdEditor,
+        private readonly _tocEditor: TocEditor,
+    ) {}
 
     resolveWebviewView(webviewView: vscode.WebviewView) {
         this._view = webviewView;
@@ -36,6 +42,15 @@ export class Sidebar implements vscode.WebviewViewProvider {
             if (message.command === 'change') {
                 await this._applyToDocument(message.text);
             }
+
+            if (message.command === 'requestFiles') {
+                const files = await this._getMarkdownFiles();
+                webviewView.webview.postMessage({command: 'setFiles', files});
+            }
+
+            if (message.command === 'openFile') {
+                await this._openFile(message.file);
+            }
         });
 
         webviewView.onDidChangeVisibility(() => {
@@ -45,12 +60,67 @@ export class Sidebar implements vscode.WebviewViewProvider {
         });
 
         this._syncActiveEditor();
+
+        const mdWatcher = vscode.workspace.createFileSystemWatcher('**/*.md');
+        const tocWatcher = vscode.workspace.createFileSystemWatcher('**/toc.yaml');
+
+        const refreshFiles = async () => {
+            const files = await this._getMarkdownFiles();
+            webviewView.webview.postMessage({command: 'setFiles', files});
+        };
+
+        mdWatcher.onDidCreate(refreshFiles);
+        mdWatcher.onDidDelete(refreshFiles);
+        tocWatcher.onDidCreate(refreshFiles);
+        tocWatcher.onDidDelete(refreshFiles);
+
+        vscode.workspace.onDidChangeWorkspaceFolders(refreshFiles);
+
+        webviewView.onDidDispose(() => {
+            mdWatcher.dispose();
+            tocWatcher.dispose();
+        });
+    }
+
+    private async _getMarkdownFiles(): Promise<string[]> {
+        const [mdUris, tocUris] = await Promise.all([
+            vscode.workspace.findFiles('**/*.md', '**/node_modules/**'),
+            vscode.workspace.findFiles('**/toc.yaml', '**/node_modules/**'),
+        ]);
+
+        return [...mdUris, ...tocUris]
+            .map(uri => {
+                const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
+
+                if (workspaceFolder) {
+                    return uri.fsPath.replace(workspaceFolder.uri.fsPath + '/', '');
+                }
+                return uri.fsPath;
+            })
+            .sort();
+    }
+
+    private async _openFile(relativePath: string) {
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+
+        if (!workspaceFolder) {
+            return;
+        }
+
+        const fileUri = vscode.Uri.joinPath(workspaceFolder.uri, relativePath);
+
+        if (relativePath.endsWith('.md')) {
+            await this._mdEditor.showFile(fileUri, vscode.ViewColumn.Active);
+        } else if (relativePath.endsWith('toc.yaml')) {
+            await this._tocEditor.showFile(fileUri, vscode.ViewColumn.Active);
+        }
     }
 
     syncFromEditor(editor: vscode.TextEditor) {
         if (!this._view?.visible) {
             return;
         }
+
         const text = editor.document.getText();
         const fileName = editor.document.fileName.split('/').pop() ?? '';
         this._view.webview.postMessage({command: 'setContent', text, fileName});
@@ -72,6 +142,7 @@ export class Sidebar implements vscode.WebviewViewProvider {
         }
 
         this.isUpdatingFromWebview = true;
+
         try {
             const edit = new vscode.WorkspaceEdit();
             const fullRange = new vscode.Range(
@@ -80,7 +151,7 @@ export class Sidebar implements vscode.WebviewViewProvider {
             );
 
             edit.replace(editor.document.uri, fullRange, text);
-            
+
             await vscode.workspace.applyEdit(edit);
         } finally {
             this.isUpdatingFromWebview = false;

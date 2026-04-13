@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import {Diagnostic as LspDiagnostic, DiagnosticSeverity as LspSeverity} from 'vscode-languageserver-types';
 import {getConfiguredService, createVirtualDocument, SchemaType} from './yaml-service';
 import {toVscodeRange} from './position';
-import {Content} from '../../types';
+import {Content} from '../types';
 
 const TYPE_MISMATCH_RE = /^Incorrect type\./;
 const MISSING_PROPERTY_RE = /^Missing property/;

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import {InsertTextFormat, CompletionList} from 'vscode-languageserver-types';
 import {getConfiguredService, createVirtualDocument, SchemaType} from './yaml-service';
 import {findBlockAtPosition, toBlockPosition, toVscodeRange} from './position';
-import {Content} from '../../types';
+import {Content} from '../types';
 
 type LspCompletionItem = CompletionList['items'][number];
 

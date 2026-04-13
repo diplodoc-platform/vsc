@@ -9,7 +9,7 @@ import imagesPlugin from '@diplodoc/transform/lib/plugins/images';
 import includesPlugin from '@diplodoc/transform/lib/plugins/includes';
 import linksPlugin from '@diplodoc/transform/lib/plugins/links';
 import {toDiagnostics} from './utils';
-import {PluginMessage} from '../types';
+import {PluginMessage} from './types';
 
 const allPlugins = [
     ...defaultPlugins,

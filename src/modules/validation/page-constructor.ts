@@ -1,4 +1,4 @@
-import {Content} from "../types";
+import {Content} from "./types";
 import {getDiagnostics} from './providers/diagnostic';
 import {SchemaType} from './providers/yaml-service';
 
