@@ -14,29 +14,11 @@ on:
         type: choice
         options:
           # === packages ===
-          - '@diplodoc/client'
-          - '@diplodoc/components'
-          - '@diplodoc/directive'
-          - '@diplodoc/liquid'
-          - '@diplodoc/sentenizer'
           - '@diplodoc/transform'
-          - '@diplodoc/translation'
-          - '@diplodoc/utils'
           - '@diplodoc/yfmlint'
           # === extensions ===
-          - '@diplodoc/algolia-extension'
-          - '@diplodoc/color-extension'
-          - '@diplodoc/cut-extension'
-          - '@diplodoc/file-extension'
-          - '@diplodoc/folding-headings-extension'
-          - '@diplodoc/html-extension'
           - '@diplodoc/latex-extension'
           - '@diplodoc/mermaid-extension'
-          - '@diplodoc/openapi-extension'
-          - '@diplodoc/page-constructor-extension'
-          - '@diplodoc/quote-link-extension'
-          - '@diplodoc/search-extension'
-          - '@diplodoc/tabs-extension'
       update_as_dev:
         description: 'Update as devDependency (only for single package selection)'
         required: false
