@@ -7,9 +7,9 @@ import {insertElement} from './utils';
 
 export function activate(context: vscode.ExtensionContext) {
     validation.activate(context);
-    const sidebar = new Sidebar(context.extensionUri);
     const mdEditor = new MdEditor(context.extensionUri);
     const tocEditor = new TocEditor(context.extensionUri);
+    const sidebar = new Sidebar(context.extensionUri, mdEditor, tocEditor);
 
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider('diplodoc-extension-view', sidebar)

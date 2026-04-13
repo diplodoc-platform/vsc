@@ -1,0 +1,32 @@
+.filesList,
+.filesList div {
+    width: 100%;
+    display: grid;
+    justify-items: left;
+}
+
+.filesList {
+    gap: 16px;
+    height: fit-content;
+    max-height: 82vh;
+    overflow-y: auto;
+
+    .dir {
+        font-weight: 700;
+    }
+
+    div {
+        gap: 4px;
+    }
+}
+
+.filesItems div {
+    display: grid;
+    gap: 4px;
+}
+
+.fileItem {
+    padding: 2px 8px !important;
+    border-radius: 4px;
+    cursor: pointer;
+}

@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
-import {getBaseHtml} from '../../ui/utils/html';
+import {getBaseHtml} from '../../ui/html';
 
 export class TocEditor {
     private _panel?: vscode.WebviewPanel;
+    private _currentDocUri?: vscode.Uri;
     isUpdatingFromWebview = false;
 
     constructor(private readonly _extensionUri: vscode.Uri) {}
@@ -14,10 +15,50 @@ export class TocEditor {
             return;
         }
 
+        this._createPanel();
+        this._syncActiveEditor();
+    }
+
+    async showFile(uri: vscode.Uri, column: vscode.ViewColumn = vscode.ViewColumn.One) {
+        const document = await vscode.workspace.openTextDocument(uri);
+        if (!this._panel) {
+            this._createPanel(column);
+        } else {
+            this._panel.reveal(column);
+        }
+
+        if (column === vscode.ViewColumn.Beside) {
+            await vscode.window.showTextDocument(document, {
+                preview: true,
+                preserveFocus: true,
+                viewColumn: vscode.ViewColumn.One,
+            });
+        }
+
+        const editor = vscode.window.visibleTextEditors.find(
+            (e) => e.document.uri.toString() === uri.toString()
+        );
+
+        if (editor) {
+            this.syncFromEditor(editor);
+        } else {
+            this._currentDocUri = uri;
+            const text = document.getText();
+            const fileName = uri.fsPath.split('/').pop() ?? '';
+
+            this._panel!.title = fileName
+                ? `Diplodoc TOC Editor: ${fileName}`
+                : 'Diplodoc TOC Editor';
+
+            this._panel!.webview.postMessage({command: 'setContent', text, fileName});
+        }
+    }
+
+    private _createPanel(column: vscode.ViewColumn = vscode.ViewColumn.Beside) {
         this._panel = vscode.window.createWebviewPanel(
             'diplodoc-toc-editor',
             'Diplodoc TOC Editor',
-            vscode.ViewColumn.Beside,
+            column,
             {
                 enableScripts: true,
                 retainContextWhenHidden: true,
@@ -38,8 +79,6 @@ export class TocEditor {
         this._panel.onDidDispose(() => {
             this._panel = undefined;
         });
-
-        this._syncActiveEditor();
     }
 
     syncFromEditor(editor: vscode.TextEditor) {
@@ -47,6 +86,7 @@ export class TocEditor {
             return;
         }
 
+        this._currentDocUri = editor.document.uri;
         const text = editor.document.getText();
         const fileName = editor.document.fileName.split('/').pop() ?? '';
 
@@ -89,29 +129,29 @@ export class TocEditor {
     private _syncActiveEditor() {
         const editor = vscode.window.activeTextEditor;
 
-        if (editor && editor.document.fileName === 'toc.yaml') {
+        if (editor && editor.document.fileName.endsWith('toc.yaml')) {
             this.syncFromEditor(editor);
         }
     }
 
     private async _applyToDocument(text: string) {
-        const editor = vscode.window.activeTextEditor;
-
-        if (!editor || editor.document.fileName !== 'toc.yaml') {
+        if (!this._currentDocUri) {
             return;
         }
 
+        const document = await vscode.workspace.openTextDocument(this._currentDocUri);
+
         this.isUpdatingFromWebview = true;
-        
+
         try {
             const edit = new vscode.WorkspaceEdit();
             const fullRange = new vscode.Range(
-                editor.document.positionAt(0),
-                editor.document.positionAt(editor.document.getText().length)
+                document.positionAt(0),
+                document.positionAt(document.getText().length)
             );
 
-            edit.replace(editor.document.uri, fullRange, text);
-            
+            edit.replace(this._currentDocUri, fullRange, text);
+
             await vscode.workspace.applyEdit(edit);
         } finally {
             this.isUpdatingFromWebview = false;

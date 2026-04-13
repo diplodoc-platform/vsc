@@ -2,7 +2,7 @@ const esbuild = require('esbuild');
 const {sassPlugin} = require('esbuild-sass-plugin');
 
 const isWatch = process.argv.includes('--watch');
-const target = process.env.BUILD_TARGET ?? 'all'; // 'ext' | 'webview' | 'all'
+const target = process.env.BUILD_TARGET ?? 'all';
 
 const browserPolyfills = {
     punycode: require.resolve('punycode/'),
@@ -47,25 +47,17 @@ const nodeShims = {
 
 const ctx = isWatch ? esbuild.context : (opts) => esbuild.build(opts).then(r => r);
 
-// yaml-language-server bundle fixes:
-// 1. Stub heavy/unused deps (prettier for formatting, request-light for remote schemas)
-// 2. Redirect vscode-json-languageservice UMD deep imports to ESM equivalents
-//    (yaml-language-server does require("vscode-json-languageservice/lib/umd/...") which
-//    contains UMD factory wrappers that esbuild can't statically resolve)
 const yamlServerFixes = {
     name: 'yaml-server-fixes',
     setup(build) {
-        // Redirect UMD → ESM for vscode-json-languageservice deep imports
         build.onResolve({filter: /vscode-json-languageservice\/lib\/umd\//}, (args) => {
             const esmPath = args.path.replace('/lib/umd/', '/lib/esm/');
             return {path: require.resolve(esmPath)};
         });
-        // Stub out prettier (only used for formatting, we never call doFormat())
         build.onResolve({filter: /^prettier/}, (args) => ({
             path: args.path,
             namespace: 'stub',
         }));
-        // Stub out request-light (only used for fetching remote schemas)
         build.onResolve({filter: /^request-light$/}, (args) => ({
             path: args.path,
             namespace: 'stub',
@@ -79,8 +71,6 @@ const yamlServerFixes = {
 
 const builds = [];
 
-// Extension host — bundled as CJS Node.js module.
-// vscode is provided by VS Code at runtime; everything else is inlined.
 if (target === 'ext' || target === 'all') {
     builds.push(
         ctx({
@@ -126,7 +116,6 @@ const webviewBase = {
     },
 };
 
-// Markdown editor webview
 if (target === 'webview' || target === 'all') {
     builds.push(
         ctx({
@@ -148,7 +137,6 @@ if (target === 'webview' || target === 'all') {
     );
 }
 
-// Sidebar webview
 if (target === 'webview' || target === 'all') {
     builds.push(
         ctx({

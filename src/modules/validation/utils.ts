@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import {PluginMessage, ValidationMessage, YfmLintError} from '../types';
+import {PluginMessage, ValidationMessage, YfmLintError} from './types';
 
 export function toDiagnostics(errors: ValidationMessage[], document: vscode.TextDocument): vscode.Diagnostic[] {
     return errors.map((error) => toDiagnostic(error, document));
