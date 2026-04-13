@@ -1,0 +1,52 @@
+name: Build VSIX
+
+on:
+  pull_request:
+    types: [opened, synchronize, labeled]
+
+permissions:
+  contents: write
+
+jobs:
+  build-vsix:
+    if: "contains(github.event.pull_request.labels.*.name, 'autorelease: pending')"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+          token: ${{ secrets.YC_UI_BOT_GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install latest npm (>= 11.5.1)
+        run: |
+          [ "$(printf '%s\n' "11.5.1" "$(npm -v)" | sort -V | head -n1)" = "11.5.1" ] || npm install -g npm@11.5.1
+        shell: bash
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build extension
+        run: |
+          npm run compile
+          npm run vsce
+
+      - name: Commit .vsix
+        run: |
+          VSIX_FILE=$(ls *.vsix)
+          git config --global user.email "95919151+yc-ui-bot@users.noreply.github.com"
+          git config --global user.name "yc-ui-bot"
+          git add "$VSIX_FILE"
+          if git diff --cached --quiet; then
+            echo "::info::.vsix is up to date"
+          else
+            git commit -m "chore: update $VSIX_FILE" --no-verify
+            git push
+          fi
