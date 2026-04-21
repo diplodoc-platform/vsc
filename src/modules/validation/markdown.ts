@@ -14,6 +14,8 @@ import linksPlugin from '@diplodoc/transform/lib/plugins/links';
 
 import {toDiagnostics} from './utils';
 
+const FRONTMATTER_RE = /^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/;
+
 const allPlugins = [
     ...defaultPlugins,
     changelogPlugin,
@@ -48,6 +50,7 @@ export async function validateMarkdown(document: TextDocument) {
                 },
             },
         },
+        frontMatter: FRONTMATTER_RE,
         lintConfig: {
             default: true,
         },
