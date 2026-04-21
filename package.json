@@ -53,6 +53,10 @@
       {
         "command": "diplodoc.insertNote",
         "title": "Diplodoc: Insert Note"
+      },
+      {
+        "command": "diplodoc.initProject",
+        "title": "Diplodoc: Initialize Project"
       }
     ],
     "languages": [

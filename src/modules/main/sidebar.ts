@@ -2,7 +2,9 @@ import type {MdEditor} from '../md-editor/editor';
 import type {TocEditor} from '../toc-editor/editor';
 
 import * as vscode from 'vscode';
+import {exec} from 'child_process';
 
+import {t} from '../../i18n';
 import {getBaseHtml} from '../../ui/html';
 
 export class Sidebar implements vscode.WebviewViewProvider {
@@ -55,6 +57,10 @@ export class Sidebar implements vscode.WebviewViewProvider {
 
             if (message.command === 'openFile') {
                 await this._openFile(message.file);
+            }
+
+            if (message.command === 'initProject') {
+                await this._handleInitProject();
             }
         });
 
@@ -113,6 +119,44 @@ export class Sidebar implements vscode.WebviewViewProvider {
                 return uri.fsPath;
             })
             .sort();
+    }
+
+    private async _handleInitProject() {
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+
+        if (!workspaceFolders) {
+            vscode.window.showErrorMessage(t('sidebar.no_folder_found'));
+
+            return;
+        }
+
+        exec('yfm --version', async (error) => {
+            if (error) {
+                const result = await vscode.window.showErrorMessage(
+                    t('sidebar.install_yfm'),
+                    t('yes'),
+                    t('no'),
+                );
+
+                if (result === t('yes')) {
+                    const terminal = vscode.window.createTerminal('Install YFM');
+
+                    terminal.show();
+                    terminal.sendText('npm install -g @diplodoc/cli');
+                }
+
+                return;
+            } else {
+                this._runYfmInit(workspaceFolders[0].uri.fsPath);
+            }
+        });
+    }
+
+    private _runYfmInit(projectPath: string) {
+        const terminal = vscode.window.createTerminal('YFM Init');
+
+        terminal.show();
+        terminal.sendText(`cd "${projectPath}" && yfm init`);
     }
 
     private async _openFile(relativePath: string) {

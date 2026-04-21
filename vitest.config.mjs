@@ -2,7 +2,7 @@ import {coverageConfigDefaults, defineConfig} from 'vitest/config';
 
 export default defineConfig({
     test: {
-        setupFiles: ['./src/test-setup.ts', './src/require.ts'],
+        setupFiles: ['./src/test-setup.ts'],
         environment: 'node',
         include: [
             'src/**/*.{test,spec}.ts',
