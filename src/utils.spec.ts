@@ -1,6 +1,6 @@
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 
-import {insertElement} from './utils';
+import {insertAtCursor, insertElement} from './utils';
 
 describe('insertElement', () => {
     it('returns markdown table', () => {
@@ -15,5 +15,87 @@ describe('insertElement', () => {
 
         expect(result).toContain('{% note info');
         expect(result).toContain('{% endnote %}');
+    });
+});
+
+describe('insertAtCursor', () => {
+    it('appends text when markup editor is unavailable', () => {
+        const editor = {
+            append: vi.fn(),
+        };
+
+        insertAtCursor(editor as never, 'content');
+
+        expect(editor.append).toHaveBeenCalledWith('\ncontent');
+    });
+
+    it('inserts text into an empty line', () => {
+        const dispatch = vi.fn();
+        const focus = vi.fn();
+        const editor = {
+            markupEditor: {
+                cm: {
+                    state: {
+                        selection: {
+                            main: {
+                                from: 0,
+                            },
+                        },
+                        doc: {
+                            lineAt: () => ({
+                                from: 0,
+                                to: 0,
+                                length: 0,
+                            }),
+                        },
+                    },
+                    dispatch,
+                    focus,
+                },
+            },
+            append: vi.fn(),
+        };
+
+        insertAtCursor(editor as never, 'content');
+
+        expect(dispatch).toHaveBeenCalledWith({
+            changes: {from: 0, insert: 'content\n'},
+            selection: {anchor: 8},
+        });
+        expect(focus).toHaveBeenCalledOnce();
+    });
+
+    it('adds blank lines before inserting into a non-empty line', () => {
+        const dispatch = vi.fn();
+        const editor = {
+            markupEditor: {
+                cm: {
+                    state: {
+                        selection: {
+                            main: {
+                                from: 2,
+                            },
+                        },
+                        doc: {
+                            lineAt: () => ({
+                                from: 0,
+                                to: 5,
+                                length: 5,
+                            }),
+                        },
+                    },
+                    dispatch,
+                    focus: vi.fn(),
+                },
+            },
+            append: vi.fn(),
+        };
+
+        insertAtCursor(editor as never, 'note');
+
+        expect(dispatch).toHaveBeenCalledWith({
+            changes: {from: 5, insert: '\n\nnote\n'},
+            selection: {anchor: 12},
+        });
     });
 });

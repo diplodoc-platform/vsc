@@ -15,7 +15,9 @@ type Flatten<T, P extends string = ''> = {
 export type I18nKey = Flatten<Messages>;
 
 function detectLang(): Lang {
-    const code = document.documentElement.lang.split('-')[0];
+    const raw = typeof document === 'undefined' ? 'en' : document.documentElement.lang;
+    const code = raw.split('-')[0];
+
     return (code in locales ? code : 'en') as Lang;
 }
 
@@ -24,8 +26,12 @@ function resolve(obj: Record<string, unknown>, key: string): string {
     let current: unknown = obj;
 
     for (const part of parts) {
-        if (typeof current !== 'object' || current === null) return key;
-        current = (current as Record<string, unknown>)[part];
+        if (typeof current === 'object' && current !== null) {
+            current = (current as Record<string, unknown>)[part];
+            continue;
+        }
+
+        return key;
     }
 
     return typeof current === 'string' ? current : key;

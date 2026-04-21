@@ -1,11 +1,15 @@
 {
-    "sidebar": {
-        "welcome": "Добро пожаловать в Diplodoc",
-        "search_placeholder": "Найти файл...",
-        "empty_placeholder": "Файлы не найдены",
-        "init": "Инициализировать пустой проект"
-    },
-    "editor": {
-        "error": "Ошибка редактора"
-    }
+  "sidebar": {
+    "welcome": "Добро пожаловать в Diplodoc",
+    "search_placeholder": "Найти файл...",
+    "empty_placeholder": "Файлы не найдены",
+    "init": "Инициализировать пустой проект",
+    "no_folder_found": "Не найдена рабочая директория",
+    "install_yfm": "Установите yfm с помощью `npm i @diplodoc/cli -g`. Установить?"
+  },
+  "editor": {
+    "error": "Ошибка редактора"
+  },
+  "yes": "Да",
+  "no": "Нет"
 }
