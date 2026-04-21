@@ -64,10 +64,7 @@
     },
     "outputFormat": {
       "type": "string",
-      "enum": [
-        "html",
-        "md"
-      ],
+      "enum": ["html", "md"],
       "description": "Output format. html — render to static HTML. md — render to enriched Markdown with metadata.",
       "markdownDescription": "**`'html' | 'md'`** Output format for the build.",
       "markdownEnumDescriptions": [
@@ -138,12 +135,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": [
-          "new",
-          "preview",
-          "tech-preview",
-          "skip"
-        ],
+        "enum": ["new", "preview", "tech-preview", "skip"],
         "markdownDescription": "**`'new' | 'preview' | 'tech-preview' | 'skip'`**",
         "markdownEnumDescriptions": [
           "Exclude pages tagged `new`.",
@@ -702,9 +694,7 @@
           "body": {
             "project-name": "${1:my-project}",
             "lang": "${2:en}",
-            "langs": [
-              "${3:en}"
-            ]
+            "langs": ["${3:en}"]
           }
         }
       ]
@@ -835,9 +825,7 @@
         },
         {
           "type": "object",
-          "required": [
-            "lang"
-          ],
+          "required": ["lang"],
           "properties": {
             "lang": {
               "type": "string",
@@ -906,9 +894,7 @@
         },
         {
           "type": "object",
-          "required": [
-            "name"
-          ],
+          "required": ["name"],
           "properties": {
             "name": {
               "type": "string",
@@ -1006,9 +992,7 @@
                 },
                 {
                   "type": "string",
-                  "enum": [
-                    "strict"
-                  ],
+                  "enum": ["strict"],
                   "markdownDescription": "**`'strict'`**"
                 }
               ],
@@ -1070,10 +1054,7 @@
         },
         "provider": {
           "type": "string",
-          "enum": [
-            "local",
-            "algolia"
-          ],
+          "enum": ["local", "algolia"],
           "description": "Search provider identifier (local or algolia).",
           "markdownDescription": "**`'local' | 'algolia'`** Search provider.",
           "markdownEnumDescriptions": [
@@ -1121,19 +1102,13 @@
         },
         "confidence": {
           "type": "string",
-          "enum": [
-            "phrased",
-            "sparsed"
-          ],
+          "enum": ["phrased", "sparsed"],
           "description": "Search scoring strategy (provider=local).",
           "markdownDescription": "**`'phrased' | 'sparsed'`** Search scoring strategy for local provider.\n\n- `phrased` — prefer exact phrase matches\n- `sparsed` — allow sparse word matches"
         },
         "confidense": {
           "type": "string",
-          "enum": [
-            "phrased",
-            "sparsed"
-          ],
+          "enum": ["phrased", "sparsed"],
           "description": "Alternative spelling of confidence. Search scoring strategy (provider=local).",
           "markdownDescription": "**`'phrased' | 'sparsed'`** Alternative spelling of confidence. Search scoring strategy (provider=local)."
         },
@@ -1199,11 +1174,17 @@
             ]
           },
           "markdownDescription": "**`object`** Map of language codes to custom widget header labels. Use `default` as fallback key. Only available for whitelisted projects."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["default", "search"],
+          "description": "Widget integration type. default — floating widget initialized on page load. search — widget activated via search suggest button.",
+          "markdownDescription": "**`'default' | 'search'`** Widget integration type.\n\n- `default` — floating widget initialized on page load\n- `search` — widget activated via search suggest button"
         }
       },
       "additionalProperties": false,
-      "markdownDescription": "**`NeuroExpertConfig`** AI expert (Yandex Neuro Expert) widget configuration.\n\n- `projectId` **`{projectId, hasOutsideClick, parentId, ...}`** — language → project ID map (use `default` as fallback key)\n- `hasOutsideClick` **`boolean`** — close widget on outside click\n- `parentId` **`string | null`** — parent element ID for placement\n- `disabled` **`boolean`** — disable the widget globally\n- `customLabel` **`{projectId, hasOutsideClick, parentId, ...}`** — language → custom header label map",
-      "description": "AI expert widget config. Fields: projectId, hasOutsideClick, parentId, disabled, customLabel."
+      "markdownDescription": "**`NeuroExpertConfig`** AI expert (Yandex Neuro Expert) widget configuration.\n\n- `projectId` **`object`** — language → project ID map (use `default` as fallback key)\n- `hasOutsideClick` **`boolean`** — close widget on outside click\n- `parentId` **`string | null`** — parent element ID for placement\n- `disabled` **`boolean`** — disable the widget globally\n- `customLabel` **`object`** — language → custom header label map\n- `type` **`'default' | 'search'`** — widget integration type",
+      "description": "AI expert widget config. Fields: projectId, hasOutsideClick, parentId, disabled, customLabel, type."
     },
     "PublishConfig": {
       "type": "object",
@@ -1374,10 +1355,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": [
-              "light",
-              "dark"
-            ],
+            "enum": ["light", "dark"],
             "markdownDescription": "**`'light' | 'dark'`**"
           },
           "description": "Available themes. Server-only.",
@@ -1393,10 +1371,7 @@
             },
             "mode": {
               "type": "string",
-              "enum": [
-                "base",
-                "notification"
-              ],
+              "enum": ["base", "notification"],
               "description": "GTM consent mode (base or notification).",
               "markdownDescription": "**`'base' | 'notification'`** GTM consent mode (base or notification)."
             }
@@ -1753,9 +1728,7 @@
                   "markdownDescription": "**`string`**"
                 }
               },
-              "required": [
-                "language"
-              ],
+              "required": ["language"],
               "markdownDescription": "**`{language, locale}`**"
             }
           ],
@@ -1890,10 +1863,7 @@
         },
         "mode": {
           "type": "string",
-          "enum": [
-            "base",
-            "notification"
-          ],
+          "enum": ["base", "notification"],
           "markdownDescription": "**`'base' | 'notification'`**"
         }
       },
@@ -1902,9 +1872,7 @@
     "AnalyticsMetrikaConfig": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "id"
-      ],
+      "required": ["id"],
       "properties": {
         "id": {
           "type": "integer",
@@ -1915,10 +1883,7 @@
           "additionalProperties": false,
           "properties": {
             "accurateTrackBounce": {
-              "type": [
-                "boolean",
-                "number"
-              ]
+              "type": ["boolean", "number"]
             },
             "childIframe": {
               "type": "boolean",
