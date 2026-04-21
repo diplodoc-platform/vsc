@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0 (2026-04-21)
+
+## What's Changed
+* feat: added init by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/43
+
+
+**Full Changelog**: https://github.com/diplodoc-platform/vsc/compare/v0.2.3...v0.3.0
+
 ## 0.2.3 (2026-04-21)
 
 ## What's Changed
