@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.3 (2026-04-21)
+
+## What's Changed
+* fix: fixed validation by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/40
+
+
+**Full Changelog**: https://github.com/diplodoc-platform/vsc/compare/v0.2.2...v0.2.3
+
 ## 0.2.2 (2026-04-13)
 
 ## What's Changed
