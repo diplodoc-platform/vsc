@@ -4,10 +4,11 @@ import {MdEditor} from './modules/md-editor/editor';
 import {Sidebar} from './modules/main/sidebar';
 import * as validation from './modules/validation';
 import {TocEditor} from './modules/toc-editor/editor';
-import {insertElement} from './utils';
+import {insertNote, insertTable, openMdEditor, openTocEditor} from './commands';
 
 export function activate(context: vscode.ExtensionContext) {
     validation.activate(context);
+
     const mdEditor = new MdEditor(context.extensionUri);
     const tocEditor = new TocEditor(context.extensionUri);
     const sidebar = new Sidebar(context.extensionUri, mdEditor, tocEditor);
@@ -17,56 +18,19 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('diplodoc.openMdEditor', () => {
-            const editor = vscode.window.activeTextEditor;
-
-            if (!editor || editor.document.languageId !== 'markdown') {
-                return;
-            }
-
-            mdEditor.show();
-            mdEditor.syncFromEditor(editor);
-        }),
+        vscode.commands.registerCommand('diplodoc.openMdEditor', () => openMdEditor(mdEditor)),
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('diplodoc.openTocEditor', () => {
-            const editor = vscode.window.activeTextEditor;
-
-            if (!editor || editor.document.fileName === 'toc.yaml') {
-                return;
-            }
-
-            tocEditor.show();
-            tocEditor.syncFromEditor(editor);
-        }),
+        vscode.commands.registerCommand('diplodoc.openTocEditor', () => openTocEditor(tocEditor)),
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('diplodoc.insertTable', () => {
-            const activeEditor = vscode.window.activeTextEditor;
-            if (activeEditor && activeEditor.document.languageId === 'markdown') {
-                const position = activeEditor.selection.active;
-
-                activeEditor.edit((editBuilder) => {
-                    editBuilder.insert(position, insertElement('table'));
-                });
-            }
-        }),
+        vscode.commands.registerCommand('diplodoc.insertTable', () => insertTable()),
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('diplodoc.insertNote', () => {
-            const activeEditor = vscode.window.activeTextEditor;
-
-            if (activeEditor && activeEditor.document.languageId === 'markdown') {
-                const position = activeEditor.selection.active;
-
-                activeEditor.edit((editBuilder) => {
-                    editBuilder.insert(position, insertElement('note'));
-                });
-            }
-        }),
+        vscode.commands.registerCommand('diplodoc.insertNote', () => insertNote()),
     );
 
     context.subscriptions.push(
@@ -88,6 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.workspace.onDidChangeTextDocument((event) => {
             const activeEditor = vscode.window.activeTextEditor;
+
             if (
                 activeEditor &&
                 event.document === activeEditor.document &&

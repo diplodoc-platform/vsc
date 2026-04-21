@@ -39,11 +39,15 @@ export function Sidebar() {
         vscodeApi.postMessage({command: 'openFile', file});
     };
 
+    const handleInitClick = () => {
+        vscodeApi.postMessage({command: 'initProject'});
+    };
+
     return (
         <div className={styles.sidebar}>
             <Search fileName={fileName} setFileName={setFileName} />
             <FilesList fileName={fileName} files={files} onFileClick={handleFileClick} />
-            <Button size="l" view="action" className={styles.initButton}>
+            <Button size="l" view="action" className={styles.initButton} onClick={handleInitClick}>
                 {t('sidebar.init')}
             </Button>
         </div>

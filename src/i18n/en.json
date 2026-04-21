@@ -1,11 +1,15 @@
 {
-    "sidebar": {
-        "welcome": "Welcome to Diplodoc",
-        "search_placeholder": "Find file...",
-        "empty_placeholder": "Files not found",
-        "init": "Init empty project"
-    },
-    "editor": {
-        "error": "Editor error"
-    }
+  "sidebar": {
+    "welcome": "Welcome to Diplodoc",
+    "search_placeholder": "Find file...",
+    "empty_placeholder": "Files not found",
+    "init": "Init empty project",
+    "no_folder_found": "No workspace folder found",
+    "install_yfm": "Install yfm with `npm i @diplodoc/cli -g`. Do this?"
+  },
+  "editor": {
+    "error": "Editor error"
+  },
+  "yes": "Yes",
+  "no": "No"
 }
