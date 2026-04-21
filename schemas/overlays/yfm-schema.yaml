@@ -13,43 +13,43 @@ markdownDescription: >-
   ```
 properties:
   input:
-    markdownDescription: "**`string`** Path to the directory containing documentation sources (`.md` files, `toc.yaml`, `presets.yaml`, etc.)."
+    markdownDescription: '**`string`** Path to the directory containing documentation sources (`.md` files, `toc.yaml`, `presets.yaml`, etc.).'
   output:
-    markdownDescription: "**`string`** Path to the directory where build artifacts are written."
+    markdownDescription: '**`string`** Path to the directory where build artifacts are written.'
   quiet:
-    markdownDescription: "**`boolean`** Suppress all stdout log output during the build."
+    markdownDescription: '**`boolean`** Suppress all stdout log output during the build.'
   strict:
-    markdownDescription: "**`boolean`** Exit with a non-zero code if any errors **or warnings** are emitted during the build."
+    markdownDescription: '**`boolean`** Exit with a non-zero code if any errors **or warnings** are emitted during the build.'
   jobs:
     markdownDescription: "**`integer (≥0)`** Number of parallel worker threads.\n\n- `0` — single-threaded (no workers)\n- omitted — uses `CPU count − 1`"
   workerMaxOldSpace:
-    markdownDescription: "**`integer`** Maximum V8 old-space heap size (in **megabytes**) for each worker thread."
+    markdownDescription: '**`integer`** Maximum V8 old-space heap size (in **megabytes**) for each worker thread.'
   config:
-    markdownDescription: "**`string`** Path to an alternative config file. Useful for environment-specific overrides."
+    markdownDescription: '**`string`** Path to an alternative config file. Useful for environment-specific overrides.'
   copyOnWrite:
-    markdownDescription: "**`boolean`** Use `COPYFILE_FICLONE` (copy-on-write / reflinks) when copying files. Faster on supported filesystems (APFS, Btrfs)."
+    markdownDescription: '**`boolean`** Use `COPYFILE_FICLONE` (copy-on-write / reflinks) when copying files. Faster on supported filesystems (APFS, Btrfs).'
   originAsInput:
-    markdownDescription: "**`boolean`** Allow the build to modify the `input` directory in-place (used in `md` output mode)."
+    markdownDescription: '**`boolean`** Allow the build to modify the `input` directory in-place (used in `md` output mode).'
   lang:
-    markdownDescription: "**`string`** Default language code for the documentation (ISO 639-1, e.g. `en`, `ru`)."
+    markdownDescription: '**`string`** Default language code for the documentation (ISO 639-1, e.g. `en`, `ru`).'
   langs:
     markdownDescription: "**`LangItem[]`** All languages supported by the project. Used to generate language-switcher links.\n\nEach item is a language code string or an extended object:\n```yaml\nlangs:\n  - en\n  - ru\n  - lang: zh\n    tld: .cn\n```"
   outputFormat:
     markdownDescription: "**`'html' | 'md'`** Output format for the build."
     markdownEnumDescriptions:
-      - "**html** — render to a fully static HTML site (default)."
-      - "**md** — render to enriched Markdown with injected metadata (for further processing or translation)."
+      - '**html** — render to a fully static HTML site (default).'
+      - '**md** — render to enriched Markdown with injected metadata (for further processing or translation).'
   varsPreset:
     markdownDescription: "**`string`** Name of a preset from `presets.yaml` to activate.\n\nThe named preset is deep-merged with the `default` preset."
   vars:
     markdownDescription: "**`object`** Template variables passed directly to the build. Overrides matching keys from `presets.yaml`.\n\n```yaml\nvars:\n  version: '2.0'\n  env: production\n```"
   allowHTML:
-    markdownDescription: "**`boolean`** *(legacy alias)* Allow raw HTML inside Markdown files. Prefer `allowHtml`."
-    deprecationMessage: "Deprecated: use allowHtml instead."
+    markdownDescription: '**`boolean`** *(legacy alias)* Allow raw HTML inside Markdown files. Prefer `allowHtml`.'
+    deprecationMessage: 'Deprecated: use allowHtml instead.'
   allowHtml:
-    markdownDescription: "**`boolean`** Allow raw HTML tags inside Markdown files. When `false` (default), HTML tags are escaped."
+    markdownDescription: '**`boolean`** Allow raw HTML tags inside Markdown files. When `false` (default), HTML tags are escaped.'
   sanitizeHtml:
-    markdownDescription: "**`boolean`** Run the generated HTML through an HTML sanitizer. Slower but removes potentially dangerous markup."
+    markdownDescription: '**`boolean`** Run the generated HTML through an HTML sanitizer. Slower but removes potentially dangerous markup.'
   sanitizeOptions:
     markdownDescription: "**`object`** Options passed to the HTML sanitizer (when `sanitizeHtml: true`). See the sanitizer's documentation for available keys."
   linkifyTlds:
@@ -60,42 +60,42 @@ properties:
     markdownDescription: "**`string[]`** TOC `stage` values to exclude from the build.\n\nExample: `['new', 'preview']` — only ship stable pages."
     items:
       markdownEnumDescriptions:
-        - "Exclude pages tagged `new`."
-        - "Exclude pages tagged `preview`."
-        - "Exclude pages tagged `tech-preview`."
-        - "Exclude pages tagged `skip` (already excluded by default)."
+        - 'Exclude pages tagged `new`.'
+        - 'Exclude pages tagged `preview`.'
+        - 'Exclude pages tagged `tech-preview`.'
+        - 'Exclude pages tagged `skip` (already excluded by default).'
   staticContent:
-    markdownDescription: "**`boolean`** Allow custom resources (`script`, `style`) to be injected in static output mode."
+    markdownDescription: '**`boolean`** Allow custom resources (`script`, `style`) to be injected in static output mode.'
   addSystemMeta:
     markdownDescription: "**`boolean`** Inject preset variables into each page's `__system` metadata field."
   addAlternateMeta:
-    markdownDescription: "**`boolean`** Emit `<link rel=\"alternate\">` and `<link rel=\"canonical\">` meta tags."
+    markdownDescription: '**`boolean`** Emit `<link rel="alternate">` and `<link rel="canonical">` meta tags.'
   supportGithubAnchors:
-    markdownDescription: "**`boolean`** Generate GitHub-compatible heading anchors (lowercase, hyphens) in addition to standard anchors."
+    markdownDescription: '**`boolean`** Generate GitHub-compatible heading anchors (lowercase, hyphens) in addition to standard anchors.'
   breaks:
     markdownDescription: "**`boolean`** Treat single newlines in Markdown as `<br>` hard line breaks (CommonMark 'breaks' option)."
   linkify:
-    markdownDescription: "**`boolean`** Automatically convert plain URL-like text into clickable `<a>` links."
+    markdownDescription: '**`boolean`** Automatically convert plain URL-like text into clickable `<a>` links.'
   vcs:
     markdownDescription: "**`boolean | object`** Version control system connector.\n\n- `false` — disable VCS integration\n- `true` — enable with defaults\n- Object — explicit settings:\n  - `enabled` **`boolean`**\n  - `endpoint` **`string`** — API endpoint URL\n  - `owner` **`string`** — repository owner (GitHub)\n  - `repo` **`string`** — repository name (GitHub)\n  - `branch` **`string`** — default branch\n  - `initialCommit` **`string`** — SHA for redirect tracking\n  - `scopes` **`string[]`** — VCS scopes (Arcadia)"
     defaultSnippets:
       - label: GitHub VCS config
         body:
           enabled: true
-          endpoint: "${1:https://api.github.com}"
-          owner: "${2:my-org}"
-          repo: "${3:my-repo}"
-          branch: "${4:main}"
+          endpoint: '${1:https://api.github.com}'
+          owner: '${2:my-org}'
+          repo: '${3:my-repo}'
+          branch: '${4:main}'
   vcsToken:
     markdownDescription: "**`string`** ⚠️ VCS access token.\n\n> **WARNING:** Do not store secrets in the config file. Use environment variables or CLI `--vcs-token` argument instead."
   vcsPath:
-    markdownDescription: "**`boolean | {enabled: boolean}`** Show the VCS file path (\"Edit on GitHub\" link) in the page header."
+    markdownDescription: '**`boolean | {enabled: boolean}`** Show the VCS file path ("Edit on GitHub" link) in the page header.'
   mtimes:
-    markdownDescription: "**`boolean | {enabled: boolean}`** Collect file modification timestamps from VCS for the \"Last updated\" footer."
+    markdownDescription: '**`boolean | {enabled: boolean}`** Collect file modification timestamps from VCS for the "Last updated" footer.'
   authors:
-    markdownDescription: "**`boolean | object`** Collect per-file author information from VCS commit history."
+    markdownDescription: '**`boolean | object`** Collect per-file author information from VCS commit history.'
   contributors:
-    markdownDescription: "**`boolean | object`** Collect per-file contributor list from VCS commit history."
+    markdownDescription: '**`boolean | object`** Collect per-file contributor list from VCS commit history.'
   template:
     markdownDescription: "**`boolean | TemplateConfig`** Configure the Liquid template engine.\n\n- `false` — disable templating entirely\n- Object — fine-grained control over features and scopes"
     defaultSnippets:
@@ -115,7 +115,7 @@ properties:
       - label: Lint with config file
         body:
           enabled: true
-          config: "${1:.yfmlint}"
+          config: '${1:.yfmlint}'
   extensions:
     markdownDescription: "**`ExtensionItem[]`** External extensions loaded at build startup.\n\nEach item is an npm package name or an object with `name` and options:\n```yaml\nextensions:\n  - '@diplodoc/openapi-extension'\n  - name: my-extension\n    option: value\n```"
   interface:
@@ -123,21 +123,21 @@ properties:
     markdownDescription: "**`object`** Global UI visibility flags. Per-page `interface` frontmatter overrides these values.\n\nAvailable fields:\n- `toc` — show/hide the sidebar\n- `toc-header` — show/hide the TOC header section\n- `search` — show/hide the search input\n- `feedback` — show/hide like/dislike controls\n- `favicon-src` — custom favicon URL"
     properties:
       toc:
-        markdownDescription: "**`boolean`** Show (`true`) or hide (`false`) the table-of-contents sidebar globally."
+        markdownDescription: '**`boolean`** Show (`true`) or hide (`false`) the table-of-contents sidebar globally.'
       toc-header:
-        markdownDescription: "**`boolean`** Show (`true`) or hide (`false`) the TOC header section globally."
+        markdownDescription: '**`boolean`** Show (`true`) or hide (`false`) the TOC header section globally.'
       search:
-        markdownDescription: "**`boolean`** Show (`true`) or hide (`false`) the search input globally."
+        markdownDescription: '**`boolean`** Show (`true`) or hide (`false`) the search input globally.'
       feedback:
-        markdownDescription: "**`boolean`** Show (`true`) or hide (`false`) the like/dislike feedback widget globally."
+        markdownDescription: '**`boolean`** Show (`true`) or hide (`false`) the like/dislike feedback widget globally.'
       favicon-src:
-        markdownDescription: "**`string`** Default favicon URL for all pages."
+        markdownDescription: '**`string`** Default favicon URL for all pages.'
   feedbackUrl:
-    markdownDescription: "**`string (uri)`** URL endpoint that receives feedback submissions (POST). Used by the feedback widget."
+    markdownDescription: '**`string (uri)`** URL endpoint that receives feedback submissions (POST). Used by the feedback widget.'
   resources:
     markdownDescription: "**`Resources`** Custom scripts, stylesheets, and CSP directives injected into every page.\n\n```yaml\nresources:\n  style:\n    - _assets/custom.css\n  script:\n    - _assets/custom.js\n```"
   allowCustomResources:
-    markdownDescription: "**`boolean`** Allow the `resources` field to inject scripts/styles in static output mode."
+    markdownDescription: '**`boolean`** Allow the `resources` field to inject scripts/styles in static output mode.'
   disableCsp:
     markdownDescription: "**`boolean`** Do **not** inject `Content-Security-Policy` `<meta>` tags into the HTML output.\n\nUse this when CSP is managed via HTTP headers on the server."
   theme:
@@ -153,61 +153,61 @@ properties:
         body:
           enabled: true
           provider: algolia
-          appId: "${1:YOUR_APP_ID}"
-          apiKey: "${2:YOUR_API_KEY}"
-          indexName: "${3:my-docs}"
+          appId: '${1:YOUR_APP_ID}'
+          apiKey: '${2:YOUR_API_KEY}'
+          indexName: '${3:my-docs}'
   singlePage:
-    markdownDescription: "**`boolean`** Generate a single-page HTML variant for each TOC that concatenates all pages."
+    markdownDescription: '**`boolean`** Generate a single-page HTML variant for each TOC that concatenates all pages.'
   pdf:
     markdownDescription: "**`boolean | object`** PDF output generation.\n\n- `false` — disable\n- `true` — enable with defaults\n- Object — enable with `hiddenPolicy`"
   pdfDebug:
-    markdownDescription: "**`boolean`** Include PDF start/end pages in the HTML output for debugging page breaks."
+    markdownDescription: '**`boolean`** Include PDF start/end pages in the HTML output for debugging page breaks.'
   preprocess:
     markdownDescription: "**`object`** Markdown preprocessing flags for `md` output format only.\n\n- `hashIncludes` **`boolean`** — replace include paths with content hashes\n- `mergeIncludes` **`boolean`** — inline `{% include %}` directives\n- `mergeAutotitles` **`boolean`** — merge auto-generated heading anchors\n- `mergeSvg` **`boolean`** — inline SVG `<img>` as `<svg>` blocks\n- `disableMetaMaxLineWidth` **`boolean`** — disable metadata line-width limit"
     properties:
       hashIncludes:
-        markdownDescription: "**`boolean`** Replace included file paths with content hashes."
+        markdownDescription: '**`boolean`** Replace included file paths with content hashes.'
       mergeIncludes:
-        markdownDescription: "**`boolean`** Inline `{% include %}` directives — merge the included content into the parent file."
+        markdownDescription: '**`boolean`** Inline `{% include %}` directives — merge the included content into the parent file.'
       mergeAutotitles:
-        markdownDescription: "**`boolean`** Merge auto-generated heading anchors."
+        markdownDescription: '**`boolean`** Merge auto-generated heading anchors.'
       mergeSvg:
-        markdownDescription: "**`boolean`** Inline SVG `<img>` references as `<svg>` blocks."
+        markdownDescription: '**`boolean`** Inline SVG `<img>` references as `<svg>` blocks.'
       disableMetaMaxLineWidth:
-        markdownDescription: "**`boolean`** Disable the maximum line-width limit on metadata output."
+        markdownDescription: '**`boolean`** Disable the maximum line-width limit on metadata output.'
   mergeIncludes:
-    markdownDescription: "**`boolean`** Shorthand for `preprocess.mergeIncludes: true`."
+    markdownDescription: '**`boolean`** Shorthand for `preprocess.mergeIncludes: true`.'
   content:
     markdownDescription: "**`object`** Content size limits and processing options.\n\n- `maxInlineSvgSize` **`string | integer`** — max SVG size for inline embedding\n- `maxHtmlSize` **`string | integer`** — max rendered HTML page size\n- `maxAssetSize` **`string | integer`** — max asset file size (`0` = no limit)\n- `multilineTermDefinitions` **`boolean`** — allow multi-line term definitions"
     defaultSnippets:
       - label: Set content size limits
         body:
-          maxInlineSvgSize: "${1:10K}"
-          maxHtmlSize: "${2:1M}"
-          maxAssetSize: "${3:5M}"
+          maxInlineSvgSize: '${1:10K}'
+          maxHtmlSize: '${2:1M}'
+          maxAssetSize: '${3:5M}'
     properties:
       maxInlineSvgSize:
         markdownDescription: "**`string | integer`** Maximum SVG file size for inline embedding.\n\nFormat: `'100K'`, `'2M'`, or bytes as integer. Larger files are kept as `<img>` references."
       maxHtmlSize:
-        markdownDescription: "**`string | integer`** Maximum rendered HTML file size. Build warns if a page exceeds this limit."
+        markdownDescription: '**`string | integer`** Maximum rendered HTML file size. Build warns if a page exceeds this limit.'
       maxAssetSize:
-        markdownDescription: "**`string | integer`** Maximum single asset file size. `0` disables the check."
+        markdownDescription: '**`string | integer`** Maximum single asset file size. `0` disables the check.'
       multilineTermDefinitions:
-        markdownDescription: "**`boolean`** Allow term definitions (`[*key]: ...`) to span multiple lines. Default: `false`."
+        markdownDescription: '**`boolean`** Allow term definitions (`[*key]: ...`) to span multiple lines. Default: `false`.'
   removeHiddenTocItems:
-    markdownDescription: "**`boolean`** Strip `hidden: true` items from the compiled TOC JSON."
+    markdownDescription: '**`boolean`** Strip `hidden: true` items from the compiled TOC JSON.'
   removeEmptyTocItems:
-    markdownDescription: "**`boolean`** Strip TOC sections that have no visible child pages after filtering."
+    markdownDescription: '**`boolean`** Strip TOC sections that have no visible child pages after filtering.'
   buildManifest:
-    markdownDescription: "**`boolean`** Emit `yfm-build-manifest.json` listing all built page paths."
+    markdownDescription: '**`boolean`** Emit `yfm-build-manifest.json` listing all built page paths.'
   crawlerManifest:
-    markdownDescription: "**`boolean`** Emit `crawler-manifest.json` mapping each source file to its external links. Useful for link-health checks (404/403 detection)."
+    markdownDescription: '**`boolean`** Emit `crawler-manifest.json` mapping each source file to its external links. Useful for link-health checks (404/403 detection).'
   changelogs:
-    markdownDescription: "**`boolean | string`** Enable changelog generation. String value selects the output format."
+    markdownDescription: '**`boolean | string`** Enable changelog generation. String value selects the output format.'
   watch:
-    markdownDescription: "**`boolean`** Enable file-watching mode with incremental rebuilds on change."
+    markdownDescription: '**`boolean`** Enable file-watching mode with incremental rebuilds on change.'
   skipHtmlExtension:
-    markdownDescription: "**`boolean`** Remove `.html` extension from all generated internal links."
+    markdownDescription: '**`boolean`** Remove `.html` extension from all generated internal links.'
   analytics:
     markdownDescription: "**`object`** Web analytics configuration.\n\n- `gtm` **`object`** — Google Tag Manager (`id: string`, `mode: 'base' | 'notification'`)"
     properties:
@@ -215,14 +215,14 @@ properties:
         markdownDescription: "**`object`** Google Tag Manager settings.\n\n- `id` **`string`** — GTM container ID (e.g. `GTM-XXXXXX`)\n- `mode` **`'base' | 'notification'`** — consent mode"
         properties:
           id:
-            markdownDescription: "**`string`** GTM container ID (e.g. `GTM-XXXXXX`)."
+            markdownDescription: '**`string`** GTM container ID (e.g. `GTM-XXXXXX`).'
           mode:
             markdownDescription: "**`'base' | 'notification'`** GTM consent mode."
             markdownEnumDescriptions:
-              - "Base consent mode — basic analytics."
-              - "Notification consent mode — additional consent signals."
+              - 'Base consent mode — basic analytics.'
+              - 'Notification consent mode — additional consent signals.'
   neuroExpert:
-    markdownDescription: "**`NeuroExpertConfig`** AI expert widget global configuration.\n\n- `projectId` **`object`** — language → project ID map\n- `hasOutsideClick` **`boolean`** — close on outside click\n- `parentId` **`string | null`** — parent element ID\n- `disabled` **`boolean`** — disable widget globally\n- `customLabel` **`object`** — language → custom header label map"
+    markdownDescription: "**`NeuroExpertConfig`** AI expert widget global configuration.\n\n- `projectId` **`object`** — language → project ID map\n- `hasOutsideClick` **`boolean`** — close on outside click\n- `parentId` **`string | null`** — parent element ID\n- `disabled` **`boolean`** — disable widget globally\n- `customLabel` **`object`** — language → custom header label map\n- `type` **`'default' | 'search'`** — widget integration type"
   yabug:
     markdownDescription: "**`YaBugConfig`** Bug-report widget (docs-viewer) global configuration.\n\n- `disabled` **`boolean`** — disable widget globally\n- `form` **`string`** — custom bug-report form URL or path"
   yafeedback:
@@ -232,9 +232,9 @@ properties:
     defaultSnippets:
       - label: Docs viewer config
         body:
-          project-name: "${1:my-project}"
-          lang: "${2:en}"
-          langs: ["${3:en}"]
+          project-name: '${1:my-project}'
+          lang: '${2:en}'
+          langs: ['${3:en}']
   pages:
     markdownDescription: "**`object`** Custom error and access-denied page configuration.\n\n- `accessDenied` **`object`** — custom 403 page settings\n- `notFound` **`object`** — custom 404 page settings\n- `serverError` **`object`** — custom 500 page settings"
     properties:
@@ -245,55 +245,55 @@ properties:
       serverError:
         markdownDescription: "**`object`** Custom 500 server-error page settings (passed to the viewer's page renderer)."
   queryParameters:
-    markdownDescription: "**`object`** Global query parameter forwarding rules for `<iframe>` embeds."
+    markdownDescription: '**`object`** Global query parameter forwarding rules for `<iframe>` embeds.'
   build:
-    markdownDescription: "**`object`** Scoped overrides applied only during the `build` command. Accepts the same properties as the root level."
+    markdownDescription: '**`object`** Scoped overrides applied only during the `build` command. Accepts the same properties as the root level.'
   publish:
-    markdownDescription: "**`PublishConfig`** Configuration for the `publish` command (S3-compatible storage)."
+    markdownDescription: '**`PublishConfig`** Configuration for the `publish` command (S3-compatible storage).'
     defaultSnippets:
       - label: Publish to S3
         body:
-          endpoint: "${1:https://storage.example.com}"
-          bucket: "${2:my-docs}"
-          prefix: "${3:docs/}"
+          endpoint: '${1:https://storage.example.com}'
+          bucket: '${2:my-docs}'
+          prefix: '${3:docs/}'
   translate:
-    markdownDescription: "**`TranslateConfig`** Configuration for the `translate` command."
+    markdownDescription: '**`TranslateConfig`** Configuration for the `translate` command.'
   # ── Deprecated ─────────────────────────────────────────────────────────
   disableLiquid:
-    markdownDescription: "**`boolean`** *(deprecated)* Disable the Liquid template engine."
-    deprecationMessage: "Deprecated: use template.enabled: false instead."
+    markdownDescription: '**`boolean`** *(deprecated)* Disable the Liquid template engine.'
+    deprecationMessage: 'Deprecated: use template.enabled: false instead.'
     doNotSuggest: true
   applyPresets:
-    markdownDescription: "**`boolean`** *(deprecated)* Apply preset variable substitutions."
-    deprecationMessage: "Deprecated: use template.features.substitutions instead."
+    markdownDescription: '**`boolean`** *(deprecated)* Apply preset variable substitutions.'
+    deprecationMessage: 'Deprecated: use template.features.substitutions instead.'
     doNotSuggest: true
   resolveConditions:
-    markdownDescription: "**`boolean`** *(deprecated)* Resolve Liquid conditions during build."
-    deprecationMessage: "Deprecated: use template.features.conditions instead."
+    markdownDescription: '**`boolean`** *(deprecated)* Resolve Liquid conditions during build.'
+    deprecationMessage: 'Deprecated: use template.features.conditions instead.'
     doNotSuggest: true
   conditionsInCode:
-    markdownDescription: "**`boolean`** *(deprecated)* Process Liquid conditions inside code blocks."
-    deprecationMessage: "Deprecated: use template.scopes.code instead."
+    markdownDescription: '**`boolean`** *(deprecated)* Process Liquid conditions inside code blocks.'
+    deprecationMessage: 'Deprecated: use template.scopes.code instead.'
     doNotSuggest: true
   lintDisabled:
-    markdownDescription: "**`boolean`** *(deprecated)* Disable linting."
-    deprecationMessage: "Deprecated: use lint.enabled: false instead."
+    markdownDescription: '**`boolean`** *(deprecated)* Disable linting.'
+    deprecationMessage: 'Deprecated: use lint.enabled: false instead.'
     doNotSuggest: true
   needToSanitizeHtml:
-    markdownDescription: "**`boolean`** *(deprecated)* Sanitize HTML output."
-    deprecationMessage: "Deprecated: use sanitizeHtml instead."
+    markdownDescription: '**`boolean`** *(deprecated)* Sanitize HTML output.'
+    deprecationMessage: 'Deprecated: use sanitizeHtml instead.'
     doNotSuggest: true
   addMapFile:
-    markdownDescription: "**`boolean`** *(deprecated)* Write all documentation paths to `file.json`."
-    deprecationMessage: "Deprecated: use buildManifest instead."
+    markdownDescription: '**`boolean`** *(deprecated)* Write all documentation paths to `file.json`.'
+    deprecationMessage: 'Deprecated: use buildManifest instead.'
     doNotSuggest: true
 
 definitions:
   Toggleable:
     description: Boolean or object with an enabled flag.
-    markdownDescription: "**`boolean | {enabled: boolean}`** Simple toggle — either `true`/`false` or an object with `enabled: true/false`."
+    markdownDescription: '**`boolean | {enabled: boolean}`** Simple toggle — either `true`/`false` or an object with `enabled: true/false`.'
   FileSize:
-    description: "File size — integer bytes or string with K/M suffix."
+    description: 'File size — integer bytes or string with K/M suffix.'
     markdownDescription: "**`string | integer`** File size value.\n\n- String with suffix: `'512K'`, `'10M'`\n- Integer: bytes (`1048576` = 1 MB)"
   LangItem:
     description: Language code or extended language object.
@@ -303,144 +303,146 @@ definitions:
     markdownDescription: "**`string | {name, ...}`** Extension item.\n\n- String: npm package name\n- Object: `{name: 'package-name', option: value}`"
   Resources:
     description: Custom scripts, stylesheets, and CSP directives.
-    markdownDescription: "**`Resources`** Custom assets injected into every page."
+    markdownDescription: '**`Resources`** Custom assets injected into every page.'
     properties:
       script:
-        markdownDescription: "**`string[]`** Paths or URLs to JavaScript files (relative to `input`)."
+        markdownDescription: '**`string[]`** Paths or URLs to JavaScript files (relative to `input`).'
       style:
-        markdownDescription: "**`string[]`** Paths or URLs to CSS files (relative to `input`)."
+        markdownDescription: '**`string[]`** Paths or URLs to CSS files (relative to `input`).'
       csp:
-        markdownDescription: "**`object[]`** Content Security Policy directive overrides. Each item maps a directive (e.g. `script-src`) to allowed sources."
+        markdownDescription: '**`object[]`** Content Security Policy directive overrides. Each item maps a directive (e.g. `script-src`) to allowed sources.'
   TemplateConfig:
-    description: "Liquid template engine config. Fields: enabled, keepNotVar, legacyConditions, scopes (text, code), features (substitutions, conditions, cycles)."
+    description: 'Liquid template engine config. Fields: enabled, keepNotVar, legacyConditions, scopes (text, code), features (substitutions, conditions, cycles).'
     markdownDescription: "**`TemplateConfig`** Liquid template engine settings.\n\n- `enabled` **`boolean`** — enable/disable\n- `keepNotVar` **`boolean`** — keep unresolved `{{ var }}` placeholders\n- `scopes` **`object`** — where to process: `text`, `code`\n- `features` **`object`** — what to process: `substitutions`, `conditions`, `cycles`"
     properties:
       enabled:
-        markdownDescription: "**`boolean`** Enable or disable the template engine."
+        markdownDescription: '**`boolean`** Enable or disable the template engine.'
       keepNotVar:
-        markdownDescription: "**`boolean`** Keep unresolved `{{ variable }}` placeholders as-is instead of removing them."
+        markdownDescription: '**`boolean`** Keep unresolved `{{ variable }}` placeholders as-is instead of removing them.'
       legacyConditions:
-        markdownDescription: "**`boolean`** Use legacy Liquid condition syntax (for backwards compatibility)."
+        markdownDescription: '**`boolean`** Use legacy Liquid condition syntax (for backwards compatibility).'
       scopes:
         markdownDescription: "**`object`** Where to process Liquid expressions.\n\n- `text` **`boolean`** — process in regular text\n- `code` **`boolean`** — process inside code blocks"
         properties:
           text:
-            markdownDescription: "**`boolean`** Process Liquid expressions in regular text content."
+            markdownDescription: '**`boolean`** Process Liquid expressions in regular text content.'
           code:
-            markdownDescription: "**`boolean`** Process Liquid expressions inside code blocks (backtick or fenced)."
+            markdownDescription: '**`boolean`** Process Liquid expressions inside code blocks (backtick or fenced).'
       features:
         markdownDescription: "**`object`** Which Liquid features to enable.\n\n- `substitutions` **`boolean`** — `{{ var }}` variable substitution\n- `conditions` **`boolean | 'strict'`** — `{% if %}` blocks\n- `cycles` **`boolean`** — `{% for %}` loops"
         properties:
           substitutions:
-            markdownDescription: "**`boolean`** Enable `{{ var }}` variable substitution."
+            markdownDescription: '**`boolean`** Enable `{{ var }}` variable substitution.'
           conditions:
             markdownDescription: "**`boolean | 'strict'`** Enable `{% if %}` conditional blocks.\n\n`'strict'` mode is required by the `translate` command."
           cycles:
-            markdownDescription: "**`boolean`** Enable `{% for %}` loop constructs."
+            markdownDescription: '**`boolean`** Enable `{% for %}` loop constructs.'
   LintConfig:
     description: YFM linter configuration.
-    markdownDescription: "**`LintConfig`** YFM linter configuration."
+    markdownDescription: '**`LintConfig`** YFM linter configuration.'
     properties:
       enabled:
-        markdownDescription: "**`boolean`** Enable or disable linting during the build."
+        markdownDescription: '**`boolean`** Enable or disable linting during the build.'
       config:
         markdownDescription: "**`string | object`** Lint configuration.\n\n- String — path to a `.yfmlint` file\n- Object — inline rule configuration (same format as `.yfmlint`)"
   SearchConfig:
-    description: "Search config. Fields: enabled, provider (local|algolia), tolerance (0-2), confidence (phrased|sparsed), and Algolia-specific fields."
+    description: 'Search config. Fields: enabled, provider (local|algolia), tolerance (0-2), confidence (phrased|sparsed), and Algolia-specific fields.'
     markdownDescription: "**`SearchConfig`** Documentation search configuration.\n\n- `enabled` **`boolean`** — enable/disable search\n- `provider` **`'local' | 'algolia'`** — search backend\n- `tolerance` **`0 | 1 | 2`** — wildcard tolerance (local only)\n- `confidence` **`'phrased' | 'sparsed'`** — scoring strategy (local only)\n- `appId` / `apiKey` / `indexName` — Algolia credentials"
     properties:
       enabled:
-        markdownDescription: "**`boolean`** Enable or disable the search feature."
+        markdownDescription: '**`boolean`** Enable or disable the search feature.'
       provider:
         markdownDescription: "**`'local' | 'algolia'`** Search provider."
         markdownEnumDescriptions:
-          - "**local** — full-text search index generated at build time. No external service required."
-          - "**algolia** — Algolia DocSearch or custom index. Requires `appId`, `apiKey`, `indexName`."
+          - '**local** — full-text search index generated at build time. No external service required.'
+          - '**algolia** — Algolia DocSearch or custom index. Requires `appId`, `apiKey`, `indexName`.'
       tolerance:
         markdownDescription: "**`0 | 1 | 2`** Wildcard tolerance for local search.\n\n- `0` — exact match only\n- `1` — trailing wildcard\n- `2` — leading and trailing wildcard"
       confidence:
         markdownDescription: "**`'phrased' | 'sparsed'`** Search scoring strategy for local provider.\n\n- `phrased` — prefer exact phrase matches\n- `sparsed` — allow sparse word matches"
       indexSettings:
-        markdownDescription: "**`object`** Algolia index settings passed to `setSettings`. Supports `searchableAttributes`, `attributesToHighlight`, etc."
+        markdownDescription: '**`object`** Algolia index settings passed to `setSettings`. Supports `searchableAttributes`, `attributesToHighlight`, etc.'
       querySettings:
-        markdownDescription: "**`object`** Algolia query settings merged into each search request. Supports `hitsPerPage`, `attributesToRetrieve`, etc."
+        markdownDescription: '**`object`** Algolia query settings merged into each search request. Supports `hitsPerPage`, `attributesToRetrieve`, etc.'
   PublishConfig:
-    description: "S3 publish config. Fields: endpoint, bucket, prefix, region, accessKeyId, secretAccessKey, hidden."
+    description: 'S3 publish config. Fields: endpoint, bucket, prefix, region, accessKeyId, secretAccessKey, hidden.'
     markdownDescription: "**`PublishConfig`** S3-compatible storage upload configuration.\n\n- `endpoint` **`string`** — storage endpoint URL\n- `bucket` **`string`** — target bucket name\n- `prefix` **`string`** — key prefix (e.g. `docs/v2/`)\n- `region` **`string`** — storage region\n- `accessKeyId` / `secretAccessKey` **`string`** ⚠️ credentials — use env vars\n- `hidden` **`string[]`** — glob patterns to exclude from upload"
     properties:
       endpoint:
-        markdownDescription: "**`string (uri)`** S3-compatible storage endpoint URL."
+        markdownDescription: '**`string (uri)`** S3-compatible storage endpoint URL.'
       bucket:
-        markdownDescription: "**`string`** Target bucket name."
+        markdownDescription: '**`string`** Target bucket name.'
       prefix:
-        markdownDescription: "**`string`** Key prefix inside the bucket (e.g. `docs/v2/`)."
+        markdownDescription: '**`string`** Key prefix inside the bucket (e.g. `docs/v2/`).'
       region:
-        markdownDescription: "**`string`** Storage region (e.g. `us-east-1`)."
+        markdownDescription: '**`string`** Storage region (e.g. `us-east-1`).'
       accessKeyId:
-        markdownDescription: "**`string`** ⚠️ S3 access key ID. Do not commit secrets — use environment variables."
+        markdownDescription: '**`string`** ⚠️ S3 access key ID. Do not commit secrets — use environment variables.'
       secretAccessKey:
-        markdownDescription: "**`string`** ⚠️ S3 secret access key. Do not commit secrets — use environment variables."
+        markdownDescription: '**`string`** ⚠️ S3 secret access key. Do not commit secrets — use environment variables.'
       hidden:
-        markdownDescription: "**`string[]`** Glob patterns for files to exclude from upload."
+        markdownDescription: '**`string[]`** Glob patterns for files to exclude from upload.'
   NeuroExpertConfig:
-    description: "AI expert widget config. Fields: projectId, hasOutsideClick, parentId, disabled, customLabel."
-    markdownDescription: "**`NeuroExpertConfig`** AI expert (Yandex Neuro Expert) widget configuration.\n\n- `projectId` **`object`** — language → project ID map (use `default` as fallback key)\n- `hasOutsideClick` **`boolean`** — close widget on outside click\n- `parentId` **`string | null`** — parent element ID for placement\n- `disabled` **`boolean`** — disable the widget globally\n- `customLabel` **`object`** — language → custom header label map"
+    description: 'AI expert widget config. Fields: projectId, hasOutsideClick, parentId, disabled, customLabel, type.'
+    markdownDescription: "**`NeuroExpertConfig`** AI expert (Yandex Neuro Expert) widget configuration.\n\n- `projectId` **`object`** — language → project ID map (use `default` as fallback key)\n- `hasOutsideClick` **`boolean`** — close widget on outside click\n- `parentId` **`string | null`** — parent element ID for placement\n- `disabled` **`boolean`** — disable the widget globally\n- `customLabel` **`object`** — language → custom header label map\n- `type` **`'default' | 'search'`** — widget integration type"
     properties:
       projectId:
-        markdownDescription: "**`object`** Map of language codes to AI expert project IDs. Use `default` as fallback key."
+        markdownDescription: '**`object`** Map of language codes to AI expert project IDs. Use `default` as fallback key.'
       hasOutsideClick:
-        markdownDescription: "**`boolean`** Close the AI expert widget when the user clicks outside it."
+        markdownDescription: '**`boolean`** Close the AI expert widget when the user clicks outside it.'
       parentId:
-        markdownDescription: "**`string | null`** Parent element ID for widget placement. `null` uses the default placement."
+        markdownDescription: '**`string | null`** Parent element ID for widget placement. `null` uses the default placement.'
       disabled:
-        markdownDescription: "**`boolean`** Disable the AI expert widget globally."
+        markdownDescription: '**`boolean`** Disable the AI expert widget globally.'
       customLabel:
-        markdownDescription: "**`object`** Map of language codes to custom widget header labels. Use `default` as fallback key. Only available for whitelisted projects."
+        markdownDescription: '**`object`** Map of language codes to custom widget header labels. Use `default` as fallback key. Only available for whitelisted projects.'
+      type:
+        markdownDescription: "**`'default' | 'search'`** Widget integration type.\n\n- `default` — floating widget initialized on page load\n- `search` — widget activated via search suggest button"
   YaBugConfig:
-    description: "Bug-report widget config. Fields: disabled (boolean), form (string)."
+    description: 'Bug-report widget config. Fields: disabled (boolean), form (string).'
     markdownDescription: "**`YaBugConfig`** Bug-report widget (docs-viewer) configuration.\n\n- `disabled` **`boolean`** — disable the widget globally\n- `form` **`string`** — custom bug-report form URL or path"
     properties:
       disabled:
-        markdownDescription: "**`boolean`** Disable the bug-report widget globally."
+        markdownDescription: '**`boolean`** Disable the bug-report widget globally.'
       form:
-        markdownDescription: "**`string`** Custom bug-report form URL or path."
+        markdownDescription: '**`string`** Custom bug-report form URL or path.'
   YaFeedbackConfig:
-    description: "Yandex Feedback widget config. Fields: ownerId, hideHeader, disabled, testIds."
+    description: 'Yandex Feedback widget config. Fields: ownerId, hideHeader, disabled, testIds.'
     markdownDescription: "**`YaFeedbackConfig`** Yandex Feedback (Pythia) widget configuration.\n\n- `ownerId` **`string | object`** — feedback owner ID or language → ID map\n- `hideHeader` **`boolean`** — hide the widget header\n- `disabled` **`boolean`** — disable the widget globally\n- `testIds` **`object`** — A/B test form IDs"
     properties:
       ownerId:
-        markdownDescription: "**`string | object`** Pythia feedback survey owner ID. String for a single ID; object maps language codes to IDs."
+        markdownDescription: '**`string | object`** Pythia feedback survey owner ID. String for a single ID; object maps language codes to IDs.'
       hideHeader:
-        markdownDescription: "**`boolean`** Hide the feedback widget header section."
+        markdownDescription: '**`boolean`** Hide the feedback widget header section.'
       disabled:
-        markdownDescription: "**`boolean`** Disable the Yandex Feedback widget globally."
+        markdownDescription: '**`boolean`** Disable the Yandex Feedback widget globally.'
       testIds:
-        markdownDescription: "**`object`** A/B test form IDs for the feedback widget."
+        markdownDescription: '**`object`** A/B test form IDs for the feedback widget.'
   TranslateConfig:
-    description: "Translate command config. Fields: provider, source, target, files, include, exclude, vars, dryRun, useSource, and provider-specific fields."
+    description: 'Translate command config. Fields: provider, source, target, files, include, exclude, vars, dryRun, useSource, and provider-specific fields.'
     markdownDescription: "**`TranslateConfig`** Configuration for the `translate` command.\n\n- `provider` **`string`** — translation service identifier\n- `source` **`string | object`** — source language (`'en'` or `{language, locale?}`)\n- `target` **`string | string[]`** — target language(s)\n- `files` **`string[]`** — explicit file list\n- `include` / `exclude` **`string[]`** — glob filters\n- `dryRun` **`boolean`** — calculate quota without translating\n- `useSource` **`boolean`** — use original text as output (debug)"
     properties:
       provider:
-        markdownDescription: "**`string`** Translation service provider identifier."
+        markdownDescription: '**`string`** Translation service provider identifier.'
       source:
         markdownDescription: "**`string | object`** Source language.\n\n- String: ISO 639-1 code (`'en'`, `'ru'`)\n- Object: `{language: 'en', locale?: 'US'}`"
       target:
-        markdownDescription: "**`string | string[]`** Target language(s) to translate to."
+        markdownDescription: '**`string | string[]`** Target language(s) to translate to.'
       files:
-        markdownDescription: "**`string[]`** Explicit list of files or filter-lists to translate."
+        markdownDescription: '**`string[]`** Explicit list of files or filter-lists to translate.'
       include:
-        markdownDescription: "**`string[]`** Glob patterns or paths for files to include in translation."
+        markdownDescription: '**`string[]`** Glob patterns or paths for files to include in translation.'
       exclude:
-        markdownDescription: "**`string[]`** Glob patterns or paths for files to exclude from translation."
+        markdownDescription: '**`string[]`** Glob patterns or paths for files to exclude from translation.'
       vars:
-        markdownDescription: "**`object`** Variables passed to the translation pipeline (overrides presets)."
+        markdownDescription: '**`object`** Variables passed to the translation pipeline (overrides presets).'
       dryRun:
-        markdownDescription: "**`boolean`** Calculate translation quota without executing the translation."
+        markdownDescription: '**`boolean`** Calculate translation quota without executing the translation.'
       useSource:
-        markdownDescription: "**`boolean`** Use the original source text as the translation output (debug mode)."
+        markdownDescription: '**`boolean`** Use the original source text as the translation output (debug mode).'
       folder:
-        markdownDescription: "**`string`** Yandex Cloud folder ID (provider-specific)."
+        markdownDescription: '**`string`** Yandex Cloud folder ID (provider-specific).'
       glossary:
-        markdownDescription: "**`string`** Path to a glossary YAML file (provider-specific)."
+        markdownDescription: '**`string`** Path to a glossary YAML file (provider-specific).'
       auth:
-        markdownDescription: "**`string`** ⚠️ Authorization token for the translation API. Use environment variables instead of storing here."
+        markdownDescription: '**`string`** ⚠️ Authorization token for the translation API. Use environment variables instead of storing here.'
