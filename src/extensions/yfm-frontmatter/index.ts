@@ -8,6 +8,12 @@ import {
 } from './const';
 import {yfmFrontmatterPlugin} from './plugin';
 
+declare global {
+    interface WysiwygEditorActions {
+        [yfmFrontmatterAction]: Action;
+    }
+}
+
 const addFrontmatter: ActionSpec = {
     isEnable(state) {
         let hasFrontmatter = false;
@@ -67,11 +73,3 @@ export const YfmFrontmatter: ExtensionAuto = (builder) => {
 
     builder.addAction(yfmFrontmatterAction, () => addFrontmatter);
 };
-
-declare global {
-    namespace WysiwygEditor {
-        interface Actions {
-            [yfmFrontmatterAction]: Action;
-        }
-    }
-}

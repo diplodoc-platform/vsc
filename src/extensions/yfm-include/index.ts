@@ -8,6 +8,12 @@ import {
 } from './const';
 import {yfmIncludePlugin} from './plugin';
 
+declare global {
+    interface WysiwygEditorActions {
+        [yfmIncludeAction]: Action;
+    }
+}
+
 const addYfmInclude: ActionSpec = {
     isEnable(state) {
         return state.selection.empty;
@@ -57,11 +63,3 @@ export const YfmInclude: ExtensionAuto = (builder) => {
 
     builder.addAction(yfmIncludeAction, () => addYfmInclude);
 };
-
-declare global {
-    namespace WysiwygEditor {
-        interface Actions {
-            [yfmIncludeAction]: Action;
-        }
-    }
-}
