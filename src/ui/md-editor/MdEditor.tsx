@@ -104,7 +104,7 @@ function MdEditor() {
 
     useEffect(() => {
         function onMessage(event: MessageEvent) {
-            const {command, text, fileName: name} = event.data ?? {};
+            const {command, text, fileName: name, mode} = event.data ?? {};
 
             if (command === 'setContent') {
                 setFileName(name ?? '');
@@ -113,6 +113,8 @@ function MdEditor() {
                 setTimeout(() => {
                     isSettingContent.current = false;
                 }, 350);
+            } else if (command === 'setMode' && mode) {
+                editor.setEditorMode(mode);
             }
         }
 
