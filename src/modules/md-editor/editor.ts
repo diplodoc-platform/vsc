@@ -122,9 +122,23 @@ export class MdEditor {
 
         this._setupWebview(this._panel.webview);
 
+        const configListener = vscode.workspace.onDidChangeConfiguration((e) => {
+            if (e.affectsConfiguration('diplodoc.editorMode')) {
+                const mode = this._getConfiguredMode();
+                this._panel?.webview.postMessage({command: 'setMode', mode});
+            }
+        });
+
         this._panel.onDidDispose(() => {
+            configListener.dispose();
             this._panel = undefined;
         });
+    }
+
+    private _getConfiguredMode(): 'wysiwyg' | 'markup' {
+        const config = vscode.workspace.getConfiguration('diplodoc');
+
+        return config.get<'wysiwyg' | 'markup'>('editorMode', 'wysiwyg');
     }
 
     private _extractWhitespace(text: string): {leading: string; trailing: string; body: string} {
@@ -155,6 +169,9 @@ export class MdEditor {
 
         webview.onDidReceiveMessage(async (message) => {
             if (message.command === 'ready') {
+                const mode = this._getConfiguredMode();
+                this._panel?.webview.postMessage({command: 'setMode', mode});
+
                 if (this._pendingSync) {
                     this._panel?.webview.postMessage({
                         command: 'setContent',
