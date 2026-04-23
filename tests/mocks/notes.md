@@ -2,15 +2,17 @@
 interface:
   toc: true
   search: true
-  feedback: false
+  feedback: true
 ---
 
 # Notes
 
-{% note warnng %}
+{% include [Description](pc.md) %}
 
-{% list tabs %}
+{% cut "Cut title" %}
 
-{% endnote %}
+Add text to be displayed on click
 
-{% endlist %}
+{% endcut %}
+
+Привет

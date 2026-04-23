@@ -9,6 +9,10 @@ vi.mock('../../utils', () => ({
     insertElement: vi.fn(),
 }));
 
+function findShortcut(action: string) {
+    return editorShortcuts.find((s) => s.action === action)!;
+}
+
 describe('editorShortcuts', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -24,7 +28,7 @@ describe('editorShortcuts', () => {
             },
         };
 
-        editorShortcuts[0].handler(editor as never);
+        findShortcut('insertTable').handler(editor as never);
 
         expect(editor.focus).toHaveBeenCalledOnce();
         expect(run).toHaveBeenCalledOnce();
@@ -38,7 +42,7 @@ describe('editorShortcuts', () => {
         };
         vi.mocked(insertElement).mockReturnValue('| a | b |');
 
-        editorShortcuts[0].handler(editor as never);
+        findShortcut('insertTable').handler(editor as never);
 
         expect(editor.focus).toHaveBeenCalledOnce();
         expect(insertElement).toHaveBeenCalledWith('table');
@@ -55,7 +59,7 @@ describe('editorShortcuts', () => {
             },
         };
 
-        editorShortcuts[1].handler(editor as never);
+        findShortcut('insertNote').handler(editor as never);
 
         expect(editor.focus).toHaveBeenCalledOnce();
         expect(run).toHaveBeenCalledOnce();
@@ -69,10 +73,104 @@ describe('editorShortcuts', () => {
         };
         vi.mocked(insertElement).mockReturnValue('{% note info "Title" %}');
 
-        editorShortcuts[1].handler(editor as never);
+        findShortcut('insertNote').handler(editor as never);
 
         expect(editor.focus).toHaveBeenCalledOnce();
         expect(insertElement).toHaveBeenCalledWith('note');
         expect(insertAtCursor).toHaveBeenCalledWith(editor, '{% note info "Title" %}');
+    });
+
+    it('runs include action in wysiwyg mode', () => {
+        const run = vi.fn();
+        const editor = {
+            currentMode: 'wysiwyg',
+            focus: vi.fn(),
+            actions: {
+                toYfmInclude: {run},
+            },
+        };
+
+        findShortcut('insertInclude').handler(editor as never);
+
+        expect(editor.focus).toHaveBeenCalledOnce();
+        expect(run).toHaveBeenCalledOnce();
+        expect(insertAtCursor).not.toHaveBeenCalled();
+    });
+
+    it('inserts include snippet in markdown mode', () => {
+        const editor = {
+            currentMode: 'markup',
+            focus: vi.fn(),
+        };
+        vi.mocked(insertElement).mockReturnValue('{% include []() %}');
+
+        findShortcut('insertInclude').handler(editor as never);
+
+        expect(editor.focus).toHaveBeenCalledOnce();
+        expect(insertElement).toHaveBeenCalledWith('include');
+        expect(insertAtCursor).toHaveBeenCalledWith(editor, '{% include []() %}');
+    });
+
+    it('runs frontmatter action in wysiwyg mode', () => {
+        const run = vi.fn();
+        const editor = {
+            currentMode: 'wysiwyg',
+            focus: vi.fn(),
+            actions: {
+                createFrontmatter: {run},
+            },
+        };
+
+        findShortcut('insertFrontmatter').handler(editor as never);
+
+        expect(editor.focus).toHaveBeenCalledOnce();
+        expect(run).toHaveBeenCalledOnce();
+        expect(insertAtCursor).not.toHaveBeenCalled();
+    });
+
+    it('inserts frontmatter snippet in markdown mode', () => {
+        const editor = {
+            currentMode: 'markup',
+            focus: vi.fn(),
+        };
+        vi.mocked(insertElement).mockReturnValue('---\n\n---');
+
+        findShortcut('insertFrontmatter').handler(editor as never);
+
+        expect(editor.focus).toHaveBeenCalledOnce();
+        expect(insertElement).toHaveBeenCalledWith('frontmatter');
+        expect(insertAtCursor).toHaveBeenCalledWith(editor, '---\n\n---');
+    });
+
+    it('runs mermaid action in wysiwyg mode', () => {
+        const run = vi.fn();
+        const editor = {
+            currentMode: 'wysiwyg',
+            focus: vi.fn(),
+            actions: {
+                createMermaid: {run},
+            },
+        };
+
+        findShortcut('insertMermaid').handler(editor as never);
+
+        expect(editor.focus).toHaveBeenCalledOnce();
+        expect(run).toHaveBeenCalledOnce();
+    });
+
+    it('runs checkbox action in wysiwyg mode', () => {
+        const run = vi.fn();
+        const editor = {
+            currentMode: 'wysiwyg',
+            focus: vi.fn(),
+            actions: {
+                addCheckbox: {run},
+            },
+        };
+
+        findShortcut('insertCheckbox').handler(editor as never);
+
+        expect(editor.focus).toHaveBeenCalledOnce();
+        expect(run).toHaveBeenCalledOnce();
     });
 });
