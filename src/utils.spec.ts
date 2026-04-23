@@ -16,6 +16,40 @@ describe('insertElement', () => {
         expect(result).toContain('{% note info');
         expect(result).toContain('{% endnote %}');
     });
+
+    it('returns include directive', () => {
+        const result = insertElement('include');
+
+        expect(result).toBe('{% include []() %}');
+    });
+
+    it('returns frontmatter block', () => {
+        const result = insertElement('frontmatter');
+
+        expect(result).toContain('---');
+        expect(result.startsWith('---')).toBe(true);
+        expect(result.endsWith('---')).toBe(true);
+    });
+
+    it('returns cut block', () => {
+        const result = insertElement('cut');
+
+        expect(result).toContain('{% cut');
+        expect(result).toContain('{% endcut %}');
+    });
+
+    it('returns checkbox', () => {
+        const result = insertElement('checkbox');
+
+        expect(result).toBe('[ ] ');
+    });
+
+    it('returns mermaid block', () => {
+        const result = insertElement('mermaid');
+
+        expect(result).toContain('```mermaid');
+        expect(result).toContain('sequenceDiagram');
+    });
 });
 
 describe('insertAtCursor', () => {

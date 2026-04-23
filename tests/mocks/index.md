@@ -12,11 +12,11 @@ Hello, world
 
 ## Include from root level
 
-\{% include [root-include](includes/root-include.md) %\}
+{% include [root-include](includes/root-include.md) %}
 
 ## Include from level1
 
-\{% include [level1-include](level1/includes/level1-include.md) %\}
+{% include [level1-include](level1/includes/level1-include.md) %}
 
 ## Include from level2
 
@@ -72,7 +72,7 @@ Hello, world
 
 ## Include with anchor {#anchor}
 
-\{% include notitle [anchor](#anchor) %\}
-\{% include [anchor](#anchor) %\}
+{% include notitle [anchor](#anchor) %}
+{% include [anchor](#anchor) %}
 
-\{% include [no-title-include](includes/no-title-include.md#anchor) %\}
+{% include [no-title-include](includes/no-title-include.md#anchor) %}

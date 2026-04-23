@@ -33,6 +33,46 @@
         "command": "diplodoc.insertNote",
         "key": "alt+r",
         "when": "editorLangId == markdown && editorTextFocus"
+      },
+      {
+        "command": "diplodoc.insertCut",
+        "key": "alt+c",
+        "when": "editorLangId == markdown && editorTextFocus"
+      },
+      {
+        "command": "diplodoc.insertTab",
+        "key": "alt+a",
+        "when": "editorLangId == markdown && editorTextFocus"
+      },
+      {
+        "command": "diplodoc.insertCodeBlock",
+        "key": "alt+o",
+        "when": "editorLangId == markdown && editorTextFocus"
+      },
+      {
+        "command": "diplodoc.insertInclude",
+        "key": "alt+i",
+        "when": "editorLangId == markdown && editorTextFocus"
+      },
+      {
+        "command": "diplodoc.insertQuote",
+        "key": "alt+q",
+        "when": "editorLangId == markdown && editorTextFocus"
+      },
+      {
+        "command": "diplodoc.insertMermaid",
+        "key": "alt+m",
+        "when": "editorLangId == markdown && editorTextFocus"
+      },
+      {
+        "command": "diplodoc.insertCheckbox",
+        "key": "alt+x",
+        "when": "editorLangId == markdown && editorTextFocus"
+      },
+      {
+        "command": "diplodoc.insertFrontmatter",
+        "key": "alt+f",
+        "when": "editorLangId == markdown && editorTextFocus"
       }
     ],
     "commands": [

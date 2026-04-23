@@ -5,6 +5,9 @@ import {
 } from '@gravity-ui/markdown-editor';
 import {Math as MathExtension} from '@gravity-ui/markdown-editor/extensions/additional/Math/index.js';
 import {Mermaid as MermaidExtension} from '@gravity-ui/markdown-editor/extensions/additional/Mermaid/index.js';
+
+import {YfmFrontmatter} from '../../extensions/yfm-frontmatter';
+import {YfmInclude} from '../../extensions/yfm-include';
 import {ThemeProvider, Toaster, ToasterProvider, configure} from '@gravity-ui/uikit';
 import {useEffect, useMemo, useRef, useState} from 'react';
 
@@ -71,6 +74,8 @@ function MdEditor() {
                         import('@diplodoc/mermaid-extension/runtime');
                     },
                 });
+                builder.use(YfmInclude);
+                builder.use(YfmFrontmatter);
             },
             extensionOptions: {
                 commandMenu: {
