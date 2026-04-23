@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.1 (2026-04-23)
+
+## What's Changed
+* fix: configure editor mode by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/47
+
+
+**Full Changelog**: https://github.com/diplodoc-platform/vsc/compare/v0.4.0...v0.4.1
+
 ## 0.4.0 (2026-04-23)
 
 ## What's Changed
