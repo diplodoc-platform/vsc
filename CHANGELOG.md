@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 (2026-04-23)
+
+## What's Changed
+* feat: updated shortcuts and added frontmatter and includes extension by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/45
+
+
+**Full Changelog**: https://github.com/diplodoc-platform/vsc/compare/v0.3.0...v0.4.0
+
 ## 0.3.0 (2026-04-21)
 
 ## What's Changed
