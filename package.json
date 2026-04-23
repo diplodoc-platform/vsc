@@ -193,7 +193,7 @@
     "@diplodoc/transform": "^4.72.0",
     "@diplodoc/yfmlint": "^1.7.3",
     "@gravity-ui/components": "^4.18.0",
-    "@gravity-ui/markdown-editor": "^15.37.0",
+    "@gravity-ui/markdown-editor": "^15.38.1",
     "@gravity-ui/uikit": "^7.37.0",
     "highlight.js": "^11.11.1",
     "js-yaml": "^4.1.1",
@@ -205,7 +205,7 @@
     "url": "^0.11.4",
     "vscode-languageserver-textdocument": "^1.0.12",
     "vscode-languageserver-types": "^3.17.5",
-    "yaml-language-server": "^1.21.0"
+    "yaml-language-server": "^1.22.0"
   },
   "devDependencies": {
     "@diplodoc/lint": "^1.14.2",
