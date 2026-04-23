@@ -23,6 +23,20 @@
   ],
   "main": "./build/index.js",
   "contributes": {
+    "configuration": {
+      "title": "Diplodoc",
+      "properties": {
+        "diplodoc.editorMode": {
+          "type": "string",
+          "enum": [
+            "wysiwyg",
+            "markup"
+          ],
+          "default": "wysiwyg",
+          "description": "Default mode for Markdown editor"
+        }
+      }
+    },
     "keybindings": [
       {
         "command": "diplodoc.insertTable",
