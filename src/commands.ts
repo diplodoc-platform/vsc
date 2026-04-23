@@ -1,9 +1,10 @@
 import type {MdEditor} from './modules/md-editor/editor';
 import type {TocEditor} from './modules/toc-editor/editor';
+import type {ElementType} from './utils';
 
 import * as vscode from 'vscode';
 
-import {ElementType, insertElement} from './utils';
+import {insertElement} from './utils';
 
 export function openMdEditor(mdEditor: MdEditor) {
     const editor = vscode.window.activeTextEditor;
