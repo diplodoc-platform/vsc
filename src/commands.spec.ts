@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import * as vscode from 'vscode';
 
-import {insertNote, insertTable, openMdEditor, openTocEditor} from './commands';
+import {insertBlock, openMdEditor, openTocEditor} from './commands';
 import {insertElement} from './utils';
 
 vi.mock('vscode', () => ({
@@ -125,12 +125,12 @@ describe('commands', () => {
         });
     });
 
-    describe('insertTable', () => {
+    describe('insertBlock', () => {
         it('inserts table snippet into markdown files', () => {
             const snippet = '| a | b |';
             vi.mocked(insertElement).mockReturnValue(snippet);
 
-            insertTable();
+            insertBlock('table');
 
             expect(activeEditor.edit).toHaveBeenCalledOnce();
 
@@ -142,22 +142,11 @@ describe('commands', () => {
             expect(editBuilder.insert).toHaveBeenCalledWith(activeEditor.selection.active, snippet);
         });
 
-        it('does nothing for non-markdown files', () => {
-            activeEditor.document.languageId = 'plaintext';
-
-            insertTable();
-
-            expect(insertElement).not.toHaveBeenCalled();
-            expect(activeEditor.edit).not.toHaveBeenCalled();
-        });
-    });
-
-    describe('insertNote', () => {
         it('inserts note snippet into markdown files', () => {
             const snippet = '{% note info "Title" %}';
             vi.mocked(insertElement).mockReturnValue(snippet);
 
-            insertNote();
+            insertBlock('note');
 
             expect(activeEditor.edit).toHaveBeenCalledOnce();
 
@@ -169,10 +158,42 @@ describe('commands', () => {
             expect(editBuilder.insert).toHaveBeenCalledWith(activeEditor.selection.active, snippet);
         });
 
+        it('inserts include snippet into markdown files', () => {
+            const snippet = '{% include []() %}';
+            vi.mocked(insertElement).mockReturnValue(snippet);
+
+            insertBlock('include');
+
+            expect(activeEditor.edit).toHaveBeenCalledOnce();
+
+            const editBuilder = {insert: vi.fn()};
+            const callback = vi.mocked(activeEditor.edit).mock.calls[0][0];
+            callback(editBuilder);
+
+            expect(insertElement).toHaveBeenCalledWith('include');
+            expect(editBuilder.insert).toHaveBeenCalledWith(activeEditor.selection.active, snippet);
+        });
+
+        it('inserts frontmatter snippet into markdown files', () => {
+            const snippet = '---\n\n---';
+            vi.mocked(insertElement).mockReturnValue(snippet);
+
+            insertBlock('frontmatter');
+
+            expect(activeEditor.edit).toHaveBeenCalledOnce();
+
+            const editBuilder = {insert: vi.fn()};
+            const callback = vi.mocked(activeEditor.edit).mock.calls[0][0];
+            callback(editBuilder);
+
+            expect(insertElement).toHaveBeenCalledWith('frontmatter');
+            expect(editBuilder.insert).toHaveBeenCalledWith(activeEditor.selection.active, snippet);
+        });
+
         it('does nothing for non-markdown files', () => {
             activeEditor.document.languageId = 'plaintext';
 
-            insertNote();
+            insertBlock('table');
 
             expect(insertElement).not.toHaveBeenCalled();
             expect(activeEditor.edit).not.toHaveBeenCalled();

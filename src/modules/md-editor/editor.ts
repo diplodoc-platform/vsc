@@ -8,7 +8,8 @@ export class MdEditor {
     private _panel?: vscode.WebviewPanel;
     private _currentDocUri?: vscode.Uri;
     private _pendingSync?: {text: string; fileName: string};
-    private _frontmatter = '';
+    private _leadingWhitespace = '';
+    private _trailingWhitespace = '';
 
     constructor(extensionUri: vscode.Uri) {
         this._extensionUri = extensionUri;
@@ -53,8 +54,10 @@ export class MdEditor {
             this._currentDocUri = uri;
             const rawText = document.getText();
             const fileName = uri.fsPath.split('/').pop() ?? '';
-            const {frontmatter, content} = this._extractFrontmatter(rawText);
-            this._frontmatter = frontmatter;
+
+            const {leading, trailing, body} = this._extractWhitespace(rawText);
+            this._leadingWhitespace = leading;
+            this._trailingWhitespace = trailing;
 
             if (this._panel) {
                 this._panel.title = fileName
@@ -63,9 +66,9 @@ export class MdEditor {
             }
 
             if (isNewPanel) {
-                this._pendingSync = {text: content, fileName};
+                this._pendingSync = {text: body, fileName};
             } else {
-                this._panel?.webview.postMessage({command: 'setContent', text: content, fileName});
+                this._panel?.webview.postMessage({command: 'setContent', text: body, fileName});
             }
         }
     }
@@ -83,13 +86,14 @@ export class MdEditor {
             ? `Diplodoc Markdown Editor: ${fileName}`
             : 'Diplodoc Markdown Editor';
 
-        const {frontmatter, content} = this._extractFrontmatter(rawText);
+        const {leading, trailing, body} = this._extractWhitespace(rawText);
+        this._leadingWhitespace = leading;
+        this._trailingWhitespace = trailing;
 
-        this._frontmatter = frontmatter;
-        this._pendingSync = {text: content, fileName};
+        this._pendingSync = {text: body, fileName};
         this._panel.webview.postMessage({
             command: 'setContent',
-            text: content,
+            text: body,
             fileName,
         });
     }
@@ -123,17 +127,16 @@ export class MdEditor {
         });
     }
 
-    private _extractFrontmatter(text: string): {frontmatter: string; content: string} {
-        const match = text.match(/^(---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$))/);
+    private _extractWhitespace(text: string): {leading: string; trailing: string; body: string} {
+        const leadingMatch = text.match(/^(\s*\n)/);
+        const leading = leadingMatch ? leadingMatch[1] : '';
+        const withoutLeading = leading ? text.slice(leading.length) : text;
 
-        if (match) {
-            return {
-                frontmatter: match[1],
-                content: text.slice(match[1].length),
-            };
-        }
+        const trailingMatch = withoutLeading.match(/(\n\s*)$/);
+        const trailing = trailingMatch ? trailingMatch[1] : '';
+        const body = trailing ? withoutLeading.slice(0, -trailing.length) : withoutLeading;
 
-        return {frontmatter: '', content: text};
+        return {leading, trailing, body};
     }
 
     private _setupWebview(webview: vscode.Webview) {
@@ -205,7 +208,11 @@ export class MdEditor {
                 document.positionAt(document.getText().length),
             );
 
-            edit.replace(this._currentDocUri, fullRange, this._frontmatter + text);
+            edit.replace(
+                this._currentDocUri,
+                fullRange,
+                this._leadingWhitespace + text + this._trailingWhitespace,
+            );
 
             await vscode.workspace.applyEdit(edit);
         } finally {

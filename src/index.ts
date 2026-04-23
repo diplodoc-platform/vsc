@@ -4,7 +4,7 @@ import {MdEditor} from './modules/md-editor/editor';
 import {Sidebar} from './modules/main/sidebar';
 import * as validation from './modules/validation';
 import {TocEditor} from './modules/toc-editor/editor';
-import {insertNote, insertTable, openMdEditor, openTocEditor} from './commands';
+import {insertBlock, openMdEditor, openTocEditor} from './commands';
 
 export function activate(context: vscode.ExtensionContext) {
     validation.activate(context);
@@ -26,11 +26,45 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('diplodoc.insertTable', () => insertTable()),
+        vscode.commands.registerCommand('diplodoc.insertTable', () => insertBlock('table')),
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('diplodoc.insertNote', () => insertNote()),
+        vscode.commands.registerCommand('diplodoc.insertNote', () => insertBlock('note')),
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('diplodoc.insertCut', () => insertBlock('cut')),
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('diplodoc.insertTab', () => insertBlock('tab')),
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('diplodoc.insertCodeBlock', () => insertBlock('codeBlock')),
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('diplodoc.insertInclude', () => insertBlock('include')),
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('diplodoc.insertQuote', () => insertBlock('quote')),
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('diplodoc.insertMermaid', () => insertBlock('mermaid')),
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('diplodoc.insertCheckbox', () => insertBlock('checkbox')),
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('diplodoc.insertFrontmatter', () =>
+            insertBlock('frontmatter'),
+        ),
     );
 
     context.subscriptions.push(
