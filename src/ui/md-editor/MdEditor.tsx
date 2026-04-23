@@ -8,6 +8,8 @@ import {Mermaid as MermaidExtension} from '@gravity-ui/markdown-editor/extension
 import {ThemeProvider, Toaster, ToasterProvider, configure} from '@gravity-ui/uikit';
 import {useEffect, useMemo, useRef, useState} from 'react';
 
+import {YfmFrontmatter} from '../../extensions/yfm-frontmatter';
+import {YfmInclude} from '../../extensions/yfm-include';
 import {debounce} from '../utils';
 import {ErrorBoundary} from '../error/ErrorBoundary';
 import {useVscodeTheme} from '../useVscodeTheme';
@@ -71,6 +73,8 @@ function MdEditor() {
                         import('@diplodoc/mermaid-extension/runtime');
                     },
                 });
+                builder.use(YfmInclude);
+                builder.use(YfmFrontmatter);
             },
             extensionOptions: {
                 commandMenu: {

@@ -1,5 +1,6 @@
 import type {MdEditor} from './modules/md-editor/editor';
 import type {TocEditor} from './modules/toc-editor/editor';
+import type {ElementType} from './utils';
 
 import * as vscode from 'vscode';
 
@@ -27,26 +28,14 @@ export function openTocEditor(tocEditor: TocEditor) {
     tocEditor.syncFromEditor(editor);
 }
 
-export function insertTable() {
+export function insertBlock(type: ElementType) {
     const activeEditor = vscode.window.activeTextEditor;
 
     if (activeEditor && activeEditor.document.languageId === 'markdown') {
         const position = activeEditor.selection.active;
 
         activeEditor.edit((editBuilder) => {
-            editBuilder.insert(position, insertElement('table'));
-        });
-    }
-}
-
-export function insertNote() {
-    const activeEditor = vscode.window.activeTextEditor;
-
-    if (activeEditor && activeEditor.document.languageId === 'markdown') {
-        const position = activeEditor.selection.active;
-
-        activeEditor.edit((editBuilder) => {
-            editBuilder.insert(position, insertElement('note'));
+            editBuilder.insert(position, insertElement(type));
         });
     }
 }
