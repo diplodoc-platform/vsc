@@ -22,7 +22,7 @@ describe('yfmFrontmatterPlugin', () => {
         const token = findToken(tokens, TOKEN_NAME);
 
         expect(token).toBeDefined();
-        expect(token!.content).toBe('title: Hello');
+        expect(token?.content).toBe('title: Hello');
     });
 
     it('captures multiline YAML content', () => {
@@ -32,7 +32,7 @@ describe('yfmFrontmatterPlugin', () => {
         const token = findToken(tokens, TOKEN_NAME);
 
         expect(token).toBeDefined();
-        expect(token!.content).toBe('title: Hello\ndescription: World\ntags:\n  - a\n  - b');
+        expect(token?.content).toBe('title: Hello\ndescription: World\ntags:\n  - a\n  - b');
     });
 
     it('does not match frontmatter without closing ---', () => {
@@ -49,7 +49,7 @@ describe('yfmFrontmatterPlugin', () => {
         const token = findToken(tokens, TOKEN_NAME);
 
         expect(token).toBeDefined();
-        expect(token!.content).toBe('key: value');
+        expect(token?.content).toBe('key: value');
     });
 
     it('does not match empty --- pair in the middle of the document', () => {
@@ -66,7 +66,7 @@ describe('yfmFrontmatterPlugin', () => {
         const token = findToken(tokens, TOKEN_NAME);
 
         expect(token).toBeDefined();
-        expect(token!.content).toBe('');
+        expect(token?.content).toBe('');
     });
 
     it('does not consume content after closing ---', () => {
@@ -92,7 +92,7 @@ describe('yfmFrontmatterPlugin', () => {
         const token = findToken(tokens, TOKEN_NAME);
 
         expect(token).toBeDefined();
-        expect(token!.content).toContain('interface:');
-        expect(token!.content).toContain('toc: true');
+        expect(token?.content).toContain('interface:');
+        expect(token?.content).toContain('toc: true');
     });
 });

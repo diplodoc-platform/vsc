@@ -8,15 +8,14 @@ meta:
   - name: keywords
     content: diplodoc, markdown, test
 ---
+
 # Поддерживаемые фичи редактора
 
 ## YFM Notes (работает в wysiwyg)
 
-<a href="/root_folder/path_to_file">Ссылка</a>
+\<a href="/root_folder/path_to_file"\>Ссылка\</a\>
 
-My favorite search engine is [Yandex][1].
-
-[1]: ./ssss/ "The best search engine"
+My favorite search engine is [Yandex](./ssss/ "The best search engine").
 
 [ddd](./sss.md)
 
@@ -28,11 +27,7 @@ My favorite search engine is [Yandex][1].
 
 {% endnote %}
 
-{% note tip "Tip" %}
-
 Подсказка. Это полезный совет.
-
-
 
 {% note warning "Warning" %}
 
@@ -48,8 +43,6 @@ My favorite search engine is [Yandex][1].
 
 ## YFM Tabs (работает в wysiwyg)
 
-{% lis %}
-
 - Tab A
 
   Содержимое первой вкладки.
@@ -62,13 +55,9 @@ My favorite search engine is [Yandex][1].
 
   Содержимое третьей вкладки.
 
-
 ## YFM Cut / Spoiler (работает в wysiwyg)
 
-{% cut "Скрытый контент" %}
-
 Этот текст скрыт под спойлером. Нажмите чтобы раскрыть.
-
 
 ## LaTeX / Math (работает в wysiwyg)
 
@@ -107,10 +96,10 @@ blocks:
 - type: 'header-block'
   title: 'Заголовок страницы'
   description: 'Описание страницы'
-  \:::
+  :::
 
 ## OpenAPI (только markup-режим)
 
 \::: openapi
 path: ./openapi.yaml
-\:::
+:::

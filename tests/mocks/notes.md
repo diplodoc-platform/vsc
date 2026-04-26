@@ -15,4 +15,4 @@ Add text to be displayed on click
 
 {% endcut %}
 
-Привет
+Привет, мир!

@@ -22,7 +22,7 @@ describe('yfmIncludePlugin', () => {
         const token = findToken(tokens, TOKEN_NAME);
 
         expect(token).toBeDefined();
-        expect(token!.content).toBe('{% include [Title](path/to/file.md) %}');
+        expect(token?.content).toBe('{% include [Title](path/to/file.md) %}');
     });
 
     it('parses include with empty title and path', () => {
@@ -31,7 +31,7 @@ describe('yfmIncludePlugin', () => {
         const token = findToken(tokens, TOKEN_NAME);
 
         expect(token).toBeDefined();
-        expect(token!.content).toBe('{% include []() %}');
+        expect(token?.content).toBe('{% include []() %}');
     });
 
     it('parses include with extra spaces', () => {
@@ -64,7 +64,7 @@ describe('yfmIncludePlugin', () => {
         const token = findToken(tokens, TOKEN_NAME);
 
         expect(token).toBeDefined();
-        expect(token!.content).toBe('{% include [Desc](file.md) %}');
+        expect(token?.content).toBe('{% include [Desc](file.md) %}');
     });
 
     it('does not consume following content', () => {

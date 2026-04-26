@@ -1,0 +1,12 @@
+.header {
+    padding: 6px 12px;
+    color: var(--vscode-sideBarTitle-foreground);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 6px;
+
+    span {
+        opacity: 0.6;
+    }
+}
