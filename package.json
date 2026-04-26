@@ -65,7 +65,7 @@
       },
       {
         "command": "diplodoc.insertInclude",
-        "key": "alt+i",
+        "key": "alt+z",
         "when": "editorLangId == markdown && editorTextFocus"
       },
       {
