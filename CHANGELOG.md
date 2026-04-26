@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.2 (2026-04-26)
+
+## What's Changed
+* fix: added useEditor by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/49
+
+
+**Full Changelog**: https://github.com/diplodoc-platform/vsc/compare/v0.4.1...v0.4.2
+
 ## 0.4.1 (2026-04-23)
 
 ## What's Changed
