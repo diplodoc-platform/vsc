@@ -1,15 +1,22 @@
-// @vitest-environment jsdom
-import {describe, expect, it, vi} from 'vitest';
+import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest';
 
 import {debounce, getFilesMap, isTrustedOrigin} from './utils';
 
 describe('isTrustedOrigin', () => {
+    beforeAll(() => {
+        vi.stubGlobal('window', {location: {origin: 'http://localhost'}});
+    });
+
+    afterAll(() => {
+        vi.unstubAllGlobals();
+    });
+
     it('trusts empty origin (VS Code extension host)', () => {
         expect(isTrustedOrigin('')).toBe(true);
     });
 
     it('trusts same origin as window.location', () => {
-        expect(isTrustedOrigin(window.location.origin)).toBe(true);
+        expect(isTrustedOrigin('http://localhost')).toBe(true);
     });
 
     it('rejects foreign origin', () => {

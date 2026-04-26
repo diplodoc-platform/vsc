@@ -1,7 +1,6 @@
-// @vitest-environment jsdom
 import type {EditorCommand, EditorInstance} from './types';
 
-import {afterEach, describe, expect, it, vi} from 'vitest';
+import {afterAll, afterEach, beforeAll, describe, expect, it, vi} from 'vitest';
 
 import {useShortcuts} from './useShortcuts';
 
@@ -13,13 +12,6 @@ vi.mock('./match', () => ({
     matchesShortcut: vi.fn(() => false),
 }));
 
-function createEditor(): EditorInstance {
-    return {
-        focus: vi.fn(),
-        currentMode: 'wysiwyg',
-    } as unknown as EditorInstance;
-}
-
 const effectCleanups: Array<() => void> = [];
 
 vi.mock('react', () => ({
@@ -29,8 +21,26 @@ vi.mock('react', () => ({
     },
 }));
 
+function createEditor(): EditorInstance {
+    return {
+        focus: vi.fn(),
+        currentMode: 'wysiwyg',
+    } as unknown as EditorInstance;
+}
+
+let windowMock: EventTarget;
+
+beforeAll(() => {
+    windowMock = new EventTarget();
+    vi.stubGlobal('window', windowMock);
+});
+
+afterAll(() => {
+    vi.unstubAllGlobals();
+});
+
 function dispatchMessage(data: unknown, origin = '') {
-    window.dispatchEvent(new MessageEvent('message', {data, origin}));
+    windowMock.dispatchEvent(new MessageEvent('message', {data, origin}));
 }
 
 describe('useShortcuts message origin check', () => {
