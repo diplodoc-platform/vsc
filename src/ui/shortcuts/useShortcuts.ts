@@ -2,6 +2,8 @@ import type {EditorCommand, EditorInstance} from './types';
 
 import {useEffect} from 'react';
 
+import {isTrustedOrigin} from '../utils';
+
 import {matchesShortcut} from './match';
 
 export function useShortcuts(commands: EditorCommand[], editor: EditorInstance) {
@@ -30,6 +32,10 @@ export function useShortcuts(commands: EditorCommand[], editor: EditorInstance) 
 
     useEffect(() => {
         function onMessage(event: MessageEvent) {
+            if (!isTrustedOrigin(event.origin)) {
+                return;
+            }
+
             const {command, action} = event.data ?? {};
 
             if (command === 'action') {

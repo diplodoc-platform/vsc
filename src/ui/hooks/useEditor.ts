@@ -7,7 +7,7 @@ import {Mermaid as MermaidExtension} from '@gravity-ui/markdown-editor/extension
 
 import {YfmInclude} from '../../extensions/yfm-include';
 import {YfmFrontmatter} from '../../extensions/yfm-frontmatter';
-import {debounce} from '../utils';
+import {debounce, isTrustedOrigin} from '../utils';
 
 interface EditorParams {
     setFileName: (name: string) => void;
@@ -85,6 +85,10 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
 
     useEffect(() => {
         function onMessage(event: MessageEvent) {
+            if (!isTrustedOrigin(event.origin)) {
+                return;
+            }
+
             const {command, text, fileName: name, mode} = event.data ?? {};
 
             if (command === 'setContent') {
