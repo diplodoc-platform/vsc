@@ -4,7 +4,7 @@ import {useEffect} from 'react';
 
 import {matchesShortcut} from './match';
 
-export function useShortcuts(editor: EditorInstance, commands: EditorCommand[]) {
+export function useShortcuts(commands: EditorCommand[], editor: EditorInstance) {
     useEffect(() => {
         function onKeyDown(event: KeyboardEvent) {
             for (const cmd of commands) {
