@@ -80,7 +80,7 @@ export const editorShortcuts: EditorCommand[] = [
     },
     {
         action: 'insertInclude',
-        key: 'i',
+        key: 'z',
         alt: true,
         handler: (editor) => {
             editor.focus();

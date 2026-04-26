@@ -10,7 +10,13 @@ vi.mock('../../utils', () => ({
 }));
 
 function findShortcut(action: string) {
-    return editorShortcuts.find((s) => s.action === action)!;
+    const result = editorShortcuts.find((s) => s.action === action);
+
+    if (!result) {
+        throw new Error(`Shortcut for action "${action}" not found`);
+    }
+
+    return result;
 }
 
 describe('editorShortcuts', () => {

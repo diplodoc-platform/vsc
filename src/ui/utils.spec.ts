@@ -1,6 +1,32 @@
-import {describe, expect, it, vi} from 'vitest';
+import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest';
 
-import {debounce, getFilesMap} from './utils';
+import {debounce, getFilesMap, isTrustedOrigin} from './utils';
+
+describe('isTrustedOrigin', () => {
+    beforeAll(() => {
+        vi.stubGlobal('window', {location: {origin: 'http://localhost'}});
+    });
+
+    afterAll(() => {
+        vi.unstubAllGlobals();
+    });
+
+    it('trusts empty origin (VS Code extension host)', () => {
+        expect(isTrustedOrigin('')).toBe(true);
+    });
+
+    it('trusts same origin as window.location', () => {
+        expect(isTrustedOrigin('http://localhost')).toBe(true);
+    });
+
+    it('rejects foreign origin', () => {
+        expect(isTrustedOrigin('https://evil.example.com')).toBe(false);
+    });
+
+    it('rejects null string origin', () => {
+        expect(isTrustedOrigin('null')).toBe(false);
+    });
+});
 
 describe('debounce', () => {
     it('calls the function after the delay', () => {
