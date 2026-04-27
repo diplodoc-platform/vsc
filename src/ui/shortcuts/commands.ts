@@ -148,4 +148,32 @@ export const editorShortcuts: EditorCommand[] = [
             }
         },
     },
+    {
+        action: 'insertPageConstructor',
+        key: 'p',
+        alt: true,
+        handler: (editor) => {
+            editor.focus();
+            if (editor.currentMode === 'wysiwyg') {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (editor as any).actions?.createYfmPageConstructor?.run();
+            } else {
+                insertAtCursor(editor, insertElement('pageConstructor'));
+            }
+        },
+    },
+    {
+        action: 'insertHtmlBlock',
+        key: 'h',
+        alt: true,
+        handler: (editor) => {
+            editor.focus();
+            if (editor.currentMode === 'wysiwyg') {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (editor as any).actions?.createYfmHtmlBlock?.run();
+            } else {
+                insertAtCursor(editor, insertElement('htmlBlock'));
+            }
+        },
+    },
 ];

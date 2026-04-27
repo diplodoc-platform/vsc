@@ -7,12 +7,4 @@ interface:
 
 # Notes
 
-{% include [Description](pc.md) %}
-
-{% cut "Cut title" %}
-
-Add text to be displayed on click
-
-{% endcut %}
-
-Привет, мир!
+Это обычный текст в Markdown, а вот <span style="color: red; font-weight: bold;">инлайн HTML-элемент</span> с красным цветом и жирным начертанием.
