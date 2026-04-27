@@ -68,6 +68,16 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
+        vscode.commands.registerCommand('diplodoc.insertPageConstructor', () =>
+            insertBlock('pageConstructor'),
+        ),
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('diplodoc.insertHtmlBlock', () => insertBlock('htmlBlock')),
+    );
+
+    context.subscriptions.push(
         vscode.window.onDidChangeActiveTextEditor((editor) => {
             if (editor && editor.document.languageId === 'markdown') {
                 mdEditor.syncFromEditor(editor);

@@ -4,6 +4,9 @@ import {useMarkdownEditor, wysiwygToolbarConfigs} from '@gravity-ui/markdown-edi
 import {useEffect, useMemo, useRef} from 'react';
 import {Math as MathExtension} from '@gravity-ui/markdown-editor/extensions/additional/Math/index.js';
 import {Mermaid as MermaidExtension} from '@gravity-ui/markdown-editor/extensions/additional/Mermaid/index.js';
+import {YfmHtmlBlock} from '@gravity-ui/markdown-editor/extensions/additional/YfmHtmlBlock/index.js';
+import {YfmPageConstructorExtension} from '@gravity-ui/markdown-editor-page-constructor-extension';
+import {wYfmPageConstructorItemData} from '@gravity-ui/markdown-editor-page-constructor-extension/configs';
 
 import {YfmInclude} from '../../extensions/yfm-include';
 import {YfmFrontmatter} from '../../extensions/yfm-frontmatter';
@@ -23,14 +26,21 @@ declare const acquireVsCodeApi: () => {
 
 export const vscodeApi = acquireVsCodeApi();
 
-const {wMathInlineItemData, wMathBlockItemData, wMermaidItemData, wCommandMenuConfigByPreset} =
-    wysiwygToolbarConfigs;
+const {
+    wMathInlineItemData,
+    wMathBlockItemData,
+    wMermaidItemData,
+    wYfmHtmlBlockItemData,
+    wCommandMenuConfigByPreset,
+} = wysiwygToolbarConfigs;
 
 const commandMenuActions = [
     ...wCommandMenuConfigByPreset.yfm,
     wMathInlineItemData,
     wMathBlockItemData,
     wMermaidItemData,
+    wYfmPageConstructorItemData,
+    wYfmHtmlBlockItemData,
 ];
 
 export function useEditor({setFileName, preset, mode}: EditorParams) {
@@ -38,6 +48,9 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
 
     const editor = useMarkdownEditor({
         preset: preset ?? 'yfm',
+        md: {
+            html: true,
+        },
         initial: {
             mode: mode ?? 'wysiwyg',
         },
@@ -54,6 +67,8 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
                         import('@diplodoc/mermaid-extension/runtime');
                     },
                 });
+                builder.use(YfmPageConstructorExtension, {});
+                builder.use(YfmHtmlBlock, {});
                 builder.use(YfmInclude);
                 builder.use(YfmFrontmatter);
             },

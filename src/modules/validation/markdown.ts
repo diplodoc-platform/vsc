@@ -12,7 +12,7 @@ import imagesPlugin from '@diplodoc/transform/lib/plugins/images';
 import includesPlugin from '@diplodoc/transform/lib/plugins/includes';
 import linksPlugin from '@diplodoc/transform/lib/plugins/links';
 
-import {toDiagnostics} from './utils';
+import {findYfmConfig, toDiagnostics} from './utils';
 
 const FRONTMATTER_RE = /^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/;
 
@@ -32,6 +32,8 @@ export async function validateMarkdown(document: TextDocument) {
     const filePath = document.fileName;
     const root = path.dirname(filePath);
     const pluginMessages: PluginMessage[] = [];
+    const yfmConfig = findYfmConfig(root);
+    const allowHtml = yfmConfig?.allowHtml ?? yfmConfig?.allowHTML ?? false;
 
     const lintErrors = await yfmlint(content, filePath, {
         plugins: allPlugins,
@@ -53,6 +55,8 @@ export async function validateMarkdown(document: TextDocument) {
         frontMatter: FRONTMATTER_RE,
         lintConfig: {
             default: true,
+            MD013: false,
+            MD033: !allowHtml,
         },
     });
 

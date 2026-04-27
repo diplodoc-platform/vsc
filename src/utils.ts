@@ -10,7 +10,9 @@ export type ElementType =
     | 'quote'
     | 'mermaid'
     | 'checkbox'
-    | 'frontmatter';
+    | 'frontmatter'
+    | 'pageConstructor'
+    | 'htmlBlock';
 
 export function insertElement(type: ElementType): string {
     const elements = {
@@ -24,6 +26,9 @@ export function insertElement(type: ElementType): string {
         mermaid: '```mermaid\nsequenceDiagram\n  Alice->>Bob: Hi Bob\n  Bob->>Alice: Hi Alice\n```',
         checkbox: '[ ] ',
         frontmatter: '---\n\n---',
+        pageConstructor:
+            '::: page-constructor\nblocks:\n  - type: "header-block"\n    title: "Title"\n    description: "Description"\n:::',
+        htmlBlock: '::: html\n<div>HTML content</div>\n:::',
     };
 
     return elements[type];
