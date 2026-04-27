@@ -32,7 +32,7 @@ src/
 │   │   ├── parser.ts                           # Extract frontmatter + ::: page-constructor blocks from .md
 │   │   ├── page-constructor.ts                 # Thin wrapper: getDiagnostics(content, schemaType)
 │   │   ├── markdown.ts                         # @diplodoc/yfmlint integration for .md linting
-│   │   ├── utils.ts                            # yfmlint/plugin errors → vscode.Diagnostic conversion
+│   │   ├── utils.ts                            # yfmlint/plugin errors → vscode.Diagnostic; findYfmConfig()
 │   │   └── providers/
 │   │       ├── yaml-service.ts                 # yaml-language-server singleton, ALL schemas registered
 │   │       ├── diagnostic.ts                   # ls.doValidation() → vscode.Diagnostic[]
@@ -80,6 +80,19 @@ Three separate bundles: `md-editor`, `toc-editor`, `sidebar`.
 - Node APIs shimmed via `nodeShims` plugin (fs/path/process → empty, punycode/url → browser polyfills)
 - Assets (images, fonts) embedded as data URLs
 - SCSS with CSS modules support
+
+#### Markdown Editor Extensions (WYSIWYG)
+
+The editor (`useEditor` hook) configures the following extensions:
+
+- `md: {html: true}` — enables built-in `Html` extension (inline HTML like `<span>`, `<br>` is preserved without escaping)
+- `YfmHtmlBlock` (`@diplodoc/html-extension`) — `::: html ... :::` directive blocks rendered in sandboxed iframes
+- `YfmPageConstructorExtension` — `::: page-constructor ... :::` blocks
+- `YfmInclude` (custom, `src/extensions/yfm-include/`) — `{% include []() %}` blocks without escaping
+- `YfmFrontmatter` (custom, `src/extensions/yfm-frontmatter/`) — `---` YAML frontmatter blocks without escaping
+- `Math`, `Mermaid` — LaTeX and diagram support
+
+Toolbar includes `wYfmHtmlBlockItemData` and `wYfmPageConstructorItemData` in the command menu.
 
 ## Validation System — Detailed
 
@@ -183,7 +196,16 @@ Errors arrive via **two independent channels** — do not confuse them:
 
 #### yfmlint configuration
 
-`@diplodoc/yfmlint` has `default: false` in its built-in config, meaning rules won't run unless enabled. We pass `lintConfig: { default: true }` to enable all rules with their default severity levels.
+`@diplodoc/yfmlint` has `default: false` in its built-in config, meaning rules won't run unless enabled. We pass `lintConfig: { default: true, MD013: false, MD033: !allowHtml }`:
+
+- **MD013** (Line length) is always disabled — documentation lines often exceed 80 characters.
+- **MD033** (Inline HTML) is disabled when `allowHtml: true` in the project's `.yfm` config.
+
+#### .yfm config resolution
+
+`findYfmConfig(startDir)` in `validation/utils.ts` walks up from `startDir` to filesystem root looking for a `.yfm` file. Returns parsed YAML as `Record<string, unknown>` or `null`.
+
+Used by `validateMarkdown()` to determine `allowHtml` and potentially other project-level settings. The `.yfm` file always lives at the documentation project root (never nested deeper).
 
 Available rules (yfmlint 1.7.0, no YFM012–YFM017, no YFM019):
 
@@ -320,8 +342,8 @@ Run: `npm run merge-schemas` (auto-detects CLI schemas at `../packages/cli/schem
 - **activationEvents**: `onLanguage:markdown`, `onLanguage:yaml`
 - **languages**: `.yfm`/`.yfmlint` as YAML; `toc.yaml`/`presets.yaml`/`redirects.yaml`/`theme.yaml` filenames as YAML
 - **grammars**: Injects YAML syntax highlighting into `::: page-constructor` blocks in Markdown
-- **commands**: `diplodoc.openMdEditor`, `diplodoc.openTocEditor`, `diplodoc.insertTable`, `diplodoc.insertNote`
-- **keybindings**: `Alt+T` (table), `Alt+R` (note)
+- **commands**: `diplodoc.openMdEditor`, `diplodoc.openTocEditor`, `diplodoc.insertTable`, `diplodoc.insertNote`, `diplodoc.insertPageConstructor`, `diplodoc.insertHtmlBlock`
+- **keybindings**: `Alt+T` (table), `Alt+R` (note), `Alt+P` (page-constructor), `Alt+H` (HTML block)
 - **views**: Sidebar webview in activity bar
 
 No `yamlValidation` contribution — the extension handles all YAML validation internally (no dependency on Red Hat YAML extension).

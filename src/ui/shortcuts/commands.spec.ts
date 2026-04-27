@@ -179,4 +179,69 @@ describe('editorShortcuts', () => {
         expect(editor.focus).toHaveBeenCalledOnce();
         expect(run).toHaveBeenCalledOnce();
     });
+
+    it('runs page-constructor action in wysiwyg mode', () => {
+        const run = vi.fn();
+        const editor = {
+            currentMode: 'wysiwyg',
+            focus: vi.fn(),
+            actions: {
+                createYfmPageConstructor: {run},
+            },
+        };
+
+        findShortcut('insertPageConstructor').handler(editor as never);
+
+        expect(editor.focus).toHaveBeenCalledOnce();
+        expect(run).toHaveBeenCalledOnce();
+        expect(insertAtCursor).not.toHaveBeenCalled();
+    });
+
+    it('inserts page-constructor snippet in markdown mode', () => {
+        const editor = {
+            currentMode: 'markup',
+            focus: vi.fn(),
+        };
+        vi.mocked(insertElement).mockReturnValue('::: page-constructor\n:::');
+
+        findShortcut('insertPageConstructor').handler(editor as never);
+
+        expect(editor.focus).toHaveBeenCalledOnce();
+        expect(insertElement).toHaveBeenCalledWith('pageConstructor');
+        expect(insertAtCursor).toHaveBeenCalledWith(editor, '::: page-constructor\n:::');
+    });
+
+    it('runs html block action in wysiwyg mode', () => {
+        const run = vi.fn();
+        const editor = {
+            currentMode: 'wysiwyg',
+            focus: vi.fn(),
+            actions: {
+                createYfmHtmlBlock: {run},
+            },
+        };
+
+        findShortcut('insertHtmlBlock').handler(editor as never);
+
+        expect(editor.focus).toHaveBeenCalledOnce();
+        expect(run).toHaveBeenCalledOnce();
+        expect(insertAtCursor).not.toHaveBeenCalled();
+    });
+
+    it('inserts html block snippet in markdown mode', () => {
+        const editor = {
+            currentMode: 'markup',
+            focus: vi.fn(),
+        };
+        vi.mocked(insertElement).mockReturnValue('::: html\n<div>HTML content</div>\n:::');
+
+        findShortcut('insertHtmlBlock').handler(editor as never);
+
+        expect(editor.focus).toHaveBeenCalledOnce();
+        expect(insertElement).toHaveBeenCalledWith('htmlBlock');
+        expect(insertAtCursor).toHaveBeenCalledWith(
+            editor,
+            '::: html\n<div>HTML content</div>\n:::',
+        );
+    });
 });
