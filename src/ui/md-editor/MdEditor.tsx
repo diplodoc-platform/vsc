@@ -17,11 +17,18 @@ configure({
 
 const toaster = new Toaster();
 
-const {wMathListItem, wMermaidItemData, wToolbarConfigByPreset} = wysiwygToolbarConfigs;
+const {wMathListItem, wMermaidItemData, wYfmHtmlBlockItemData, wToolbarConfigByPreset} =
+    wysiwygToolbarConfigs;
 const yfmBase = wToolbarConfigByPreset.yfm;
 const wysiwygToolbarConfig = [
     ...yfmBase.slice(0, -1),
-    [...yfmBase[yfmBase.length - 1], wMathListItem, wMermaidItemData, wYfmPageConstructorItemData],
+    [
+        ...yfmBase[yfmBase.length - 1],
+        wMathListItem,
+        wMermaidItemData,
+        wYfmHtmlBlockItemData,
+        wYfmPageConstructorItemData,
+    ],
 ];
 
 function MdEditor() {
