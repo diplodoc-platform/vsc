@@ -1,9 +1,13 @@
 import type {PluginMessage, ValidationMessage, YfmLintError} from './types';
 import type * as vscode from 'vscode';
 
-import {describe, expect, it} from 'vitest';
+import {afterEach, describe, expect, it} from 'vitest';
+import {existsSync, mkdirSync, rmSync, writeFileSync} from 'fs';
+import {join} from 'path';
+import {tmpdir} from 'os';
 
 import {
+    findYfmConfig,
     formatLintMessage,
     formatPluginMessage,
     toDiagnostic,
@@ -144,5 +148,60 @@ describe('toDiagnostics', () => {
 
         const diags = toDiagnostics(errors, doc);
         expect(diags).toHaveLength(2);
+    });
+});
+
+describe('findYfmConfig', () => {
+    const testRoot = join(tmpdir(), `yfm-config-test-${Date.now()}`);
+    const nestedDir = join(testRoot, 'a', 'b', 'c');
+
+    function setup() {
+        mkdirSync(nestedDir, {recursive: true});
+    }
+
+    afterEach(() => {
+        rmSync(testRoot, {recursive: true, force: true});
+    });
+
+    it('finds .yfm in the same directory', () => {
+        setup();
+        writeFileSync(join(testRoot, '.yfm'), 'allowHtml: true\n');
+
+        const config = findYfmConfig(testRoot);
+        expect(config).toEqual({allowHtml: true});
+    });
+
+    it('finds .yfm in a parent directory', () => {
+        setup();
+        writeFileSync(join(testRoot, '.yfm'), 'allowHtml: false\nlang: ru\n');
+
+        const config = findYfmConfig(nestedDir);
+        expect(config).toEqual({allowHtml: false, lang: 'ru'});
+    });
+
+    it('returns null when no .yfm exists', () => {
+        setup();
+        const config = findYfmConfig(nestedDir);
+        expect(config).toBeNull();
+    });
+
+    it('returns null for invalid YAML', () => {
+        setup();
+        writeFileSync(join(testRoot, '.yfm'), ':\n  :\n    - [invalid');
+
+        const config = findYfmConfig(nestedDir);
+        expect(config).toBeNull();
+    });
+
+    it('reads allowHtml correctly from real test mock', () => {
+        const mocksDir = join(__dirname, '../../../tests/mocks');
+
+        if (!existsSync(join(mocksDir, '.yfm'))) {
+            return;
+        }
+
+        const config = findYfmConfig(mocksDir);
+        expect(config).not.toBeNull();
+        expect(config?.allowHtml).toBe(true);
     });
 });

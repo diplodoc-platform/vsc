@@ -69,6 +69,23 @@ const yamlServerFixes = {
     },
 };
 
+const pageConstructorFixes = {
+    name: 'page-constructor-fixes',
+    setup(build) {
+        // @gravity-ui/markdown-editor/pm/* subpaths need .js extension for esbuild
+        build.onResolve({filter: /^@gravity-ui\/markdown-editor\/pm\//}, (args) => {
+            const resolved = args.path.endsWith('.js') ? args.path : args.path + '.js';
+            return {path: require.resolve(resolved)};
+        });
+
+        // @gravity-ui/page-constructor CSS uses webpack-style ~ prefix
+        build.onResolve({filter: /^~@diplodoc\/transform/}, (args) => {
+            const bare = args.path.replace(/^~/, '');
+            return {path: require.resolve(bare)};
+        });
+    },
+};
+
 const builds = [];
 
 if (target === 'ext' || target === 'all') {
@@ -95,7 +112,12 @@ const webviewBase = {
     target: 'es2020',
     format: 'iife',
     sourcemap: false,
-    plugins: [nodeShims, sassPlugin({filter: /\.module\.scss$/, type: 'local-css'}), sassPlugin()],
+    plugins: [
+        nodeShims,
+        pageConstructorFixes,
+        sassPlugin({filter: /\.module\.scss$/, type: 'local-css'}),
+        sassPlugin(),
+    ],
     define: {
         'process.env.NODE_ENV': '"production"',
         global: 'window',

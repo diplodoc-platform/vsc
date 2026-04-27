@@ -190,6 +190,22 @@ describe('commands', () => {
             expect(editBuilder.insert).toHaveBeenCalledWith(activeEditor.selection.active, snippet);
         });
 
+        it('inserts htmlBlock snippet into markdown files', () => {
+            const snippet = '::: html\n<div>HTML content</div>\n:::';
+            vi.mocked(insertElement).mockReturnValue(snippet);
+
+            insertBlock('htmlBlock');
+
+            expect(activeEditor.edit).toHaveBeenCalledOnce();
+
+            const editBuilder = {insert: vi.fn()};
+            const callback = vi.mocked(activeEditor.edit).mock.calls[0][0];
+            callback(editBuilder);
+
+            expect(insertElement).toHaveBeenCalledWith('htmlBlock');
+            expect(editBuilder.insert).toHaveBeenCalledWith(activeEditor.selection.active, snippet);
+        });
+
         it('does nothing for non-markdown files', () => {
             activeEditor.document.languageId = 'plaintext';
 

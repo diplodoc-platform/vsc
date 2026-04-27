@@ -1,6 +1,9 @@
 import type {PluginMessage, ValidationMessage, YfmLintError} from './types';
 
 import * as vscode from 'vscode';
+import {existsSync, readFileSync} from 'fs';
+import {dirname, resolve} from 'path';
+import {load as yamlLoad} from 'js-yaml';
 
 const DIRECTIVE_HANDLERS: Array<{
     message: RegExp;
@@ -294,4 +297,28 @@ function stripAnsi(value: string): string {
 
 function isYfmLintError(error: ValidationMessage): error is YfmLintError {
     return 'ruleDescription' in error;
+}
+
+export function findYfmConfig(startDir: string): Record<string, unknown> | null {
+    let dir = startDir;
+    let parent = dirname(dir);
+
+    while (dir !== parent) {
+        const yfmPath = resolve(dir, '.yfm');
+
+        if (existsSync(yfmPath)) {
+            try {
+                const content = readFileSync(yfmPath, 'utf8');
+
+                return (yamlLoad(content) as Record<string, unknown>) ?? null;
+            } catch {
+                return null;
+            }
+        }
+
+        dir = parent;
+        parent = dirname(dir);
+    }
+
+    return null;
 }

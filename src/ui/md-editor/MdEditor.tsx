@@ -1,4 +1,5 @@
 import {MarkdownEditorView, wysiwygToolbarConfigs} from '@gravity-ui/markdown-editor';
+import {wYfmPageConstructorItemData} from '@gravity-ui/markdown-editor-page-constructor-extension/configs';
 import {ThemeProvider, Toaster, ToasterProvider, configure} from '@gravity-ui/uikit';
 import {useMemo, useState} from 'react';
 
@@ -16,11 +17,18 @@ configure({
 
 const toaster = new Toaster();
 
-const {wMathListItem, wMermaidItemData, wToolbarConfigByPreset} = wysiwygToolbarConfigs;
+const {wMathListItem, wMermaidItemData, wYfmHtmlBlockItemData, wToolbarConfigByPreset} =
+    wysiwygToolbarConfigs;
 const yfmBase = wToolbarConfigByPreset.yfm;
 const wysiwygToolbarConfig = [
     ...yfmBase.slice(0, -1),
-    [...yfmBase[yfmBase.length - 1], wMathListItem, wMermaidItemData],
+    [
+        ...yfmBase[yfmBase.length - 1],
+        wMathListItem,
+        wMermaidItemData,
+        wYfmHtmlBlockItemData,
+        wYfmPageConstructorItemData,
+    ],
 ];
 
 function MdEditor() {
