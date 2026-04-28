@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0 (2026-04-28)
+
+## What's Changed
+* feat: added html and pc entensions by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/53
+* feat: added PC yaml editor by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/56
+
+
+**Full Changelog**: https://github.com/diplodoc-platform/vsc/compare/v0.4.2...v0.5.0
+
 ## 0.4.2 (2026-04-26)
 
 ## What's Changed
