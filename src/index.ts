@@ -5,9 +5,11 @@ import {Sidebar} from './modules/main/sidebar';
 import * as validation from './modules/validation';
 import {TocEditor} from './modules/toc-editor/editor';
 import {insertBlock, openMdEditor, openTocEditor} from './commands';
+import {isBlocksYaml} from './utils';
 
 export function activate(context: vscode.ExtensionContext) {
     validation.activate(context);
+    updateYamlContext(vscode.window.activeTextEditor);
 
     const mdEditor = new MdEditor(context.extensionUri);
     const tocEditor = new TocEditor(context.extensionUri);
@@ -79,7 +81,12 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.window.onDidChangeActiveTextEditor((editor) => {
-            if (editor && editor.document.languageId === 'markdown') {
+            updateYamlContext(editor);
+
+            if (
+                editor &&
+                (editor.document.languageId === 'markdown' || isBlocksYaml(editor.document))
+            ) {
                 mdEditor.syncFromEditor(editor);
             }
         }),
@@ -100,7 +107,7 @@ export function activate(context: vscode.ExtensionContext) {
             if (
                 activeEditor &&
                 event.document === activeEditor.document &&
-                event.document.languageId === 'markdown'
+                (event.document.languageId === 'markdown' || isBlocksYaml(event.document))
             ) {
                 if (!mdEditor.isUpdatingFromWebview) {
                     mdEditor.syncFromEditor(activeEditor);
@@ -108,6 +115,18 @@ export function activate(context: vscode.ExtensionContext) {
             }
         }),
     );
+}
+
+async function updateYamlContext(editor?: vscode.TextEditor) {
+    if (!editor) {
+        await vscode.commands.executeCommand('setContext', 'diplodoc.hasBlocksYaml', false);
+
+        return;
+    }
+
+    const hasBlocks = isBlocksYaml(editor.document);
+
+    await vscode.commands.executeCommand('setContext', 'diplodoc.hasBlocksYaml', hasBlocks);
 }
 
 export function deactivate() {}

@@ -24,6 +24,7 @@ export function Sidebar() {
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
             const {command, files} = event.data;
+
             if (command === 'setFiles') {
                 setFiles(files || []);
             }
