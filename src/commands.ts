@@ -4,12 +4,12 @@ import type {ElementType} from './utils';
 
 import * as vscode from 'vscode';
 
-import {insertElement} from './utils';
+import {insertElement, isBlocksYaml} from './utils';
 
 export function openMdEditor(mdEditor: MdEditor) {
     const editor = vscode.window.activeTextEditor;
 
-    if (!editor || editor.document.languageId !== 'markdown') {
+    if (!editor || (editor.document.languageId !== 'markdown' && !isBlocksYaml(editor.document))) {
         return;
     }
 

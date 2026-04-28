@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import {getBaseHtml} from '../../ui/html';
+import {isBlocksYaml, unwrapPageConstructor, wrapPageConstructor} from '../../utils';
 
 export class MdEditor {
     isUpdatingFromWebview = false;
@@ -59,6 +60,9 @@ export class MdEditor {
             this._leadingWhitespace = leading;
             this._trailingWhitespace = trailing;
 
+            const isYaml = isBlocksYaml(document);
+            const content = isYaml ? wrapPageConstructor(body) : body;
+
             if (this._panel) {
                 this._panel.title = fileName
                     ? `Diplodoc Markdown Editor: ${fileName}`
@@ -66,9 +70,9 @@ export class MdEditor {
             }
 
             if (isNewPanel) {
-                this._pendingSync = {text: body, fileName};
+                this._pendingSync = {text: content, fileName};
             } else {
-                this._panel?.webview.postMessage({command: 'setContent', text: body, fileName});
+                this._panel?.webview.postMessage({command: 'setContent', text: content, fileName});
             }
         }
     }
@@ -90,10 +94,13 @@ export class MdEditor {
         this._leadingWhitespace = leading;
         this._trailingWhitespace = trailing;
 
-        this._pendingSync = {text: body, fileName};
+        const isYaml = isBlocksYaml(editor.document);
+        const content = isYaml ? wrapPageConstructor(body) : body;
+
+        this._pendingSync = {text: content, fileName};
         this._panel.webview.postMessage({
             command: 'setContent',
-            text: body,
+            text: content,
             fileName,
         });
     }
@@ -204,7 +211,11 @@ export class MdEditor {
     private _syncActiveEditor() {
         const editor = vscode.window.activeTextEditor;
 
-        if (editor && editor.document.languageId === 'markdown') {
+        if (!editor) {
+            return;
+        }
+
+        if (editor.document.languageId === 'markdown' || isBlocksYaml(editor.document)) {
             this.syncFromEditor(editor);
         }
     }
@@ -215,6 +226,9 @@ export class MdEditor {
         }
 
         const document = await vscode.workspace.openTextDocument(this._currentDocUri);
+
+        const isYaml = isBlocksYaml(document);
+        const content = isYaml ? unwrapPageConstructor(text) : text;
 
         this.isUpdatingFromWebview = true;
 
@@ -228,7 +242,7 @@ export class MdEditor {
             edit.replace(
                 this._currentDocUri,
                 fullRange,
-                this._leadingWhitespace + text + this._trailingWhitespace,
+                this._leadingWhitespace + content + this._trailingWhitespace,
             );
 
             await vscode.workspace.applyEdit(edit);

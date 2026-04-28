@@ -6,6 +6,7 @@ import {exec} from 'child_process';
 
 import {t} from '../../i18n';
 import {getBaseHtml} from '../../ui/html';
+import {isBlocksYaml} from '../../utils';
 
 export class Sidebar implements vscode.WebviewViewProvider {
     isUpdatingFromWebview = false;
@@ -74,6 +75,7 @@ export class Sidebar implements vscode.WebviewViewProvider {
 
         const mdWatcher = vscode.workspace.createFileSystemWatcher('**/*.md');
         const tocWatcher = vscode.workspace.createFileSystemWatcher('**/toc.yaml');
+        const yamlWatcher = vscode.workspace.createFileSystemWatcher('**/*.yaml');
 
         const refreshFiles = async () => {
             const files = await this._getMarkdownFiles();
@@ -84,12 +86,15 @@ export class Sidebar implements vscode.WebviewViewProvider {
         mdWatcher.onDidDelete(refreshFiles);
         tocWatcher.onDidCreate(refreshFiles);
         tocWatcher.onDidDelete(refreshFiles);
+        yamlWatcher.onDidCreate(refreshFiles);
+        yamlWatcher.onDidDelete(refreshFiles);
 
         vscode.workspace.onDidChangeWorkspaceFolders(refreshFiles);
 
         webviewView.onDidDispose(() => {
             mdWatcher.dispose();
             tocWatcher.dispose();
+            yamlWatcher.dispose();
         });
     }
 
@@ -104,12 +109,25 @@ export class Sidebar implements vscode.WebviewViewProvider {
     }
 
     private async _getMarkdownFiles(): Promise<string[]> {
-        const [mdUris, tocUris] = await Promise.all([
+        const [mdUris, tocUris, yamlUris] = await Promise.all([
             vscode.workspace.findFiles('**/*.md', '**/node_modules/**'),
             vscode.workspace.findFiles('**/toc.yaml', '**/node_modules/**'),
+            vscode.workspace.findFiles('**/*.yaml', '**/node_modules/**'),
         ]);
 
-        return [...mdUris, ...tocUris]
+        const blockYamlUris: vscode.Uri[] = [];
+
+        for (const uri of yamlUris) {
+            try {
+                const doc = await vscode.workspace.openTextDocument(uri);
+
+                if (isBlocksYaml(doc)) {
+                    blockYamlUris.push(uri);
+                }
+            } catch {}
+        }
+
+        return [...mdUris, ...tocUris, ...blockYamlUris]
             .map((uri) => {
                 const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
 
@@ -172,6 +190,12 @@ export class Sidebar implements vscode.WebviewViewProvider {
             await this._mdEditor.showFile(fileUri, vscode.ViewColumn.Active);
         } else if (relativePath.endsWith('toc.yaml')) {
             await this._tocEditor.showFile(fileUri, vscode.ViewColumn.Active);
+        } else if (relativePath.endsWith('.yaml')) {
+            const doc = await vscode.workspace.openTextDocument(fileUri);
+
+            if (isBlocksYaml(doc)) {
+                await this._mdEditor.showFile(fileUri, vscode.ViewColumn.Active);
+            }
         }
     }
 

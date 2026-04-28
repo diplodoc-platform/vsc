@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import * as vscode from 'vscode';
 
 import {insertBlock, openMdEditor, openTocEditor} from './commands';
-import {insertElement} from './utils';
+import {insertElement, isBlocksYaml} from './utils';
 
 vi.mock('vscode', () => ({
     window: {
@@ -12,6 +12,7 @@ vi.mock('vscode', () => ({
 
 vi.mock('./utils', () => ({
     insertElement: vi.fn(),
+    isBlocksYaml: vi.fn().mockReturnValue(false),
 }));
 
 type MockEditor = {
@@ -73,6 +74,38 @@ describe('commands', () => {
 
         it('does nothing for non-markdown files', () => {
             activeEditor.document.languageId = 'plaintext';
+            const mdEditor = {
+                show: vi.fn(),
+                syncFromEditor: vi.fn(),
+            };
+
+            openMdEditor(mdEditor as never);
+
+            expect(mdEditor.show).not.toHaveBeenCalled();
+            expect(mdEditor.syncFromEditor).not.toHaveBeenCalled();
+        });
+
+        it('opens editor for yaml files with blocks', () => {
+            activeEditor.document.languageId = 'yaml';
+            activeEditor.document.fileName = 'pc.yaml';
+            vi.mocked(isBlocksYaml).mockReturnValue(true);
+
+            const mdEditor = {
+                show: vi.fn(),
+                syncFromEditor: vi.fn(),
+            };
+
+            openMdEditor(mdEditor as never);
+
+            expect(mdEditor.show).toHaveBeenCalledOnce();
+            expect(mdEditor.syncFromEditor).toHaveBeenCalledWith(activeEditor);
+        });
+
+        it('does nothing for yaml files without blocks', () => {
+            activeEditor.document.languageId = 'yaml';
+            activeEditor.document.fileName = 'toc.yaml';
+            vi.mocked(isBlocksYaml).mockReturnValue(false);
+
             const mdEditor = {
                 show: vi.fn(),
                 syncFromEditor: vi.fn(),

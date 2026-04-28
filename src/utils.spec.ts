@@ -1,6 +1,12 @@
 import {describe, expect, it, vi} from 'vitest';
 
-import {insertAtCursor, insertElement} from './utils';
+import {
+    insertAtCursor,
+    insertElement,
+    isBlocksYaml,
+    unwrapPageConstructor,
+    wrapPageConstructor,
+} from './utils';
 
 describe('insertElement', () => {
     it('returns markdown table', () => {
@@ -49,6 +55,77 @@ describe('insertElement', () => {
 
         expect(result).toContain('```mermaid');
         expect(result).toContain('sequenceDiagram');
+    });
+});
+
+describe('isBlocksYaml', () => {
+    const makeDoc = (languageId: string, text: string) =>
+        ({languageId, getText: () => text}) as never;
+
+    it('returns true for yaml with top-level blocks key', () => {
+        expect(isBlocksYaml(makeDoc('yaml', 'blocks:\n  - type: header-block'))).toBe(true);
+    });
+
+    it('returns true for yaml with indented blocks key', () => {
+        expect(isBlocksYaml(makeDoc('yaml', '  blocks:\n  - type: header-block'))).toBe(true);
+    });
+
+    it('returns false for non-yaml language', () => {
+        expect(isBlocksYaml(makeDoc('markdown', 'blocks:\n  - type: header-block'))).toBe(false);
+    });
+
+    it('returns false for yaml without blocks key', () => {
+        expect(isBlocksYaml(makeDoc('yaml', 'items:\n  - name: page1'))).toBe(false);
+    });
+
+    it('returns false for yaml with blocks in a string value', () => {
+        expect(isBlocksYaml(makeDoc('yaml', 'title: "blocks: yes"'))).toBe(false);
+    });
+
+    it('returns false for empty yaml', () => {
+        expect(isBlocksYaml(makeDoc('yaml', ''))).toBe(false);
+    });
+});
+
+describe('wrapPageConstructor', () => {
+    it('wraps yaml text in page-constructor directive', () => {
+        const yaml = 'blocks:\n  - type: header-block';
+        const result = wrapPageConstructor(yaml);
+
+        expect(result).toBe('::: page-constructor\nblocks:\n  - type: header-block\n:::');
+    });
+
+    it('handles empty string', () => {
+        expect(wrapPageConstructor('')).toBe('::: page-constructor\n\n:::');
+    });
+});
+
+describe('unwrapPageConstructor', () => {
+    it('removes page-constructor directive wrapper', () => {
+        const wrapped = '::: page-constructor\nblocks:\n  - type: header-block\n:::';
+        const result = unwrapPageConstructor(wrapped);
+
+        expect(result).toBe('blocks:\n  - type: header-block');
+    });
+
+    it('handles extra whitespace in directive', () => {
+        const wrapped = '::: page-constructor  \nblocks:\n  - type: header-block\n:::  ';
+        const result = unwrapPageConstructor(wrapped);
+
+        expect(result).toBe('blocks:\n  - type: header-block');
+    });
+
+    it('returns text unchanged when no directive present', () => {
+        const text = 'blocks:\n  - type: header-block';
+
+        expect(unwrapPageConstructor(text)).toBe(text);
+    });
+
+    it('is inverse of wrapPageConstructor', () => {
+        const original = 'blocks:\n  - type: header-block\n    title: Test';
+        const roundTripped = unwrapPageConstructor(wrapPageConstructor(original));
+
+        expect(roundTripped).toBe(original);
     });
 });
 

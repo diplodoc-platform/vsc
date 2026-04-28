@@ -1,4 +1,5 @@
 import type {EditorInstance} from './ui/shortcuts/types';
+import type * as vscode from 'vscode';
 
 export type ElementType =
     | 'table'
@@ -56,4 +57,22 @@ export function insertAtCursor(editor: EditorInstance, text: string) {
         selection: {anchor: insertPos + insert.length},
     });
     cm.focus();
+}
+
+export function isBlocksYaml(document: vscode.TextDocument): boolean {
+    if (document.languageId !== 'yaml') {
+        return false;
+    }
+
+    const text = document.getText();
+
+    return /^\s*blocks\s*:/m.test(text);
+}
+
+export function wrapPageConstructor(text: string): string {
+    return `::: page-constructor\n${text}\n:::`;
+}
+
+export function unwrapPageConstructor(text: string): string {
+    return text.replace(/^\s*::: page-constructor\s*\n/, '').replace(/\n:::\s*$/, '');
 }
