@@ -103,7 +103,8 @@
       {
         "command": "diplodoc.openMdEditor",
         "title": "Open Diplodoc Markdown Editor",
-        "icon": "assets/diplodoc-logo-colored.svg"
+        "icon": "assets/diplodoc-logo-colored.svg",
+        "enablement": "resourceLangId == markdown || diplodoc.hasBlocksYaml"
       },
       {
         "command": "diplodoc.openTocEditor",
@@ -203,7 +204,7 @@
       "editor/title": [
         {
           "command": "diplodoc.openMdEditor",
-          "when": "resourceLangId == markdown",
+          "when": "resourceLangId == markdown || diplodoc.hasBlocksYaml",
           "group": "navigation@1"
         },
         {
