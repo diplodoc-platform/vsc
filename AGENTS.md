@@ -1,6 +1,6 @@
 # Diplodoc VSCode Extension
 
-VSCode extension for the [Diplodoc](https://diplodoc.com) documentation platform. Provides JSON Schema-based YAML validation, autocompletion, hover documentation, Markdown linting, and visual editors for `.md` and `toc.yaml` files.
+VSCode extension for the [Diplodoc](https://diplodoc.com) documentation platform. Provides JSON Schema-based YAML validation, autocompletion, hover documentation, Markdown linting, and visual editors for `.md`, `toc.yaml`, and page-constructor `.yaml` files.
 
 ## Quick Reference
 
@@ -23,7 +23,7 @@ Install locally: `code --install-extension diplodoc-vsc-extension-0.0.1.vsix --f
 ```
 src/
 ├── index.ts                                    # activate() / deactivate() — registers all modules
-├── utils.ts                                    # insertElement() for table/note snippets
+├── utils.ts                                    # insertElement(), isBlocksYaml(), wrap/unwrapPageConstructor()
 ├── modules/
 │   ├── types.ts                                # Content, PluginMessage, ValidationMessage, YfmLintError
 │   ├── utils.ts                                # logger() — Output channel "Diplodoc"
@@ -93,6 +93,20 @@ The editor (`useEditor` hook) configures the following extensions:
 - `Math`, `Mermaid` — LaTeX and diagram support
 
 Toolbar includes `wYfmHtmlBlockItemData` and `wYfmPageConstructorItemData` in the command menu.
+
+#### YAML Page-Constructor Editor
+
+YAML files containing a top-level `blocks:` key (page-constructor files) can be edited in the same Markdown WYSIWYG editor used for `.md` files. The flow:
+
+1. **Detection**: `isBlocksYaml(document)` in `src/utils.ts` checks `languageId === 'yaml'` and tests for `/^\s*blocks\s*:/m` in the document text.
+
+2. **Context variable**: `diplodoc.hasBlocksYaml` is set via `vscode.commands.executeCommand('setContext', ...)` whenever the active editor changes (`updateYamlContext()` in `src/index.ts`). This enables the editor title bar button and command enablement.
+
+3. **Wrap/unwrap**: When sending YAML content to the Markdown editor webview, the YAML body is wrapped in `::: page-constructor\n...\n:::` via `wrapPageConstructor()`. When receiving edits back from the webview, `unwrapPageConstructor()` strips the directive wrapper before writing back to the YAML file.
+
+4. **Sidebar integration**: `_getMarkdownFiles()` in `sidebar.ts` scans `**/*.yaml` (excluding `node_modules`), opens each document, and includes URIs where `isBlocksYaml()` returns true. A `yamlWatcher` refreshes the file list on YAML create/delete. Clicking a blocks-YAML file opens it in the Markdown editor via `_mdEditor.showFile()`.
+
+5. **package.json contributions**: The `diplodoc.openMdEditor` command has `enablement` and `when` conditions that include `diplodoc.hasBlocksYaml` alongside `resourceLangId == markdown`.
 
 ## Validation System — Detailed
 
@@ -342,7 +356,7 @@ Run: `npm run merge-schemas` (auto-detects CLI schemas at `../packages/cli/schem
 - **activationEvents**: `onLanguage:markdown`, `onLanguage:yaml`
 - **languages**: `.yfm`/`.yfmlint` as YAML; `toc.yaml`/`presets.yaml`/`redirects.yaml`/`theme.yaml` filenames as YAML
 - **grammars**: Injects YAML syntax highlighting into `::: page-constructor` blocks in Markdown
-- **commands**: `diplodoc.openMdEditor`, `diplodoc.openTocEditor`, `diplodoc.insertTable`, `diplodoc.insertNote`, `diplodoc.insertPageConstructor`, `diplodoc.insertHtmlBlock`
+- **commands**: `diplodoc.openMdEditor` (works for both Markdown and blocks-YAML), `diplodoc.openTocEditor`, `diplodoc.insertTable`, `diplodoc.insertNote`, `diplodoc.insertPageConstructor`, `diplodoc.insertHtmlBlock`
 - **keybindings**: `Alt+T` (table), `Alt+R` (note), `Alt+P` (page-constructor), `Alt+H` (HTML block)
 - **views**: Sidebar webview in activity bar
 
