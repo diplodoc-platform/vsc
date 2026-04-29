@@ -7,9 +7,11 @@ import {join} from 'path';
 import {tmpdir} from 'os';
 
 import {
-    findYfmConfig,
+    buildLintConfig,
+    findConfig,
     formatLintMessage,
     formatPluginMessage,
+    processYfmlintConfig,
     toDiagnostic,
     toDiagnostics,
     toLintDiagnostic,
@@ -151,7 +153,7 @@ describe('toDiagnostics', () => {
     });
 });
 
-describe('findYfmConfig', () => {
+describe('findConfig', () => {
     const testRoot = join(tmpdir(), `yfm-config-test-${Date.now()}`);
     const nestedDir = join(testRoot, 'a', 'b', 'c');
 
@@ -167,7 +169,7 @@ describe('findYfmConfig', () => {
         setup();
         writeFileSync(join(testRoot, '.yfm'), 'allowHtml: true\n');
 
-        const config = findYfmConfig(testRoot);
+        const config = findConfig(testRoot, '.yfm');
         expect(config).toEqual({allowHtml: true});
     });
 
@@ -175,13 +177,13 @@ describe('findYfmConfig', () => {
         setup();
         writeFileSync(join(testRoot, '.yfm'), 'allowHtml: false\nlang: ru\n');
 
-        const config = findYfmConfig(nestedDir);
+        const config = findConfig(nestedDir, '.yfm');
         expect(config).toEqual({allowHtml: false, lang: 'ru'});
     });
 
     it('returns null when no .yfm exists', () => {
         setup();
-        const config = findYfmConfig(nestedDir);
+        const config = findConfig(nestedDir, '.yfm');
         expect(config).toBeNull();
     });
 
@@ -189,7 +191,7 @@ describe('findYfmConfig', () => {
         setup();
         writeFileSync(join(testRoot, '.yfm'), ':\n  :\n    - [invalid');
 
-        const config = findYfmConfig(nestedDir);
+        const config = findConfig(nestedDir, '.yfm');
         expect(config).toBeNull();
     });
 
@@ -200,8 +202,121 @@ describe('findYfmConfig', () => {
             return;
         }
 
-        const config = findYfmConfig(mocksDir);
+        const config = findConfig(mocksDir, '.yfm');
         expect(config).not.toBeNull();
         expect(config?.allowHtml).toBe(true);
+    });
+
+    it('finds .yfmlint in the same directory', () => {
+        setup();
+        writeFileSync(
+            join(testRoot, '.yfmlint'),
+            'default: true\nYFM001:\n  level: error\n  maximum: 50\n',
+        );
+
+        const config = findConfig(testRoot, '.yfmlint');
+        expect(config).toEqual({default: true, YFM001: {level: 'error', maximum: 50}});
+    });
+
+    it('finds .yfmlint with log-levels', () => {
+        setup();
+        writeFileSync(
+            join(testRoot, '.yfmlint'),
+            'log-levels:\n  MD001: disabled\n  MD041: disabled\n',
+        );
+
+        const config = findConfig(testRoot, '.yfmlint');
+        expect(config).toEqual({'log-levels': {MD001: 'disabled', MD041: 'disabled'}});
+    });
+});
+
+describe('processYfmlintConfig', () => {
+    it('returns empty object for null config', () => {
+        expect(processYfmlintConfig(null)).toEqual({});
+    });
+
+    it('passes through config without log-levels unchanged', () => {
+        const config = {default: true, MD013: false, YFM001: {level: 'warn', maximum: 80}};
+        expect(processYfmlintConfig(config)).toEqual(config);
+    });
+
+    it('flattens log-levels into per-rule entries', () => {
+        const config = {
+            'log-levels': {MD001: 'disabled', YFM003: 'error'},
+        };
+
+        expect(processYfmlintConfig(config)).toEqual({
+            MD001: 'disabled',
+            YFM003: 'error',
+        });
+    });
+
+    it('inline rule config takes precedence over log-levels', () => {
+        const config = {
+            YFM001: {level: 'warn', maximum: 80},
+            'log-levels': {YFM001: 'error', MD007: 'error'},
+        };
+
+        const result = processYfmlintConfig(config);
+        expect(result).toEqual({
+            YFM001: {level: 'warn', maximum: 80},
+            MD007: 'error',
+        });
+    });
+
+    it('ignores non-object log-levels value', () => {
+        const config = {'log-levels': 'invalid' as unknown};
+        expect(processYfmlintConfig(config as Record<string, unknown>)).toEqual({});
+    });
+});
+
+describe('buildLintConfig', () => {
+    it('returns base defaults when no .yfmlint config', () => {
+        const config = buildLintConfig(null, false);
+        expect(config.default).toBe(true);
+        expect(config.MD013).toBe(false);
+        expect(config.MD033).toBe(true);
+    });
+
+    it('disables MD033 when allowHtml is true', () => {
+        const config = buildLintConfig(null, true);
+        expect(config.MD033).toBe(false);
+    });
+
+    it('allows user to override default', () => {
+        const config = buildLintConfig({default: false}, false);
+        expect(config.default).toBe(false);
+    });
+
+    it('allows user to re-enable MD013', () => {
+        const config = buildLintConfig({MD013: true}, false);
+        expect(config.MD013).toBe(true);
+    });
+
+    it('MD033 cannot be overridden by user config', () => {
+        const config = buildLintConfig({MD033: true}, true);
+        expect(config.MD033).toBe(true);
+    });
+
+    it('merges user rules with defaults', () => {
+        const config = buildLintConfig(
+            {YFM001: {level: 'error', maximum: 50}, YFM003: 'disabled'},
+            false,
+        );
+
+        expect(config.default).toBe(true);
+        expect(config.MD013).toBe(false);
+        expect(config.YFM001).toEqual({level: 'error', maximum: 50});
+        expect(config.YFM003).toBe('disabled');
+    });
+
+    it('processes log-levels from .yfmlint config', () => {
+        const config = buildLintConfig(
+            {'log-levels': {MD001: 'disabled', MD041: 'disabled'}},
+            false,
+        );
+
+        expect(config.MD001).toBe('disabled');
+        expect(config.MD041).toBe('disabled');
     });
 });
