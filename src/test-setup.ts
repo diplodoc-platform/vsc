@@ -34,6 +34,20 @@ class MockDiagnostic {
     }
 }
 
+class MockColor {
+    red: number;
+    green: number;
+    blue: number;
+    alpha: number;
+
+    constructor(red: number, green: number, blue: number, alpha: number) {
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
+        this.alpha = alpha;
+    }
+}
+
 class MockMarkdownString {
     value: string;
 
@@ -45,6 +59,7 @@ class MockMarkdownString {
 vi.mock('vscode', () => ({
     Range: MockRange,
     Position: MockPosition,
+    Color: MockColor,
     Diagnostic: MockDiagnostic,
     MarkdownString: MockMarkdownString,
     DiagnosticSeverity: {
