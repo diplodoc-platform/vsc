@@ -1,4 +1,5 @@
 import type {PluginMessage, ValidationMessage, YfmLintError} from './types';
+import type {RawLintConfig} from '@diplodoc/yfmlint';
 
 import * as vscode from 'vscode';
 import {existsSync, readFileSync} from 'fs';
@@ -299,12 +300,12 @@ function isYfmLintError(error: ValidationMessage): error is YfmLintError {
     return 'ruleDescription' in error;
 }
 
-export function findYfmConfig(startDir: string): Record<string, unknown> | null {
+export function findConfig(startDir: string, config: string): Record<string, unknown> | null {
     let dir = startDir;
     let parent = dirname(dir);
 
     while (dir !== parent) {
-        const yfmPath = resolve(dir, '.yfm');
+        const yfmPath = resolve(dir, config);
 
         if (existsSync(yfmPath)) {
             try {
@@ -321,4 +322,43 @@ export function findYfmConfig(startDir: string): Record<string, unknown> | null 
     }
 
     return null;
+}
+
+export function processYfmlintConfig(
+    config: Record<string, unknown> | null,
+): Record<string, unknown> {
+    if (!config) {
+        return {};
+    }
+
+    const result = {...config};
+
+    if ('log-levels' in result) {
+        const logLevels = result['log-levels'];
+        delete result['log-levels'];
+
+        if (logLevels && typeof logLevels === 'object') {
+            for (const [rule, level] of Object.entries(logLevels as Record<string, unknown>)) {
+                if (!(rule in result)) {
+                    result[rule] = level;
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+export function buildLintConfig(
+    yfmlintConfig: Record<string, unknown> | null,
+    allowHtml: boolean,
+): RawLintConfig {
+    const userConfig = processYfmlintConfig(yfmlintConfig);
+
+    return {
+        default: true,
+        MD013: false,
+        MD033: !allowHtml,
+        ...userConfig,
+    } as RawLintConfig;
 }
