@@ -258,6 +258,7 @@
     "@diplodoc/mermaid-extension": "^2.0.0",
     "@diplodoc/transform": "^4.72.0",
     "@diplodoc/yfmlint": "^1.7.5",
+    "colord": "^2.9.3",
     "@gravity-ui/components": "^4.18.0",
     "@gravity-ui/markdown-editor": "^15.39.0",
     "@gravity-ui/markdown-editor-page-constructor-extension": "^0.1.0",
