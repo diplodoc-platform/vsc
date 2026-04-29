@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.2 (2026-04-29)
+
+## What's Changed
+* fix: color highlighting in files has been added by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/59
+
+
+**Full Changelog**: https://github.com/diplodoc-platform/vsc/compare/v0.5.1...v0.5.2
+
 ## 0.5.1 (2026-04-29)
 
 ## What's Changed
