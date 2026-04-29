@@ -210,16 +210,44 @@ Errors arrive via **two independent channels** — do not confuse them:
 
 #### yfmlint configuration
 
-`@diplodoc/yfmlint` has `default: false` in its built-in config, meaning rules won't run unless enabled. We pass `lintConfig: { default: true, MD013: false, MD033: !allowHtml }`:
+`@diplodoc/yfmlint` has `default: false` in its built-in config, meaning rules won't run unless enabled. The extension builds the lint config via `buildLintConfig()` (`markdown.ts`) in the following merge order:
 
-- **MD013** (Line length) is always disabled — documentation lines often exceed 80 characters.
-- **MD033** (Inline HTML) is disabled when `allowHtml: true` in the project's `.yfm` config.
+1. **Extension defaults**: `{ default: true, MD013: false }` — all rules enabled, line length disabled
+2. **User's `.yfmlint` overrides**: processed by `processYfmlintConfig()` — the user can change `default`, enable/disable any rule, set severity levels
+3. **Forced overrides**: `MD033: !allowHtml` — always controlled by `.yfm`, cannot be overridden by `.yfmlint` (matches CLI behavior)
 
-#### .yfm config resolution
+User config entries spread on top of extension defaults, so the user **can** re-enable `MD013` or set `default: false` in `.yfmlint`.
 
-`findYfmConfig(startDir)` in `validation/utils.ts` walks up from `startDir` to filesystem root looking for a `.yfm` file. Returns parsed YAML as `Record<string, unknown>` or `null`.
+##### `.yfmlint` config format
 
-Used by `validateMarkdown()` to determine `allowHtml` and potentially other project-level settings. The `.yfm` file always lives at the documentation project root (never nested deeper).
+The `.yfmlint` file supports the same format as in `@diplodoc/cli`:
+
+```yaml
+default: false # disable all rules, then allowlist
+MD013: true # boolean: enable at default level (warn)
+YFM003: error # string: set severity (error/warn/info/disabled)
+YFM001: # object: severity + rule-specific params
+  level: error
+  maximum: 80
+log-levels: # convenience shorthand for severity overrides
+  MD001: disabled
+  MD041: disabled
+```
+
+##### `log-levels` handling
+
+`processYfmlintConfig()` flattens the `log-levels` map into per-rule entries before passing to `yfmlint()`. Inline rule config takes precedence over `log-levels` for the same rule. Unlike the CLI (which uses `normalizeConfig()` to merge `log-levels`), we flatten manually to avoid a double-normalization bug where `yfmlint()` internally re-normalizes and loses severity from pre-normalized `log-levels`.
+
+#### Config resolution
+
+`findConfig(startDir, configName)` in `validation/utils.ts` walks up from `startDir` to filesystem root looking for the named config file (`.yfm` or `.yfmlint`). Returns parsed YAML as `Record<string, unknown>` or `null`.
+
+Used by `validateMarkdown()` to load:
+
+- `.yfm` — determines `allowHtml` and other project-level settings
+- `.yfmlint` — lint rule overrides
+
+Both config files live at the documentation project root (never nested deeper).
 
 Available rules (yfmlint 1.7.0, no YFM012–YFM017, no YFM019):
 
