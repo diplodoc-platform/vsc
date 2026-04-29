@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.1 (2026-04-29)
+
+## What's Changed
+* fix: getting settings from .yfmlint during validation by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/57
+
+
+**Full Changelog**: https://github.com/diplodoc-platform/vsc/compare/v0.5.0...v0.5.1
+
 ## 0.5.0 (2026-04-28)
 
 ## What's Changed
