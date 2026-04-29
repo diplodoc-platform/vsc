@@ -5,6 +5,7 @@ items:
     href: toc-include.md
   - name: Mermaid
     href: mermaid.md
+    color: '#ff0000'
   - name: Latex
     href: latex.md
   - name: Notes
