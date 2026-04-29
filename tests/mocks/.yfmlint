@@ -2,4 +2,4 @@ log-levels:
   MD001: disabled
   MD007: error
   MD040: disabled
-unknownRule: bad
+  MD041: disabled
