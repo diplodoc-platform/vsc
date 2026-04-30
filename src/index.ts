@@ -85,19 +85,14 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.onDidChangeActiveTextEditor((editor) => {
             updateYamlContext(editor);
 
-            if (
-                editor &&
-                (editor.document.languageId === 'markdown' || isBlocksYaml(editor.document))
-            ) {
-                mdEditor.syncFromEditor(editor);
-            }
-        }),
-    );
+            if (editor) {
+                if (editor.document.languageId === 'markdown' || isBlocksYaml(editor.document)) {
+                    mdEditor.syncFromEditor(editor);
+                }
 
-    context.subscriptions.push(
-        vscode.window.onDidChangeActiveTextEditor((editor) => {
-            if (editor && editor.document.fileName === 'toc.yaml') {
-                tocEditor.syncFromEditor(editor);
+                if (editor.document.fileName.endsWith('toc.yaml')) {
+                    tocEditor.syncFromEditor(editor);
+                }
             }
         }),
     );
