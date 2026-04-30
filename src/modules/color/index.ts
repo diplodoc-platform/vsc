@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import {colorToHex, colorToRgb, findColors} from './utils';
 
-class YamlColorProvider implements vscode.DocumentColorProvider {
+export class YamlColorProvider implements vscode.DocumentColorProvider {
     provideDocumentColors(document: vscode.TextDocument): vscode.ColorInformation[] {
         return findColors(document).map((m) => new vscode.ColorInformation(m.range, m.color));
     }

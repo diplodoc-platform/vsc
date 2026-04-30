@@ -1,264 +1,273 @@
-# Contributing to @diplodoc/vsc
+# Contributing
 
-Thank you for your interest in contributing! This document provides guidelines and instructions for contributing to this project.
+**english** | [русский](https://github.com/diplodoc-platform/vsc/blob/master/CONTRIBUTING.ru.md)
 
-## Table of Contents
+---
 
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Workflow](#development-workflow)
-- [Code Style](#code-style)
-- [Testing](#testing)
-- [Documentation](#documentation)
-- [Commit Guidelines](#commit-guidelines)
-- [Pull Request Process](#pull-request-process)
+## Prerequisites
 
-## Code of Conduct
+- Node.js 22+
+- npm >= 11.5
+- VS Code 1.110+
+- Git
 
-This project adheres to a code of conduct that all contributors are expected to follow. Please be respectful and constructive in all interactions.
+## Setup
 
-## Getting Started
-
-### Prerequisites
-
-- **Node.js**: Version 22.x
-- **npm**: >= 11.5.1
-- **Git**: For version control
-
-### Setup
-
-1. **Fork and clone the repository**:
-   ```bash
-   git clone https://github.com/diplodoc-platform/vsc.git
-   cd vsc
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Verify the setup**:
-   ```bash
-   npm run build
-   npm test
-   ```
-
-## Development Workflow
-
-### Project Structure
-
-```
-package-name/
-├── src/                    # Source code
-├── build/                  # Compiled output (generated)
-├── esbuild/               # Build configuration
-├── .github/               # GitHub workflows and templates
-└── test/                  # Test files (if separate)
+```bash
+git clone https://github.com/diplodoc-platform/vsc.git
+cd vsc
+npm install
+npm run compile
 ```
 
-### Making Changes
+Verify everything works:
 
-1. **Create a branch** from `master`:
-   ```bash
-   git checkout -b feature/your-feature-name
-   # or
-   git checkout -b fix/your-bug-fix
-   ```
+```bash
+npm run typecheck
+npm test
+npm run lint
+```
 
-2. **Make your changes** following the [Code Style](#code-style) guidelines.
+## Running the extension locally
 
-3. **Run tests** to ensure everything works:
-   ```bash
-   npm test
-   ```
+1. Open the project in VS Code
+2. Press `F5` — this launches a new VS Code window (Extension Development Host) with the extension loaded
+3. Open any Markdown or YAML file in the dev host to test
 
-4. **Run linting** to check code quality:
-   ```bash
-   npm run lint
-   ```
+For faster iteration:
 
-5. **Format your code** (if needed):
-   ```bash
-   npm run lint:fix
-   ```
+```bash
+npm run watch:ext       # rebuilds extension host on change
+npm run watch:webview   # rebuilds webviews on change
+```
 
-6. **Commit your changes** following [Commit Guidelines](#commit-guidelines).
+Run both in separate terminals. After a rebuild, press `Ctrl+Shift+P` → `Developer: Reload Window` in the dev host.
 
-## Code Style
+To test from a packaged `.vsix`:
 
-### TypeScript
+```bash
+npm run vsce
+code --install-extension diplodoc-vsc-extension-*.vsix --force
+```
 
-- **Strict mode**: All code must pass TypeScript strict mode checks.
-- **ES2022 target**: Code is compiled to ES2022 with ES modules.
-- **Functional patterns**: Prefer functional programming patterns where possible.
+## Project structure
 
-### Import Organization
+```
+src/
+├── index.ts                          # activate() — entry point
+├── commands.ts                       # Command handlers
+├── utils.ts                          # Shared utilities
+├── modules/
+│   ├── shared/base-editor.ts         # Abstract base class for visual editors
+│   ├── md-editor/editor.ts           # WYSIWYG Markdown editor (extends BaseEditor)
+│   ├── toc-editor/editor.ts          # TOC editor (extends BaseEditor)
+│   ├── main/sidebar.ts               # Sidebar file browser
+│   ├── color/                        # YAML color picker provider
+│   └── validation/                   # YAML schema validation + Markdown linting
+│       ├── index.ts                  # Orchestrator: events, cache, debounce
+│       ├── parser.ts                 # Extract frontmatter + page-constructor blocks
+│       ├── markdown.ts               # @diplodoc/yfmlint integration
+│       ├── utils.ts                  # Error → vscode.Diagnostic conversion
+│       └── providers/
+│           ├── yaml-service.ts       # yaml-language-server singleton
+│           ├── diagnostic.ts         # Schema validation diagnostics
+│           ├── completion.ts         # YAML autocompletion
+│           ├── hover.ts              # YAML hover documentation
+│           └── position.ts           # Editor ↔ block coordinate mapping
+├── ui/                               # React webview source (runs in browser)
+│   ├── md-editor/                    # Markdown editor UI
+│   ├── toc-editor/                   # TOC editor UI
+│   └── sidebar/                      # Sidebar UI
+├── extensions/                       # Custom markdown-it plugins
+│   ├── yfm-include/                  # {% include %}
+│   └── yfm-frontmatter/             # --- frontmatter ---
+├── i18n/                             # Localization (en, ru)
+schemas/
+├── *.json                            # Generated JSON Schema files (committed)
+├── overlays/*.yaml                   # VS Code-specific schema extensions
+scripts/
+└── merge-schemas.js                  # CLI schema → JSON Schema pipeline
+syntaxes/
+└── markdown-page-constructor.json    # TextMate grammar for ::: page-constructor
+tests/mocks/                          # Manual test files
+```
 
-Imports should be organized according to the project's style guidelines. See `.agents/style-and-testing.md` in the metapackage for detailed import organization rules.
+## Architecture overview
 
-### Comments and Documentation
+The extension runs in two environments:
 
-- **All comments must be in English** (including test comments and inline documentation).
-- **JSDoc**: All public APIs must be documented with JSDoc comments.
-- **Internal functions**: Use concise comments without redundant `@param` and `@returns` tags.
+### Extension Host (Node.js)
 
-### Code Formatting
+Entry: `src/index.ts` → `build/index.js`
 
-The project uses **Prettier** for code formatting, configured via `@diplodoc/lint`. Run `npm run lint:fix` before committing.
+Built with esbuild as a single CJS bundle (~8 MB). Only `vscode` is external — everything else (including `yaml-language-server`) is inlined. Three esbuild plugins handle bundling issues:
+
+- **yamlServerFixes** — redirects `vscode-json-languageservice/lib/umd/` → `lib/esm/`; stubs `prettier` and `request-light` (unused by us)
+- **nodeShims** — stubs `fs`/`path`/`process` for webview bundles; provides browser polyfills for `punycode`/`url`
+- **pageConstructorFixes** — fixes `@gravity-ui/markdown-editor/pm/*` subpath resolution and webpack-style `~` imports
+
+### Webviews (Browser)
+
+Three separate IIFE bundles: `md-editor`, `toc-editor`, `sidebar`. React 18 + @gravity-ui/uikit. Assets embedded as data URLs.
+
+Communication between extension host and webviews is via `postMessage()` — see the protocol tables in AGENTS.md.
+
+### Editor class hierarchy
+
+Visual editors share a base class:
+
+```
+BaseEditor (abstract)          — src/modules/shared/base-editor.ts
+├── MdEditor                   — src/modules/md-editor/editor.ts
+│   Adds: WYSIWYG mode, whitespace preservation,
+│   page-constructor wrap/unwrap, pending sync, save
+└── TocEditor                  — src/modules/toc-editor/editor.ts
+    Identity transforms, change-only messages
+```
+
+To add a new visual editor: extend `BaseEditor`, implement abstract methods (`_panelId`, `_panelTitle`, `_buildSubdir`, `_canSync`, `_onWebviewMessage`, `_transformForWebview`, `_transformFromWebview`).
+
+## Working with schemas
+
+JSON schemas are generated from `@diplodoc/cli` YAML schemas, with VS Code-specific overlays merged on top.
+
+### Updating schemas
+
+```bash
+npm run merge-schemas
+```
+
+This reads from `../packages/cli/schemas/`, applies overlays from `schemas/overlays/`, and writes to `schemas/*.json`. If the CLI schemas are elsewhere, the script prompts for the path.
+
+### Adding a new schema type
+
+1. Ensure the CLI schema exists at `../packages/cli/schemas/<name>.yaml`
+2. Create an overlay at `schemas/overlays/<name>.yaml` (minimum: `title` and `additionalProperties: false`)
+3. Add entry to `SCHEMAS` in `scripts/merge-schemas.js`
+4. Run `npm run merge-schemas`
+5. In `yaml-service.ts`: import the schema, add entry to `SCHEMA_ENTRIES`
+6. In `validation/index.ts`: add entry to `YAML_FILE_SCHEMAS`
+7. Optionally add the filename to `contributes.languages` in `package.json`
+
+### Modifying hover/completion content
+
+Edit `schemas/overlays/<name>.yaml` and run `npm run merge-schemas`. Overlays support:
+
+- `markdownDescription` — rich hover content
+- `defaultSnippets` — autocompletion snippets
+- `additionalProperties: false` — strict property checking
+
+Important: when a definition uses `oneOf`/`anyOf` with `$ref`, all referenced properties must also be listed in the parent `properties` if `additionalProperties: false` is set.
+
+## Validation system
+
+The validation system has two independent paths:
+
+- **YAML validation** — `yaml-language-server` with in-process singleton, virtual documents, block-relative coordinates
+- **Markdown linting** — `@diplodoc/yfmlint` with all Diplodoc transform plugins
+
+Key design choices documented in AGENTS.md: singleton with all schemas pre-registered (no race conditions), virtual document version incrementing (no stale diagnostics), lazy block parsing (hover/completion work before first validation).
+
+### Adding a new directive error handler
+
+Add an entry to `DIRECTIVE_HANDLERS` in `src/modules/validation/utils.ts`:
+
+```typescript
+{message: /^My block must be closed/, open: /{%\s*myblock\b[^%]*%}/, close: /{%\s*endmyblock\s*%}/}
+```
 
 ## Testing
 
-### Test Structure
-
-- Test files use `.test.ts` or `.spec.ts` extension.
-- Tests are located next to the code they test or in a `test/` directory.
-- Use Vitest framework for unit tests.
-
-### Running Tests
-
 ```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run tests with coverage
-npm run test:coverage
+npm test                # Run all tests (vitest)
+npm run test:coverage   # With coverage report
 ```
 
-### Writing Tests
+### Test patterns
 
-Focus areas:
-- Core functionality
-- Error handling
-- Edge cases
+- **Mock vscode API**: centralized in `src/test-setup.ts` — provides MockPosition, MockRange, MockDiagnostic, MockColor, MockHover, MockCompletionItem, etc.
+- **Mock documents**: factory functions (`mockDocument(text)`) that create minimal `vscode.TextDocument` with `lineCount` and `lineAt()`
+- **Mock yaml-language-server**: `vi.mock('yaml-language-server')` with controlled return values
+- **Mock modules**: `vi.mock('./module')` for isolating providers from yaml-service, position utils, etc.
+- **Real filesystem**: `findConfig()` tests use real `/tmp` directories
 
-## Documentation
+Tests live next to the code they test (`*.spec.ts`). Manual test files for integration testing are in `tests/mocks/`.
 
-### User Documentation
+### What to test
 
-- **README.md**: Main project documentation
-- **AGENTS.md**: Documentation for AI coding agents
+- **New validation features**: test the diagnostic conversion, range calculation, and error formatting
+- **New schema types**: test via `getDiagnostics()` with real content + schema type
+- **New editor features**: mock the webview message protocol
+- **New UI components**: test with mock `window` and `MessageEvent`
 
-### Developer Documentation
+## Debugging
 
-- **CONTRIBUTING.md**: This file
-- **SECURITY.md**: Security policy
+- **Output channel**: `logger()` from `src/modules/utils.ts` writes to VS Code Output → "Diplodoc"
+- **Extension Host log**: shows activation errors and unhandled exceptions
+- **Webview DevTools**: in the dev host, `Ctrl+Shift+P` → `Developer: Open Webview Developer Tools`
+- **Standalone yaml-language-server tests**: `node -e "..."` scripts can call validation/hover/completion directly without VS Code
 
-### Updating Documentation
+## Code style
 
-- Update relevant README files when adding features
-- Keep examples up to date with API changes
+Managed by `@diplodoc/lint` (wraps ESLint + Prettier + Stylelint):
 
-## Commit Guidelines
+```bash
+npm run lint            # Check
+npm run lint:fix        # Auto-fix
+```
 
-This project uses [Conventional Commits](https://www.conventionalcommits.org/) format:
+Key rules:
+
+- TypeScript strict mode
+- Import order: `import type` first, then external packages, then local (separated by blank lines)
+- No `any` without `// eslint-disable-next-line @typescript-eslint/no-explicit-any`
+- Public members before protected, protected before private (`@typescript-eslint/member-ordering`)
+- All comments and commit messages in English
+
+## Commit guidelines
+
+[Conventional Commits](https://www.conventionalcommits.org/) format:
 
 ```
 <type>(<scope>): <subject>
-
-<body>
 ```
 
-### Commit Types
+| Type       | When                                    |
+| ---------- | --------------------------------------- |
+| `feat`     | New user-facing feature                 |
+| `fix`      | Bug fix                                 |
+| `perf`     | Performance improvement                 |
+| `refactor` | Code restructuring (no behavior change) |
+| `docs`     | Documentation only                      |
+| `chore`    | Build, CI, dependencies                 |
 
-- `feat`: New feature for end users
-- `fix`: Bug fix for end users
-- `perf`: Performance improvement
-- `refactor`: Code refactoring (no functional changes)
-- `docs`: Documentation changes only
-- `chore`: Maintenance tasks and infrastructure changes
-- `revert`: Reverting a previous commit
+Subject: imperative mood, lowercase, no period. Scope is optional (e.g., `validation`, `editor`, `schemas`).
 
-**Key distinction**: `feat` is for **user-facing functionality**, while `chore` is for **development infrastructure**.
+Releases are managed automatically by [release-please](https://github.com/googleapis/release-please).
 
-**Examples**:
-- ✅ `feat(cache): add CacheFirst strategy` – new caching feature
-- ✅ `chore(lint): add module import restrictions` – ESLint configuration
-- ❌ `feat(lint): add module import restrictions` – incorrect (infrastructure, not user feature)
+## Pull request process
 
-### Commit Message Rules
-
-- **All commit messages must be in English**
-- **Subject**: Brief description in imperative mood (e.g., "add", "fix", not "added", "fixed")
-- **Scope** (optional): Area of codebase (e.g., `cache`, `models`, `telemetry`)
-- **Body** (optional): Detailed explanation of what and why
-
-## Pull Request Process
-
-1. **Update your branch**:
+1. Branch from `master`: `git checkout -b feat/my-feature`
+2. Make changes, ensure all checks pass:
    ```bash
-   git checkout master
-   git pull origin master
-   git checkout your-branch
-   git rebase master
+   npm run typecheck
+   npm test
+   npm run lint
    ```
+3. Push and create a PR against `master`
+4. Fill in the PR description — what changed and why
+5. Address review feedback
 
-2. **Ensure all checks pass**:
-   - Tests pass: `npm test`
-   - Linting passes: `npm run lint`
-   - Type checking passes: `npm run typecheck`
-   - Build succeeds: `npm run build`
+### PR checklist
 
-3. **Create a Pull Request**:
-   - Use the PR template provided
-   - Provide a clear description of changes
-   - Link related issues if applicable
-   - Ensure CI checks pass
+- [ ] `npm run typecheck` passes
+- [ ] `npm test` passes
+- [ ] `npm run lint` passes (zero warnings)
+- [ ] New code has tests
+- [ ] AGENTS.md updated if architecture changed
 
-4. **Code Review**:
-   - Address review comments
-   - Keep commits focused and logical
-   - Squash commits if requested
+## CLA
 
-### PR Checklist
+By contributing, you agree to the [Yandex CLA](https://yandex.ru/legal/cla/?lang=en). Add this to your first PR:
 
-- [ ] Tests pass locally
-- [ ] Added/updated tests for new functionality
-- [ ] Type check passes (`npm run typecheck`)
-- [ ] Code follows project style guidelines
-- [ ] Self-review completed
-- [ ] Comments added for complex code
-- [ ] Documentation updated (if needed)
-- [ ] No new warnings generated
-- [ ] CHANGELOG will be updated by release-please (if applicable)
-
-## CLA (Contributor License Agreement)
-
-In order for us (YANDEX LLC) to accept patches and other contributions from you, you will have to adopt our Yandex Contributor License Agreement (the "**CLA**"). The current version of the CLA can be found here:
-1) https://yandex.ru/legal/cla/?lang=en (in English) and 
-2) https://yandex.ru/legal/cla/?lang=ru (in Russian).
-
-By adopting the CLA, you state the following:
-
-* You obviously wish and are willingly licensing your contributions to us for our open source projects under the terms of the CLA,
-* You have read the terms and conditions of the CLA and agree with them in full,
-* You are legally able to provide and license your contributions as stated,
-* We may use your contributions for our open source projects and for any other our project too,
-* We rely on your assurances concerning the rights of third parties in relation to your contributions.
-
-If you agree with these principles, please read and adopt our CLA. By providing us your contributions, you hereby declare that you have already read and adopt our CLA, and we may freely merge your contributions with our corresponding open source project and use it in further in accordance with terms and conditions of the CLA.
-
-### Provide contributions 
-
-If you have already adopted terms and conditions of the CLA, you are able to provide your contributions. When you submit your pull request, please add the following information into it:
-
-```
-I hereby agree to the terms of the CLA available at: [link].
-```
-
-Replace the bracketed text as follows:
-* [link] is the link to the current version of the CLA: https://yandex.ru/legal/cla/?lang=en (in English) or https://yandex.ru/legal/cla/?lang=ru (in Russian).
-
-It is enough to provide us such notification once. 
-
-## Questions?
-
-If you have questions or need help, please:
-- Open an issue for bugs or feature requests
-- Check existing documentation
-- Review examples in the codebase
-
-Thank you for contributing! 🎉
+> I hereby agree to the terms of the CLA available at: https://yandex.ru/legal/cla/?lang=en

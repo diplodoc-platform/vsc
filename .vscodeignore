@@ -3,19 +3,45 @@ src/**
 tests/**
 scripts/**
 
-# Config
+# Config & tooling
 tsconfig.json
 esbuild.js
 .gitignore
 .eslintrc*
+.eslintignore
 .prettierrc*
+.prettierignore
+.stylelintrc*
+.stylelintignore
+.lintstagedrc*
 .editorconfig
+.nvmrc
+.release-please*
+sonar-project.properties
+vitest.config.*
 
-# Dependencies (bundled into build/index.js)
+# Dependencies (bundled into build/)
 node_modules/**
 
 # Dev artifacts
 coverage/**
 *.vsix
 .DS_Store
+
+# Dev directories
 .vscode/**
+.claude/**
+.github/**
+.husky/**
+
+# Dev docs (not needed by end users)
+AGENTS.md
+CONTRIBUTING.md
+CONTRIBUTING.ru.md
+SECURITY.md
+
+# Sourcemaps (not needed in packaged extension)
+build/**/*.map
+
+# Schema overlays (only needed for generation, not runtime)
+schemas/overlays/**

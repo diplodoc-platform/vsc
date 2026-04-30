@@ -20,7 +20,7 @@ export function openMdEditor(mdEditor: MdEditor) {
 export function openTocEditor(tocEditor: TocEditor) {
     const editor = vscode.window.activeTextEditor;
 
-    if (!editor || editor.document.fileName === 'toc.yaml') {
+    if (!editor || !editor.document.fileName.endsWith('toc.yaml')) {
         return;
     }
 
