@@ -56,12 +56,86 @@ class MockMarkdownString {
     }
 }
 
+class MockColorInformation {
+    range: MockRange;
+    color: MockColor;
+
+    constructor(range: MockRange, color: MockColor) {
+        this.range = range;
+        this.color = color;
+    }
+}
+
+class MockColorPresentation {
+    label: string;
+
+    constructor(label: string) {
+        this.label = label;
+    }
+}
+
+class MockHover {
+    contents: MockMarkdownString;
+
+    constructor(contents: MockMarkdownString) {
+        this.contents = contents;
+    }
+}
+
+class MockCompletionItem {
+    label: string;
+    kind?: number;
+    detail?: string;
+    documentation?: MockMarkdownString;
+    insertText?: string | MockSnippetString;
+    range?: MockRange;
+
+    constructor(label: string, kind?: number) {
+        this.label = label;
+        this.kind = kind;
+    }
+}
+
+class MockSnippetString {
+    value: string;
+
+    constructor(value = '') {
+        this.value = value;
+    }
+}
+
 vi.mock('vscode', () => ({
     Range: MockRange,
     Position: MockPosition,
     Color: MockColor,
     Diagnostic: MockDiagnostic,
     MarkdownString: MockMarkdownString,
+    ColorInformation: MockColorInformation,
+    ColorPresentation: MockColorPresentation,
+    Hover: MockHover,
+    CompletionItem: MockCompletionItem,
+    SnippetString: MockSnippetString,
+    CompletionItemKind: {
+        Text: 0,
+        Method: 1,
+        Function: 2,
+        Constructor: 3,
+        Field: 4,
+        Variable: 5,
+        Class: 6,
+        Interface: 7,
+        Module: 8,
+        Property: 9,
+        Unit: 10,
+        Value: 11,
+        Enum: 12,
+        Keyword: 13,
+        Snippet: 14,
+        Color: 15,
+        File: 16,
+        Reference: 17,
+        Folder: 18,
+    },
     DiagnosticSeverity: {
         Error: 0,
         Warning: 1,

@@ -112,6 +112,7 @@ const webviewBase = {
     target: 'es2020',
     format: 'iife',
     sourcemap: false,
+    minify: !isWatch,
     plugins: [
         nodeShims,
         pageConstructorFixes,

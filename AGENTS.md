@@ -390,6 +390,112 @@ Run: `npm run merge-schemas` (auto-detects CLI schemas at `../packages/cli/schem
 
 No `yamlValidation` contribution — the extension handles all YAML validation internally (no dependency on Red Hat YAML extension).
 
+## Color Provider
+
+`src/modules/color/` provides a YAML color picker (color swatches in the gutter).
+
+### How it works
+
+1. `YamlColorProvider.provideDocumentColors()` scans every line of YAML files
+2. `KEY_VALUE_RE` (`/^(\s*)([\w-]+)\s*:\s*/`) matches YAML key-value lines
+3. `extractValueSpan()` extracts the value portion (handles both quoted and unquoted values, strips inline comments)
+4. `parseColor()` uses `colord` library to validate and parse — supports hex, rgb(), rgba(), hsl(), named colors
+5. If valid, a `ColorInformation` is returned → VS Code shows the color swatch
+
+### Color presentations
+
+When the user picks a color from the VS Code color picker, two representations are offered:
+
+- Hex (`'#rrggbb'` or `'#rrggbbaa'`)
+- RGB (`'rgb(r, g, b)'` or `'rgba(r, g, b, a)'`)
+
+Both are always quoted (preserves original quote style; defaults to `'` if unquoted).
+
+## Editor Modules
+
+### Shared patterns
+
+`MdEditor` and `TocEditor` follow the same lifecycle pattern:
+
+1. `show()` → reveal existing panel or create new one → sync active editor
+2. `showFile(uri, column)` → open document → create/reveal panel → sync
+3. `syncFromEditor(editor)` → read text → postMessage to webview
+4. `_applyToDocument(text)` → WorkspaceEdit → replace full document range
+5. `_createPanel()` → WebviewPanel with CSP, icon, event handlers
+6. `_setupWebview()` → set HTML, register message handler
+
+### MdEditor specifics
+
+- **Whitespace preservation**: `_extractWhitespace()` strips leading/trailing whitespace before sending to webview, restores on write-back. This prevents WYSIWYG normalization from eating blank lines at file boundaries.
+- **Page-constructor wrapping**: YAML files with `blocks:` key are wrapped in `::: page-constructor ... :::` for the WYSIWYG editor, unwrapped on save.
+- **Pending sync**: New panels get a `_pendingSync` that fires on `ready` message from webview (avoids race condition where postMessage arrives before webview scripts load).
+- **Mode configuration**: `diplodoc.editorMode` setting (`wysiwyg`/`markup`) is sent to webview on creation and on config change.
+- **Save handling**: Webview can send `save` command (Ctrl+S in editor) → applies text + saves document.
+
+### TocEditor specifics
+
+- Simpler: no whitespace extraction, no page-constructor wrapping, no pending sync
+- No `ready` handshake — sends content immediately after panel creation (potential message loss on first open if webview not ready)
+- No mode toggle — always in markup mode
+
+### Webview HTML
+
+`getBaseHtml()` in `src/ui/html.ts` generates the shell HTML for all three webviews with:
+
+- Content Security Policy: `default-src 'none'`, scoped `style-src`, `script-src`, `img-src` (data:, https:, blob:), `font-src` (data:), `worker-src` (blob:)
+- Root div with `id` matching the webview name
+- Single script + single stylesheet
+
+## Webview Communication Protocol
+
+All webviews communicate with the extension host via `postMessage()`.
+
+### Extension → Webview messages
+
+| Command      | Fields             | Used by   | Description                           |
+| ------------ | ------------------ | --------- | ------------------------------------- |
+| `setContent` | `text`, `fileName` | all       | Replace editor content                |
+| `setFiles`   | `files`            | sidebar   | Update file list                      |
+| `setMode`    | `mode`             | md-editor | Switch wysiwyg/markup mode            |
+| `action`     | `action`           | md-editor | Trigger editor action (insert blocks) |
+
+### Webview → Extension messages
+
+| Command        | Fields  | Used by     | Description               |
+| -------------- | ------- | ----------- | ------------------------- |
+| `ready`        | —       | md-editor   | Webview scripts loaded    |
+| `change`       | `text`  | all editors | Content changed by user   |
+| `save`         | `text?` | md-editor   | Save requested (Ctrl+S)   |
+| `requestFiles` | —       | sidebar     | Request file list refresh |
+| `openFile`     | `file`  | sidebar     | Open file in editor       |
+| `initProject`  | —       | sidebar     | Run `yfm init`            |
+
+## I18n System
+
+`src/i18n/` provides a minimal i18n framework for webview UIs.
+
+- **Languages**: English (`en.json`), Russian (`ru.json`)
+- **Detection**: `document.documentElement.lang` (set from `vscode.env.language` in `getBaseHtml()`)
+- **Fallback**: English if lang not found
+- **Key format**: dot-separated path (`sidebar.welcome`, `editor.error`)
+- **Type safety**: `I18nKey` type is recursively flattened from the English messages structure — typos in keys cause type errors
+- **Scope**: only used in webview UIs (sidebar buttons/labels, error boundary text); extension host uses VS Code's built-in NLS
+
+## Theme Integration
+
+`useVscodeTheme()` hook (`src/ui/useVscodeTheme.ts`) detects VS Code's color theme:
+
+- Reads `data-vscode-theme-kind` attribute from `document.body`
+- `vscode-dark` and `vscode-high-contrast` → `'dark'`; everything else → `'light'`
+- Watches for attribute changes via `MutationObserver` (updates when user switches theme)
+- Used by all webviews to set Gravity UI theme (`<ThemeProvider theme={theme}>`)
+
+## Known Issues
+
+1. **`commands.ts:23`**: `editor.document.fileName === 'toc.yaml'` — `fileName` returns full path, never matches. TOC editor guard broken. Should use `.endsWith()`.
+2. **`index.ts:99`**: Same bug — `onDidChangeActiveTextEditor` sync for TOC editor never fires.
+3. **`ui/shortcuts/commands.ts`**: All WYSIWYG shortcuts use `(editor as any).actions?.X?.run()` — fragile, breaks silently if @gravity-ui API changes.
+
 ## Common Tasks
 
 ### Adding a new schema type

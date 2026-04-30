@@ -119,7 +119,8 @@ describe('commands', () => {
     });
 
     describe('openTocEditor', () => {
-        it('opens toc editor for non-toc files', () => {
+        it('opens toc editor for toc.yaml files', () => {
+            activeEditor.document.fileName = '/path/to/toc.yaml';
             const tocEditor = {
                 show: vi.fn(),
                 syncFromEditor: vi.fn(),
@@ -144,8 +145,8 @@ describe('commands', () => {
             expect(tocEditor.syncFromEditor).not.toHaveBeenCalled();
         });
 
-        it('does nothing for toc.yaml', () => {
-            activeEditor.document.fileName = 'toc.yaml';
+        it('does nothing for non-toc files', () => {
+            activeEditor.document.fileName = 'test.md';
             const tocEditor = {
                 show: vi.fn(),
                 syncFromEditor: vi.fn(),
