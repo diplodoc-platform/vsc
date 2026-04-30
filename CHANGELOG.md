@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.3 (2026-04-30)
+
+## What's Changed
+* fix: minified bundle by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/61
+* fix: fixed vsix by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/63
+
+
+**Full Changelog**: https://github.com/diplodoc-platform/vsc/compare/v0.5.2...v0.5.3
+
 ## 0.5.2 (2026-04-29)
 
 ## What's Changed
