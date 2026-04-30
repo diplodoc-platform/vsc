@@ -4,9 +4,6 @@ on:
   pull_request:
     types: [opened, synchronize, labeled]
 
-permissions:
-  contents: write
-
 jobs:
   build-vsix:
     if: "contains(github.event.pull_request.labels.*.name, 'autorelease: pending')"
@@ -16,7 +13,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -34,18 +30,12 @@ jobs:
 
       - name: Build extension
         run: |
-          rm -f *.vsix
           npm run compile
           npm run vsce
 
-      - name: Commit .vsix
-        run: |
-          git config user.email "95919151+yc-ui-bot@users.noreply.github.com"
-          git config user.name "yc-ui-bot"
-          git add -A -- '*.vsix'
-          if git diff --cached --quiet; then
-            echo "::info::.vsix is up to date"
-          else
-            git commit -m "chore: update vsix" --no-verify
-            git push
-          fi
+      - name: Upload VSIX as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: diplodoc-vsc-extension
+          path: '*.vsix'
+          retention-days: 90
