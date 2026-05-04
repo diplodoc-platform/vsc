@@ -508,10 +508,32 @@
               "type": "boolean",
               "description": "Exclude hidden TOC items from PDF output.",
               "markdownDescription": "**`boolean`** Exclude hidden TOC items from PDF output."
+            },
+            "icon": {
+              "type": "string",
+              "description": "Custom icon for the PDF download button. Accepted values: inline SVG markup, absolute URL, or a project-relative path starting with _assets/. For md output, paths under _assets/ are copied to the output directory.",
+              "markdownDescription": "**`string`** Custom icon for the PDF download button. Accepted values: inline SVG markup, absolute URL, or a project-relative path starting with _assets/. For md output, paths under _assets/ are copied to the output directory."
+            },
+            "position": {
+              "type": "string",
+              "enum": ["toc", "header"],
+              "description": "Where to render the PDF download button. toc — below the table of contents (default). header — in the page header next to other controls.",
+              "markdownDescription": "**`'toc' | 'header'`** Where to render the PDF download button. toc — below the table of contents (default). header — in the page header next to other controls."
+            },
+            "size": {
+              "type": "string",
+              "enum": ["S", "M", "L"],
+              "description": "Size of the PDF download button icon.",
+              "markdownDescription": "**`'S' | 'M' | 'L'`** Size of the PDF download button icon."
+            },
+            "pdfFileUrl": {
+              "type": "string",
+              "description": "URL or path to the generated PDF file. Used only in static HTML builds (outputFormat: html) where the PDF download link cannot be resolved automatically. In the web viewer this value is computed on the server side.",
+              "markdownDescription": "**`string`** URL or path to the generated PDF file. Used only in static HTML builds (outputFormat: html) where the PDF download link cannot be resolved automatically. In the web viewer this value is computed on the server side."
             }
           },
           "additionalProperties": false,
-          "markdownDescription": "**`{enabled, hiddenPolicy}`**"
+          "markdownDescription": "**`{enabled, hiddenPolicy, icon, ...}`**"
         }
       ],
       "description": "Configure PDF output generation.",
@@ -672,7 +694,7 @@
     "neuroExpert": {
       "$ref": "#/definitions/NeuroExpertConfig",
       "description": "AI expert widget configuration.",
-      "markdownDescription": "**`NeuroExpertConfig`** AI expert widget global configuration.\n\n- `projectId` **`NeuroExpertConfig`** — language → project ID map\n- `hasOutsideClick` **`boolean`** — close on outside click\n- `parentId` **`string | null`** — parent element ID\n- `disabled` **`boolean`** — disable widget globally\n- `customLabel` **`NeuroExpertConfig`** — language → custom header label map"
+      "markdownDescription": "**`NeuroExpertConfig`** AI expert widget global configuration.\n\n- `projectId` **`NeuroExpertConfig`** — language → project ID map\n- `hasOutsideClick` **`boolean`** — close on outside click\n- `parentId` **`string | null`** — parent element ID\n- `disabled` **`boolean`** — disable widget globally\n- `customLabel` **`NeuroExpertConfig`** — language → custom header label map\n- `type` **`'widget' | 'search'`** — widget integration type"
     },
     "yabug": {
       "$ref": "#/definitions/YaBugConfig",
@@ -1179,11 +1201,11 @@
           "type": "string",
           "enum": ["default", "search"],
           "description": "Widget integration type. default — floating widget initialized on page load. search — widget activated via search suggest button.",
-          "markdownDescription": "**`'default' | 'search'`** Widget integration type.\n\n- `default` — floating widget initialized on page load\n- `search` — widget activated via search suggest button"
+          "markdownDescription": "**`'widget' | 'search'`** Widget integration type.\n\n- `widget` — floating widget initialized on page load\n- `search` — widget activated via search suggest button"
         }
       },
       "additionalProperties": false,
-      "markdownDescription": "**`NeuroExpertConfig`** AI expert (Yandex Neuro Expert) widget configuration.\n\n- `projectId` **`object`** — language → project ID map (use `default` as fallback key)\n- `hasOutsideClick` **`boolean`** — close widget on outside click\n- `parentId` **`string | null`** — parent element ID for placement\n- `disabled` **`boolean`** — disable the widget globally\n- `customLabel` **`object`** — language → custom header label map\n- `type` **`'default' | 'search'`** — widget integration type",
+      "markdownDescription": "**`NeuroExpertConfig`** AI expert (Yandex Neuro Expert) widget configuration.\n\n- `projectId` **`{projectId, hasOutsideClick, parentId, ...}`** — language → project ID map (use `default` as fallback key)\n- `hasOutsideClick` **`boolean`** — close widget on outside click\n- `parentId` **`string | null`** — parent element ID for placement\n- `disabled` **`boolean`** — disable the widget globally\n- `customLabel` **`{projectId, hasOutsideClick, parentId, ...}`** — language → custom header label map\n- `type` **`'widget' | 'search'`** — widget integration type",
       "description": "AI expert widget config. Fields: projectId, hasOutsideClick, parentId, disabled, customLabel, type."
     },
     "PublishConfig": {
@@ -1405,8 +1427,8 @@
         },
         "pdf": {
           "type": "boolean",
-          "description": "Enable PDF generation in docs-build action.",
-          "markdownDescription": "**`boolean`** Enable PDF generation in docs-build action."
+          "description": "Enable the PDF download button in the docs viewer.",
+          "markdownDescription": "**`boolean`** Enable the PDF download button in the docs viewer."
         },
         "support-widget": {
           "$ref": "#/definitions/SupportWidgetConfig",

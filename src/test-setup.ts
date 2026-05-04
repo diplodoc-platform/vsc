@@ -142,8 +142,33 @@ vi.mock('vscode', () => ({
         Information: 2,
         Hint: 3,
     },
+    DocumentLink: class {
+        range: MockRange;
+        target: unknown;
+        constructor(range: MockRange, target: unknown) {
+            this.range = range;
+            this.target = target;
+        }
+    },
     Uri: {
-        parse: (s: string) => ({toString: () => s}),
+        parse: (s: string) => ({toString: () => s, scheme: 'https'}),
         file: (s: string) => ({toString: () => s, fsPath: s}),
+        joinPath: (base: {toString: () => string}, ...segments: string[]) => {
+            const basePath = base.toString().replace(/\/$/, '');
+            const joined = segments.reduce((acc, seg) => {
+                if (seg === '..') {
+                    return acc.replace(/\/[^/]+$/, '');
+                }
+
+                return acc + '/' + seg;
+            }, basePath);
+
+            return {toString: () => joined, fsPath: joined};
+        },
+    },
+    workspace: {
+        fs: {
+            stat: vi.fn().mockResolvedValue({}),
+        },
     },
 }));

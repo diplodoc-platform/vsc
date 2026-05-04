@@ -59,6 +59,51 @@ export function insertAtCursor(editor: EditorInstance, text: string) {
     cm.focus();
 }
 
+export function debounce<T extends (...args: Parameters<T>) => void>(fn: T, ms: number): T {
+    let timer: ReturnType<typeof setTimeout>;
+
+    return ((...args: Parameters<T>) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), ms);
+    }) as T;
+}
+
+export function debounceByKey<T extends (...args: Parameters<T>) => void>(
+    fn: T,
+    ms: number,
+    keyFn: (...args: Parameters<T>) => string,
+): T & {clear: (key: string) => void} {
+    const timers = new Map<string, ReturnType<typeof setTimeout>>();
+
+    const debounced = ((...args: Parameters<T>) => {
+        const key = keyFn(...args);
+        const existing = timers.get(key);
+
+        if (existing) {
+            clearTimeout(existing);
+        }
+
+        timers.set(
+            key,
+            setTimeout(() => {
+                timers.delete(key);
+                fn(...args);
+            }, ms),
+        );
+    }) as T & {clear: (key: string) => void};
+
+    debounced.clear = (key: string) => {
+        const timer = timers.get(key);
+
+        if (timer) {
+            clearTimeout(timer);
+            timers.delete(key);
+        }
+    };
+
+    return debounced;
+}
+
 export function isBlocksYaml(document: vscode.TextDocument): boolean {
     if (document.languageId !== 'yaml') {
         return false;
