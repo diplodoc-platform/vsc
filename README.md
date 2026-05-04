@@ -13,6 +13,7 @@ VS Code extension for the [Diplodoc](https://diplodoc.com) documentation platfor
 - **YAML Validation** — JSON Schema-based validation for `toc.yaml`, `.yfm`, `.yfmlint`, `presets.yaml`, `redirects.yaml`, `theme.yaml`, and page-constructor files
 - **Markdown Linting** — real-time diagnostics via `@diplodoc/yfmlint` with full plugin support
 - **Autocompletion & Hover** — YAML property completion with schema documentation
+- **Link Navigation** — Ctrl+Click on file paths and URLs in YAML files to open them
 - **Color Picker** — inline color preview and picker for YAML color values
 - **Sidebar** — file browser with search, quick navigation, and project initialization
 - **Syntax Highlighting** — YAML highlighting inside `::: page-constructor` blocks in Markdown

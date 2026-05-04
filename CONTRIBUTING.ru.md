@@ -63,6 +63,7 @@ src/
 │   ├── toc-editor/editor.ts          # TOC редактор (наследует BaseEditor)
 │   ├── main/sidebar.ts               # Сайдбар — браузер файлов
 │   ├── color/                        # YAML color picker
+│   ├── links/                        # Ctrl+Click навигация по ссылкам в YAML
 │   └── validation/                   # YAML схема-валидация + Markdown линтинг
 │       ├── index.ts                  # Оркестратор: события, кэш, debounce
 │       ├── parser.ts                 # Извлечение frontmatter + page-constructor блоков
@@ -80,7 +81,8 @@ src/
 │   └── sidebar/                      # UI сайдбара
 ├── extensions/                       # Кастомные markdown-it плагины
 │   ├── yfm-include/                  # {% include %}
-│   └── yfm-frontmatter/              # --- frontmatter ---
+│   ├── yfm-frontmatter/              # --- frontmatter ---
+│   └── yfm-directive/                # Generic passthrough для ::: директив
 ├── i18n/                             # Локализация (en, ru)
 schemas/
 ├── *.json                            # Сгенерированные JSON Schema файлы (закоммичены)

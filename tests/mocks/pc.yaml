@@ -2,6 +2,9 @@ blocks:
   - type: 'header-block'
     title: 'Title 2'
     description: 'Description'
+    buttons:
+      - text: 'Index'
+        url: './index.md'
     background:
       light:
-        color: '#2eb669'
+        color: '#14a147'

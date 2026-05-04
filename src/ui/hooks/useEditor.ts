@@ -10,7 +10,9 @@ import {wYfmPageConstructorItemData} from '@gravity-ui/markdown-editor-page-cons
 
 import {YfmInclude} from '../../extensions/yfm-include';
 import {YfmFrontmatter} from '../../extensions/yfm-frontmatter';
-import {debounce, isTrustedOrigin} from '../utils';
+import {YfmDirective} from '../../extensions/yfm-directive';
+import {isTrustedOrigin} from '../utils';
+import {debounce} from '../../utils';
 
 interface EditorParams {
     setFileName: (name: string) => void;
@@ -71,6 +73,7 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
                 builder.use(YfmHtmlBlock, {});
                 builder.use(YfmInclude);
                 builder.use(YfmFrontmatter);
+                builder.use(YfmDirective);
             },
             extensionOptions: {
                 commandMenu: {
