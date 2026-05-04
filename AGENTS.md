@@ -26,7 +26,7 @@ src/
 ├── utils.ts                                    # insertElement(), isBlocksYaml(), wrap/unwrapPageConstructor()
 ├── modules/
 │   ├── types.ts                                # Content, PluginMessage, ValidationMessage, YfmLintError
-│   ├── utils.ts                                # logger() — Output channel "Diplodoc"
+│   ├── utils.ts                                # logger(), isYfmFile() — Output channel "Diplodoc"
 │   ├── validation/                             # *** Core: YAML schema validation + Markdown linting ***
 │   │   ├── index.ts                            # Orchestrator: events, cache, provider registration
 │   │   ├── parser.ts                           # Extract frontmatter + ::: page-constructor blocks from .md
@@ -44,6 +44,12 @@ src/
 │   │   ├── constants.ts                        # LINK_FIELDS set, FIELD_RE regex
 │   │   ├── utils.ts                            # isExternalUrl(), parseLinkFromLine()
 │   │   └── diagnostics.ts                      # validateLinks() — unreachable file detection
+│   ├── orphan/                                 # Orphan file detection (FileDecorationProvider)
+│   │   ├── index.ts                            # activate() — watchers + provider registration
+│   │   ├── collector.ts                        # collectReferencedFiles() + collectBlocksYamlFiles()
+│   │   ├── decorator.ts                        # OrphanDecorationProvider — marks unreferenced .md/.yaml
+│   │   ├── on-delete.ts                        # handleFileDeleted() — remove from toc / add redirect
+│   │   └── constants.ts                        # HREF_RE, INCLUDE_PATH_RE, MD_INCLUDE_RE
 │   ├── main/sidebar.ts                         # Sidebar WebviewViewProvider
 │   ├── md-editor/editor.ts                     # Markdown visual editor (WebviewPanel)
 │   └── toc-editor/editor.ts                    # TOC visual editor (WebviewPanel)
@@ -427,6 +433,36 @@ Fields from all Diplodoc YAML schemas:
 ### Adding a new link field
 
 Add the field name to `LINK_FIELDS` in `src/modules/links/constants.ts`. No other changes needed — both link navigation and diagnostics will pick it up automatically.
+
+## Orphan File Detection
+
+`src/modules/orphan/` marks `.md` and blocks-yaml files not connected to any `toc.yaml` with a `?` badge in the Explorer (via `FileDecorationProvider`).
+
+### How it works
+
+1. `collectReferencedFiles()` scans all `toc.yaml` files for `href` and `include.path` values
+2. For each referenced `.md` file, it recursively extracts `{% include [...](path) %}` paths
+3. `collectBlocksYamlFiles()` finds all `.yaml` files with a `blocks:` key (page-constructor files)
+4. Result: `Set<string>` of all referenced file paths (toc + includes chain), `Set<string>` of blocks-yaml files
+5. `OrphanDecorationProvider` marks any `.md` or blocks-yaml file NOT in the referenced set with badge `?` and yellow color
+6. Files in `includes/` directories or directories starting with `_` are automatically excluded (`isAutoIncluded`)
+7. Refresh triggers: `toc.yaml` change/create/delete, `.md` create/delete/change, `.yaml` create/delete/change
+
+### On-delete behavior
+
+When a `.md` or blocks-yaml file is deleted and was referenced in `toc.yaml`:
+
+1. `handleFileDeleted()` detects toc references via `findTocReferences()`
+2. Shows `QuickPick` with options: "Remove from toc.yaml" / "Remove + add redirect" / "Do nothing"
+3. "Remove from toc" — deletes the `href:` line (and preceding `name:` line) from toc.yaml
+4. "Add redirect" — prompts for target path via `InputBox`, appends entry to `redirects.yaml`
+
+### Performance
+
+- Initial scan on activation (parses toc.yaml files only — fast)
+- Incremental: FileSystemWatcher triggers refresh on toc/md/yaml file events
+- `.md` content changes use debounced refresh (500ms)
+- `provideFileDecoration` is O(1) Set lookup, called only for visible files
 
 ## Color Provider
 

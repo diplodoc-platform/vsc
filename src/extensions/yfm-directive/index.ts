@@ -1,6 +1,11 @@
 import type {ExtensionAuto} from '@gravity-ui/markdown-editor';
 
-import {yfmDirectiveNodeName, yfmDirectiveTokenName} from './const';
+import {
+    yfmDirectiveNodeName,
+    yfmDirectiveTokenName,
+    yfmLiquidTagNodeName,
+    yfmLiquidTagTokenName,
+} from './const';
 import {yfmDirectivePlugin} from './plugin';
 
 export const YfmDirective: ExtensionAuto = (builder) => {
@@ -45,6 +50,37 @@ export const YfmDirective: ExtensionAuto = (builder) => {
                 state.write(`::: ${node.attrs.directiveName}\n`);
                 state.text(node.textContent, false);
                 state.write('\n:::');
+                state.closeBlock(node);
+            },
+        }))
+        .addNode(yfmLiquidTagNodeName, () => ({
+            fromMd: {
+                tokenSpec: {
+                    name: yfmLiquidTagNodeName,
+                    type: 'block' as const,
+                    noCloseToken: true,
+                },
+                tokenName: yfmLiquidTagTokenName,
+            },
+            spec: {
+                content: 'text*',
+                group: 'block',
+                code: true,
+                marks: '',
+                selectable: true,
+                escapeText: false,
+                parseDOM: [
+                    {
+                        tag: 'div.yfm-liquid-tag',
+                        preserveWhitespace: 'full' as const,
+                    },
+                ],
+                toDOM() {
+                    return ['div', {class: 'yfm-liquid-tag'}, ['code', 0]];
+                },
+            },
+            toMd: (state, node) => {
+                state.text(node.textContent, false);
                 state.closeBlock(node);
             },
         }));

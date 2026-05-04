@@ -121,3 +121,7 @@ export function wrapPageConstructor(text: string): string {
 export function unwrapPageConstructor(text: string): string {
     return text.replace(/^\s*::: page-constructor\s*\n/, '').replace(/\n:::\s*$/, '');
 }
+
+export function isExternalUrl(value: string): boolean {
+    return /^https?:\/\//.test(value);
+}
