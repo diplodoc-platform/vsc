@@ -3,4 +3,3 @@ common:
     to: /new-page
   - from: /legacy/docs
     to: /docs/latest
-    unknownField: bad

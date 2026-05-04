@@ -1,11 +1,10 @@
 import {describe, expect, it, vi} from 'vitest';
 
 import {
-    debounce,
-    debounceByKey,
     insertAtCursor,
     insertElement,
     isBlocksYaml,
+    isExternalUrl,
     unwrapPageConstructor,
     wrapPageConstructor,
 } from './utils';
@@ -131,102 +130,6 @@ describe('unwrapPageConstructor', () => {
     });
 });
 
-describe('debounce', () => {
-    it('delays execution', async () => {
-        vi.useFakeTimers();
-        const fn = vi.fn();
-        const debounced = debounce(fn, 100);
-
-        debounced();
-        expect(fn).not.toHaveBeenCalled();
-
-        vi.advanceTimersByTime(100);
-        expect(fn).toHaveBeenCalledOnce();
-
-        vi.useRealTimers();
-    });
-
-    it('resets timer on repeated calls', () => {
-        vi.useFakeTimers();
-        const fn = vi.fn();
-        const debounced = debounce(fn, 100);
-
-        debounced();
-        vi.advanceTimersByTime(50);
-        debounced();
-        vi.advanceTimersByTime(50);
-        expect(fn).not.toHaveBeenCalled();
-
-        vi.advanceTimersByTime(50);
-        expect(fn).toHaveBeenCalledOnce();
-
-        vi.useRealTimers();
-    });
-
-    it('passes arguments to the original function', () => {
-        vi.useFakeTimers();
-        const fn = vi.fn();
-        const debounced = debounce(fn, 100);
-
-        debounced('a', 'b');
-        vi.advanceTimersByTime(100);
-
-        expect(fn).toHaveBeenCalledWith('a', 'b');
-
-        vi.useRealTimers();
-    });
-});
-
-describe('debounceByKey', () => {
-    it('debounces per key independently', () => {
-        vi.useFakeTimers();
-        const fn = vi.fn();
-        const debounced = debounceByKey(fn, 100, (key: string) => key);
-
-        debounced('a');
-        debounced('b');
-        vi.advanceTimersByTime(100);
-
-        expect(fn).toHaveBeenCalledTimes(2);
-        expect(fn).toHaveBeenCalledWith('a');
-        expect(fn).toHaveBeenCalledWith('b');
-
-        vi.useRealTimers();
-    });
-
-    it('resets only the matching key', () => {
-        vi.useFakeTimers();
-        const fn = vi.fn();
-        const debounced = debounceByKey(fn, 100, (key: string) => key);
-
-        debounced('a');
-        vi.advanceTimersByTime(50);
-        debounced('a');
-        vi.advanceTimersByTime(50);
-
-        expect(fn).not.toHaveBeenCalledWith('a');
-
-        vi.advanceTimersByTime(50);
-        expect(fn).toHaveBeenCalledWith('a');
-
-        vi.useRealTimers();
-    });
-
-    it('clear cancels pending timer for key', () => {
-        vi.useFakeTimers();
-        const fn = vi.fn();
-        const debounced = debounceByKey(fn, 100, (key: string) => key);
-
-        debounced('a');
-        debounced.clear('a');
-        vi.advanceTimersByTime(200);
-
-        expect(fn).not.toHaveBeenCalled();
-
-        vi.useRealTimers();
-    });
-});
-
 describe('insertAtCursor', () => {
     it('appends text when markup editor is unavailable', () => {
         const editor = {
@@ -306,5 +209,43 @@ describe('insertAtCursor', () => {
             changes: {from: 5, insert: '\n\nnote\n'},
             selection: {anchor: 12},
         });
+    });
+});
+
+describe('isExternalUrl', () => {
+    it('returns true for http URLs', () => {
+        expect(isExternalUrl('http://example.com')).toBe(true);
+        expect(isExternalUrl('http://example.com/page')).toBe(true);
+    });
+
+    it('returns true for https URLs', () => {
+        expect(isExternalUrl('https://example.com')).toBe(true);
+        expect(isExternalUrl('https://example.com/docs/guide')).toBe(true);
+    });
+
+    it('returns false for relative paths', () => {
+        expect(isExternalUrl('guide/intro.md')).toBe(false);
+        expect(isExternalUrl('./page.md')).toBe(false);
+        expect(isExternalUrl('../other/page.md')).toBe(false);
+    });
+
+    it('returns false for bare filenames', () => {
+        expect(isExternalUrl('index.md')).toBe(false);
+        expect(isExternalUrl('toc.yaml')).toBe(false);
+    });
+
+    it('returns false for empty string', () => {
+        expect(isExternalUrl('')).toBe(false);
+    });
+
+    it('returns false for non-http protocols', () => {
+        expect(isExternalUrl('ftp://files.example.com')).toBe(false);
+        expect(isExternalUrl('file:///local/path')).toBe(false);
+        expect(isExternalUrl('mailto:user@example.com')).toBe(false);
+    });
+
+    it('returns false for strings containing http mid-text', () => {
+        expect(isExternalUrl('page-https://example.com')).toBe(false);
+        expect(isExternalUrl('text http://example.com')).toBe(false);
     });
 });

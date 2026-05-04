@@ -64,6 +64,7 @@ src/
 │   ├── main/sidebar.ts               # Сайдбар — браузер файлов
 │   ├── color/                        # YAML color picker
 │   ├── links/                        # Ctrl+Click навигация по ссылкам в YAML
+│   ├── orphan/                       # Обнаружение orphan-файлов + действия при удалении
 │   └── validation/                   # YAML схема-валидация + Markdown линтинг
 │       ├── index.ts                  # Оркестратор: события, кэш, debounce
 │       ├── parser.ts                 # Извлечение frontmatter + page-constructor блоков
@@ -82,7 +83,7 @@ src/
 ├── extensions/                       # Кастомные markdown-it плагины
 │   ├── yfm-include/                  # {% include %}
 │   ├── yfm-frontmatter/              # --- frontmatter ---
-│   └── yfm-directive/                # Generic passthrough для ::: директив
+│   └── yfm-directive/                # Passthrough для ::: директив и {% liquid %} тегов
 ├── i18n/                             # Локализация (en, ru)
 schemas/
 ├── *.json                            # Сгенерированные JSON Schema файлы (закоммичены)

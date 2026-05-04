@@ -166,9 +166,56 @@ vi.mock('vscode', () => ({
             return {toString: () => joined, fsPath: joined};
         },
     },
+    FileDecoration: class {
+        badge?: string;
+        tooltip?: string;
+        color?: unknown;
+        constructor(badge?: string, tooltip?: string, color?: unknown) {
+            this.badge = badge;
+            this.tooltip = tooltip;
+            this.color = color;
+        }
+    },
+    ThemeColor: class {
+        id: string;
+        constructor(id: string) {
+            this.id = id;
+        }
+    },
+    EventEmitter: class {
+        private listeners: Array<(...args: unknown[]) => void> = [];
+        event = (listener: (...args: unknown[]) => void) => {
+            this.listeners.push(listener);
+            return {dispose: () => {}};
+        };
+        fire(data: unknown) {
+            this.listeners.forEach((l) => l(data));
+        }
+    },
+    WorkspaceEdit: class {
+        private edits: Array<{uri: unknown; edit: unknown}> = [];
+        delete(uri: unknown, range: unknown) {
+            this.edits.push({uri, edit: {type: 'delete', range}});
+        }
+        insert(uri: unknown, position: unknown, text: string) {
+            this.edits.push({uri, edit: {type: 'insert', position, text}});
+        }
+    },
+    window: {
+        createOutputChannel: vi.fn().mockReturnValue({
+            appendLine: vi.fn(),
+        }),
+        showQuickPick: vi.fn().mockResolvedValue(null),
+        showInputBox: vi.fn().mockResolvedValue(null),
+        showTextDocument: vi.fn().mockResolvedValue(undefined),
+    },
     workspace: {
         fs: {
             stat: vi.fn().mockResolvedValue({}),
+            readFile: vi.fn().mockResolvedValue(new Uint8Array()),
+            writeFile: vi.fn().mockResolvedValue(undefined),
         },
+        findFiles: vi.fn().mockResolvedValue([]),
+        applyEdit: vi.fn().mockResolvedValue(true),
     },
 }));

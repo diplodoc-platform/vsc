@@ -14,6 +14,7 @@ VS Code extension for the [Diplodoc](https://diplodoc.com) documentation platfor
 - **Markdown Linting** — real-time diagnostics via `@diplodoc/yfmlint` with full plugin support
 - **Autocompletion & Hover** — YAML property completion with schema documentation
 - **Link Navigation** — Ctrl+Click on file paths and URLs in YAML files to open them
+- **Orphan Detection** — highlights `.md` and page-constructor `.yaml` files not connected to any `toc.yaml` in the Explorer; offers to remove from toc or add redirect when files are deleted
 - **Color Picker** — inline color preview and picker for YAML color values
 - **Sidebar** — file browser with search, quick navigation, and project initialization
 - **Syntax Highlighting** — YAML highlighting inside `::: page-constructor` blocks in Markdown

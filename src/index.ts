@@ -5,6 +5,7 @@ import {Sidebar} from './modules/main/sidebar';
 import * as validation from './modules/validation';
 import * as color from './modules/color';
 import * as links from './modules/links';
+import * as orphan from './modules/orphan';
 import {TocEditor} from './modules/toc-editor/editor';
 import {insertBlock, openMdEditor, openTocEditor} from './commands';
 import {isBlocksYaml} from './utils';
@@ -13,6 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
     validation.activate(context);
     color.activate(context);
     links.activate(context);
+    orphan.activate(context);
     updateYamlContext(vscode.window.activeTextEditor);
 
     const mdEditor = new MdEditor(context.extensionUri);
