@@ -4,6 +4,7 @@ import {describe, expect, it} from 'vitest';
 import {yfmDirectivePlugin} from './plugin';
 
 const TOKEN_NAME = 'yfm_directive';
+const LIQUID_TOKEN_NAME = 'yfm_liquid_tag';
 
 function createMd() {
     const md = new MarkdownIt();
@@ -136,5 +137,144 @@ describe('yfmDirectivePlugin', () => {
         expect(tokens[0].content).toBe('first');
         expect(tokens[1].info).toBe('custom-block');
         expect(tokens[1].content).toBe('second');
+    });
+});
+
+describe('yfmLiquidTagPlugin', () => {
+    it('parses single-line {% directive %}', () => {
+        const md = createMd();
+        const tokens = md.parse('{% directive %}\n', {});
+        const token = findToken(tokens, LIQUID_TOKEN_NAME);
+
+        expect(token).toBeDefined();
+        expect(token?.content).toBe('{% directive %}');
+    });
+
+    it('parses standalone opening tag without closer as single-line', () => {
+        const md = createMd();
+        const tokens = md.parse('{% note info "Title" %}\n', {});
+        const token = findToken(tokens, LIQUID_TOKEN_NAME);
+
+        expect(token).toBeDefined();
+        expect(token?.content).toBe('{% note info "Title" %}');
+    });
+
+    it('parses {% endnote %} as single-line', () => {
+        const md = createMd();
+        const tokens = md.parse('{% endnote %}\n', {});
+        const token = findToken(tokens, LIQUID_TOKEN_NAME);
+
+        expect(token).toBeDefined();
+        expect(token?.content).toBe('{% endnote %}');
+    });
+
+    it('does not match {% include [...](path) %}', () => {
+        const md = createMd();
+        const tokens = md.parse('{% include [Title](path/to/file.md) %}\n', {});
+        const token = findToken(tokens, LIQUID_TOKEN_NAME);
+
+        expect(token).toBeUndefined();
+    });
+
+    it('parses liquid tag in the middle of document', () => {
+        const md = createMd();
+        const src = '# Title\n\n{% directive %}\n\nMore content\n';
+        const tokens = md.parse(src, {});
+        const token = findToken(tokens, LIQUID_TOKEN_NAME);
+
+        expect(token).toBeDefined();
+        expect(token?.content).toBe('{% directive %}');
+    });
+
+    it('does not consume following content after single-line tag', () => {
+        const md = createMd();
+        const tokens = md.parse('{% endnote %}\n\n# Heading\n', {});
+        const heading = tokens.find((t) => t.type === 'heading_open');
+
+        expect(heading).toBeDefined();
+    });
+
+    it('captures block pair {% note %}...{% endnote %}', () => {
+        const md = createMd();
+        const src = '{% note info %}\n\nContent\n\n{% endnote %}\n';
+        const tokens = findAllTokens(md.parse(src, {}), LIQUID_TOKEN_NAME);
+
+        expect(tokens).toHaveLength(1);
+        expect(tokens[0].content).toBe('{% note info %}\n\nContent\n\n{% endnote %}');
+    });
+
+    it('captures block pair {% cut %}...{% endcut %}', () => {
+        const md = createMd();
+        const src = '{% cut "Title" %}\nSome content here\n{% endcut %}\n';
+        const tokens = findAllTokens(md.parse(src, {}), LIQUID_TOKEN_NAME);
+
+        expect(tokens).toHaveLength(1);
+        expect(tokens[0].content).toBe('{% cut "Title" %}\nSome content here\n{% endcut %}');
+    });
+
+    it('captures block pair {% list tabs %}...{% endlist %}', () => {
+        const md = createMd();
+        const src = '{% list tabs %}\n\n- Tab 1\n\nContent 1\n\n{% endlist %}\n';
+        const tokens = findAllTokens(md.parse(src, {}), LIQUID_TOKEN_NAME);
+
+        expect(tokens).toHaveLength(1);
+        expect(tokens[0].content).toContain('{% list tabs %}');
+        expect(tokens[0].content).toContain('{% endlist %}');
+    });
+
+    it('does not consume content after block pair', () => {
+        const md = createMd();
+        const src = '{% note info %}\nText\n{% endnote %}\n\n# Heading\n';
+        const tokens = md.parse(src, {});
+        const heading = tokens.find((t) => t.type === 'heading_open');
+
+        expect(heading).toBeDefined();
+    });
+
+    it('block pair preserves inner content verbatim', () => {
+        const md = createMd();
+        const src = '{% note warning %}\n**bold** and _italic_\n- list item\n{% endnote %}\n';
+        const token = findToken(md.parse(src, {}), LIQUID_TOKEN_NAME);
+
+        expect(token).toBeDefined();
+        expect(token?.content).toContain('**bold** and _italic_');
+        expect(token?.content).toContain('- list item');
+    });
+
+    it('does not match line without closing %}', () => {
+        const md = createMd();
+        const tokens = md.parse('{% directive\n', {});
+        const token = findToken(tokens, LIQUID_TOKEN_NAME);
+
+        expect(token).toBeUndefined();
+    });
+
+    it('does not match line without opening {%', () => {
+        const md = createMd();
+        const tokens = md.parse('directive %}\n', {});
+        const token = findToken(tokens, LIQUID_TOKEN_NAME);
+
+        expect(token).toBeUndefined();
+    });
+
+    it('handles block pair in the middle of document', () => {
+        const md = createMd();
+        const src = '# Title\n\n{% note info %}\nNote content\n{% endnote %}\n\nAfter note\n';
+        const tokens = md.parse(src, {});
+        const liquid = findToken(tokens, LIQUID_TOKEN_NAME);
+        const heading = tokens.find((t) => t.type === 'heading_open');
+
+        expect(heading).toBeDefined();
+        expect(liquid).toBeDefined();
+        expect(liquid?.content).toBe('{% note info %}\nNote content\n{% endnote %}');
+    });
+
+    it('falls back to single-line when closer not found', () => {
+        const md = createMd();
+        const src = '{% note info %}\nContent without endnote\n';
+        const token = findToken(md.parse(src, {}), LIQUID_TOKEN_NAME);
+
+        expect(token).toBeDefined();
+        expect(token?.content).toBe('{% note info %}');
     });
 });
