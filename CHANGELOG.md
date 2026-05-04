@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.0 (2026-05-04)
+
+## What's Changed
+* chore: removed vsix by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/64
+* feat: added links module by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/67
+* feat: added orphan module by @separatrixxx in https://github.com/diplodoc-platform/vsc/pull/68
+
+
+**Full Changelog**: https://github.com/diplodoc-platform/vsc/compare/v0.5.3...v0.6.0
+
 ## 0.5.3 (2026-04-30)
 
 ## What's Changed
