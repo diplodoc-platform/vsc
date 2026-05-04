@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 
+import {isExternalUrl} from '../../utils';
+
 import {FIELD_RE, LINK_FIELDS} from './constants';
 
-export function isExternalUrl(value: string): boolean {
-    return /^https?:\/\//.test(value);
-}
+export {isExternalUrl};
 
 export function parseLinkFromLine(
     line: vscode.TextLine,
