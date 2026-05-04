@@ -1,6 +1,6 @@
 import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest';
 
-import {debounce, getFilesMap, isTrustedOrigin} from './utils';
+import {getFilesMap, isTrustedOrigin} from './utils';
 
 describe('isTrustedOrigin', () => {
     beforeAll(() => {
@@ -25,40 +25,6 @@ describe('isTrustedOrigin', () => {
 
     it('rejects null string origin', () => {
         expect(isTrustedOrigin('null')).toBe(false);
-    });
-});
-
-describe('debounce', () => {
-    it('calls the function after the delay', () => {
-        vi.useFakeTimers();
-        const fn = vi.fn();
-        const debounced = debounce(fn, 100);
-
-        debounced('a');
-        expect(fn).not.toHaveBeenCalled();
-
-        vi.advanceTimersByTime(100);
-        expect(fn).toHaveBeenCalledWith('a');
-
-        vi.useRealTimers();
-    });
-
-    it('resets the timer on subsequent calls', () => {
-        vi.useFakeTimers();
-        const fn = vi.fn();
-        const debounced = debounce(fn, 100);
-
-        debounced('a');
-        vi.advanceTimersByTime(50);
-        debounced('b');
-        vi.advanceTimersByTime(50);
-        expect(fn).not.toHaveBeenCalled();
-
-        vi.advanceTimersByTime(50);
-        expect(fn).toHaveBeenCalledTimes(1);
-        expect(fn).toHaveBeenCalledWith('b');
-
-        vi.useRealTimers();
     });
 });
 

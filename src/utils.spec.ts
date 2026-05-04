@@ -1,6 +1,8 @@
 import {describe, expect, it, vi} from 'vitest';
 
 import {
+    debounce,
+    debounceByKey,
     insertAtCursor,
     insertElement,
     isBlocksYaml,
@@ -126,6 +128,102 @@ describe('unwrapPageConstructor', () => {
         const roundTripped = unwrapPageConstructor(wrapPageConstructor(original));
 
         expect(roundTripped).toBe(original);
+    });
+});
+
+describe('debounce', () => {
+    it('delays execution', async () => {
+        vi.useFakeTimers();
+        const fn = vi.fn();
+        const debounced = debounce(fn, 100);
+
+        debounced();
+        expect(fn).not.toHaveBeenCalled();
+
+        vi.advanceTimersByTime(100);
+        expect(fn).toHaveBeenCalledOnce();
+
+        vi.useRealTimers();
+    });
+
+    it('resets timer on repeated calls', () => {
+        vi.useFakeTimers();
+        const fn = vi.fn();
+        const debounced = debounce(fn, 100);
+
+        debounced();
+        vi.advanceTimersByTime(50);
+        debounced();
+        vi.advanceTimersByTime(50);
+        expect(fn).not.toHaveBeenCalled();
+
+        vi.advanceTimersByTime(50);
+        expect(fn).toHaveBeenCalledOnce();
+
+        vi.useRealTimers();
+    });
+
+    it('passes arguments to the original function', () => {
+        vi.useFakeTimers();
+        const fn = vi.fn();
+        const debounced = debounce(fn, 100);
+
+        debounced('a', 'b');
+        vi.advanceTimersByTime(100);
+
+        expect(fn).toHaveBeenCalledWith('a', 'b');
+
+        vi.useRealTimers();
+    });
+});
+
+describe('debounceByKey', () => {
+    it('debounces per key independently', () => {
+        vi.useFakeTimers();
+        const fn = vi.fn();
+        const debounced = debounceByKey(fn, 100, (key: string) => key);
+
+        debounced('a');
+        debounced('b');
+        vi.advanceTimersByTime(100);
+
+        expect(fn).toHaveBeenCalledTimes(2);
+        expect(fn).toHaveBeenCalledWith('a');
+        expect(fn).toHaveBeenCalledWith('b');
+
+        vi.useRealTimers();
+    });
+
+    it('resets only the matching key', () => {
+        vi.useFakeTimers();
+        const fn = vi.fn();
+        const debounced = debounceByKey(fn, 100, (key: string) => key);
+
+        debounced('a');
+        vi.advanceTimersByTime(50);
+        debounced('a');
+        vi.advanceTimersByTime(50);
+
+        expect(fn).not.toHaveBeenCalledWith('a');
+
+        vi.advanceTimersByTime(50);
+        expect(fn).toHaveBeenCalledWith('a');
+
+        vi.useRealTimers();
+    });
+
+    it('clear cancels pending timer for key', () => {
+        vi.useFakeTimers();
+        const fn = vi.fn();
+        const debounced = debounceByKey(fn, 100, (key: string) => key);
+
+        debounced('a');
+        debounced.clear('a');
+        vi.advanceTimersByTime(200);
+
+        expect(fn).not.toHaveBeenCalled();
+
+        vi.useRealTimers();
     });
 });
 

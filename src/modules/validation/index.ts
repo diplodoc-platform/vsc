@@ -42,15 +42,19 @@ function getBlocksForDocument(document: vscode.TextDocument): Content[] {
     if (isMarkdown(document)) {
         const {pcContent, fmContent} = parseContent(document.getText());
         const allBlocks: Content[] = [...pcContent];
+
         if (fmContent) {
             allBlocks.push(fmContent);
         }
+
         blocksCache.set(key, allBlocks);
+
         return allBlocks;
     }
 
     if (isYaml(document)) {
         const schemaType = resolveYamlSchema(document);
+
         if (schemaType) {
             const block: Content = {
                 type: schemaType,
@@ -58,7 +62,9 @@ function getBlocksForDocument(document: vscode.TextDocument): Content[] {
                 endLine: document.lineCount,
                 content: document.getText(),
             };
+
             blocksCache.set(key, [block]);
+
             return [block];
         }
     }

@@ -39,6 +39,11 @@ src/
 │   │       ├── completion.ts                   # ls.doComplete() → vscode.CompletionItem[]
 │   │       ├── hover.ts                        # ls.doHover() → vscode.Hover (with Source: fix)
 │   │       └── position.ts                     # Editor ↔ block-relative position mapping
+│   ├── links/                                  # Ctrl+Click link navigation in YAML files
+│   │   ├── index.ts                            # LinkProvider + diagnostics + activate()
+│   │   ├── constants.ts                        # LINK_FIELDS set, FIELD_RE regex
+│   │   ├── utils.ts                            # isExternalUrl(), parseLinkFromLine()
+│   │   └── diagnostics.ts                      # validateLinks() — unreachable file detection
 │   ├── main/sidebar.ts                         # Sidebar WebviewViewProvider
 │   ├── md-editor/editor.ts                     # Markdown visual editor (WebviewPanel)
 │   └── toc-editor/editor.ts                    # TOC visual editor (WebviewPanel)
@@ -90,6 +95,7 @@ The editor (`useEditor` hook) configures the following extensions:
 - `YfmPageConstructorExtension` — `::: page-constructor ... :::` blocks
 - `YfmInclude` (custom, `src/extensions/yfm-include/`) — `{% include []() %}` blocks without escaping
 - `YfmFrontmatter` (custom, `src/extensions/yfm-frontmatter/`) — `---` YAML frontmatter blocks without escaping
+- `YfmDirective` (custom, `src/extensions/yfm-directive/`) — generic passthrough for any `:::` directive block not handled by other extensions (e.g. `::: no-translate`, `::: custom-block`). Preserves content without escaping. Directive name stored in `token.info` / `node.attrs.directiveName`.
 - `Math`, `Mermaid` — LaTeX and diagram support
 
 Toolbar includes `wYfmHtmlBlockItemData` and `wYfmPageConstructorItemData` in the command menu.
@@ -389,6 +395,38 @@ Run: `npm run merge-schemas` (auto-detects CLI schemas at `../packages/cli/schem
 - **views**: Sidebar webview in activity bar
 
 No `yamlValidation` contribution — the extension handles all YAML validation internally (no dependency on Red Hat YAML extension).
+
+## Link Navigation (Ctrl+Click)
+
+`src/modules/links/` provides `DocumentLinkProvider` for all YAML files. Ctrl+Click (Cmd+Click on Mac) on a path or URL opens the target file or URL.
+
+### How it works
+
+1. `LinkProvider.provideDocumentLinks()` iterates lines of any YAML document
+2. `FIELD_RE` regex extracts YAML key-value pairs (handles unquoted, single-quoted, double-quoted values, and list items `- key: value`)
+3. Field name is checked against `LINK_FIELDS` set — only known path/URL fields produce links
+4. External URLs (`https://...`) → `vscode.Uri.parse()` (opens in browser)
+5. Relative paths → `vscode.Uri.joinPath(documentDir, value)` (opens file in editor)
+
+### Supported fields
+
+Fields from all Diplodoc YAML schemas:
+
+| Category                         | Fields                                                                                                                             |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| toc / leading / page-constructor | `href`, `url`, `path`, `input`, `base`                                                                                             |
+| redirects                        | `from`, `to`                                                                                                                       |
+| .yfm config                      | `output`, `config`, `theme`, `api`, `form`, `glossary`, `feedbackUrl`, `endpoint`, `github-url-prefix`, `host`, `pdfFileUrl`       |
+| images / media                   | `src`, `src-dark`, `src-mobile`, `src-mobile-dark`, `src-preview`, `icon`, `avatar`                                                |
+| resources / meta                 | `canonical`, `favicon-src`, `logo-src`, `logo-dark-src`, `logo-link-preview`, `vcsPath`, `sourcePath`, `script`, `style`, `schema` |
+
+### Unreachable link diagnostics
+
+`src/modules/links/diagnostics.ts` validates that local file paths actually exist on disk. For each relative path found in a YAML document, it calls `vscode.workspace.fs.stat()`. Missing files produce an error diagnostic: `Link is unreachable: <path>` (source: `Diplodoc`). External URLs are skipped. Validation runs on open, save, and change (400ms debounce).
+
+### Adding a new link field
+
+Add the field name to `LINK_FIELDS` in `src/modules/links/constants.ts`. No other changes needed — both link navigation and diagnostics will pick it up automatically.
 
 ## Color Provider
 

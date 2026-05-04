@@ -1,11 +1,12 @@
 import type MarkdownIt from 'markdown-it';
 import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 
-const FENCE = /^---\s*$/;
+const OPEN_RE = /^:::\s*(\S+.*?)\s*$/;
+const CLOSE_RE = /^:::\s*$/;
 
-export const yfmFrontmatterTokenName = 'yfm_frontmatter';
+export const yfmDirectiveTokenName = 'yfm_directive';
 
-function yfmFrontmatterBlockRule(
+function yfmDirectiveBlockRule(
     state: StateBlock,
     startLine: number,
     endLine: number,
@@ -15,17 +16,20 @@ function yfmFrontmatterBlockRule(
     const openMax = state.eMarks[startLine];
     const openStr = state.src.slice(openPos, openMax);
 
-    if (!FENCE.test(openStr)) {
+    const openMatch = OPEN_RE.exec(openStr);
+
+    if (!openMatch) {
         return false;
     }
 
     let closeLine = -1;
+
     for (let i = startLine + 1; i < endLine; i++) {
         const pos = state.bMarks[i] + state.tShift[i];
         const max = state.eMarks[i];
         const line = state.src.slice(pos, max);
 
-        if (FENCE.test(line)) {
+        if (CLOSE_RE.test(line)) {
             closeLine = i;
             break;
         }
@@ -35,27 +39,25 @@ function yfmFrontmatterBlockRule(
         return false;
     }
 
-    const contentStart = state.bMarks[startLine + 1];
-    const contentEnd = state.bMarks[closeLine];
-    const content = state.src.slice(contentStart, contentEnd).replace(/\n$/, '');
-
-    if (startLine !== 0 && content.trim().length === 0) {
-        return false;
-    }
-
     if (silent) {
         return true;
     }
 
-    const token = state.push(yfmFrontmatterTokenName, 'pre', 0);
+    const directiveName = openMatch[1];
+    const contentStart = state.bMarks[startLine + 1];
+    const contentEnd = state.bMarks[closeLine];
+    const content = state.src.slice(contentStart, contentEnd).replace(/\n$/, '');
+
+    const token = state.push(yfmDirectiveTokenName, 'div', 0);
     token.map = [startLine, closeLine + 1];
     token.content = content;
+    token.info = directiveName;
 
     state.line = closeLine + 1;
 
     return true;
 }
 
-export function yfmFrontmatterPlugin(md: MarkdownIt) {
-    md.block.ruler.before('hr', yfmFrontmatterTokenName, yfmFrontmatterBlockRule);
+export function yfmDirectivePlugin(md: MarkdownIt) {
+    md.block.ruler.before('paragraph', yfmDirectiveTokenName, yfmDirectiveBlockRule);
 }
