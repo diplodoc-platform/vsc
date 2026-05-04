@@ -39,7 +39,6 @@ function yfmFrontmatterBlockRule(
     const contentEnd = state.bMarks[closeLine];
     const content = state.src.slice(contentStart, contentEnd).replace(/\n$/, '');
 
-    // When not at line 0, require non-empty content to avoid matching pairs of <hr>
     if (startLine !== 0 && content.trim().length === 0) {
         return false;
     }

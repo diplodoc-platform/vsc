@@ -104,9 +104,9 @@
           "markdownDescription": "**`string`** URL to a custom favicon shown in the browser tab for this page only."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "description": "Per-page UI overrides (takes precedence over .yfm config).",
-      "markdownDescription": "**`{toc, toc-header, search, ...}`** Per-page UI element visibility overrides. Takes precedence over the global `.yfm` config.",
+      "markdownDescription": "**`{toc, toc-header, search, feedback, favicon-src}`** Per-page UI element visibility overrides. Takes precedence over the global `.yfm` config.",
       "defaultSnippets": [
         {
           "label": "Configure page UI",
@@ -174,12 +174,7 @@
     },
     "stage": {
       "type": "string",
-      "enum": [
-        "new",
-        "preview",
-        "tech-preview",
-        "skip"
-      ],
+      "enum": ["new", "preview", "tech-preview", "skip"],
       "description": "Document lifecycle stage (inherited from toc.yaml or set manually).",
       "markdownDescription": "**`'new' | 'preview' | 'tech-preview' | 'skip'`** Document lifecycle stage.\n\nInherited from the parent `toc.yaml` entry; override here for this page only.",
       "markdownEnumDescriptions": [
@@ -398,9 +393,7 @@
           "markdownDescription": "**`string`** BCP-47 language code (e.g. `en`, `ru`, `zh-Hans`)."
         }
       },
-      "required": [
-        "href"
-      ],
+      "required": ["href"],
       "additionalProperties": false,
       "markdownDescription": "**`Alternate`** Alternate language version of this page for `<link rel=\"alternate\">`.",
       "description": "Alternate language version of this page."
@@ -429,9 +422,7 @@
           "markdownDescription": "**`string`** Content value of the meta tag. **Required.**"
         }
       },
-      "required": [
-        "content"
-      ],
+      "required": ["content"],
       "additionalProperties": false,
       "markdownDescription": "**`MetaItem`** One custom HTML `<meta>` tag. Must have exactly one of `name`, `property`, or `http-equiv`, plus `content`.",
       "description": "Custom HTML meta tag definition."
