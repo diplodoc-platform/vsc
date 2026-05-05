@@ -119,6 +119,48 @@ describe('removeTocEntry', () => {
 
         expect(editCall).toBeDefined();
     });
+
+    it('removes only href when entry has nested items', async () => {
+        const toc = [
+            '  - name: Level 1',
+            '    href: a.md',
+            '    items:',
+            '      - name: Page 1',
+            '        href: page1.md',
+        ].join('\n');
+
+        mockFiles({'/docs/toc.yaml': toc});
+
+        await removeTocEntry(makeUri('/docs/toc.yaml'), 1);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const edit = vi.mocked(vscode.workspace.applyEdit).mock.calls[0][0] as any;
+        const range = edit.edits[0].edit.range;
+
+        // Should delete only line 1 (href), not line 0 (name)
+        expect(range.start.line).toBe(1);
+        expect(range.end.line).toBe(2);
+    });
+
+    it('removes name+href when entry has no nested items', async () => {
+        const toc = [
+            '  - name: Leaf',
+            '    href: leaf.md',
+            '  - name: Other',
+            '    href: other.md',
+        ].join('\n');
+
+        mockFiles({'/docs/toc.yaml': toc});
+
+        await removeTocEntry(makeUri('/docs/toc.yaml'), 1);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const edit = vi.mocked(vscode.workspace.applyEdit).mock.calls[0][0] as any;
+        const range = edit.edits[0].edit.range;
+
+        expect(range.start.line).toBe(0);
+        expect(range.end.line).toBe(2);
+    });
 });
 
 describe('addRedirect', () => {

@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import {debounceByKey} from '../../utils';
 
 import {validateLinks} from './diagnostics';
+import {FileReferenceProvider, findFileReferences} from './references';
 import {parseLinkFromLine} from './utils';
 
 export class LinkProvider implements vscode.DocumentLinkProvider {
@@ -34,6 +35,26 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         collection,
         vscode.languages.registerDocumentLinkProvider({language: 'yaml'}, new LinkProvider()),
+        vscode.languages.registerReferenceProvider(
+            [{language: 'markdown'}, {language: 'yaml'}],
+            new FileReferenceProvider(),
+        ),
+        vscode.commands.registerCommand('diplodoc.findFileReferences', async (uri?: vscode.Uri) => {
+            const targetUri = uri ?? vscode.window.activeTextEditor?.document.uri;
+
+            if (!targetUri) {
+                return;
+            }
+
+            const locations = await findFileReferences(targetUri);
+
+            await vscode.commands.executeCommand(
+                'editor.action.showReferences',
+                targetUri,
+                new vscode.Position(0, 0),
+                locations,
+            );
+        }),
         vscode.workspace.onDidOpenTextDocument((doc) => {
             if (doc.languageId === 'yaml') {
                 validateLinks(doc, collection);

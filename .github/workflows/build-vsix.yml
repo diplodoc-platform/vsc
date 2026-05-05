@@ -39,6 +39,7 @@ jobs:
         run: |
           git config user.name "yc-ui-bot"
           git config user.email "yc-ui-bot@users.noreply.github.com"
+          git rm --ignore-unmatch -f *.vsix
           git add -f *.vsix
           git diff --cached --quiet && exit 0
           git commit -m "chore: update vsix [skip ci]"
