@@ -396,8 +396,8 @@ Run: `npm run merge-schemas` (auto-detects CLI schemas at `../packages/cli/schem
 - **activationEvents**: `onLanguage:markdown`, `onLanguage:yaml`
 - **languages**: `.yfm`/`.yfmlint` as YAML; `toc.yaml`/`presets.yaml`/`redirects.yaml`/`theme.yaml` filenames as YAML
 - **grammars**: Injects YAML syntax highlighting into `::: page-constructor` blocks in Markdown
-- **commands**: `diplodoc.openMdEditor` (works for both Markdown and blocks-YAML), `diplodoc.openTocEditor`, `diplodoc.insertTable`, `diplodoc.insertNote`, `diplodoc.insertPageConstructor`, `diplodoc.insertHtmlBlock`
-- **keybindings**: `Alt+T` (table), `Alt+R` (note), `Alt+P` (page-constructor), `Alt+H` (HTML block)
+- **commands**: `diplodoc.openMdEditor` (works for both Markdown and blocks-YAML), `diplodoc.openTocEditor`, `diplodoc.insertTable`, `diplodoc.insertNote`, `diplodoc.insertCut`, `diplodoc.insertTab`, `diplodoc.insertCodeBlock`, `diplodoc.insertInclude`, `diplodoc.insertQuote`, `diplodoc.insertMermaid`, `diplodoc.insertFrontmatter`, `diplodoc.insertPageConstructor`, `diplodoc.insertHtmlBlock`, `diplodoc.insertVideo`
+- **keybindings**: `Alt+T` (table), `Alt+R` (note), `Alt+C` (cut), `Alt+A` (tabs), `Alt+O` (code block), `Alt+Z` (include), `Alt+Q` (quote), `Alt+M` (mermaid), `Alt+F` (frontmatter), `Alt+P` (page-constructor), `Alt+H` (HTML block), `Alt+V` (video)
 - **views**: Sidebar webview in activity bar
 
 No `yamlValidation` contribution — the extension handles all YAML validation internally (no dependency on Red Hat YAML extension).

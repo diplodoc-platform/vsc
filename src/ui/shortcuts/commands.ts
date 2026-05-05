@@ -98,6 +98,7 @@ export const editorShortcuts: EditorCommand[] = [
         alt: true,
         handler: (editor) => {
             editor.focus();
+
             if (editor.currentMode === 'wysiwyg') {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (editor as any).actions?.quote?.run();
@@ -112,6 +113,7 @@ export const editorShortcuts: EditorCommand[] = [
         alt: true,
         handler: (editor) => {
             editor.focus();
+
             if (editor.currentMode === 'wysiwyg') {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (editor as any).actions?.createMermaid?.run();
@@ -121,25 +123,12 @@ export const editorShortcuts: EditorCommand[] = [
         },
     },
     {
-        action: 'insertCheckbox',
-        key: 'x',
-        alt: true,
-        handler: (editor) => {
-            editor.focus();
-            if (editor.currentMode === 'wysiwyg') {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (editor as any).actions?.addCheckbox?.run();
-            } else {
-                insertAtCursor(editor, insertElement('checkbox'));
-            }
-        },
-    },
-    {
         action: 'insertFrontmatter',
         key: 'f',
         alt: true,
         handler: (editor) => {
             editor.focus();
+
             if (editor.currentMode === 'wysiwyg') {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (editor as any).actions?.createFrontmatter?.run();
@@ -154,6 +143,7 @@ export const editorShortcuts: EditorCommand[] = [
         alt: true,
         handler: (editor) => {
             editor.focus();
+
             if (editor.currentMode === 'wysiwyg') {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (editor as any).actions?.createYfmPageConstructor?.run();
@@ -168,11 +158,24 @@ export const editorShortcuts: EditorCommand[] = [
         alt: true,
         handler: (editor) => {
             editor.focus();
+
             if (editor.currentMode === 'wysiwyg') {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (editor as any).actions?.createYfmHtmlBlock?.run();
             } else {
                 insertAtCursor(editor, insertElement('htmlBlock'));
+            }
+        },
+    },
+    {
+        action: 'insertVideo',
+        key: 'v',
+        alt: true,
+        handler: (editor) => {
+            editor.focus();
+
+            if (editor.currentMode !== 'wysiwyg') {
+                insertAtCursor(editor, insertElement('video'));
             }
         },
     },
