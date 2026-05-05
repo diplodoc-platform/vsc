@@ -208,6 +208,9 @@ vi.mock('vscode', () => ({
         insert(uri: unknown, position: unknown, text: string) {
             this.edits.push({uri, edit: {type: 'insert', position, text}});
         }
+        replace(uri: unknown, range: unknown, newText: string) {
+            this.edits.push({uri, edit: {type: 'replace', range, newText}});
+        }
     },
     window: {
         createOutputChannel: vi.fn().mockReturnValue({
