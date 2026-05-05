@@ -37,4 +37,5 @@ export const LINK_FIELDS = new Set([
 ]);
 
 export const SKIP_DIAGNOSTIC_FIELDS = new Set(['from', 'to']);
+export const NOT_ONLY_LINKS_FIELDS = new Set(['theme']);
 export const FIELD_RE = /^[ \t]*(?:-\s+)?(\S+?):\s+['"]?([^'"#\s][^'"\n]*)['"]?\s*$/;
