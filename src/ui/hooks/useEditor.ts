@@ -71,7 +71,11 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
                         import('@diplodoc/mermaid-extension/runtime');
                     },
                 });
-                builder.use(YfmPageConstructorExtension, {});
+                builder.use(YfmPageConstructorExtension, {
+                    transformerOptions: {
+                        lang: (document.documentElement.lang || 'en') as 'en',
+                    },
+                });
                 builder.use(YfmHtmlBlock, {});
                 builder.use(YfmInclude);
                 builder.use(YfmFrontmatter);
