@@ -11,6 +11,8 @@ const LIQUID_TAG_RE = /^{%[\s\S]*?%}\s*$/;
 const LIQUID_OPEN_RE = /^{%[-\s]*(\w+)/;
 const INCLUDE_RE = /^{%\s*include\s/;
 
+const KNOWN_LIQUID_TAGS = new Set(['note', 'cut', 'list']);
+
 function makeCloseRe(tagName: string): RegExp {
     return new RegExp(`^{%[-\\s]*end${tagName}\\s*-?%}\\s*$`);
 }
@@ -81,12 +83,18 @@ function yfmLiquidTagBlockRule(
         return false;
     }
 
+    const nameMatch = LIQUID_OPEN_RE.exec(line);
+    const tagName = nameMatch?.[1] ?? '';
+
+    const baseName = tagName.startsWith('end') ? tagName.slice(3) : tagName;
+
+    if (KNOWN_LIQUID_TAGS.has(baseName)) {
+        return false;
+    }
+
     if (silent) {
         return true;
     }
-
-    const nameMatch = LIQUID_OPEN_RE.exec(line);
-    const tagName = nameMatch?.[1] ?? '';
     const isEndTag = tagName.startsWith('end');
 
     let closeLine = -1;
