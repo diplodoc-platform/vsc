@@ -1,13 +1,26 @@
-import {describe, expect, it} from 'vitest';
+import {mkdirSync, rmSync, writeFileSync} from 'fs';
+import {join} from 'path';
+import {tmpdir} from 'os';
+import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 
 import {isYfmFile} from './utils';
 
 describe('isYfmFile', () => {
-    it('returns true for files inside yfm project (tests/mocks has .yfm)', () => {
-        const mocksDir = `${process.cwd()}/tests/mocks`;
+    const testRoot = join(tmpdir(), `yfm-test-${Date.now()}`);
+    const nestedDir = join(testRoot, 'sub');
 
-        expect(isYfmFile(`${mocksDir}/index.md`)).toBe(true);
-        expect(isYfmFile(`${mocksDir}/level1/page1.md`)).toBe(true);
+    beforeAll(() => {
+        mkdirSync(nestedDir, {recursive: true});
+        writeFileSync(join(testRoot, '.yfm'), 'allowHtml: true\n');
+    });
+
+    afterAll(() => {
+        rmSync(testRoot, {recursive: true, force: true});
+    });
+
+    it('returns true for files inside yfm project', () => {
+        expect(isYfmFile(join(testRoot, 'index.md'))).toBe(true);
+        expect(isYfmFile(join(nestedDir, 'page.md'))).toBe(true);
     });
 
     it('returns false for files outside any yfm project', () => {
