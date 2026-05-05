@@ -162,6 +162,10 @@
       {
         "command": "diplodoc.insertVideo",
         "title": "Diplodoc: Insert Video"
+      },
+      {
+        "command": "diplodoc.findFileReferences",
+        "title": "Diplodoc: Find File in toc.yaml"
       }
     ],
     "languages": [
@@ -211,6 +215,13 @@
           "command": "diplodoc.openTocEditor",
           "when": "resourceFilename == toc.yaml",
           "group": "navigation@1"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "diplodoc.findFileReferences",
+          "when": "resourceLangId == markdown || resourceLangId == yaml",
+          "group": "4_search"
         }
       ]
     },
