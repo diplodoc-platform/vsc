@@ -430,6 +430,8 @@ Fields from all Diplodoc YAML schemas:
 
 `src/modules/links/diagnostics.ts` validates that local file paths actually exist on disk. For each relative path found in a YAML document, it calls `vscode.workspace.fs.stat()`. Missing files produce an error diagnostic: `Link is unreachable: <path>` (source: `Diplodoc`). External URLs are skipped. Validation runs on open, save, and change (400ms debounce).
 
+**Navigation section exception**: Links inside the `navigation:` block in `toc.yaml` are skipped entirely. Navigation items (`leftItems`/`rightItems`) contain URLs (not file paths) that are resolved from the documentation root, not the file location, and may point outside the doc root. The `getNavigationLines()` helper detects the navigation block via indentation tracking and returns the set of line numbers to skip. When `navigation` is a scalar value (`navigation: false` or `navigation: ./nav.yaml`), no lines are skipped.
+
 ### Adding a new link field
 
 Add the field name to `LINK_FIELDS` in `src/modules/links/constants.ts`. No other changes needed — both link navigation and diagnostics will pick it up automatically.

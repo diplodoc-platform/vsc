@@ -9,8 +9,11 @@ import {
 import {yfmIncludePlugin} from './plugin';
 
 declare global {
-    interface WysiwygEditorActions {
-        [yfmIncludeAction]: Action;
+    // eslint-disable-next-line @typescript-eslint/no-namespace
+    namespace WysiwygEditor {
+        interface Actions {
+            [yfmIncludeAction]: Action;
+        }
     }
 }
 

@@ -19,12 +19,12 @@ markdownDescription: >-
 properties:
   title:
     description: Title of the documentation section. Shown in the browser tab and sidebar header.
-    markdownDescription: "**`string`** Title of the documentation section. Shown in the browser tab and the navigation sidebar header."
+    markdownDescription: '**`string`** Title of the documentation section. Shown in the browser tab and the navigation sidebar header.'
   href:
     description: Entry-point page for this TOC section (relative path to a .md or index.yaml file).
-    markdownDescription: "**`string`** Entry-point page for this TOC section. Relative path to a `.md` file or nested `index.yaml`."
+    markdownDescription: '**`string`** Entry-point page for this TOC section. Relative path to a `.md` file or nested `index.yaml`.'
   stage:
-    description: "Publication stage: new | preview | tech-preview | skip."
+    description: 'Publication stage: new | preview | tech-preview | skip.'
     markdownDescription: "**`'new' | 'preview' | 'tech-preview' | 'skip'`** Publication stage controlling which builds include this entire section."
     enum:
       - new
@@ -32,33 +32,50 @@ properties:
       - tech-preview
       - skip
     markdownEnumDescriptions:
-      - "New section — visible only in **preview** builds. Excluded from production."
-      - "Preview — visible in preview and tech-preview builds."
-      - "Tech-preview — visible only in tech-preview builds."
-      - "Excluded from **all** builds. The section is completely skipped."
+      - 'New section — visible only in **preview** builds. Excluded from production.'
+      - 'Preview — visible in preview and tech-preview builds.'
+      - 'Tech-preview — visible only in tech-preview builds.'
+      - 'Excluded from **all** builds. The section is completely skipped.'
   base:
     description: Base path prefix prepended to all relative hrefs in this TOC.
-    markdownDescription: "**`string`** Base path prefix prepended to all relative `href` values in this TOC. Useful when the same TOC is included from multiple places."
+    markdownDescription: '**`string`** Base path prefix prepended to all relative `href` values in this TOC. Useful when the same TOC is included from multiple places.'
   singlePage:
     description: Generate a single-page HTML variant that combines all items into one page.
-    markdownDescription: "**`boolean`** Generate a single-page HTML variant that concatenates all TOC items into one scrollable page."
+    markdownDescription: '**`boolean`** Generate a single-page HTML variant that concatenates all TOC items into one scrollable page.'
   label:
-    description: "Label badge(s) shown next to the TOC title in the sidebar."
+    description: 'Label badge(s) shown next to the TOC title in the sidebar.'
     markdownDescription: "**`TocLabel | TocLabel[]`** Badge label(s) shown next to the section title in the navigation sidebar.\n\n```yaml\nlabel:\n  title: New\n  theme: info\n```"
     defaultSnippets:
       - label: Single label badge
         body:
-          title: "${1:New}"
-          theme: "${2:info}"
+          title: '${1:New}'
+          theme: '${2:info}'
       - label: Multiple label badges
         body:
-          - title: "${1:New}"
-            theme: "${2:info}"
-          - title: "${3:Beta}"
-            theme: "${4:warning}"
+          - title: '${1:New}'
+            theme: '${2:info}'
+          - title: '${3:Beta}'
+            theme: '${4:warning}'
   when:
-    description: "Condition expression for including this TOC. Liquid expression (string) or boolean."
+    description: 'Condition expression for including this TOC. Liquid expression (string) or boolean.'
     markdownDescription: "**`string | boolean`** Condition for including this TOC in the build.\n\nUse Liquid-style expressions with variables from `presets.yaml`:\n```yaml\nwhen: env == 'production'\nwhen: feature_flag\nwhen: false  # always hidden\n```"
+  analytics:
+    description: 'Analytics and cookie consent configuration.'
+    markdownDescription: "**`AnalyticsConfig`** Analytics tracking and cookie consent popup configuration.\n\n- `text` **`string`** — cookie consent popup text (HTML allowed)\n- `buttons` **`object`** — consent popup buttons (`accept`, `decline`)\n- `gtm` **`AnalyticsGtmConfig`** — Google Tag Manager configuration\n- `metrika` **`AnalyticsMetrikaConfig[]`** — Yandex Metrika counters"
+    defaultSnippets:
+      - label: Cookie consent
+        body:
+          text: '${1:We use cookies to improve your experience.}'
+          buttons:
+            accept:
+              text: '${2:Ok}'
+              theme: '${3:accent}'
+              size: '${4:xl}'
+      - label: Analytics with GTM
+        body:
+          gtm:
+            id: '${1:GTM-XXXXXXX}'
+            mode: '${2:base}'
   navigation:
     description: Top navigation bar configuration (logo + header items).
     markdownDescription: "**`boolean | string | Navigation`** Top navigation bar configuration.\n\n- `false` — disable the nav bar\n- `'...'` — path to a shared navigation YAML file\n- Object — inline navigation with `logo` and `header` fields"
@@ -66,67 +83,67 @@ properties:
       - label: Inline navigation
         body:
           logo:
-            text: "${1:My Project}"
-            url: "${2:/}"
+            text: '${1:My Project}'
+            url: '${2:/}'
           header:
             leftItems: []
             rightItems: []
   pdf:
-    description: "PDF generation config. Fields: startPages (string[]), endPages (string[])."
+    description: 'PDF generation config. Fields: startPages (string[]), endPages (string[]).'
     markdownDescription: "**`object`** PDF generation settings for this section.\n\n- `startPages` **`string[]`** — `.md` pages prepended at the beginning of the PDF\n- `endPages` **`string[]`** — `.md` pages appended at the end of the PDF"
     properties:
       startPages:
         description: Pages prepended at the start of the PDF.
-        markdownDescription: "**`string[]`** Paths to `.md` pages prepended at the beginning of the PDF output."
+        markdownDescription: '**`string[]`** Paths to `.md` pages prepended at the beginning of the PDF output.'
       endPages:
         description: Pages appended at the end of the PDF.
-        markdownDescription: "**`string[]`** Paths to `.md` pages appended at the end of the PDF output."
+        markdownDescription: '**`string[]`** Paths to `.md` pages appended at the end of the PDF output.'
   items:
     description: List of TOC items (pages, sections, or includes).
     markdownDescription: "**`TocItem[]`** The navigation tree. Each item can be:\n- A **page** (has `href`)\n- A **section** (has `name` + nested `items`)\n- An **include** (has `include` with a `path`)"
     defaultSnippets:
       - label: Page item
         body:
-          name: "${1:Page title}"
-          href: "${2:page.md}"
+          name: '${1:Page title}'
+          href: '${2:page.md}'
       - label: Section with children
         body:
-          name: "${1:Section title}"
+          name: '${1:Section title}'
           items:
-            - name: "${2:First page}"
-              href: "${3:page.md}"
+            - name: '${2:First page}'
+              href: '${3:page.md}'
       - label: Include from another TOC
         body:
           include:
-            path: "${1:../other-section/toc.yaml}"
-            mode: "${2:link}"
+            path: '${1:../other-section/toc.yaml}'
+            mode: '${2:link}'
 
 definitions:
   TocLabel:
     description: Badge label shown next to a TOC entry in the sidebar.
-    markdownDescription: "**`TocLabel`** Badge label shown next to a TOC title in the navigation sidebar."
+    markdownDescription: '**`TocLabel`** Badge label shown next to a TOC title in the navigation sidebar.'
     properties:
       title:
         description: Label text displayed in the badge.
-        markdownDescription: "**`string`** Badge text (e.g. `New`, `Beta`, `Deprecated`). **Required.**"
+        markdownDescription: '**`string`** Badge text (e.g. `New`, `Beta`, `Deprecated`). **Required.**'
       description:
         description: Tooltip text shown on hover over the badge.
-        markdownDescription: "**`string`** Tooltip text shown when hovering over the badge."
+        markdownDescription: '**`string`** Tooltip text shown when hovering over the badge.'
       theme:
-        description: "Visual theme of the badge: normal | info | danger | warning | success | utility | unknown | clear."
-        markdownDescription: "**`string`** Visual color theme of the badge."
+        description: 'Visual theme of the badge: normal | info | danger | warning | success | utility | unknown | clear.'
+        markdownDescription: '**`string`** Visual color theme of the badge.'
         markdownEnumDescriptions:
-          - "Default neutral style."
-          - "Blue — informational."
-          - "Red — error / danger."
-          - "Yellow — warning."
-          - "Green — success / stable."
-          - "Purple — utility."
-          - "Grey — unknown status."
-          - "Transparent background."
+          - 'Default neutral style.'
+          - 'Blue — informational.'
+          - 'Red — error / danger.'
+          - 'Yellow — warning.'
+          - 'Green — success / stable.'
+          - 'Purple — utility.'
+          - 'Grey — unknown status.'
+          - 'Transparent background.'
       when:
         description: Liquid condition expression. Badge is hidden when false.
-        markdownDescription: "**`string | boolean`** Liquid condition — badge is hidden when the expression is falsy."
+        markdownDescription: '**`string | boolean`** Liquid condition — badge is hidden when the expression is falsy.'
 
   TocItem:
     additionalProperties: false
@@ -135,50 +152,50 @@ definitions:
     properties:
       name:
         description: Display name of the item in the navigation sidebar.
-        markdownDescription: "**`string`** Display name in the navigation sidebar."
+        markdownDescription: '**`string`** Display name in the navigation sidebar.'
       href:
         description: Relative path to the target .md file or URL.
-        markdownDescription: "**`string`** Relative path to the `.md` page or an external URL."
+        markdownDescription: '**`string`** Relative path to the `.md` page or an external URL.'
         type: string
       include:
         description: Include directive to merge another toc.yaml.
-        markdownDescription: "**`Include`** Directive to include another `toc.yaml` into this navigation tree."
+        markdownDescription: '**`Include`** Directive to include another `toc.yaml` into this navigation tree.'
       expanded:
         description: Whether this section starts expanded in the sidebar.
-        markdownDescription: "**`boolean`** Start this section expanded in the sidebar (`true`) or collapsed (`false`)."
+        markdownDescription: '**`boolean`** Start this section expanded in the sidebar (`true`) or collapsed (`false`).'
       labeled:
         description: Show the label badge next to this item's children.
-        markdownDescription: "**`boolean`** Propagate the label badge to all children of this section."
+        markdownDescription: '**`boolean`** Propagate the label badge to all children of this section.'
       hidden:
         description: Exclude this item from the sidebar (but the page is still built).
-        markdownDescription: "**`boolean`** Hide this item in the sidebar. The page is still built and accessible by direct URL."
+        markdownDescription: '**`boolean`** Hide this item in the sidebar. The page is still built and accessible by direct URL.'
       when:
         description: Liquid condition. Item is excluded when false.
         markdownDescription: "**`string | boolean`** Liquid condition — item is excluded from the build when the expression is falsy.\n\n```yaml\nwhen: env == 'internal'\n```"
       restricted-access:
         description: Access restriction rules. String or array of role/group conditions.
-        markdownDescription: "**`string | string[]`** Access restriction conditions. The user must satisfy at least one condition to see this item."
+        markdownDescription: '**`string | string[]`** Access restriction conditions. The user must satisfy at least one condition to see this item.'
 
   TocItemWithLink:
     properties:
       href:
         description: Relative path to the target .md file or URL.
-        markdownDescription: "**`string`** Relative path to the `.md` page (e.g. `guide/intro.md`) or an external URL."
+        markdownDescription: '**`string`** Relative path to the `.md` page (e.g. `guide/intro.md`) or an external URL.'
 
   Include:
     description: Directive to include another toc.yaml file into this navigation tree.
-    markdownDescription: "**`Include`** Directive to include another `toc.yaml` into this navigation tree."
+    markdownDescription: '**`Include`** Directive to include another `toc.yaml` into this navigation tree.'
     properties:
       path:
         description: Relative path to the toc.yaml to include.
-        markdownDescription: "**`string`** Relative path to the `toc.yaml` file to include (e.g. `../shared/toc.yaml`)."
+        markdownDescription: '**`string`** Relative path to the `toc.yaml` file to include (e.g. `../shared/toc.yaml`).'
       mode:
-        description: "Inclusion mode: link | merge | root_merge."
+        description: 'Inclusion mode: link | merge | root_merge.'
         markdownDescription: "**`'link' | 'merge' | 'root_merge'`** How the included TOC is grafted into the current tree."
         markdownEnumDescriptions:
-          - "**link** — include as a subsection with its own root. The included TOC keeps its own `base` path."
-          - "**merge** — merge items directly into the current level. Items inherit the current `base`."
-          - "**root_merge** — merge items at the root of the TOC. Ignores nesting level."
+          - '**link** — include as a subsection with its own root. The included TOC keeps its own `base` path.'
+          - '**merge** — merge items directly into the current level. Items inherit the current `base`.'
+          - '**root_merge** — merge items at the root of the TOC. Ignores nesting level.'
       includers:
         description: List of includer plugins that transform the included content.
         markdownDescription: "**`Includer[]`** Plugins that process the included content before merging.\n\nCommon includers: `openapi`, `unarchive`."
@@ -186,95 +203,162 @@ definitions:
           - label: OpenAPI includer
             body:
               - name: openapi
-                input: "${1:openapi.yaml}"
+                input: '${1:openapi.yaml}'
 
   Navigation:
-    description: "Top nav bar config. Fields: logo (NavigationLogo), header (NavigationHeader)."
+    description: 'Top nav bar config. Fields: logo (NavigationLogo), header (NavigationHeader).'
     markdownDescription: "**`Navigation`** Top navigation bar layout.\n\n- `logo` **`NavigationLogo`** — logo in the top-left corner\n- `header` **`NavigationHeader`** — left/right header link groups"
     properties:
       logo:
         description: Logo shown in the top-left of the navigation bar.
         markdownDescription: "**`NavigationLogo`** Logo shown in the top-left corner of the navigation bar.\n\n- `text` — text label\n- `url` — click destination URL\n- `icon` — image URL\n- `dark` / `light` — theme-specific variants"
       header:
-        description: "Header navigation items. Fields: leftItems (NavigationItem[]), rightItems (NavigationItem[]), iconSize (number)."
+        description: 'Header navigation items. Fields: leftItems (NavigationItem[]), rightItems (NavigationItem[]), iconSize (number).'
         markdownDescription: "**`NavigationHeader`** Header navigation items.\n\n- `leftItems` **`NavigationItem[]`** — items shown on the left\n- `rightItems` **`NavigationItem[]`** — items shown on the right\n- `iconSize` **`number`** — default icon size in pixels"
 
   NavigationLogo:
-    description: "Navigation bar logo. Fields: text, url, urlTitle, icon, dark (NavigationLogo), light (NavigationLogo)."
+    description: 'Navigation bar logo. Fields: text, url, urlTitle, icon, dark (NavigationLogo), light (NavigationLogo).'
     markdownDescription: "**`NavigationLogo`** Navigation bar logo configuration.\n\n- `text` **`string`** — text label (shown when no image)\n- `url` **`string`** — click destination URL\n- `urlTitle` **`string`** — accessible title / tooltip\n- `icon` **`string`** — image URL\n- `dark` **`NavigationLogo`** — dark-theme variant\n- `light` **`NavigationLogo`** — light-theme variant"
     properties:
       text:
-        markdownDescription: "**`string`** Text label shown next to (or instead of) the logo image."
+        markdownDescription: '**`string`** Text label shown next to (or instead of) the logo image.'
       url:
-        markdownDescription: "**`string`** URL the logo links to when clicked."
+        markdownDescription: '**`string`** URL the logo links to when clicked.'
       urlTitle:
-        markdownDescription: "**`string`** Accessible title for the logo link (tooltip / screen-reader text)."
+        markdownDescription: '**`string`** Accessible title for the logo link (tooltip / screen-reader text).'
       icon:
-        markdownDescription: "**`string`** Logo image URL."
+        markdownDescription: '**`string`** Logo image URL.'
       dark:
-        markdownDescription: "**`NavigationLogo`** Logo variant for dark theme — overrides the root logo fields."
+        markdownDescription: '**`NavigationLogo`** Logo variant for dark theme — overrides the root logo fields.'
       light:
-        markdownDescription: "**`NavigationLogo`** Logo variant for light theme — overrides the root logo fields."
+        markdownDescription: '**`NavigationLogo`** Logo variant for light theme — overrides the root logo fields.'
 
   NavigationHeader:
-    description: "Navigation header. Fields: leftItems (NavigationItem[]), rightItems (NavigationItem[]), iconSize (number)."
+    description: 'Navigation header. Fields: leftItems (NavigationItem[]), rightItems (NavigationItem[]), iconSize (number).'
     markdownDescription: "**`NavigationHeader`** Navigation header item groups.\n\n- `leftItems` **`NavigationItem[]`** — items shown on the left side\n- `rightItems` **`NavigationItem[]`** — items shown on the right side\n- `iconSize` **`number`** — default icon size in pixels"
     properties:
       leftItems:
         description: Navigation items shown on the left side of the header.
-        markdownDescription: "**`NavigationItem[]`** Navigation items shown on the **left** side of the header bar."
+        markdownDescription: '**`NavigationItem[]`** Navigation items shown on the **left** side of the header bar.'
       rightItems:
         description: Navigation items shown on the right side of the header.
-        markdownDescription: "**`NavigationItem[]`** Navigation items shown on the **right** side of the header bar."
+        markdownDescription: '**`NavigationItem[]`** Navigation items shown on the **right** side of the header bar.'
       iconSize:
         description: Default icon size in pixels for all header items.
-        markdownDescription: "**`number`** Default icon size in pixels for header item icons."
+        markdownDescription: '**`number`** Default icon size in pixels for header item icons.'
 
   NavigationBaseItem:
-    description: "Base navigation item fields: text, url, icon, iconSize, when."
+    description: 'Base navigation item fields: text, url, icon, iconSize, when.'
     markdownDescription: "**`NavigationBaseItem`** Shared fields for all navigation item types.\n\n- `text` **`string`** — label text\n- `url` **`string`** — link URL\n- `icon` **`string`** — icon image URL\n- `iconSize` **`number`** — icon size in pixels\n- `when` **`string | boolean`** — visibility condition"
     properties:
       text:
-        markdownDescription: "**`string`** Label text displayed for this navigation item."
+        markdownDescription: '**`string`** Label text displayed for this navigation item.'
       url:
-        markdownDescription: "**`string`** Link destination URL."
+        markdownDescription: '**`string`** Link destination URL.'
       icon:
-        markdownDescription: "**`string`** Icon image URL displayed next to the text."
+        markdownDescription: '**`string`** Icon image URL displayed next to the text.'
       iconSize:
-        markdownDescription: "**`number`** Icon size in pixels (overrides the header-level `iconSize`)."
+        markdownDescription: '**`number`** Icon size in pixels (overrides the header-level `iconSize`).'
       when:
-        markdownDescription: "**`string | boolean`** Liquid visibility condition — item is hidden when falsy."
+        markdownDescription: '**`string | boolean`** Liquid visibility condition — item is hidden when falsy.'
 
   NavigationItem:
-    description: "Navigation header item. type field determines variant: link | button | dropdown | controls."
+    description: 'Navigation header item. type field determines variant: link | button | dropdown | controls.'
     markdownDescription: "**`NavigationItem`** A navigation header item. The `type` field determines the variant:\n- `link` — text link (requires `text`, `url`)\n- `button` — CTA button (requires `text`, `url`)\n- `dropdown` — dropdown menu (requires `items`)\n- `controls` — theme/language switcher"
     properties:
       type:
-        description: "Item type: link | button | dropdown | controls."
+        description: 'Item type: link | button | dropdown | controls.'
         markdownDescription: "**`'link' | 'button' | 'dropdown' | 'controls'`** Item variant. **Required.**"
 
+  AnalyticsConfig:
+    description: 'Analytics and cookie consent configuration.'
+    markdownDescription: "**`AnalyticsConfig`** Analytics tracking and cookie consent popup configuration.\n\n- `text` **`string`** — consent popup text (HTML allowed)\n- `buttons` **`AnalyticsButtons`** — popup button configuration\n- `gtm` **`AnalyticsGtmConfig`** — Google Tag Manager\n- `metrika` **`AnalyticsMetrikaConfig[]`** — Yandex Metrika counters"
+    properties:
+      text:
+        description: Cookie consent popup text (HTML allowed).
+        markdownDescription: '**`string`** Text displayed in the cookie consent popup. HTML tags are allowed (e.g. `<a>` links to privacy policy).'
+      buttons:
+        description: Cookie consent popup buttons.
+        markdownDescription: "**`AnalyticsButtons`** Button configuration for the cookie consent popup.\n\n- `accept` — accept all cookies button\n- `decline` — decline optional cookies button"
+      gtm:
+        description: Google Tag Manager configuration.
+        markdownDescription: "**`AnalyticsGtmConfig`** Google Tag Manager configuration.\n\n- `id` **`string`** — GTM container ID (e.g. `GTM-XXXXXXX`)\n- `mode` **`'base' | 'notification'`** — consent mode"
+      metrika:
+        description: Yandex Metrika counter configurations.
+        markdownDescription: '**`AnalyticsMetrikaConfig[]`** Array of Yandex Metrika counter configurations.'
+
+  AnalyticsButtons:
+    description: Cookie consent popup buttons.
+    markdownDescription: '**`AnalyticsButtons`** Cookie consent popup button configuration.'
+    properties:
+      accept:
+        description: Accept button configuration.
+        markdownDescription: '**`AnalyticsButton`** Accept all cookies button.'
+      decline:
+        description: Decline button configuration.
+        markdownDescription: '**`AnalyticsButton`** Decline optional cookies button.'
+
+  AnalyticsButton:
+    description: Cookie consent button.
+    markdownDescription: '**`AnalyticsButton`** A cookie consent popup button.'
+    properties:
+      text:
+        description: Button label text.
+        markdownDescription: '**`string`** Button label text.'
+      theme:
+        description: 'Button visual theme (e.g. accent, normal).'
+        markdownDescription: '**`string`** Button visual theme (Gravity UI theme, e.g. `accent`, `normal`, `outlined`).'
+      size:
+        description: 'Button size (e.g. s, m, l, xl).'
+        markdownDescription: '**`string`** Button size (`s`, `m`, `l`, `xl`).'
+
+  AnalyticsGtmConfig:
+    description: Google Tag Manager configuration.
+    markdownDescription: '**`AnalyticsGtmConfig`** Google Tag Manager configuration.'
+    properties:
+      id:
+        description: GTM container ID.
+        markdownDescription: '**`string`** GTM container ID (e.g. `GTM-XXXXXXX`).'
+      mode:
+        description: 'Consent mode: base | notification.'
+        markdownDescription: "**`'base' | 'notification'`** Consent integration mode.\n\n- `base` — default consent mode with full popup\n- `notification` — notification-style consent banner"
+        markdownEnumDescriptions:
+          - 'Default consent mode with full popup.'
+          - 'Notification-style consent banner.'
+
+  AnalyticsMetrikaConfig:
+    description: Yandex Metrika counter configuration.
+    markdownDescription: "**`AnalyticsMetrikaConfig`** Yandex Metrika counter configuration.\n\n- `id` **`number`** — counter ID (**required**)\n- `params` **`object`** — initialization parameters"
+    properties:
+      id:
+        description: Yandex Metrika counter ID.
+        markdownDescription: '**`number`** Yandex Metrika counter ID. **Required.**'
+      params:
+        description: Yandex Metrika initialization parameters.
+        markdownDescription: '**`object`** Yandex Metrika initialization parameters (webvisor, clickmap, trackLinks, etc.).'
+
   NavigationAnalyticsEvent:
-    description: "Analytics event. Fields: name (string, required), type (string), counters (object), context (string)."
+    description: 'Analytics event. Fields: name (string, required), type (string), counters (object), context (string).'
     markdownDescription: "**`NavigationAnalyticsEvent`** Analytics event attached to a navigation item click.\n\n- `name` **`string`** — event name (**required**)\n- `type` **`string`** — event type\n- `counters` **`object`** — counter filter (`include: string[]`, `exclude: string[]`)\n- `context` **`string`** — event context string"
     properties:
       name:
         description: Analytics event name. Required.
-        markdownDescription: "**`string`** Analytics event name. **Required.**"
+        markdownDescription: '**`string`** Analytics event name. **Required.**'
       type:
         description: Analytics event type.
-        markdownDescription: "**`string`** Analytics event type identifier."
+        markdownDescription: '**`string`** Analytics event type identifier.'
       counters:
-        description: "Counter filter. Fields: include (string[]), exclude (string[])."
+        description: 'Counter filter. Fields: include (string[]), exclude (string[]).'
         markdownDescription: "**`object`** Counter filter for this event.\n\n- `include` **`string[]`** — counter IDs to include\n- `exclude` **`string[]`** — counter IDs to exclude"
       context:
         description: Event context string.
-        markdownDescription: "**`string`** Event context string passed with the analytics event."
+        markdownDescription: '**`string`** Event context string passed with the analytics event.'
 
   NavigationLinkTarget:
-    description: "Link target: _self | _blank | _parent | _top."
-    markdownDescription: "**`string`** HTML link target attribute."
+    description: 'Link target: _self | _blank | _parent | _top.'
+    markdownDescription: '**`string`** HTML link target attribute.'
     markdownEnumDescriptions:
-      - "Open in the same frame (default)."
-      - "Open in a new tab."
-      - "Open in the parent frame."
-      - "Open in the full window."
+      - 'Open in the same frame (default).'
+      - 'Open in a new tab.'
+      - 'Open in the parent frame.'
+      - 'Open in the full window.'
