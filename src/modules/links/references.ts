@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 
 import {isExternalUrl} from '../../utils';
-import {logger} from '../utils';
 import {HREF_RE} from '../orphan/constants';
 
 async function readFileText(uri: vscode.Uri): Promise<string | null> {
