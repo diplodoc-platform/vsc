@@ -1199,8 +1199,8 @@
         },
         "type": {
           "type": "string",
-          "enum": ["default", "search"],
-          "description": "Widget integration type. default — floating widget initialized on page load. search — widget activated via search suggest button.",
+          "enum": ["widget", "search"],
+          "description": "Widget integration type. widget — floating widget initialized on page load. search — widget activated via search suggest button.",
           "markdownDescription": "**`'widget' | 'search'`** Widget integration type.\n\n- `widget` — floating widget initialized on page load\n- `search` — widget activated via search suggest button"
         }
       },
