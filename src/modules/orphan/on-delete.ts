@@ -68,17 +68,32 @@ export async function removeTocEntry(tocUri: vscode.Uri, lineIndex: number): Pro
     }
 
     const lines = text.split('\n');
-    let startLine = lineIndex;
-    const endLine = lineIndex + 1;
+    const hrefLine = lines[lineIndex];
+    const hrefIndent = hrefLine.search(/\S/);
 
-    if (startLine > 0 && /^\s*-?\s*name:\s/.test(lines[startLine - 1])) {
-        startLine--;
-    }
+    const hasNestedItems =
+        lineIndex + 1 < lines.length &&
+        /^\s+items\s*:/.test(lines[lineIndex + 1]) &&
+        lines[lineIndex + 1].search(/\S/) === hrefIndent;
 
     const edit = new vscode.WorkspaceEdit();
-    const range = new vscode.Range(startLine, 0, endLine, 0);
 
-    edit.delete(tocUri, range);
+    if (hasNestedItems) {
+        const range = new vscode.Range(lineIndex, 0, lineIndex + 1, 0);
+
+        edit.delete(tocUri, range);
+    } else {
+        let startLine = lineIndex;
+
+        if (startLine > 0 && /^\s*-?\s*name:\s/.test(lines[startLine - 1])) {
+            startLine--;
+        }
+
+        const range = new vscode.Range(startLine, 0, lineIndex + 1, 0);
+
+        edit.delete(tocUri, range);
+    }
+
     await vscode.workspace.applyEdit(edit);
 }
 
