@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.1](https://github.com/diplodoc-platform/vsc/compare/v0.6.0...v0.6.1) (2026-05-05)
+
+
+### Bug Fixes
+
+* fixed directive bug ([d1de092](https://github.com/diplodoc-platform/vsc/commit/d1de092d85f8092769a2b68a3a95005d9f602752))
+* fixed directive bug ([ed744c8](https://github.com/diplodoc-platform/vsc/commit/ed744c8dfa7fbe8eb8d6471f46cb50dd1b41046a))
+* fixed pc links ([5cb4376](https://github.com/diplodoc-platform/vsc/commit/5cb4376efe919e88564b197e5ae6dba480eb306a))
+* fixed pc-links ([5cad558](https://github.com/diplodoc-platform/vsc/commit/5cad558b26164343204649842b31c57abd6d9893))
+* removed unnecessary plugins from Markdown Editor ([9e4a0d2](https://github.com/diplodoc-platform/vsc/commit/9e4a0d20dcaac79f6248c0a60613332457306c22))
+* removed unnecessary plugins from Markdown Editor ([d80a593](https://github.com/diplodoc-platform/vsc/commit/d80a593c40751fcc05f7c381184fa4a68052d0fc))
+
 ## 0.6.0 (2026-05-04)
 
 ## What's Changed
