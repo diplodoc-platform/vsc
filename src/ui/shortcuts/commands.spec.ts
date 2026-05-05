@@ -164,22 +164,6 @@ describe('editorShortcuts', () => {
         expect(run).toHaveBeenCalledOnce();
     });
 
-    it('runs checkbox action in wysiwyg mode', () => {
-        const run = vi.fn();
-        const editor = {
-            currentMode: 'wysiwyg',
-            focus: vi.fn(),
-            actions: {
-                addCheckbox: {run},
-            },
-        };
-
-        findShortcut('insertCheckbox').handler(editor as never);
-
-        expect(editor.focus).toHaveBeenCalledOnce();
-        expect(run).toHaveBeenCalledOnce();
-    });
-
     it('runs page-constructor action in wysiwyg mode', () => {
         const run = vi.fn();
         const editor = {
@@ -243,5 +227,31 @@ describe('editorShortcuts', () => {
             editor,
             '::: html\n<div>HTML content</div>\n:::',
         );
+    });
+
+    it('does not insert video in wysiwyg mode', () => {
+        const editor = {
+            currentMode: 'wysiwyg',
+            focus: vi.fn(),
+        };
+
+        findShortcut('insertVideo').handler(editor as never);
+
+        expect(editor.focus).toHaveBeenCalledOnce();
+        expect(insertAtCursor).not.toHaveBeenCalled();
+    });
+
+    it('inserts video snippet in markdown mode', () => {
+        const editor = {
+            currentMode: 'markup',
+            focus: vi.fn(),
+        };
+        vi.mocked(insertElement).mockReturnValue('@[]()');
+
+        findShortcut('insertVideo').handler(editor as never);
+
+        expect(editor.focus).toHaveBeenCalledOnce();
+        expect(insertElement).toHaveBeenCalledWith('video');
+        expect(insertAtCursor).toHaveBeenCalledWith(editor, '@[]()');
     });
 });

@@ -19,11 +19,17 @@ const toaster = new Toaster();
 
 const {wMathListItem, wMermaidItemData, wYfmHtmlBlockItemData, wToolbarConfigByPreset} =
     wysiwygToolbarConfigs;
+
+const HIDDEN_TOOLBAR_IDS = new Set(['checkbox', 'file', 'underline']);
+
 const yfmBase = wToolbarConfigByPreset.yfm;
+const filterToolbar = (item: {id: string}) => !HIDDEN_TOOLBAR_IDS.has(item.id);
 const wysiwygToolbarConfig = [
-    ...yfmBase.slice(0, -1),
+    ...yfmBase
+        .slice(0, -1)
+        .map((group) => (Array.isArray(group) ? group.filter(filterToolbar) : group)),
     [
-        ...yfmBase[yfmBase.length - 1],
+        ...yfmBase[yfmBase.length - 1].filter(filterToolbar),
         wMathListItem,
         wMermaidItemData,
         wYfmHtmlBlockItemData,
