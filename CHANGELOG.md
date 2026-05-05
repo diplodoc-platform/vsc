@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.2](https://github.com/diplodoc-platform/vsc/compare/v0.6.1...v0.6.2) (2026-05-05)
+
+
+### Bug Fixes
+
+* fixed ([8c0ab90](https://github.com/diplodoc-platform/vsc/commit/8c0ab904884ca0e0c04722c3a899be0ce206d5e7))
+* fixed links module ([6a37d3e](https://github.com/diplodoc-platform/vsc/commit/6a37d3ec39a04a6b2dc540fdaa90a464d373161a))
+* fixed links module ([afbf2c4](https://github.com/diplodoc-platform/vsc/commit/afbf2c4d29f2d9c4d4cc225107c48f63c0544fe5))
+* fixed linter ([3b892b1](https://github.com/diplodoc-platform/vsc/commit/3b892b1c72ccf99d9739e6fcaed53ff989cd3cb8))
+* fixed not-link fields ([24e4c9f](https://github.com/diplodoc-platform/vsc/commit/24e4c9fd16a5de2b7ad0e250a1e2fda59f7485b1))
+* fixed not-link fields ([bc2f24c](https://github.com/diplodoc-platform/vsc/commit/bc2f24cd9d97d958bfb315056b74022be830dbd8))
+* some fixes ([5e33074](https://github.com/diplodoc-platform/vsc/commit/5e330741aa316b3b6c7b8fe5c39263028fec1f7b))
+* some fixes ([2b85018](https://github.com/diplodoc-platform/vsc/commit/2b850181548bb190f2c10ad2fed8b1ff5a7a0b8d))
+
 ## [0.6.1](https://github.com/diplodoc-platform/vsc/compare/v0.6.0...v0.6.1) (2026-05-05)
 
 
