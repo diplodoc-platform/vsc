@@ -150,22 +150,20 @@ describe('yfmLiquidTagPlugin', () => {
         expect(token?.content).toBe('{% directive %}');
     });
 
-    it('parses standalone opening tag without closer as single-line', () => {
+    it('skips {% note %} — handled by @diplodoc/transform', () => {
         const md = createMd();
         const tokens = md.parse('{% note info "Title" %}\n', {});
         const token = findToken(tokens, LIQUID_TOKEN_NAME);
 
-        expect(token).toBeDefined();
-        expect(token?.content).toBe('{% note info "Title" %}');
+        expect(token).toBeUndefined();
     });
 
-    it('parses {% endnote %} as single-line', () => {
+    it('skips {% endnote %} — handled by @diplodoc/transform', () => {
         const md = createMd();
         const tokens = md.parse('{% endnote %}\n', {});
         const token = findToken(tokens, LIQUID_TOKEN_NAME);
 
-        expect(token).toBeDefined();
-        expect(token?.content).toBe('{% endnote %}');
+        expect(token).toBeUndefined();
     });
 
     it('does not match {% include [...](path) %}', () => {
@@ -194,46 +192,43 @@ describe('yfmLiquidTagPlugin', () => {
         expect(heading).toBeDefined();
     });
 
-    it('captures block pair {% note %}...{% endnote %}', () => {
+    it('skips block pair {% note %}...{% endnote %} — handled by @diplodoc/transform', () => {
         const md = createMd();
         const src = '{% note info %}\n\nContent\n\n{% endnote %}\n';
         const tokens = findAllTokens(md.parse(src, {}), LIQUID_TOKEN_NAME);
 
-        expect(tokens).toHaveLength(1);
-        expect(tokens[0].content).toBe('{% note info %}\n\nContent\n\n{% endnote %}');
+        expect(tokens).toHaveLength(0);
     });
 
-    it('captures block pair {% cut %}...{% endcut %}', () => {
+    it('skips block pair {% cut %}...{% endcut %} — handled by @diplodoc/transform', () => {
         const md = createMd();
         const src = '{% cut "Title" %}\nSome content here\n{% endcut %}\n';
         const tokens = findAllTokens(md.parse(src, {}), LIQUID_TOKEN_NAME);
 
-        expect(tokens).toHaveLength(1);
-        expect(tokens[0].content).toBe('{% cut "Title" %}\nSome content here\n{% endcut %}');
+        expect(tokens).toHaveLength(0);
     });
 
-    it('captures block pair {% list tabs %}...{% endlist %}', () => {
+    it('skips block pair {% list tabs %}...{% endlist %} — handled by @diplodoc/transform', () => {
         const md = createMd();
         const src = '{% list tabs %}\n\n- Tab 1\n\nContent 1\n\n{% endlist %}\n';
         const tokens = findAllTokens(md.parse(src, {}), LIQUID_TOKEN_NAME);
 
-        expect(tokens).toHaveLength(1);
-        expect(tokens[0].content).toContain('{% list tabs %}');
-        expect(tokens[0].content).toContain('{% endlist %}');
+        expect(tokens).toHaveLength(0);
     });
 
-    it('does not consume content after block pair', () => {
+    it('does not consume content after skipped known block pair', () => {
         const md = createMd();
         const src = '{% note info %}\nText\n{% endnote %}\n\n# Heading\n';
         const tokens = md.parse(src, {});
         const heading = tokens.find((t) => t.type === 'heading_open');
 
         expect(heading).toBeDefined();
+        expect(findToken(tokens, LIQUID_TOKEN_NAME)).toBeUndefined();
     });
 
-    it('block pair preserves inner content verbatim', () => {
+    it('captures unknown block pair {% custom %}...{% endcustom %}', () => {
         const md = createMd();
-        const src = '{% note warning %}\n**bold** and _italic_\n- list item\n{% endnote %}\n';
+        const src = '{% custom %}\n**bold** and _italic_\n- list item\n{% endcustom %}\n';
         const token = findToken(md.parse(src, {}), LIQUID_TOKEN_NAME);
 
         expect(token).toBeDefined();
@@ -257,7 +252,7 @@ describe('yfmLiquidTagPlugin', () => {
         expect(token).toBeUndefined();
     });
 
-    it('handles block pair in the middle of document', () => {
+    it('skips known tags in the middle of document', () => {
         const md = createMd();
         const src = '# Title\n\n{% note info %}\nNote content\n{% endnote %}\n\nAfter note\n';
         const tokens = md.parse(src, {});
@@ -265,16 +260,27 @@ describe('yfmLiquidTagPlugin', () => {
         const heading = tokens.find((t) => t.type === 'heading_open');
 
         expect(heading).toBeDefined();
-        expect(liquid).toBeDefined();
-        expect(liquid?.content).toBe('{% note info %}\nNote content\n{% endnote %}');
+        expect(liquid).toBeUndefined();
     });
 
-    it('falls back to single-line when closer not found', () => {
+    it('handles unknown block pair in the middle of document', () => {
         const md = createMd();
-        const src = '{% note info %}\nContent without endnote\n';
+        const src = '# Title\n\n{% custom %}\nContent\n{% endcustom %}\n\nAfter\n';
+        const tokens = md.parse(src, {});
+        const liquid = findToken(tokens, LIQUID_TOKEN_NAME);
+        const heading = tokens.find((t) => t.type === 'heading_open');
+
+        expect(heading).toBeDefined();
+        expect(liquid).toBeDefined();
+        expect(liquid?.content).toBe('{% custom %}\nContent\n{% endcustom %}');
+    });
+
+    it('falls back to single-line for unknown tag when closer not found', () => {
+        const md = createMd();
+        const src = '{% custom %}\nContent without endcustom\n';
         const token = findToken(md.parse(src, {}), LIQUID_TOKEN_NAME);
 
         expect(token).toBeDefined();
-        expect(token?.content).toBe('{% note info %}');
+        expect(token?.content).toBe('{% custom %}');
     });
 });
