@@ -19,12 +19,7 @@
       "type": "string",
       "markdownDescription": "**`'new' | 'preview' | 'tech-preview' | 'skip'`** Publication stage controlling which builds include this entire section.",
       "description": "Publication stage: new | preview | tech-preview | skip.",
-      "enum": [
-        "new",
-        "preview",
-        "tech-preview",
-        "skip"
-      ],
+      "enum": ["new", "preview", "tech-preview", "skip"],
       "markdownEnumDescriptions": [
         "New section — visible only in **preview** builds. Excluded from production.",
         "Preview — visible in preview and tech-preview builds.",
@@ -81,12 +76,38 @@
       ]
     },
     "when": {
-      "type": [
-        "string",
-        "boolean"
-      ],
+      "type": ["string", "boolean"],
       "description": "Condition expression for including this TOC. Liquid expression (string) or boolean.",
       "markdownDescription": "**`string | boolean`** Condition for including this TOC in the build.\n\nUse Liquid-style expressions with variables from `presets.yaml`:\n```yaml\nwhen: env == 'production'\nwhen: feature_flag\nwhen: false  # always hidden\n```"
+    },
+    "analytics": {
+      "$ref": "#/definitions/AnalyticsConfig",
+      "description": "Analytics and cookie consent configuration.",
+      "markdownDescription": "**`AnalyticsConfig`** Analytics tracking and cookie consent popup configuration.\n\n- `text` **`string`** — cookie consent popup text (HTML allowed)\n- `buttons` **`AnalyticsConfig`** — consent popup buttons (`accept`, `decline`)\n- `gtm` **`AnalyticsGtmConfig`** — Google Tag Manager configuration\n- `metrika` **`AnalyticsMetrikaConfig[]`** — Yandex Metrika counters",
+      "defaultSnippets": [
+        {
+          "label": "Cookie consent",
+          "body": {
+            "text": "${1:We use cookies to improve your experience.}",
+            "buttons": {
+              "accept": {
+                "text": "${2:Ok}",
+                "theme": "${3:accent}",
+                "size": "${4:xl}"
+              }
+            }
+          }
+        },
+        {
+          "label": "Analytics with GTM",
+          "body": {
+            "gtm": {
+              "id": "${1:GTM-XXXXXXX}",
+              "mode": "${2:base}"
+            }
+          }
+        }
+      ]
     },
     "navigation": {
       "oneOf": [
@@ -185,9 +206,7 @@
   "definitions": {
     "TocLabel": {
       "type": "object",
-      "required": [
-        "title"
-      ],
+      "required": ["title"],
       "properties": {
         "title": {
           "type": "string",
@@ -201,16 +220,7 @@
         },
         "theme": {
           "type": "string",
-          "enum": [
-            "normal",
-            "info",
-            "danger",
-            "warning",
-            "success",
-            "utility",
-            "unknown",
-            "clear"
-          ],
+          "enum": ["normal", "info", "danger", "warning", "success", "utility", "unknown", "clear"],
           "markdownDescription": "**`string`** Visual color theme of the badge.",
           "description": "Visual theme of the badge: normal | info | danger | warning | success | utility | unknown | clear.",
           "markdownEnumDescriptions": [
@@ -225,10 +235,7 @@
           ]
         },
         "when": {
-          "type": [
-            "string",
-            "boolean"
-          ],
+          "type": ["string", "boolean"],
           "description": "Liquid condition expression. Badge is hidden when false.",
           "markdownDescription": "**`string | boolean`** Liquid condition — badge is hidden when the expression is falsy."
         }
@@ -286,10 +293,7 @@
           "markdownDescription": "**`string | string[]`** Access restriction conditions. The user must satisfy at least one condition to see this item."
         },
         "when": {
-          "type": [
-            "string",
-            "boolean"
-          ],
+          "type": ["string", "boolean"],
           "description": "Liquid condition. Item is excluded when false.",
           "markdownDescription": "**`string | boolean`** Liquid condition — item is excluded from the build when the expression is falsy.\n\n```yaml\nwhen: env == 'internal'\n```"
         },
@@ -332,9 +336,7 @@
       }
     },
     "TocItemWithInclude": {
-      "required": [
-        "include"
-      ],
+      "required": ["include"],
       "properties": {
         "name": {
           "type": "string",
@@ -350,11 +352,7 @@
       "properties": {
         "mode": {
           "type": "string",
-          "enum": [
-            "link",
-            "merge",
-            "root_merge"
-          ],
+          "enum": ["link", "merge", "root_merge"],
           "markdownDescription": "**`'link' | 'merge' | 'root_merge'`** How the included TOC is grafted into the current tree.",
           "description": "Inclusion mode: link | merge | root_merge.",
           "markdownEnumDescriptions": [
@@ -394,9 +392,7 @@
     },
     "Includer": {
       "type": "object",
-      "required": [
-        "name"
-      ],
+      "required": ["name"],
       "properties": {
         "name": {
           "type": "string",
@@ -408,9 +404,7 @@
     },
     "OpenApiIncluder": {
       "type": "object",
-      "required": [
-        "input"
-      ],
+      "required": ["input"],
       "properties": {
         "input": {
           "type": "string",
@@ -449,10 +443,7 @@
             },
             "mode": {
               "type": "string",
-              "enum": [
-                "section",
-                "leaf"
-              ],
+              "enum": ["section", "leaf"],
               "markdownDescription": "**`'section' | 'leaf'`**"
             },
             "spec": {
@@ -460,10 +451,7 @@
               "properties": {
                 "renderMode": {
                   "type": "string",
-                  "enum": [
-                    "inline",
-                    "hidden"
-                  ],
+                  "enum": ["inline", "hidden"],
                   "markdownDescription": "**`'inline' | 'hidden'`**"
                 }
               },
@@ -599,9 +587,7 @@
     },
     "NavigationItem": {
       "type": "object",
-      "required": [
-        "type"
-      ],
+      "required": ["type"],
       "properties": {
         "type": {
           "type": "string",
@@ -655,10 +641,7 @@
           "markdownDescription": "**`number`** Icon size in pixels (overrides the header-level `iconSize`)."
         },
         "when": {
-          "type": [
-            "string",
-            "boolean"
-          ],
+          "type": ["string", "boolean"],
           "markdownDescription": "**`string | boolean`** Liquid visibility condition — item is hidden when falsy."
         }
       },
@@ -685,10 +668,7 @@
           "markdownDescription": "**`boolean`**"
         }
       },
-      "required": [
-        "type",
-        "text"
-      ],
+      "required": ["type", "text"],
       "markdownDescription": "**`{text, type, target, arrow}`**"
     },
     "NavigationButtonItem": {
@@ -722,9 +702,7 @@
             },
             {
               "type": "object",
-              "required": [
-                "data"
-              ],
+              "required": ["data"],
               "properties": {
                 "data": {
                   "type": "string",
@@ -732,10 +710,7 @@
                 },
                 "position": {
                   "type": "string",
-                  "enum": [
-                    "left",
-                    "right"
-                  ],
+                  "enum": ["left", "right"],
                   "markdownDescription": "**`'left' | 'right'`**"
                 },
                 "alt": {
@@ -766,18 +741,11 @@
         },
         "width": {
           "type": "string",
-          "enum": [
-            "auto",
-            "max"
-          ],
+          "enum": ["auto", "max"],
           "markdownDescription": "**`'auto' | 'max'`**"
         }
       },
-      "required": [
-        "type",
-        "text",
-        "url"
-      ]
+      "required": ["type", "text", "url"]
     },
     "NavigationDropdownItem": {
       "type": "object",
@@ -795,10 +763,7 @@
           "markdownDescription": "**`NavigationLinkItem[]`**"
         }
       },
-      "required": [
-        "type",
-        "items"
-      ],
+      "required": ["type", "items"],
       "markdownDescription": "**`{type, items}`**"
     },
     "NavigationControlsItem": {
@@ -810,19 +775,12 @@
           "markdownDescription": "**`string`**"
         }
       },
-      "required": [
-        "type"
-      ],
+      "required": ["type"],
       "markdownDescription": "**`{type}`**"
     },
     "NavigationLinkTarget": {
       "type": "string",
-      "enum": [
-        "_self",
-        "_blank",
-        "_parent",
-        "_top"
-      ],
+      "enum": ["_self", "_blank", "_parent", "_top"],
       "markdownDescription": "**`string`** HTML link target attribute.",
       "description": "Link target: _self | _blank | _parent | _top.",
       "markdownEnumDescriptions": [
@@ -832,11 +790,193 @@
         "Open in the full window."
       ]
     },
+    "AnalyticsConfig": {
+      "description": "Analytics and cookie consent configuration.",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Cookie consent popup text (HTML allowed).",
+          "markdownDescription": "**`string`** Text displayed in the cookie consent popup. HTML tags are allowed (e.g. `<a>` links to privacy policy)."
+        },
+        "buttons": {
+          "$ref": "#/definitions/AnalyticsButtons",
+          "description": "Cookie consent popup buttons.",
+          "markdownDescription": "**`AnalyticsButtons`** Button configuration for the cookie consent popup.\n\n- `accept` — accept all cookies button\n- `decline` — decline optional cookies button"
+        },
+        "gtm": {
+          "$ref": "#/definitions/AnalyticsGtmConfig",
+          "description": "Google Tag Manager configuration.",
+          "markdownDescription": "**`AnalyticsGtmConfig`** Google Tag Manager configuration.\n\n- `id` **`string`** — GTM container ID (e.g. `GTM-XXXXXXX`)\n- `mode` **`'base' | 'notification'`** — consent mode"
+        },
+        "metrika": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AnalyticsMetrikaConfig"
+          },
+          "markdownDescription": "**`AnalyticsMetrikaConfig[]`** Array of Yandex Metrika counter configurations.",
+          "description": "Yandex Metrika counter configurations."
+        }
+      },
+      "additionalProperties": true,
+      "markdownDescription": "**`AnalyticsConfig`** Analytics tracking and cookie consent popup configuration.\n\n- `text` **`string`** — consent popup text (HTML allowed)\n- `buttons` **`AnalyticsButtons`** — popup button configuration\n- `gtm` **`AnalyticsGtmConfig`** — Google Tag Manager\n- `metrika` **`AnalyticsMetrikaConfig[]`** — Yandex Metrika counters"
+    },
+    "AnalyticsButtons": {
+      "description": "Cookie consent popup buttons.",
+      "type": "object",
+      "properties": {
+        "accept": {
+          "$ref": "#/definitions/AnalyticsButton",
+          "description": "Accept button configuration.",
+          "markdownDescription": "**`AnalyticsButton`** Accept all cookies button."
+        },
+        "decline": {
+          "$ref": "#/definitions/AnalyticsButton",
+          "description": "Decline button configuration.",
+          "markdownDescription": "**`AnalyticsButton`** Decline optional cookies button."
+        }
+      },
+      "additionalProperties": true,
+      "markdownDescription": "**`AnalyticsButtons`** Cookie consent popup button configuration."
+    },
+    "AnalyticsButton": {
+      "description": "Cookie consent button.",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "markdownDescription": "**`string`** Button label text.",
+          "description": "Button label text."
+        },
+        "theme": {
+          "type": "string",
+          "markdownDescription": "**`string`** Button visual theme (Gravity UI theme, e.g. `accent`, `normal`, `outlined`).",
+          "description": "Button visual theme (e.g. accent, normal)."
+        },
+        "size": {
+          "type": "string",
+          "markdownDescription": "**`string`** Button size (`s`, `m`, `l`, `xl`).",
+          "description": "Button size (e.g. s, m, l, xl)."
+        }
+      },
+      "additionalProperties": true,
+      "markdownDescription": "**`AnalyticsButton`** A cookie consent popup button."
+    },
+    "AnalyticsGtmConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "markdownDescription": "**`string`** GTM container ID (e.g. `GTM-XXXXXXX`).",
+          "description": "GTM container ID."
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["base", "notification"],
+          "markdownDescription": "**`'base' | 'notification'`** Consent integration mode.\n\n- `base` — default consent mode with full popup\n- `notification` — notification-style consent banner",
+          "description": "Consent mode: base | notification.",
+          "markdownEnumDescriptions": [
+            "Default consent mode with full popup.",
+            "Notification-style consent banner."
+          ]
+        }
+      },
+      "markdownDescription": "**`AnalyticsGtmConfig`** Google Tag Manager configuration.",
+      "description": "Google Tag Manager configuration."
+    },
+    "AnalyticsMetrikaConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "markdownDescription": "**`number`** Yandex Metrika counter ID. **Required.**",
+          "description": "Yandex Metrika counter ID."
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "accurateTrackBounce": {
+              "type": ["boolean", "number"]
+            },
+            "childIframe": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            },
+            "clickmap": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            },
+            "defer": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            },
+            "ecommerce": {
+              "oneOf": [
+                {
+                  "type": "boolean",
+                  "markdownDescription": "**`boolean`**"
+                },
+                {
+                  "type": "string",
+                  "markdownDescription": "**`string`**"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "markdownDescription": "**`string`**"
+                  },
+                  "markdownDescription": "**`string[]`**"
+                }
+              ]
+            },
+            "trackHash": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            },
+            "trackLinks": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            },
+            "trustedDomains": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "markdownDescription": "**`string`**"
+              },
+              "markdownDescription": "**`string[]`**"
+            },
+            "webvisor": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            },
+            "triggerEvent": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            },
+            "sendTitle": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            },
+            "ssr": {
+              "type": "boolean",
+              "markdownDescription": "**`boolean`**"
+            }
+          },
+          "markdownDescription": "**`{accurateTrackBounce, childIframe, clickmap, ...}`** Yandex Metrika initialization parameters (webvisor, clickmap, trackLinks, etc.).",
+          "description": "Yandex Metrika initialization parameters."
+        }
+      },
+      "markdownDescription": "**`AnalyticsMetrikaConfig`** Yandex Metrika counter configuration.\n\n- `id` **`number`** — counter ID (**required**)\n- `params` **`{id, params}`** — initialization parameters",
+      "description": "Yandex Metrika counter configuration."
+    },
     "NavigationAnalyticsEvent": {
       "type": "object",
-      "required": [
-        "name"
-      ],
+      "required": ["name"],
       "properties": {
         "name": {
           "type": "string",
