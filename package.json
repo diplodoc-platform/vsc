@@ -79,11 +79,6 @@
         "when": "editorLangId == markdown && editorTextFocus"
       },
       {
-        "command": "diplodoc.insertCheckbox",
-        "key": "alt+x",
-        "when": "editorLangId == markdown && editorTextFocus"
-      },
-      {
         "command": "diplodoc.insertFrontmatter",
         "key": "alt+f",
         "when": "editorLangId == markdown && editorTextFocus"
@@ -96,6 +91,11 @@
       {
         "command": "diplodoc.insertHtmlBlock",
         "key": "alt+h",
+        "when": "editorLangId == markdown && editorTextFocus"
+      },
+      {
+        "command": "diplodoc.insertVideo",
+        "key": "alt+v",
         "when": "editorLangId == markdown && editorTextFocus"
       }
     ],
@@ -148,10 +148,6 @@
         "title": "Diplodoc: Insert Mermaid Diagram"
       },
       {
-        "command": "diplodoc.insertCheckbox",
-        "title": "Diplodoc: Insert Checkbox"
-      },
-      {
         "command": "diplodoc.insertFrontmatter",
         "title": "Diplodoc: Insert Frontmatter"
       },
@@ -162,6 +158,10 @@
       {
         "command": "diplodoc.insertHtmlBlock",
         "title": "Diplodoc: Insert HTML Block"
+      },
+      {
+        "command": "diplodoc.insertVideo",
+        "title": "Diplodoc: Insert Video"
       }
     ],
     "languages": [

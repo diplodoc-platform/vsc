@@ -62,10 +62,10 @@ The editor supports two modes: **WYSIWYG** and **Markup**. Set the default mode 
 | `Alt+Z`  | Insert Include          |
 | `Alt+Q`  | Insert Quote            |
 | `Alt+M`  | Insert Mermaid Diagram  |
-| `Alt+X`  | Insert Checkbox         |
 | `Alt+F`  | Insert Frontmatter      |
 | `Alt+P`  | Insert Page Constructor |
 | `Alt+H`  | Insert HTML Block       |
+| `Alt+V`  | Insert Video            |
 
 ### Validation
 

@@ -66,10 +66,6 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('diplodoc.insertCheckbox', () => insertBlock('checkbox')),
-    );
-
-    context.subscriptions.push(
         vscode.commands.registerCommand('diplodoc.insertFrontmatter', () =>
             insertBlock('frontmatter'),
         ),
@@ -83,6 +79,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('diplodoc.insertHtmlBlock', () => insertBlock('htmlBlock')),
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('diplodoc.insertVideo', () => insertBlock('video')),
     );
 
     context.subscriptions.push(
