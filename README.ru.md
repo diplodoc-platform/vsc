@@ -62,10 +62,10 @@ code --install-extension diplodoc.diplodoc-vsc-extension
 | `Alt+Z`   | Вставить инклуд            |
 | `Alt+Q`   | Вставить цитату            |
 | `Alt+M`   | Вставить диаграмму Mermaid |
-| `Alt+X`   | Вставить чекбокс           |
 | `Alt+F`   | Вставить фронтматтер       |
 | `Alt+P`   | Вставить page-constructor  |
 | `Alt+H`   | Вставить HTML-блок         |
+| `Alt+V`   | Вставить видео             |
 
 ### Валидация
 

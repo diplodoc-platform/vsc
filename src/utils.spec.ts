@@ -45,10 +45,10 @@ describe('insertElement', () => {
         expect(result).toContain('{% endcut %}');
     });
 
-    it('returns checkbox', () => {
-        const result = insertElement('checkbox');
+    it('returns video', () => {
+        const result = insertElement('video');
 
-        expect(result).toBe('[ ] ');
+        expect(result).toBe('@[]()');
     });
 
     it('returns mermaid block', () => {

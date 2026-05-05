@@ -36,8 +36,10 @@ const {
     wCommandMenuConfigByPreset,
 } = wysiwygToolbarConfigs;
 
+const HIDDEN_COMMAND_MENU_IDS = new Set(['checkbox', 'file']);
+
 const commandMenuActions = [
-    ...wCommandMenuConfigByPreset.yfm,
+    ...wCommandMenuConfigByPreset.yfm.filter((item) => !HIDDEN_COMMAND_MENU_IDS.has(item.id)),
     wMathInlineItemData,
     wMathBlockItemData,
     wMermaidItemData,

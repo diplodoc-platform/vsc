@@ -1,10 +1,13 @@
 {
-  "tagPrefix": "v",
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "packages": {
     ".": {
       "release-type": "node",
+      "component": "",
       "include-component-in-tag": false,
+      "include-v-in-tag": true,
       "changelog-path": "CHANGELOG.md",
+      "changelog-type": "github",
       "version-file": "package.json",
       "changelog-types": [
         {"type": "feat", "section": "Features"},
@@ -16,6 +19,5 @@
         {"type": "revert", "section": "Reverts"}
       ]
     }
-  },
-  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+  }
 }
