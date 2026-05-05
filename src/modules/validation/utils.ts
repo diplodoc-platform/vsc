@@ -358,7 +358,11 @@ export function buildLintConfig(
     return {
         default: true,
         MD013: false,
+        MD018: false,
+        MD026: false,
         MD033: !allowHtml,
+        MD034: false,
+        MD051: false,
         ...userConfig,
     } as RawLintConfig;
 }
