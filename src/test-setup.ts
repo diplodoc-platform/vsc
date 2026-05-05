@@ -150,6 +150,14 @@ vi.mock('vscode', () => ({
             this.target = target;
         }
     },
+    Location: class {
+        uri: unknown;
+        range: MockRange;
+        constructor(uri: unknown, range: MockRange) {
+            this.uri = uri;
+            this.range = range;
+        }
+    },
     Uri: {
         parse: (s: string) => ({toString: () => s, scheme: 'https'}),
         file: (s: string) => ({toString: () => s, fsPath: s}),
