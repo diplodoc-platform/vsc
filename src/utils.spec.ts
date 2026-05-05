@@ -5,6 +5,7 @@ import {
     insertElement,
     isBlocksYaml,
     isExternalUrl,
+    isInternalPath,
     unwrapPageConstructor,
     wrapPageConstructor,
 } from './utils';
@@ -247,5 +248,41 @@ describe('isExternalUrl', () => {
     it('returns false for strings containing http mid-text', () => {
         expect(isExternalUrl('page-https://example.com')).toBe(false);
         expect(isExternalUrl('text http://example.com')).toBe(false);
+    });
+});
+
+describe('isInternalPath', () => {
+    it('returns true for bare filenames with extension', () => {
+        expect(isInternalPath('index.md')).toBe(true);
+        expect(isInternalPath('toc.yaml')).toBe(true);
+    });
+
+    it('returns true for relative paths', () => {
+        expect(isInternalPath('./page.md')).toBe(true);
+        expect(isInternalPath('../docs/guide.md')).toBe(true);
+        expect(isInternalPath('guide/intro.md')).toBe(true);
+    });
+
+    it('returns true for absolute unix-like paths', () => {
+        expect(isInternalPath('/page.md')).toBe(true);
+        expect(isInternalPath('/docs/guide.md')).toBe(true);
+    });
+
+    it('returns true for anchor links', () => {
+        expect(isInternalPath('#section')).toBe(true);
+    });
+
+    it('returns false for plain words without extension', () => {
+        expect(isInternalPath('dark')).toBe(false);
+        expect(isInternalPath('some-theme')).toBe(false);
+    });
+
+    it('returns false for empty string', () => {
+        expect(isInternalPath('')).toBe(false);
+    });
+
+    it('returns false for external http/https URLs', () => {
+        expect(isInternalPath('http://example.com')).toBe(false);
+        expect(isInternalPath('https://example.com/docs')).toBe(false);
     });
 });

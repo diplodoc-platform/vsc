@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 
-import {isExternalUrl} from '../../utils';
+import {isExternalUrl, isInternalPath} from '../../utils';
 
 import {FIELD_RE, LINK_FIELDS} from './constants';
 
-export {isExternalUrl};
+export {isExternalUrl, isInternalPath};
 
 export function parseLinkFromLine(
     line: vscode.TextLine,
@@ -19,7 +19,7 @@ export function parseLinkFromLine(
     const [, field, rawValue] = match;
     const value = rawValue.trim().replace(/['"]$/, '');
 
-    if (!LINK_FIELDS.has(field) || !value) {
+    if (!LINK_FIELDS.has(field) || !value || (!isExternalUrl(value) && !isInternalPath(value))) {
         return null;
     }
 
