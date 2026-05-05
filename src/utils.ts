@@ -125,3 +125,26 @@ export function unwrapPageConstructor(text: string): string {
 export function isExternalUrl(value: string): boolean {
     return /^https?:\/\//.test(value);
 }
+
+export function isInternalPath(value: string): boolean {
+    const normalized = value.trim();
+
+    if (!normalized) {
+        return false;
+    }
+
+    if (isExternalUrl(normalized)) {
+        return false;
+    }
+
+    if (
+        normalized.startsWith('./') ||
+        normalized.startsWith('../') ||
+        normalized.startsWith('/') ||
+        normalized.startsWith('#')
+    ) {
+        return true;
+    }
+
+    return /\.[a-zA-Z0-9]+$/.test(normalized);
+}
