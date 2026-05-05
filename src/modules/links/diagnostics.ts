@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
-import {FIELD_RE, LINK_FIELDS, SKIP_DIAGNOSTIC_FIELDS} from './constants';
-import {isExternalUrl} from './utils';
+import {FIELD_RE, LINK_FIELDS, NOT_ONLY_LINKS_FIELDS, SKIP_DIAGNOSTIC_FIELDS} from './constants';
+import {isExternalUrl, isInternalPath} from './utils';
 
 export async function validateLinks(
     document: vscode.TextDocument,
@@ -29,7 +29,8 @@ export async function validateLinks(
             !LINK_FIELDS.has(field) ||
             SKIP_DIAGNOSTIC_FIELDS.has(field) ||
             !value ||
-            isExternalUrl(value)
+            isExternalUrl(value) ||
+            (NOT_ONLY_LINKS_FIELDS.has(field) && !isInternalPath(value))
         ) {
             continue;
         }
