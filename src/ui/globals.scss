@@ -9,6 +9,10 @@ $color: #63d590;
     --g-color-line-brand: #{$color};
     --g-color-text-brand: #{$color};
     --g-color-text-brand-heavy: #{$color};
+    --g-color-text-link: #{$color};
+    --g-color-text-link-hover: #4eec7a;
+    --g-color-text-link-visited: #{$color};
+    --g-color-text-link-visited-hover: #4eec7a;
     --g-color-button: #fff;
 
     --g-color-base-background: var(--vscode-editor-background);
