@@ -9,6 +9,7 @@ import {YfmPageConstructorExtension} from '@gravity-ui/markdown-editor-page-cons
 import {wYfmPageConstructorItemData} from '@gravity-ui/markdown-editor-page-constructor-extension/configs';
 
 import {YfmInclude} from '../../extensions/yfm-include';
+import {wYfmIncludeItemData} from '../../extensions/yfm-include/toolbar';
 import {YfmFrontmatter} from '../../extensions/yfm-frontmatter';
 import {YfmDirective} from '../../extensions/yfm-directive';
 import {isTrustedOrigin} from '../utils';
@@ -45,6 +46,7 @@ const commandMenuActions = [
     wMermaidItemData,
     wYfmPageConstructorItemData,
     wYfmHtmlBlockItemData,
+    wYfmIncludeItemData,
 ];
 
 export function useEditor({setFileName, preset, mode}: EditorParams) {
@@ -59,6 +61,10 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
             mode: mode ?? 'wysiwyg',
         },
         wysiwygConfig: {
+            escapeConfig: {
+                commonEscape: /.^/,
+                startOfLineEscape: /.^/,
+            },
             extensions: (builder) => {
                 builder.use(MathExtension, {
                     loadRuntimeScript: () => {

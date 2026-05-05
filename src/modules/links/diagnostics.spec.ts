@@ -3,7 +3,7 @@ import type * as vscode from 'vscode';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import * as vscodeModule from 'vscode';
 
-import {validateLinks} from './diagnostics';
+import {getNavigationLines, validateLinks} from './diagnostics';
 
 const statMock = vi.mocked(vscodeModule.workspace.fs.stat);
 
@@ -127,5 +127,136 @@ describe('validateLinks', () => {
         const {diagnostics} = getSetCall();
         expect(diagnostics[0].range.start.character).toBe(10);
         expect(diagnostics[0].range.end.character).toBe(17);
+    });
+
+    it('skips url inside navigation section', async () => {
+        statMock.mockRejectedValue(new Error('not found'));
+        const doc = mockDocument(
+            [
+                'navigation:',
+                '  header:',
+                '    leftItems:',
+                '      - text: Docs',
+                '        url: /docs/',
+            ].join('\n'),
+        );
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        expect(statMock).not.toHaveBeenCalled();
+        expect(getSetCall().diagnostics).toHaveLength(0);
+    });
+
+    it('skips icon inside navigation section', async () => {
+        statMock.mockRejectedValue(new Error('not found'));
+        const doc = mockDocument(
+            [
+                'navigation:',
+                '  header:',
+                '    rightItems:',
+                '      - text: Link',
+                '        icon: /icons/link.svg',
+            ].join('\n'),
+        );
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        expect(statMock).not.toHaveBeenCalled();
+        expect(getSetCall().diagnostics).toHaveLength(0);
+    });
+
+    it('still validates href outside navigation', async () => {
+        statMock.mockRejectedValue(new Error('not found'));
+        const doc = mockDocument(
+            [
+                'navigation:',
+                '  header:',
+                '    leftItems:',
+                '      - text: Docs',
+                '        url: /docs/',
+                'items:',
+                '  - name: Page',
+                '    href: missing.md',
+            ].join('\n'),
+        );
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        const {diagnostics} = getSetCall();
+        expect(diagnostics).toHaveLength(1);
+        expect(diagnostics[0].message).toBe('Link is unreachable: missing.md');
+    });
+
+    it('does not suppress validation when navigation is a scalar', async () => {
+        statMock.mockRejectedValue(new Error('not found'));
+        const doc = mockDocument(
+            ['navigation: ./nav.yaml', 'items:', '  - name: Page', '    href: missing.md'].join(
+                '\n',
+            ),
+        );
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        const {diagnostics} = getSetCall();
+        expect(diagnostics).toHaveLength(1);
+        expect(diagnostics[0].message).toBe('Link is unreachable: missing.md');
+    });
+});
+
+describe('getNavigationLines', () => {
+    it('returns lines inside navigation block', () => {
+        const doc = mockDocument(
+            [
+                'title: My Docs',
+                'navigation:',
+                '  logo:',
+                '    url: https://example.com',
+                '  header:',
+                '    leftItems:',
+                '      - text: Link',
+                '        url: /path',
+                'items:',
+                '  - name: Page',
+            ].join('\n'),
+        );
+
+        const lines = getNavigationLines(doc);
+
+        expect(lines.has(0)).toBe(false);
+        expect(lines.has(1)).toBe(false);
+        expect(lines.has(2)).toBe(true);
+        expect(lines.has(3)).toBe(true);
+        expect(lines.has(4)).toBe(true);
+        expect(lines.has(5)).toBe(true);
+        expect(lines.has(6)).toBe(true);
+        expect(lines.has(7)).toBe(true);
+        expect(lines.has(8)).toBe(false);
+        expect(lines.has(9)).toBe(false);
+    });
+
+    it('returns empty set for scalar navigation', () => {
+        const doc = mockDocument(
+            ['navigation: false', 'items:', '  - name: Page', '    href: page.md'].join('\n'),
+        );
+
+        const lines = getNavigationLines(doc);
+        expect(lines.size).toBe(0);
+    });
+
+    it('includes empty lines and comments within navigation', () => {
+        const doc = mockDocument(
+            ['navigation:', '  logo:', '', '  # comment', '  header:', 'items:'].join('\n'),
+        );
+
+        const lines = getNavigationLines(doc);
+        expect(lines.has(1)).toBe(true);
+        expect(lines.has(2)).toBe(true);
+        expect(lines.has(3)).toBe(true);
+        expect(lines.has(4)).toBe(true);
+        expect(lines.has(5)).toBe(false);
     });
 });

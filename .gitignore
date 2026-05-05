@@ -15,7 +15,6 @@
 npm-debug.log
 *.log
 
-
 .history
 node_modules
 /lib

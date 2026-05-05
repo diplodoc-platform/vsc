@@ -3,6 +3,41 @@ import * as vscode from 'vscode';
 import {FIELD_RE, LINK_FIELDS, NOT_ONLY_LINKS_FIELDS, SKIP_DIAGNOSTIC_FIELDS} from './constants';
 import {isExternalUrl, isInternalPath} from './utils';
 
+export function getNavigationLines(document: vscode.TextDocument): Set<number> {
+    const lines = new Set<number>();
+    let navIndent = -1;
+
+    for (let i = 0; i < document.lineCount; i++) {
+        const text = document.lineAt(i).text;
+        const stripped = text.trimStart();
+
+        if (!stripped || stripped.startsWith('#')) {
+            if (navIndent >= 0) {
+                lines.add(i);
+            }
+
+            continue;
+        }
+
+        const indent = text.length - stripped.length;
+
+        if (navIndent >= 0) {
+            if (indent <= navIndent) {
+                navIndent = -1;
+            } else {
+                lines.add(i);
+                continue;
+            }
+        }
+
+        if (/^navigation\s*:(\s*#.*)?$/.test(stripped)) {
+            navIndent = indent;
+        }
+    }
+
+    return lines;
+}
+
 export async function validateLinks(
     document: vscode.TextDocument,
     collection: vscode.DiagnosticCollection,
@@ -13,6 +48,7 @@ export async function validateLinks(
 
     const diagnostics: vscode.Diagnostic[] = [];
     const baseUri = vscode.Uri.joinPath(document.uri, '..');
+    const navigationLines = getNavigationLines(document);
 
     for (let i = 0; i < document.lineCount; i++) {
         const line = document.lineAt(i);
@@ -30,6 +66,7 @@ export async function validateLinks(
             SKIP_DIAGNOSTIC_FIELDS.has(field) ||
             !value ||
             isExternalUrl(value) ||
+            navigationLines.has(i) ||
             (NOT_ONLY_LINKS_FIELDS.has(field) && !isInternalPath(value))
         ) {
             continue;
