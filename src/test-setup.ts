@@ -220,11 +220,18 @@ vi.mock('vscode', () => ({
         showInputBox: vi.fn().mockResolvedValue(null),
         showTextDocument: vi.fn().mockResolvedValue(undefined),
     },
+    FileType: {
+        Unknown: 0,
+        File: 1,
+        Directory: 2,
+        SymbolicLink: 64,
+    },
     workspace: {
         fs: {
             stat: vi.fn().mockResolvedValue({}),
             readFile: vi.fn().mockResolvedValue(new Uint8Array()),
             writeFile: vi.fn().mockResolvedValue(undefined),
+            readDirectory: vi.fn().mockResolvedValue([]),
         },
         findFiles: vi.fn().mockResolvedValue([]),
         applyEdit: vi.fn().mockResolvedValue(true),

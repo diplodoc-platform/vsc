@@ -12,7 +12,7 @@ Hello, world
 
 ## Include from root level
 
-{% include [root-include](includes/root-include.md) %}
+{% include [root-include](includes/no-title-include.md) %}
 
 ## Include from level1
 
