@@ -33,7 +33,7 @@ function mockFiles(files: Record<string, string>) {
 }
 
 function mockFindFiles(tocFiles: string[], mdFiles: string[]) {
-    findFilesMock.mockImplementation(async (pattern: string) => {
+    findFilesMock.mockImplementation(async (pattern) => {
         if (typeof pattern === 'string' && pattern.includes('*.md')) {
             return mdFiles.map(makeUri);
         }
@@ -144,10 +144,10 @@ describe('handleFileRenamed', () => {
             '/docs/guide.md': 'See [About](old.md) for details.',
         });
 
-        vi.mocked(vscode.window.showQuickPick).mockResolvedValue({
-            label: 'Rename in markdown files',
-            id: 'rename',
-        });
+        vi.mocked(vscode.window.showQuickPick).mockResolvedValue(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            {label: 'Rename in markdown files', id: 'rename'} as any,
+        );
 
         await handleFileRenamed(makeUri('/docs/old.md'), makeUri('/docs/new.md'));
 

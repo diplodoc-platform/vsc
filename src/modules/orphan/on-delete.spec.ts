@@ -33,7 +33,7 @@ function mockFiles(files: Record<string, string>) {
 }
 
 function mockFindFiles(tocFiles: string[], mdFiles: string[]) {
-    findFilesMock.mockImplementation(async (pattern: string) => {
+    findFilesMock.mockImplementation(async (pattern) => {
         if (typeof pattern === 'string' && pattern.includes('*.md')) {
             return mdFiles.map(makeUri);
         }
@@ -244,10 +244,10 @@ describe('handleFileDeleted', () => {
             '/docs/guide.md': 'See [feedback](deleted.md) for more.',
         });
 
-        vi.mocked(vscode.window.showQuickPick).mockResolvedValue({
-            label: 'Replace links in markdown files',
-            id: 'replace-md',
-        });
+        vi.mocked(vscode.window.showQuickPick).mockResolvedValue(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            {label: 'Replace links in markdown files', id: 'replace-md'} as any,
+        );
         vi.mocked(vscode.window.showInputBox).mockResolvedValue('https://t.me/diplodoc_ru');
 
         await handleFileDeleted(makeUri('/docs/deleted.md'));
@@ -265,10 +265,10 @@ describe('handleFileDeleted', () => {
             '/docs/guide.md': 'See [feedback](deleted.md) for more.',
         });
 
-        vi.mocked(vscode.window.showQuickPick).mockResolvedValue({
-            label: 'Replace links in markdown files',
-            id: 'replace-md',
-        });
+        vi.mocked(vscode.window.showQuickPick).mockResolvedValue(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            {label: 'Replace links in markdown files', id: 'replace-md'} as any,
+        );
         vi.mocked(vscode.window.showInputBox).mockResolvedValue('');
 
         await handleFileDeleted(makeUri('/docs/deleted.md'));
