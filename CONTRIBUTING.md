@@ -63,8 +63,8 @@ src/
 │   ├── toc-editor/editor.ts          # TOC editor (extends BaseEditor)
 │   ├── main/sidebar.ts               # Sidebar file browser
 │   ├── color/                        # YAML color picker provider
-│   ├── links/                        # Ctrl+Click link navigation in YAML
-│   ├── orphan/                       # Orphan file detection + on-delete actions
+│   ├── links/                        # Link navigation, validation, md-link parsing
+│   ├── orphan/                       # Orphan detection + on-rename/on-delete with md link updates
 │   └── validation/                   # YAML schema validation + Markdown linting
 │       ├── index.ts                  # Orchestrator: events, cache, debounce
 │       ├── parser.ts                 # Extract frontmatter + page-constructor blocks

@@ -3,3 +3,7 @@ common:
     to: /new-page
   - from: /legacy/docs
     to: /docs/latest
+  - from: /b
+    to: /a
+  - from: /a
+    to: /d

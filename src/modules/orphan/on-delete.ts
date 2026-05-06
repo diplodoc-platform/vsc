@@ -2,6 +2,7 @@ import {relative} from 'path';
 import * as vscode from 'vscode';
 
 import {isExternalUrl} from '../../utils';
+import {type MdReference, findMarkdownReferences} from '../links/md-links';
 import {findYfmRoot} from '../utils';
 
 import {HREF_RE} from './constants';
@@ -137,6 +138,78 @@ function computeRedirectFrom(deletedFsPath: string): string | null {
     return `/${withoutExt}`;
 }
 
+function buildDeleteChoices(hasToc: boolean, hasMd: boolean): Array<{label: string; id: string}> {
+    const choices: Array<{label: string; id: string}> = [];
+
+    if (hasToc) {
+        choices.push({label: 'Remove from toc.yaml', id: 'remove'});
+    }
+
+    if (hasToc && hasMd) {
+        choices.push({
+            label: 'Remove from toc + replace links in markdown',
+            id: 'remove-and-replace',
+        });
+    } else if (hasMd) {
+        choices.push({label: 'Replace links in markdown files', id: 'replace-md'});
+    }
+
+    if (hasToc) {
+        choices.push({label: 'Remove from toc + add redirect', id: 'redirect'});
+    }
+
+    choices.push({label: 'Do nothing', id: 'nothing'});
+
+    return choices;
+}
+
+async function replaceMarkdownLinks(mdRefs: MdReference[]): Promise<void> {
+    const replacementUrl = await vscode.window.showInputBox({
+        prompt: 'Enter the replacement URL for markdown links',
+        placeHolder: 'https://example.com/new-page',
+    });
+
+    if (!replacementUrl) {
+        return;
+    }
+
+    const edit = new vscode.WorkspaceEdit();
+
+    for (const ref of mdRefs) {
+        const range = new vscode.Range(
+            ref.lineIndex,
+            ref.hrefStart,
+            ref.lineIndex,
+            ref.hrefStart + ref.href.length,
+        );
+
+        edit.replace(ref.fileUri, range, replacementUrl);
+    }
+
+    await vscode.workspace.applyEdit(edit);
+}
+
+async function handleRedirect(root: string, deletedUri: vscode.Uri): Promise<void> {
+    const fromPath = computeRedirectFrom(deletedUri.fsPath);
+    const toPath = await vscode.window.showInputBox({
+        prompt: 'Enter the redirect target path (leave empty to fill in later)',
+        placeHolder: '/new-page',
+    });
+
+    if (toPath === undefined || !fromPath) {
+        return;
+    }
+
+    const redirectsUri = vscode.Uri.file(`${root}/redirects.yaml`);
+    const normalizedTo = toPath && !toPath.startsWith('/') ? `/${toPath}` : toPath;
+
+    await addRedirect(redirectsUri, fromPath, normalizedTo);
+
+    if (!toPath) {
+        await vscode.window.showTextDocument(redirectsUri);
+    }
+}
+
 export async function handleFileDeleted(deletedUri: vscode.Uri): Promise<void> {
     const root = findYfmRoot(deletedUri.fsPath);
 
@@ -144,48 +217,39 @@ export async function handleFileDeleted(deletedUri: vscode.Uri): Promise<void> {
         return;
     }
 
-    const refs = await findTocReferences(deletedUri);
+    const tocRefs = await findTocReferences(deletedUri);
+    const mdRefs = await findMarkdownReferences(deletedUri);
 
-    if (refs.length === 0) {
+    if (tocRefs.length === 0 && mdRefs.length === 0) {
         return;
     }
 
-    const choice = await vscode.window.showQuickPick(
-        [
-            {label: 'Remove from toc.yaml', id: 'remove'},
-            {label: 'Remove from toc + add redirect', id: 'redirect'},
-            {label: 'Do nothing', id: 'nothing'},
-        ],
-        {
-            placeHolder: `"${refs[0].hrefValue}" was deleted. What would you like to do?`,
-        },
-    );
+    const hasToc = tocRefs.length > 0;
+    const hasMd = mdRefs.length > 0;
+    const choices = buildDeleteChoices(hasToc, hasMd);
+    const fileName = hasToc ? tocRefs[0].hrefValue : (deletedUri.fsPath.split('/').pop() ?? '');
+
+    const choice = await vscode.window.showQuickPick(choices, {
+        placeHolder: `"${fileName}" was deleted. What would you like to do?`,
+    });
 
     if (!choice || choice.id === 'nothing') {
         return;
     }
 
-    if (choice.id === 'redirect') {
-        const fromPath = computeRedirectFrom(deletedUri.fsPath);
-        const toPath = await vscode.window.showInputBox({
-            prompt: 'Enter the redirect target path (leave empty to fill in later)',
-            placeHolder: '/new-page',
-        });
+    const shouldReplaceMd = choice.id === 'remove-and-replace' || choice.id === 'replace-md';
 
-        if (toPath !== undefined && fromPath) {
-            const redirectsUri = vscode.Uri.file(`${root}/redirects.yaml`);
-
-            const normalizedTo = toPath && !toPath.startsWith('/') ? `/${toPath}` : toPath;
-
-            await addRedirect(redirectsUri, fromPath, normalizedTo);
-
-            if (!toPath) {
-                await vscode.window.showTextDocument(redirectsUri);
-            }
-        }
+    if (shouldReplaceMd && mdRefs.length > 0) {
+        await replaceMarkdownLinks(mdRefs);
     }
 
-    for (const ref of refs) {
-        await removeTocEntry(ref.tocUri, ref.lineIndex);
+    if (choice.id === 'redirect') {
+        await handleRedirect(root, deletedUri);
+    }
+
+    if (hasToc) {
+        for (const ref of tocRefs) {
+            await removeTocEntry(ref.tocUri, ref.lineIndex);
+        }
     }
 }

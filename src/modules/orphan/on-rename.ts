@@ -1,6 +1,7 @@
 import {relative} from 'path';
 import * as vscode from 'vscode';
 
+import {computeNewMdHref, findMarkdownReferences} from '../links/md-links';
 import {findYfmRoot} from '../utils';
 
 import {addRedirect, findTocReferences} from './on-delete';
@@ -58,22 +59,37 @@ export async function handleFileRenamed(oldUri: vscode.Uri, newUri: vscode.Uri):
         return;
     }
 
-    const refs = await findTocReferences(oldUri);
+    const tocRefs = await findTocReferences(oldUri);
+    const mdRefs = await findMarkdownReferences(oldUri);
 
-    if (refs.length === 0) {
+    if (tocRefs.length === 0 && mdRefs.length === 0) {
         return;
     }
 
-    const choice = await vscode.window.showQuickPick(
-        [
-            {label: 'Rename in toc.yaml', id: 'rename'},
-            {label: 'Rename in toc + add redirect', id: 'redirect'},
-            {label: 'Do nothing', id: 'nothing'},
-        ],
-        {
-            placeHolder: `"${refs[0].hrefValue}" was renamed. What would you like to do?`,
-        },
-    );
+    const hasToc = tocRefs.length > 0;
+    const hasMd = mdRefs.length > 0;
+
+    let renameLabel = 'Rename in markdown files';
+
+    if (hasToc && hasMd) {
+        renameLabel = 'Rename in toc.yaml and markdown files';
+    } else if (hasToc) {
+        renameLabel = 'Rename in toc.yaml';
+    }
+
+    const choices: Array<{label: string; id: string}> = [{label: renameLabel, id: 'rename'}];
+
+    if (hasToc) {
+        choices.push({label: 'Rename + add redirect', id: 'redirect'});
+    }
+
+    choices.push({label: 'Do nothing', id: 'nothing'});
+
+    const fileName = hasToc ? tocRefs[0].hrefValue : (oldUri.fsPath.split('/').pop() ?? '');
+
+    const choice = await vscode.window.showQuickPick(choices, {
+        placeHolder: `"${fileName}" was renamed. What would you like to do?`,
+    });
 
     if (!choice || choice.id === 'nothing') {
         return;
@@ -90,9 +106,27 @@ export async function handleFileRenamed(oldUri: vscode.Uri, newUri: vscode.Uri):
         }
     }
 
-    for (const ref of refs) {
+    for (const ref of tocRefs) {
         const newHref = computeNewHref(ref.tocUri, newUri);
 
         await renameTocEntry(ref.tocUri, ref.lineIndex, newHref);
+    }
+
+    if (mdRefs.length > 0) {
+        const edit = new vscode.WorkspaceEdit();
+
+        for (const ref of mdRefs) {
+            const newHref = computeNewMdHref(ref.fileUri, newUri);
+            const range = new vscode.Range(
+                ref.lineIndex,
+                ref.hrefStart,
+                ref.lineIndex,
+                ref.hrefStart + ref.filePath.length,
+            );
+
+            edit.replace(ref.fileUri, range, newHref);
+        }
+
+        await vscode.workspace.applyEdit(edit);
     }
 }
