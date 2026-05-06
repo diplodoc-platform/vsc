@@ -13,11 +13,9 @@ meta:
 
 ## YFM Notes (работает в wysiwyg)
 
-\<a href="/root_folder/path_to_file"\>Ссылка\</a\>
+<a href="/root_folder/path_to_file">Ссылка</a>
 
 My favorite search engine is [Yandex](./ssss/ "The best search engine").
-
-[ddd](./sss.md)
 
 привет
 
@@ -83,14 +81,14 @@ graph TD
 Инклюды разрешаются во время сборки, не в редакторе.
 В wysiwyg-режиме показывается как текст со ссылкой.
 
-\{% include [level1-include](level1/includes/level1-include.md) %\}
+{% include [level1-include](level1/includes/level1-include.md) %}
 
 ## Page Constructor (только markup-режим)
 
 Блок `page-constructor` отображается как текст в wysiwyg-режиме.
 Для редактирования используйте markup-режим.
 
-\::: page-constructor
+::: page-constructor
 blocks:
 
 - type: 'header-block'
@@ -100,6 +98,7 @@ blocks:
 
 ## OpenAPI (только markup-режим)
 
-\::: openapi
+::: openapi
 path: ./openapi.yaml
 :::
+
