@@ -39,16 +39,18 @@ src/
 │   │       ├── completion.ts                   # ls.doComplete() → vscode.CompletionItem[]
 │   │       ├── hover.ts                        # ls.doHover() → vscode.Hover (with Source: fix)
 │   │       └── position.ts                     # Editor ↔ block-relative position mapping
-│   ├── links/                                  # Ctrl+Click link navigation in YAML files
+│   ├── links/                                  # Link navigation, validation, md-link parsing
 │   │   ├── index.ts                            # LinkProvider + diagnostics + activate()
 │   │   ├── constants.ts                        # LINK_FIELDS set, FIELD_RE regex
 │   │   ├── utils.ts                            # isExternalUrl(), parseLinkFromLine()
-│   │   └── diagnostics.ts                      # validateLinks() — unreachable file detection
+│   │   ├── diagnostics.ts                      # validateLinks() — unreachable file detection
+│   │   └── md-links.ts                         # findMarkdownReferences() + computeNewMdHref()
 │   ├── orphan/                                 # Orphan file detection (FileDecorationProvider)
 │   │   ├── index.ts                            # activate() — watchers + provider registration
 │   │   ├── collector.ts                        # collectReferencedFiles() + collectBlocksYamlFiles()
 │   │   ├── decorator.ts                        # OrphanDecorationProvider — marks unreferenced .md/.yaml
-│   │   ├── on-delete.ts                        # handleFileDeleted() — remove from toc / add redirect
+│   │   ├── on-delete.ts                        # handleFileDeleted() — remove from toc / replace md links / add redirect
+│   │   ├── on-rename.ts                        # handleFileRenamed() — rename in toc + update md links / add redirect
 │   │   └── constants.ts                        # HREF_RE, INCLUDE_PATH_RE, MD_INCLUDE_RE
 │   ├── main/sidebar.ts                         # Sidebar WebviewViewProvider
 │   ├── md-editor/editor.ts                     # Markdown visual editor (WebviewPanel)
@@ -452,12 +454,41 @@ Add the field name to `LINK_FIELDS` in `src/modules/links/constants.ts`. No othe
 
 ### On-delete behavior
 
-When a `.md` or blocks-yaml file is deleted and was referenced in `toc.yaml`:
+When a `.md` or blocks-yaml file is deleted and was referenced in `toc.yaml` or linked from other markdown files:
 
-1. `handleFileDeleted()` detects toc references via `findTocReferences()`
-2. Shows `QuickPick` with options: "Remove from toc.yaml" / "Remove + add redirect" / "Do nothing"
+1. `handleFileDeleted()` detects toc references via `findTocReferences()` and markdown references via `findMarkdownReferences()` (from `links/md-links.ts`)
+2. Shows `QuickPick` with context-aware options based on what references were found:
+   - If toc refs exist: "Remove from toc.yaml"
+   - If both toc + md refs: "Remove from toc + replace links in markdown"
+   - If only md refs: "Replace links in markdown files"
+   - If toc refs exist: "Remove from toc + add redirect"
+   - Always: "Do nothing"
 3. "Remove from toc" — deletes the `href:` line (and preceding `name:` line) from toc.yaml
-4. "Add redirect" — prompts for target path via `InputBox`, appends entry to `redirects.yaml`
+4. "Replace links in markdown" — prompts for replacement URL via `InputBox`, replaces all `[text](deleted.md)` hrefs with the provided URL across the workspace
+5. "Add redirect" — prompts for target path via `InputBox`, appends entry to `redirects.yaml`
+
+### On-rename behavior
+
+When a `.md` or blocks-yaml file is renamed and was referenced in `toc.yaml` or linked from other markdown files:
+
+1. `handleFileRenamed()` detects toc references via `findTocReferences()` and markdown references via `findMarkdownReferences()`
+2. Shows `QuickPick` with context-aware options:
+   - "Rename in toc.yaml" / "Rename in markdown files" / "Rename in toc.yaml and markdown files" (depending on what refs exist)
+   - If toc refs exist: "Rename in toc + add redirect"
+   - Always: "Do nothing"
+3. Updates toc.yaml href values to the new relative path
+4. Updates markdown link hrefs across the workspace, computing the correct relative path from each referencing file to the new location via `computeNewMdHref()`
+5. All markdown replacements are batched into a single `WorkspaceEdit` for atomic undo
+
+### Markdown link parsing (links/md-links.ts)
+
+`findMarkdownReferences(targetUri)` scans all `.md` files in the workspace and returns references matching the target:
+
+- Parses standard markdown links: `[text](path.md)`, `[text](path.md#anchor)`
+- Parses image references: `![alt](image.png)`
+- Parses include directives: `{% include [text](path.md) %}`
+- Skips external URLs, anchor-only links, and links inside fenced code blocks
+- Returns structured `MdReference` objects with file URI, href, filePath, fragment, hrefStart, and lineIndex for precise `WorkspaceEdit` replacements
 
 ### Performance
 
