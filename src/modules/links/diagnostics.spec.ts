@@ -190,6 +190,53 @@ describe('validateLinks', () => {
         expect(diagnostics[0].message).toBe('Link is unreachable: missing.md');
     });
 
+    it('reports error for missing file in YAML list under link field', async () => {
+        statMock.mockRejectedValue(new Error('not found'));
+        const doc = mockDocument(
+            ['resources:', '  style:', '    - _assets/style/custom.css'].join('\n'),
+        );
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        const {diagnostics} = getSetCall();
+        expect(diagnostics).toHaveLength(1);
+        expect(diagnostics[0].message).toBe('Link is unreachable: _assets/style/custom.css');
+    });
+
+    it('reports no error for existing file in YAML list', async () => {
+        const doc = mockDocument(
+            ['resources:', '  style:', '    - _assets/style/custom.css'].join('\n'),
+        );
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        expect(getSetCall().diagnostics).toHaveLength(0);
+    });
+
+    it('skips external URLs in YAML list', async () => {
+        const doc = mockDocument(
+            ['resources:', '  script:', '    - https://cdn.example.com/app.js'].join('\n'),
+        );
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        expect(statMock).not.toHaveBeenCalled();
+        expect(getSetCall().diagnostics).toHaveLength(0);
+    });
+
+    it('does not treat list items under non-link fields as links', async () => {
+        const doc = mockDocument(['items:', '  - missing-file.md'].join('\n'));
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        expect(statMock).not.toHaveBeenCalled();
+        expect(getSetCall().diagnostics).toHaveLength(0);
+    });
+
     it('does not suppress validation when navigation is a scalar', async () => {
         statMock.mockRejectedValue(new Error('not found'));
         const doc = mockDocument(

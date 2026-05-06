@@ -2,20 +2,70 @@ import * as vscode from 'vscode';
 
 import {debounceByKey} from '../../utils';
 
+import {LINK_FIELDS, LIST_ITEM_RE, LIST_PARENT_RE} from './constants';
 import {validateLinks} from './diagnostics';
+import {FilePathCompletionProvider} from './file-completion';
 import {FileReferenceProvider, findFileReferences} from './references';
-import {parseLinkFromLine} from './utils';
+import {isExternalUrl, parseLinkFromLine} from './utils';
 
 export class LinkProvider implements vscode.DocumentLinkProvider {
     provideDocumentLinks(document: vscode.TextDocument): vscode.DocumentLink[] {
         const links: vscode.DocumentLink[] = [];
         const baseUri = vscode.Uri.joinPath(document.uri, '..');
 
+        let activeListField: string | null = null;
+        let activeListIndent = -1;
+
         for (let i = 0; i < document.lineCount; i++) {
-            const link = parseLinkFromLine(document.lineAt(i), baseUri);
+            const line = document.lineAt(i);
+
+            const link = parseLinkFromLine(line, baseUri);
 
             if (link) {
+                activeListField = null;
                 links.push(link);
+                continue;
+            }
+
+            const parentMatch = LIST_PARENT_RE.exec(line.text);
+
+            if (parentMatch) {
+                const [, indent, field] = parentMatch;
+
+                if (LINK_FIELDS.has(field)) {
+                    activeListField = field;
+                    activeListIndent = indent.length;
+                } else {
+                    activeListField = null;
+                }
+
+                continue;
+            }
+
+            if (activeListField) {
+                const itemMatch = LIST_ITEM_RE.exec(line.text);
+
+                if (itemMatch) {
+                    const itemIndent = line.text.search(/\S/);
+
+                    if (itemIndent > activeListIndent) {
+                        const value = itemMatch[1].replace(/['"]$/, '');
+                        const valueStart = line.text.indexOf(value);
+                        const range = new vscode.Range(i, valueStart, i, valueStart + value.length);
+                        const target = isExternalUrl(value)
+                            ? vscode.Uri.parse(value)
+                            : vscode.Uri.joinPath(baseUri, value);
+
+                        links.push(new vscode.DocumentLink(range, target));
+                        continue;
+                    }
+                }
+
+                const trimmed = line.text.trim();
+
+                if (trimmed && !trimmed.startsWith('#')) {
+                    activeListField = null;
+                }
             }
         }
 
@@ -35,6 +85,11 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         collection,
         vscode.languages.registerDocumentLinkProvider({language: 'yaml'}, new LinkProvider()),
+        vscode.languages.registerCompletionItemProvider(
+            {language: 'yaml'},
+            new FilePathCompletionProvider(),
+            '/',
+        ),
         vscode.languages.registerReferenceProvider(
             [{language: 'markdown'}, {language: 'yaml'}],
             new FileReferenceProvider(),
