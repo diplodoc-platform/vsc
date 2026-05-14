@@ -17,7 +17,7 @@ export type ElementType =
 
 export function insertElement(type: ElementType): string {
     const elements = {
-        table: '| Cell content | Cell content |\n| --- | --- |\n| Cell content | Cell content |',
+        table: '#|\n|| | ||\n|| | ||\n|#',
         note: '{% note info "Note title" %}\n\nAdd content for note\n\n{% endnote %}',
         cut: '{% cut "Cut title" %}\n\nAdd content for cut\n\n{% endcut %}',
         tab: '{% list tabs %}\n\n- Tab title 1\n\nTab 1\n\n- Tab title 2\n\nTab 2\n\n{% endlist %}',

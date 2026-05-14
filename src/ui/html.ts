@@ -22,7 +22,14 @@ export function getBaseHtml(
                         worker-src blob:;">
                 <link rel="stylesheet" href="${styleUri}">
                 <style>
-                    html, body, #root {
+                    html, body {
+                        margin: 0;
+                        padding: 0;
+                        height: 100%;
+                        width: 100%;
+                        overflow: hidden;
+                    }
+                    body > div {
                         margin: 0;
                         padding: 0;
                         height: 100%;
