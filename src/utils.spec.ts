@@ -11,11 +11,12 @@ import {
 } from './utils';
 
 describe('insertElement', () => {
-    it('returns markdown table', () => {
+    it('returns yfm table', () => {
         const result = insertElement('table');
 
-        expect(result).toContain('| --- | --- |');
-        expect(result.split('\n')).toHaveLength(3);
+        expect(result).toContain('#|');
+        expect(result).toContain('|#');
+        expect(result).toContain('||');
     });
 
     it('returns note block', () => {

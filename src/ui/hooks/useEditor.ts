@@ -12,6 +12,7 @@ import {YfmInclude} from '../../extensions/yfm-include';
 import {wYfmIncludeItemData} from '../../extensions/yfm-include/toolbar';
 import {YfmFrontmatter} from '../../extensions/yfm-frontmatter';
 import {YfmDirective} from '../../extensions/yfm-directive';
+import {YfmTableCompact} from '../../extensions/yfm-table-compact';
 import {isTrustedOrigin} from '../utils';
 import {debounce} from '../../utils';
 
@@ -86,6 +87,7 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
                 builder.use(YfmInclude);
                 builder.use(YfmFrontmatter);
                 builder.use(YfmDirective);
+                builder.use(YfmTableCompact);
             },
             extensionOptions: {
                 commandMenu: {
