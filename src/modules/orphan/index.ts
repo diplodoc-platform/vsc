@@ -1,3 +1,5 @@
+import {existsSync, statSync, watch} from 'fs';
+import {join} from 'path';
 import * as vscode from 'vscode';
 
 import {debounce} from '../../utils';
@@ -71,9 +73,43 @@ export function activate(context: vscode.ExtensionContext) {
 
     const renamedPaths = new Set<string>();
 
+    let gitSwitching = false;
+    let switchTimeout: ReturnType<typeof setTimeout> | undefined;
+
+    function onGitDirChange(_event: string, filename: string | null) {
+        if (filename === 'HEAD' || filename === 'HEAD.lock') {
+            gitSwitching = true;
+
+            if (switchTimeout) {
+                clearTimeout(switchTimeout);
+            }
+
+            switchTimeout = setTimeout(() => {
+                gitSwitching = false;
+            }, 2000);
+        }
+    }
+
+    for (const folder of vscode.workspace.workspaceFolders ?? []) {
+        const gitDir = join(folder.uri.fsPath, '.git');
+
+        if (!existsSync(gitDir) || !statSync(gitDir).isDirectory()) {
+            continue;
+        }
+
+        const gitWatcher = watch(gitDir, onGitDirChange);
+
+        context.subscriptions.push({dispose: () => gitWatcher.close()});
+    }
+
     async function onFileDeleted(uri: vscode.Uri) {
         if (renamedPaths.has(uri.fsPath)) {
             renamedPaths.delete(uri.fsPath);
+            return;
+        }
+
+        if (gitSwitching) {
+            refresh();
             return;
         }
 
