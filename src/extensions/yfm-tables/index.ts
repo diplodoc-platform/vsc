@@ -3,7 +3,7 @@ import type {ExtensionAuto, SerializerNodeToken} from '@gravity-ui/markdown-edit
 type State = Parameters<SerializerNodeToken>[0];
 type PMNode = Parameters<SerializerNodeToken>[1];
 
-export const YfmTableCompact: ExtensionAuto = (builder) => {
+export const YfmTables: ExtensionAuto = (builder) => {
     builder.overrideNodeSerializerSpec('yfm_tbody', (prev) => (state, node, parent, index) => {
         if (!isSimpleTable(node)) {
             prev(state, node, parent, index);

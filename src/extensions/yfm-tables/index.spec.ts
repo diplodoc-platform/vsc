@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 
-import {YfmTableCompact} from './index';
+import {YfmTables} from './index';
 
 interface MockNode {
     type: {name: string};
@@ -82,7 +82,7 @@ function makeTbody(rows: MockNode[]): MockNode {
     return makeNode('yfm_tbody', rows);
 }
 
-describe('YfmTableCompact', () => {
+describe('YfmTables', () => {
     it('registers yfm_tbody and table overrides', () => {
         const overrides: string[] = [];
         const builder = {
@@ -93,7 +93,7 @@ describe('YfmTableCompact', () => {
         };
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, new-cap
-        YfmTableCompact(builder as any);
+        YfmTables(builder as any);
 
         expect(overrides).toContain('yfm_tbody');
         expect(overrides).toContain('table');
@@ -116,7 +116,7 @@ describe('yfm_tbody compact serializer', () => {
         };
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, new-cap
-        YfmTableCompact(builder as any);
+        YfmTables(builder as any);
 
         return fn;
     }

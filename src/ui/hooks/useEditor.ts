@@ -12,7 +12,8 @@ import {YfmInclude} from '../../extensions/yfm-include';
 import {wYfmIncludeItemData} from '../../extensions/yfm-include/toolbar';
 import {YfmFrontmatter} from '../../extensions/yfm-frontmatter';
 import {YfmDirective} from '../../extensions/yfm-directive';
-import {YfmTableCompact} from '../../extensions/yfm-table-compact';
+import {YfmTables} from '../../extensions/yfm-tables';
+import {YfmSerializer} from '../../extensions/yfm-serializer';
 import {isTrustedOrigin} from '../utils';
 import {debounce} from '../../utils';
 
@@ -87,7 +88,8 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
                 builder.use(YfmInclude);
                 builder.use(YfmFrontmatter);
                 builder.use(YfmDirective);
-                builder.use(YfmTableCompact);
+                builder.use(YfmTables);
+                builder.use(YfmSerializer);
             },
             extensionOptions: {
                 commandMenu: {
