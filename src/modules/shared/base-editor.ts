@@ -160,6 +160,10 @@ export abstract class BaseEditor {
         const document = await vscode.workspace.openTextDocument(this._currentDocUri);
         const content = this._transformFromWebview(text, document);
 
+        if (content === document.getText()) {
+            return;
+        }
+
         this.isUpdatingFromWebview = true;
 
         try {

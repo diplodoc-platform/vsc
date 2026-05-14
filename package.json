@@ -258,8 +258,9 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
-    "lint": "lint update && lint",
-    "lint:fix": "lint update && lint fix",
+    "lint": "lint",
+    "lint:fix": "lint fix",
+    "lint:update": "lint update",
     "remove-vsix": "rm -f *.vsix",
     "pre-commit": "lint update && lint-staged && npm run remove-vsix",
     "prepare": "husky"
