@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.6.6](https://github.com/diplodoc-platform/vsc/compare/v0.6.5...v0.6.6) (2026-05-14)
+
+
+### Bug Fixes
+
+* fixed bugs ([f848a27](https://github.com/diplodoc-platform/vsc/commit/f848a27e468cbaeff323bc4ca6f2ec28aa54837a))
+* fixed bugs ([4640eb6](https://github.com/diplodoc-platform/vsc/commit/4640eb6fb909d49a40f62b0ff9ca92ee49ae9624))
+* fixed git ([ea57fb0](https://github.com/diplodoc-platform/vsc/commit/ea57fb0c6e6850d04b9516463484c813bf3ce44e))
+* fixed linter and sonar ([81819df](https://github.com/diplodoc-platform/vsc/commit/81819df5c2442a16fc28b38880e0869221b64801))
+* fixed notes ([e7e47ac](https://github.com/diplodoc-platform/vsc/commit/e7e47aca858a5856cf2cd4b38df21445f36e4fda))
+* fixed sonar ([f567e72](https://github.com/diplodoc-platform/vsc/commit/f567e72611d15fb894ff31a5f03d28d56c9a670d))
+* fixed workflows ([4938ca3](https://github.com/diplodoc-platform/vsc/commit/4938ca3ecc0c29182edc8663e12e2e3a2b408e04))
+
 ## [0.6.5](https://github.com/diplodoc-platform/vsc/compare/v0.6.4...v0.6.5) (2026-05-06)
 
 
