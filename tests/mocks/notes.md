@@ -7,3 +7,9 @@ interface:
 ---
 
 ## Notes
+
+{% note tip "" %}
+
+Это примечание.
+
+{% endnote %}
