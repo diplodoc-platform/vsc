@@ -39,6 +39,7 @@ export class MdEditor extends BaseEditor {
 
     protected _transformFromWebview(text: string, document: vscode.TextDocument) {
         const content = isBlocksYaml(document) ? unwrapPageConstructor(text) : text;
+
         return this._leadingWhitespace + content + this._trailingWhitespace;
     }
 

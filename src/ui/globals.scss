@@ -25,4 +25,8 @@ $color: #63d590;
     --g-color-text-secondary: var(--vscode-descriptionForeground, var(--vscode-editor-foreground));
     --g-color-line-generic: var(--vscode-widget-border, var(--vscode-editorWidget-border));
     --g-color-line-generic-solid: var(--vscode-widget-border, var(--vscode-editorWidget-border));
+
+    .g-md-wysiwyg-editor__toolbar {
+        padding: 0 12px 12px 8px;
+    }
 }
