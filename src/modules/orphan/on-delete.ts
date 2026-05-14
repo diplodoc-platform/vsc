@@ -1,4 +1,5 @@
-import {relative} from 'path';
+import {execFile} from 'child_process';
+import {dirname, relative} from 'path';
 import * as vscode from 'vscode';
 
 import {isExternalUrl} from '../../utils';
@@ -210,10 +211,32 @@ async function handleRedirect(root: string, deletedUri: vscode.Uri): Promise<voi
     }
 }
 
+function isDeletedByGit(fsPath: string): Promise<boolean> {
+    return new Promise((resolve) => {
+        execFile(
+            'git',
+            ['ls-files', '--error-unmatch', fsPath],
+            {cwd: dirname(fsPath)},
+            (error) => {
+                if (error && 'code' in error && error.code === 1) {
+                    resolve(true);
+                    return;
+                }
+
+                resolve(false);
+            },
+        );
+    });
+}
+
 export async function handleFileDeleted(deletedUri: vscode.Uri): Promise<void> {
     const root = findYfmRoot(deletedUri.fsPath);
 
     if (!root) {
+        return;
+    }
+
+    if (await isDeletedByGit(deletedUri.fsPath)) {
         return;
     }
 
