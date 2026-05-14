@@ -5,7 +5,15 @@ vi.mock('../utils', () => ({
     findYfmRoot: (fsPath: string) => (fsPath.startsWith('/docs/') ? '/docs' : null),
 }));
 
+vi.mock('child_process', () => ({
+    execFile: vi.fn(),
+}));
+
+import {execFile} from 'child_process';
+
 import {addRedirect, findTocReferences, handleFileDeleted, removeTocEntry} from './on-delete';
+
+const execFileMock = vi.mocked(execFile);
 
 const findFilesMock = vi.mocked(vscode.workspace.findFiles);
 const readFileMock = vi.mocked(vscode.workspace.fs.readFile);
@@ -39,6 +47,23 @@ function mockFindFiles(tocFiles: string[], mdFiles: string[]) {
         }
 
         return tocFiles.map(makeUri);
+    });
+}
+
+function mockGitTracked() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    execFileMock.mockImplementation((_cmd: any, _args: any, _opts: any, callback: any) => {
+        callback(null, '', '');
+        return undefined as any;
+    });
+}
+
+function mockGitNotTracked() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    execFileMock.mockImplementation((_cmd: any, _args: any, _opts: any, callback: any) => {
+        const error = Object.assign(new Error(''), {code: 1});
+        callback(error, '', '');
+        return undefined as any;
     });
 }
 
@@ -206,6 +231,7 @@ describe('handleFileDeleted', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         findFilesMock.mockResolvedValue([]);
+        mockGitTracked();
     });
 
     it('does nothing when file is not in toc and not linked in md', async () => {
@@ -297,5 +323,37 @@ describe('handleFileDeleted', () => {
             'redirect',
             'nothing',
         ]);
+    });
+
+    it('does not show QuickPick when file was removed by git', async () => {
+        mockGitNotTracked();
+        mockFindFiles(['/docs/toc.yaml'], []);
+        mockFiles({
+            '/docs/toc.yaml': '  - name: Page\n    href: deleted.md',
+        });
+
+        await handleFileDeleted(makeUri('/docs/deleted.md'));
+
+        expect(vi.mocked(vscode.window.showQuickPick)).not.toHaveBeenCalled();
+    });
+
+    it('shows QuickPick when git command fails with unexpected error', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        execFileMock.mockImplementation((_cmd: any, _args: any, _opts: any, callback: any) => {
+            const error = Object.assign(new Error('fatal: not a git repository'), {code: 128});
+            callback(error, '', '');
+            return undefined as any;
+        });
+
+        mockFindFiles(['/docs/toc.yaml'], []);
+        mockFiles({
+            '/docs/toc.yaml': '  - name: Page\n    href: deleted.md',
+        });
+
+        vi.mocked(vscode.window.showQuickPick).mockResolvedValue(undefined);
+
+        await handleFileDeleted(makeUri('/docs/deleted.md'));
+
+        expect(vi.mocked(vscode.window.showQuickPick)).toHaveBeenCalledOnce();
     });
 });
