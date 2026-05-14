@@ -109,12 +109,12 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         if (gitSwitching) {
-            refresh();
+            debouncedRefresh();
             return;
         }
 
         await handleFileDeleted(uri);
-        refresh();
+        debouncedRefresh();
     }
 
     async function onFileRenamed(event: vscode.FileRenameEvent) {
@@ -126,7 +126,7 @@ export function activate(context: vscode.ExtensionContext) {
             }
         }
 
-        refresh();
+        debouncedRefresh();
     }
 
     context.subscriptions.push(
@@ -135,13 +135,13 @@ export function activate(context: vscode.ExtensionContext) {
         tocWatcher,
         mdWatcher,
         yamlWatcher,
-        tocWatcher.onDidChange(() => refresh()),
-        tocWatcher.onDidCreate(() => refresh()),
-        tocWatcher.onDidDelete(() => refresh()),
-        mdWatcher.onDidCreate(() => refresh()),
+        tocWatcher.onDidChange(() => debouncedRefresh()),
+        tocWatcher.onDidCreate(() => debouncedRefresh()),
+        tocWatcher.onDidDelete(() => debouncedRefresh()),
+        mdWatcher.onDidCreate(() => debouncedRefresh()),
         mdWatcher.onDidDelete((uri) => onFileDeleted(uri)),
         mdWatcher.onDidChange(() => debouncedRefresh()),
-        yamlWatcher.onDidCreate(() => refresh()),
+        yamlWatcher.onDidCreate(() => debouncedRefresh()),
         yamlWatcher.onDidDelete((uri) => onFileDeleted(uri)),
         yamlWatcher.onDidChange(() => debouncedRefresh()),
         vscode.workspace.onDidRenameFiles(onFileRenamed),
