@@ -216,7 +216,7 @@ function isDeletedByGit(fsPath: string): Promise<boolean> {
         execFile(
             'git',
             ['ls-files', '--error-unmatch', fsPath],
-            {cwd: dirname(fsPath)},
+            {cwd: dirname(fsPath), env: {PATH: process.env.PATH}},
             (error) => {
                 if (error && 'code' in error && error.code === 1) {
                     resolve(true);
