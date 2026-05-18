@@ -2,9 +2,6 @@ blocks:
   - type: 'header-block'
     title: 'Title 2'
     description: 'Description'
-    buttons:
-      - text: 'Index'
-        url: './index.yaml'
     background:
       light:
         color: '#14a147'
