@@ -4,7 +4,7 @@ blocks:
     description: 'Description'
     buttons:
       - text: 'Index'
-        url: './index.md'
+        url: './index.yaml'
     background:
       light:
         color: '#14a147'

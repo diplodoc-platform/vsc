@@ -1,6 +1,6 @@
 items:
   - name: Test Includes
-    href: index.md
+    href: index.yaml
   - name: Toc Include
     href: toc-include.md
   - name: Mermaid
