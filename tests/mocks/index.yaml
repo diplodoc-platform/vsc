@@ -1,0 +1,7 @@
+blocks:
+  - type: 'header-block'
+    title: 'Title 2'
+    description: 'Description'
+    background:
+      light:
+        color: '#14a147'
