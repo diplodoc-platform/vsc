@@ -35,7 +35,7 @@ function extractFrontmatter(content: string) {
     return {
         fmContent,
         bodyContent: content.slice(match[0].length),
-        fmLineCount: endLine + 2,
+        fmLineCount: endLine + 1,
     };
 }
 

@@ -12,11 +12,53 @@ import {validateMarkdown} from './markdown';
 import {validatePageConstructor} from './page-constructor';
 import {YamlHoverProvider} from './providers/hover';
 import {YamlCompletionProvider} from './providers/completion';
+import {DEBOUNCE_MS, MAX_CONCURRENCY, MAX_DIAGNOSTICS_PER_FILE} from './constants';
 
 let collection: vscode.DiagnosticCollection;
 
 const blocksCache = new Map<string, Content[]>();
 const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const pendingVersions = new Map<string, number>();
+
+let runningCount = 0;
+const queue: Array<() => void> = [];
+
+function runQueued(fn: () => Promise<void>): void {
+    const execute = () => {
+        runningCount++;
+        fn()
+            .catch((err) => logger(`[diplodoc] validation error: ${JSON.stringify(err)}`))
+            .finally(() => {
+                runningCount--;
+                const next = queue.shift();
+                if (next) next();
+            });
+    };
+
+    if (runningCount < MAX_CONCURRENCY) {
+        execute();
+    } else {
+        queue.push(execute);
+    }
+}
+
+function capDiagnostics(diags: vscode.Diagnostic[]): vscode.Diagnostic[] {
+    if (diags.length <= MAX_DIAGNOSTICS_PER_FILE) {
+        return diags;
+    }
+
+    const capped = diags.slice(0, MAX_DIAGNOSTICS_PER_FILE);
+
+    capped.push(
+        new vscode.Diagnostic(
+            new vscode.Range(0, 0, 0, 0),
+            `Diplodoc: showing first ${MAX_DIAGNOSTICS_PER_FILE} of ${diags.length} problems`,
+            vscode.DiagnosticSeverity.Information,
+        ),
+    );
+
+    return capped;
+}
 
 const YAML_FILE_SCHEMAS: Array<{test: (name: string) => boolean; type: SchemaType}> = [
     {test: (n) => n === 'toc.yaml', type: 'toc'},
@@ -26,10 +68,6 @@ const YAML_FILE_SCHEMAS: Array<{test: (name: string) => boolean; type: SchemaTyp
     {test: (n) => n === 'redirects.yaml', type: 'redirects'},
     {test: (n) => n === 'theme.yaml', type: 'theme'},
 ];
-
-function fireAndForget(promise: Promise<unknown>): void {
-    promise.catch((err) => logger(`[diplodoc] validation error: ${JSON.stringify(err)}`));
-}
 
 function getBlocksForDocument(document: vscode.TextDocument): Content[] {
     const key = document.uri.toString();
@@ -91,7 +129,7 @@ function resolveYamlSchema(document: vscode.TextDocument): SchemaType | null {
     return null;
 }
 
-function debounceValidate(document: vscode.TextDocument) {
+function scheduleValidation(document: vscode.TextDocument) {
     const key = document.uri.toString();
     const existing = debounceTimers.get(key);
 
@@ -103,9 +141,25 @@ function debounceValidate(document: vscode.TextDocument) {
         key,
         setTimeout(() => {
             debounceTimers.delete(key);
-            fireAndForget(validate(document));
-        }, 400),
+            enqueueValidation(document);
+        }, DEBOUNCE_MS),
     );
+}
+
+function enqueueValidation(document: vscode.TextDocument) {
+    const key = document.uri.toString();
+    const version = document.version;
+
+    pendingVersions.set(key, version);
+
+    runQueued(async () => {
+        if (pendingVersions.get(key) !== version) {
+            return;
+        }
+
+        await validate(document);
+        pendingVersions.delete(key);
+    });
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -115,29 +169,30 @@ export function activate(context: vscode.ExtensionContext) {
         collection,
         vscode.workspace.onDidOpenTextDocument((doc) => {
             if (isSupportedDocument(doc)) {
-                fireAndForget(validate(doc));
+                scheduleValidation(doc);
             }
         }),
         vscode.workspace.onDidSaveTextDocument((doc) => {
             if (isSupportedDocument(doc)) {
-                fireAndForget(validate(doc));
+                scheduleValidation(doc);
             }
         }),
         vscode.window.onDidChangeActiveTextEditor((editor) => {
             if (editor && isSupportedDocument(editor.document)) {
-                fireAndForget(validate(editor.document));
+                scheduleValidation(editor.document);
             }
         }),
         vscode.workspace.onDidChangeTextDocument((event) => {
             if (isSupportedDocument(event.document)) {
                 blocksCache.delete(event.document.uri.toString());
-                debounceValidate(event.document);
+                scheduleValidation(event.document);
             }
         }),
         vscode.workspace.onDidCloseTextDocument((doc) => {
             const key = doc.uri.toString();
             collection.delete(doc.uri);
             blocksCache.delete(key);
+            pendingVersions.delete(key);
             const timer = debounceTimers.get(key);
             if (timer) {
                 clearTimeout(timer);
@@ -159,7 +214,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     for (const doc of vscode.workspace.textDocuments) {
         if (isSupportedDocument(doc)) {
-            fireAndForget(validate(doc));
+            enqueueValidation(doc);
         }
     }
 }
@@ -191,7 +246,7 @@ async function validateYaml(document: vscode.TextDocument) {
     blocksCache.set(document.uri.toString(), [block]);
 
     const diags = await validatePageConstructor(block, schemaType);
-    collection.set(document.uri, diags);
+    collection.set(document.uri, capDiagnostics(diags));
 }
 
 async function validateMd(document: vscode.TextDocument) {
@@ -220,7 +275,7 @@ async function validateMd(document: vscode.TextDocument) {
 
     const mdDiags = await validateMarkdown(document);
 
-    collection.set(document.uri, [...mdDiags, ...pcDiags, ...fmDiags]);
+    collection.set(document.uri, capDiagnostics([...mdDiags, ...pcDiags, ...fmDiags]));
 }
 
 function isSupportedDocument(doc: vscode.TextDocument): boolean {

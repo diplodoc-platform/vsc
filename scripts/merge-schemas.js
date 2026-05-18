@@ -284,6 +284,39 @@ async function processSchema(name, file, extendFile) {
     console.log(`✓ ${name}.json`);
 }
 
+function copyBlocksToLeading() {
+    const pcPath = join(OUTPUT, 'page-constructor-schema.json');
+    const leadingPath = join(OUTPUT, 'leading-schema.json');
+
+    if (!existsSync(pcPath) || !existsSync(leadingPath)) {
+        return;
+    }
+
+    const pc = JSON.parse(readFileSync(pcPath, 'utf8'));
+    const leading = JSON.parse(readFileSync(leadingPath, 'utf8'));
+
+    if (pc.properties?.blocks) {
+        leading.properties = leading.properties || {};
+        leading.properties.blocks = JSON.parse(JSON.stringify(pc.properties.blocks));
+    }
+
+    if (pc.definitions) {
+        leading.definitions = leading.definitions || {};
+
+        for (const [name, def] of Object.entries(pc.definitions)) {
+            if (!(name in leading.definitions)) {
+                leading.definitions[name] = def;
+            }
+        }
+    }
+
+    let json = JSON.stringify(leading, null, 2);
+    json = json.replace(/self#\/definitions\//g, '#/definitions/');
+
+    writeFileSync(leadingPath, json + '\n');
+    console.log('✓ leading-schema.json (blocks copied from page-constructor)');
+}
+
 async function main() {
     mkdirSync(OUTPUT, {recursive: true});
     mkdirSync(OVERLAYS, {recursive: true});
@@ -297,6 +330,13 @@ async function main() {
             console.error(`✗  ${name}: ${err.message}`);
             ok = false;
         }
+    }
+
+    try {
+        copyBlocksToLeading();
+    } catch (err) {
+        console.error(`✗  leading blocks copy: ${err.message}`);
+        ok = false;
     }
 
     process.exit(ok ? 0 : 1);
