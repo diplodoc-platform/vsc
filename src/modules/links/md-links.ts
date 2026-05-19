@@ -2,6 +2,7 @@ import {relative} from 'path';
 import * as vscode from 'vscode';
 
 import {isExternalUrl} from '../../utils';
+import {getExcludePattern} from '../utils';
 
 const MD_LINK_RE = /!?\[[^\]]*\]\(([^)\s]+)\)/g;
 
@@ -47,7 +48,7 @@ async function readFileText(uri: vscode.Uri): Promise<string | null> {
 }
 
 export async function findMarkdownReferences(targetUri: vscode.Uri): Promise<MdReference[]> {
-    const mdUris = await vscode.workspace.findFiles('**/*.md', '**/node_modules/**');
+    const mdUris = await vscode.workspace.findFiles('**/*.md', getExcludePattern());
     const results: MdReference[] = [];
 
     for (const fileUri of mdUris) {

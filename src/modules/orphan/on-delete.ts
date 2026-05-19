@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 
 import {isExternalUrl} from '../../utils';
 import {type MdReference, findMarkdownReferences} from '../links/md-links';
-import {findYfmRoot} from '../utils';
+import {findYfmRoot, getExcludePattern} from '../utils';
 
 import {HREF_RE} from './constants';
 
@@ -24,7 +24,7 @@ async function readFileText(uri: vscode.Uri): Promise<string | null> {
 }
 
 export async function findTocReferences(deletedUri: vscode.Uri): Promise<TocReference[]> {
-    const tocUris = await vscode.workspace.findFiles('**/toc.yaml', '**/node_modules/**');
+    const tocUris = await vscode.workspace.findFiles('**/toc.yaml', getExcludePattern());
     const results: TocReference[] = [];
 
     for (const tocUri of tocUris) {

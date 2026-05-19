@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 
+import {MAX_DIAGNOSTICS_PER_FILE} from '../validation/constants';
+
 import {
     FIELD_RE,
     LINK_FIELDS,
@@ -174,5 +176,5 @@ export async function validateLinks(
         }
     }
 
-    collection.set(document.uri, diagnostics);
+    collection.set(document.uri, diagnostics.slice(0, MAX_DIAGNOSTICS_PER_FILE));
 }
