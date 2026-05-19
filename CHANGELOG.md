@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.6.9](https://github.com/diplodoc-platform/vsc/compare/v0.6.8...v0.6.9) (2026-05-19)
+
+
+### Bug Fixes
+
+* fixed rebase bugs ([3270da0](https://github.com/diplodoc-platform/vsc/commit/3270da06ec66f6d54990e98747b7dd38640ba178))
+* fixed rebase problems ([da3762d](https://github.com/diplodoc-platform/vsc/commit/da3762d2087add8e8bd0599613e8628e68b59ca6))
+* fixed windows tests ([518ff1b](https://github.com/diplodoc-platform/vsc/commit/518ff1b77e3ed21386322ab739141fff70175477))
+* remoded vsix ([752c5df](https://github.com/diplodoc-platform/vsc/commit/752c5df73a55d6e52c82d9743441036ae1abd969))
+
 ## [0.6.8](https://github.com/diplodoc-platform/vsc/compare/v0.6.7...v0.6.8) (2026-05-18)
 
 
