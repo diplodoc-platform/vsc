@@ -2,6 +2,32 @@
 
 VSCode extension for the [Diplodoc](https://diplodoc.com) documentation platform. Provides JSON Schema-based YAML validation, autocompletion, hover documentation, Markdown linting, and visual editors for `.md`, `toc.yaml`, and page-constructor `.yaml` files.
 
+## Instructions for AI Agents
+
+> **This section is mandatory for all AI agents (Claude, Copilot, Cursor, Cody, etc.).**
+
+### Do Not Access node_modules
+
+**NEVER** read, search, browse, or access `node_modules/` without explicit user permission. This applies to all tools: file reads, grep, glob, find, ls, bash, etc. Use online documentation or `package.json` to learn about dependencies.
+
+### Keep This File Up to Date
+
+After completing a task, if you discovered new knowledge about the project's architecture, structure, patterns, bugs, or design decisions that is **not already documented here** — **you must update this file**. This includes:
+
+- New modules, files, or components you created or discovered
+- New bugs or known issues
+- Changes to architecture or data flow
+- New commands, protocols, or APIs
+- Changes to the build system, testing, or CI/CD
+
+Do not duplicate — check that the section is not already described. Update existing sections if information has changed. Place new content in the appropriate existing section, or create a new section if needed.
+
+### Language
+
+This document is written in English. Keep all additions in English for consistency.
+
+---
+
 ## Quick Reference
 
 ```bash

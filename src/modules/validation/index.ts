@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import {load as yamlLoad} from 'js-yaml';
 
-import {logger} from '../utils';
+import {isInExcludedDir, logger} from '../utils';
 
 import {parseContent} from './parser';
 import {validateMarkdown} from './markdown';
@@ -279,7 +279,7 @@ async function validateMd(document: vscode.TextDocument) {
 }
 
 function isSupportedDocument(doc: vscode.TextDocument): boolean {
-    return isMarkdown(doc) || isYaml(doc);
+    return (isMarkdown(doc) || isYaml(doc)) && !isInExcludedDir(doc.uri.fsPath);
 }
 
 function isMarkdown(doc: vscode.TextDocument): boolean {

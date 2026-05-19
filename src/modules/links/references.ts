@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import {isExternalUrl} from '../../utils';
+import {getExcludePattern} from '../utils';
 import {HREF_RE} from '../orphan/constants';
 
 async function readFileText(uri: vscode.Uri): Promise<string | null> {
@@ -21,7 +22,7 @@ export class FileReferenceProvider implements vscode.ReferenceProvider {
 
 export async function findFileReferences(targetUri: vscode.Uri): Promise<vscode.Location[]> {
     const locations: vscode.Location[] = [];
-    const tocUris = await vscode.workspace.findFiles('**/toc.yaml', '**/node_modules/**');
+    const tocUris = await vscode.workspace.findFiles('**/toc.yaml', getExcludePattern());
 
     for (const tocUri of tocUris) {
         const text = await readFileText(tocUri);

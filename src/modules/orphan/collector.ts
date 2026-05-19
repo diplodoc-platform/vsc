@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import {isExternalUrl} from '../../utils';
+import {getExcludePattern} from '../utils';
 
 import {HREF_RE, INCLUDE_PATH_RE, MD_INCLUDE_RE} from './constants';
 
@@ -112,7 +113,7 @@ const BLOCKS_RE = /^\s*blocks\s*:/m;
 
 export async function collectReferencedFiles(): Promise<Set<string>> {
     const referenced = new Set<string>();
-    const tocUris = await vscode.workspace.findFiles('**/toc.yaml', '**/node_modules/**');
+    const tocUris = await vscode.workspace.findFiles('**/toc.yaml', getExcludePattern());
     const visitedTocs = new Set<string>();
 
     for (const tocUri of tocUris) {
@@ -131,7 +132,7 @@ export async function collectReferencedFiles(): Promise<Set<string>> {
 
 export async function collectBlocksYamlFiles(): Promise<Set<string>> {
     const result = new Set<string>();
-    const yamlUris = await vscode.workspace.findFiles('**/*.yaml', '**/node_modules/**');
+    const yamlUris = await vscode.workspace.findFiles('**/*.yaml', getExcludePattern());
 
     const skipNames = new Set(['toc.yaml', 'presets.yaml', 'redirects.yaml', 'theme.yaml']);
 
