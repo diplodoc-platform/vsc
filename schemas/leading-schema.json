@@ -672,6 +672,11 @@
                   "$ref": "#/definitions/cards"
                 },
                 "markdownDescription": "**`cards[]`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             },
             "additionalProperties": false,
@@ -700,6 +705,16 @@
               },
               "size": {
                 "enum": ["0", "xxs", "xs", "s", "m", "l", "xl", "xxl", "xxxl"]
+              },
+              "visible": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -1699,6 +1714,11 @@
                   }
                 },
                 "markdownDescription": "**`{sm, md, lg, ...}`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -2611,6 +2631,11 @@
                   "markdownDescription": "**`{when, title, text, ...}`**"
                 },
                 "markdownDescription": "**`{when, title, text, ...}[]`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -2837,6 +2862,11 @@
                 "type": "string",
                 "inputType": "textarea",
                 "markdownDescription": "**`string`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -4200,6 +4230,11 @@
                   "markdownDescription": "**`{when, title, text, ...}`**"
                 },
                 "markdownDescription": "**`{when, title, text, ...}[]`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -7954,6 +7989,11 @@
               "centered": {
                 "type": "boolean",
                 "markdownDescription": "**`boolean`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -12176,6 +12216,11 @@
                     "markdownDescription": "**`{light, dark}`**"
                   }
                 ]
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -13719,6 +13764,11 @@
                   }
                 },
                 "markdownDescription": "**`{zoom, address, id, markers}`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -16536,6 +16586,11 @@
                     "markdownDescription": "**`string`**"
                   }
                 }
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -20976,6 +21031,11 @@
                 "type": "string",
                 "enum": ["s", "l"],
                 "markdownDescription": "**`'s' | 'l'`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -24818,6 +24878,11 @@
                   "markdownDescription": "**`{title, overtitle, description, ...}`**"
                 },
                 "markdownDescription": "**`{title, overtitle, description, ...}[]`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -25065,6 +25130,11 @@
                   "markdownDescription": "**`{url, text, src}`**"
                 },
                 "markdownDescription": "**`{url, text, src}[]`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -26577,6 +26647,11 @@
                 "type": "string",
                 "enum": ["s", "m", "l"],
                 "markdownDescription": "**`'s' | 'm' | 'l'`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -26831,6 +26906,11 @@
               "centered": {
                 "type": "boolean",
                 "markdownDescription": "**`boolean`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -28446,6 +28526,11 @@
               "backgroundColor": {
                 "type": "string",
                 "markdownDescription": "**`string`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -28683,6 +28768,11 @@
                 "type": "string",
                 "inputType": "textarea",
                 "markdownDescription": "**`string`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -29501,6 +29591,16 @@
               "animated": {
                 "type": "boolean",
                 "markdownDescription": "**`boolean`**"
+              },
+              "visible": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -29815,6 +29915,16 @@
                   "required": ["text", "url"]
                 },
                 "markdownDescription": "**`{text, url, urlTitle, ...}`**"
+              },
+              "visible": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -30139,6 +30249,16 @@
                     "markdownDescription": "**`string`**"
                   }
                 }
+              },
+              "visible": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -31582,6 +31702,16 @@
                     "markdownDescription": "**`{name, type, counters, context}[]`**"
                   }
                 ]
+              },
+              "visible": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -32772,6 +32902,16 @@
                 "type": "string",
                 "enum": ["chevron", "english-double"],
                 "markdownDescription": "**`'chevron' | 'english-double'`**"
+              },
+              "visible": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -34159,6 +34299,16 @@
                 "type": "string",
                 "enum": ["top", "left"],
                 "markdownDescription": "**`'top' | 'left'`**"
+              },
+              "visible": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -34595,6 +34745,16 @@
                 "type": "string",
                 "enum": ["content", "footer"],
                 "markdownDescription": "**`'content' | 'footer'`**"
+              },
+              "visible": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }
@@ -35996,6 +36156,16 @@
               "urlTitle": {
                 "type": "string",
                 "markdownDescription": "**`string`**"
+              },
+              "visible": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
+              },
+              "hidden": {
+                "type": "string",
+                "enum": ["sm", "md", "lg", "xl", "all"],
+                "markdownDescription": "**`'sm' | 'md' | 'lg' | 'xl' | 'all'`**"
               }
             }
           }

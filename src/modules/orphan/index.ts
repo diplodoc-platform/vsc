@@ -1,5 +1,4 @@
-import {existsSync, statSync, watch} from 'fs';
-import {join} from 'path';
+import {watch} from 'fs';
 import * as vscode from 'vscode';
 
 import {debounce} from '../../utils';
@@ -9,6 +8,7 @@ import {collectBlocksYamlFiles, collectReferencedFiles} from './collector';
 import {OrphanDecorationProvider, isAutoIncluded} from './decorator';
 import {handleFileDeleted} from './on-delete';
 import {handleFileRenamed} from './on-rename';
+import {findVcsDir, isVcsOperationInProgress} from './utils';
 
 export function activate(context: vscode.ExtensionContext) {
     const decorator = new OrphanDecorationProvider();
@@ -91,15 +91,21 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     for (const folder of vscode.workspace.workspaceFolders ?? []) {
-        const gitDir = join(folder.uri.fsPath, '.git');
+        const vcsDir = findVcsDir(folder.uri.fsPath);
 
-        if (!existsSync(gitDir) || !statSync(gitDir).isDirectory()) {
+        if (!vcsDir) {
             continue;
         }
 
-        const gitWatcher = watch(gitDir, onGitDirChange);
+        const vcsWatcher = watch(vcsDir, onGitDirChange);
 
-        context.subscriptions.push({dispose: () => gitWatcher.close()});
+        context.subscriptions.push({dispose: () => vcsWatcher.close()});
+    }
+
+    function isVcsOperationActive(): boolean {
+        const paths = (vscode.workspace.workspaceFolders ?? []).map((f) => f.uri.fsPath);
+
+        return gitSwitching || isVcsOperationInProgress(paths);
     }
 
     async function onFileDeleted(uri: vscode.Uri) {
@@ -108,7 +114,7 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
-        if (gitSwitching) {
+        if (isVcsOperationActive()) {
             debouncedRefresh();
             return;
         }
@@ -120,6 +126,10 @@ export function activate(context: vscode.ExtensionContext) {
     async function onFileRenamed(event: vscode.FileRenameEvent) {
         for (const {oldUri, newUri} of event.files) {
             renamedPaths.add(oldUri.fsPath);
+
+            if (isVcsOperationActive()) {
+                continue;
+            }
 
             if (oldUri.fsPath.endsWith('.md') || oldUri.fsPath.endsWith('.yaml')) {
                 await handleFileRenamed(oldUri, newUri);
