@@ -4,6 +4,7 @@ vi.mock('fs', () => ({
     statSync: vi.fn(),
 }));
 import {existsSync, statSync} from 'fs';
+import {join} from 'path';
 
 import {findVcsDir, isVcsOperationInProgress} from './utils';
 
@@ -32,39 +33,45 @@ function mockFs(dirs: Set<string>, files: Set<string> = new Set()) {
     });
 }
 
+const P = '/project';
+const A = '/arcadia';
+const PA = '/project-a';
+const PB = '/project-b';
+const HG = '/has-git';
+
 describe('findVcsDir', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
     it('returns .git when it exists', () => {
-        mockFs(new Set(['/project/.git']));
+        mockFs(new Set([join(P, '.git')]));
 
-        expect(findVcsDir('/project')).toBe('/project/.git');
+        expect(findVcsDir(P)).toBe(join(P, '.git'));
     });
 
     it('returns .arc when only .arc exists', () => {
-        mockFs(new Set(['/project/.arc']));
+        mockFs(new Set([join(P, '.arc')]));
 
-        expect(findVcsDir('/project')).toBe('/project/.arc');
+        expect(findVcsDir(P)).toBe(join(P, '.arc'));
     });
 
     it('prefers .git over .arc', () => {
-        mockFs(new Set(['/project/.git', '/project/.arc']));
+        mockFs(new Set([join(P, '.git'), join(P, '.arc')]));
 
-        expect(findVcsDir('/project')).toBe('/project/.git');
+        expect(findVcsDir(P)).toBe(join(P, '.git'));
     });
 
     it('returns null when no VCS directory exists', () => {
         mockFs(new Set());
 
-        expect(findVcsDir('/project')).toBeNull();
+        expect(findVcsDir(P)).toBeNull();
     });
 
     it('skips non-directory entries', () => {
-        mockFs(new Set(), new Set(['/project/.git']));
+        mockFs(new Set(), new Set([join(P, '.git')]));
 
-        expect(findVcsDir('/project')).toBeNull();
+        expect(findVcsDir(P)).toBeNull();
     });
 
     it('handles statSync errors gracefully', () => {
@@ -73,7 +80,7 @@ describe('findVcsDir', () => {
             throw new Error('permission denied');
         });
 
-        expect(findVcsDir('/project')).toBeNull();
+        expect(findVcsDir(P)).toBeNull();
     });
 });
 
@@ -85,69 +92,69 @@ describe('isVcsOperationInProgress', () => {
     it('returns false when no VCS directory exists', () => {
         mockFs(new Set());
 
-        expect(isVcsOperationInProgress(['/project'])).toBe(false);
+        expect(isVcsOperationInProgress([P])).toBe(false);
     });
 
     it('returns false when no sentinel files exist', () => {
-        mockFs(new Set(['/project/.git']));
+        mockFs(new Set([join(P, '.git')]));
 
-        expect(isVcsOperationInProgress(['/project'])).toBe(false);
+        expect(isVcsOperationInProgress([P])).toBe(false);
     });
 
     it('detects rebase-merge (git rebase)', () => {
-        mockFs(new Set(['/project/.git', '/project/.git/rebase-merge']));
+        mockFs(new Set([join(P, '.git'), join(P, '.git', 'rebase-merge')]));
 
-        expect(isVcsOperationInProgress(['/project'])).toBe(true);
+        expect(isVcsOperationInProgress([P])).toBe(true);
     });
 
     it('detects rebase-apply (git am / rebase --apply)', () => {
-        mockFs(new Set(['/project/.git', '/project/.git/rebase-apply']));
+        mockFs(new Set([join(P, '.git'), join(P, '.git', 'rebase-apply')]));
 
-        expect(isVcsOperationInProgress(['/project'])).toBe(true);
+        expect(isVcsOperationInProgress([P])).toBe(true);
     });
 
     it('detects MERGE_HEAD (git merge)', () => {
-        mockFs(new Set(['/project/.git']), new Set(['/project/.git/MERGE_HEAD']));
+        mockFs(new Set([join(P, '.git')]), new Set([join(P, '.git', 'MERGE_HEAD')]));
 
-        expect(isVcsOperationInProgress(['/project'])).toBe(true);
+        expect(isVcsOperationInProgress([P])).toBe(true);
     });
 
     it('detects CHERRY_PICK_HEAD', () => {
-        mockFs(new Set(['/project/.git']), new Set(['/project/.git/CHERRY_PICK_HEAD']));
+        mockFs(new Set([join(P, '.git')]), new Set([join(P, '.git', 'CHERRY_PICK_HEAD')]));
 
-        expect(isVcsOperationInProgress(['/project'])).toBe(true);
+        expect(isVcsOperationInProgress([P])).toBe(true);
     });
 
     it('detects REVERT_HEAD', () => {
-        mockFs(new Set(['/project/.git']), new Set(['/project/.git/REVERT_HEAD']));
+        mockFs(new Set([join(P, '.git')]), new Set([join(P, '.git', 'REVERT_HEAD')]));
 
-        expect(isVcsOperationInProgress(['/project'])).toBe(true);
+        expect(isVcsOperationInProgress([P])).toBe(true);
     });
 
     it('detects operations in .arc directory', () => {
-        mockFs(new Set(['/arcadia/.arc', '/arcadia/.arc/rebase-merge']));
+        mockFs(new Set([join(A, '.arc'), join(A, '.arc', 'rebase-merge')]));
 
-        expect(isVcsOperationInProgress(['/arcadia'])).toBe(true);
+        expect(isVcsOperationInProgress([A])).toBe(true);
     });
 
     it('checks all workspace folders', () => {
         mockFs(
-            new Set(['/project-a/.git', '/project-b/.git']),
-            new Set(['/project-b/.git/MERGE_HEAD']),
+            new Set([join(PA, '.git'), join(PB, '.git')]),
+            new Set([join(PB, '.git', 'MERGE_HEAD')]),
         );
 
-        expect(isVcsOperationInProgress(['/project-a', '/project-b'])).toBe(true);
+        expect(isVcsOperationInProgress([PA, PB])).toBe(true);
     });
 
     it('returns false when all folders are clean', () => {
-        mockFs(new Set(['/project-a/.git', '/project-b/.arc']));
+        mockFs(new Set([join(PA, '.git'), join(PB, '.arc')]));
 
-        expect(isVcsOperationInProgress(['/project-a', '/project-b'])).toBe(false);
+        expect(isVcsOperationInProgress([PA, PB])).toBe(false);
     });
 
     it('skips folders without VCS', () => {
-        mockFs(new Set(['/has-git/.git']), new Set(['/has-git/.git/MERGE_HEAD']));
+        mockFs(new Set([join(HG, '.git')]), new Set([join(HG, '.git', 'MERGE_HEAD')]));
 
-        expect(isVcsOperationInProgress(['/no-vcs', '/has-git'])).toBe(true);
+        expect(isVcsOperationInProgress(['/no-vcs', HG])).toBe(true);
     });
 });
