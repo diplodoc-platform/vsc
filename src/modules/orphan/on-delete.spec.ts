@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 
 vi.mock('../utils', () => ({
     findYfmRoot: (fsPath: string) => (fsPath.startsWith('/docs/') ? '/docs' : null),
+    getExcludePattern: () => '**/node_modules/**',
 }));
 
 import {addRedirect, findTocReferences, handleFileDeleted, removeTocEntry} from './on-delete';

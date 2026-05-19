@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import {debounceByKey} from '../../utils';
+import {isInExcludedDir} from '../utils';
 
 import {LINK_FIELDS, LIST_ITEM_RE, LIST_PARENT_RE} from './constants';
 import {validateLinks} from './diagnostics';
@@ -111,17 +112,20 @@ export function activate(context: vscode.ExtensionContext) {
             );
         }),
         vscode.workspace.onDidOpenTextDocument((doc) => {
-            if (doc.languageId === 'yaml') {
+            if (doc.languageId === 'yaml' && !isInExcludedDir(doc.uri.fsPath)) {
                 validateLinks(doc, collection);
             }
         }),
         vscode.workspace.onDidSaveTextDocument((doc) => {
-            if (doc.languageId === 'yaml') {
+            if (doc.languageId === 'yaml' && !isInExcludedDir(doc.uri.fsPath)) {
                 validateLinks(doc, collection);
             }
         }),
         vscode.workspace.onDidChangeTextDocument((event) => {
-            if (event.document.languageId === 'yaml') {
+            if (
+                event.document.languageId === 'yaml' &&
+                !isInExcludedDir(event.document.uri.fsPath)
+            ) {
                 debouncedValidate(event.document);
             }
         }),
@@ -132,7 +136,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     for (const doc of vscode.workspace.textDocuments) {
-        if (doc.languageId === 'yaml') {
+        if (doc.languageId === 'yaml' && !isInExcludedDir(doc.uri.fsPath)) {
             validateLinks(doc, collection);
         }
     }

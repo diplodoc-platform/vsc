@@ -6,7 +6,8 @@ import {exec} from 'child_process';
 
 import {t} from '../../i18n';
 import {getBaseHtml} from '../../ui/html';
-import {isBlocksYaml} from '../../utils';
+import {debounce, isBlocksYaml} from '../../utils';
+import {getExcludePattern} from '../utils';
 
 export class Sidebar implements vscode.WebviewViewProvider {
     isUpdatingFromWebview = false;
@@ -82,14 +83,16 @@ export class Sidebar implements vscode.WebviewViewProvider {
             webviewView.webview.postMessage({command: 'setFiles', files});
         };
 
-        mdWatcher.onDidCreate(refreshFiles);
-        mdWatcher.onDidDelete(refreshFiles);
-        tocWatcher.onDidCreate(refreshFiles);
-        tocWatcher.onDidDelete(refreshFiles);
-        yamlWatcher.onDidCreate(refreshFiles);
-        yamlWatcher.onDidDelete(refreshFiles);
+        const debouncedRefreshFiles = debounce(refreshFiles, 500);
 
-        vscode.workspace.onDidChangeWorkspaceFolders(refreshFiles);
+        mdWatcher.onDidCreate(debouncedRefreshFiles);
+        mdWatcher.onDidDelete(debouncedRefreshFiles);
+        tocWatcher.onDidCreate(debouncedRefreshFiles);
+        tocWatcher.onDidDelete(debouncedRefreshFiles);
+        yamlWatcher.onDidCreate(debouncedRefreshFiles);
+        yamlWatcher.onDidDelete(debouncedRefreshFiles);
+
+        vscode.workspace.onDidChangeWorkspaceFolders(debouncedRefreshFiles);
 
         webviewView.onDidDispose(() => {
             mdWatcher.dispose();
@@ -109,10 +112,11 @@ export class Sidebar implements vscode.WebviewViewProvider {
     }
 
     private async _getMarkdownFiles(): Promise<string[]> {
+        const exclude = getExcludePattern();
         const [mdUris, tocUris, yamlUris] = await Promise.all([
-            vscode.workspace.findFiles('**/*.md', '**/node_modules/**'),
-            vscode.workspace.findFiles('**/toc.yaml', '**/node_modules/**'),
-            vscode.workspace.findFiles('**/*.yaml', '**/node_modules/**'),
+            vscode.workspace.findFiles('**/*.md', exclude),
+            vscode.workspace.findFiles('**/toc.yaml', exclude),
+            vscode.workspace.findFiles('**/*.yaml', exclude),
         ]);
 
         const blockYamlUris: vscode.Uri[] = [];
