@@ -15,7 +15,7 @@ export function formatEntries(entries: VariableEntry[], root: string | null): st
     const parts: string[] = [];
 
     for (const [filePath, fileEntries] of byFile) {
-        const fileName = root ? relative(root, filePath) : basename(filePath);
+        const fileName = root ? relative(root, filePath).replace(/\\/g, '/') : basename(filePath);
 
         if (byFile.size > 1) {
             parts.push(`*${fileName}*\n`);
