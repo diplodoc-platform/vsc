@@ -34,6 +34,14 @@
           ],
           "default": "wysiwyg",
           "description": "Default mode for Markdown editor"
+        },
+        "diplodoc.exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "markdownDescription": "Additional directories to exclude from validation and file scanning. Useful when build output directory is specified via CLI flag (e.g. `yfm -o docs-gen`). The extension always excludes `node_modules`, `_build`, and the `output` directory from `.yfm` config."
         }
       }
     },
