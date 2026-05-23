@@ -1,3 +1,8 @@
 default:
+  presets_text: Presets
+  text: Hello
   uer: Alice
   img_3: 4.png
+external:
+  presets_text: Presets external
+  text: Hello external

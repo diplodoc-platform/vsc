@@ -76,9 +76,11 @@ class MockColorPresentation {
 
 class MockHover {
     contents: MockMarkdownString;
+    range?: MockRange;
 
-    constructor(contents: MockMarkdownString) {
+    constructor(contents: MockMarkdownString, range?: MockRange) {
         this.contents = contents;
+        this.range = range;
     }
 }
 
@@ -235,5 +237,8 @@ vi.mock('vscode', () => ({
         },
         findFiles: vi.fn().mockResolvedValue([]),
         applyEdit: vi.fn().mockResolvedValue(true),
+        getConfiguration: vi.fn().mockReturnValue({
+            get: vi.fn().mockReturnValue([]),
+        }),
     },
 }));
