@@ -18,6 +18,8 @@ items:
     href: features.md
   - name: HTML
     href: html.md
+  - name: '{{presets_text}}'
+    href: presets.md
   - name: Level 1
     items:
       - name: Page 1

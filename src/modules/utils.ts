@@ -31,6 +31,16 @@ export function isYfmFile(fsPath: string): boolean {
 function getExcludeDirs(): Set<string> {
     const dirs = new Set(['node_modules', '_build']);
 
+    const userExclude = vscode.workspace.getConfiguration('diplodoc').get<string[]>('exclude');
+
+    if (userExclude) {
+        for (const dir of userExclude) {
+            if (dir) {
+                dirs.add(dir);
+            }
+        }
+    }
+
     for (const folder of vscode.workspace.workspaceFolders ?? []) {
         const yfmPath = resolve(folder.uri.fsPath, '.yfm');
 
