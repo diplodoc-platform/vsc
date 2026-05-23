@@ -53,6 +53,7 @@ const commandMenuActions = [
 
 export function useEditor({setFileName, preset, mode}: EditorParams) {
     const isSettingContent = useRef<boolean>(false);
+    const lastContent = useRef<string>('');
 
     const editor = useMarkdownEditor({
         preset: preset ?? 'yfm',
@@ -106,7 +107,14 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
                     return;
                 }
 
-                vscodeApi.postMessage({command: 'change', text: editor.getValue()});
+                const value = editor.getValue();
+
+                if (value === lastContent.current) {
+                    return;
+                }
+
+                lastContent.current = value;
+                vscodeApi.postMessage({command: 'change', text: value});
             }, 300),
         [editor],
     );
@@ -131,6 +139,7 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
                 editor.replace(text ?? '');
                 setTimeout(() => {
                     isSettingContent.current = false;
+                    lastContent.current = editor.getValue();
                 }, 350);
             } else if (command === 'setMode' && mode) {
                 editor.setEditorMode(mode);

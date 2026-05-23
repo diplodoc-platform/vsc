@@ -78,6 +78,15 @@ src/
 │   │   ├── on-delete.ts                        # handleFileDeleted() — remove from toc / replace md links / add redirect
 │   │   ├── on-rename.ts                        # handleFileRenamed() — rename in toc + update md links / add redirect
 │   │   └── constants.ts                        # HREF_RE, INCLUDE_PATH_RE, MD_INCLUDE_RE
+│   ├── presets/                                 # Preset variable support (hover, go-to-definition, completion, links)
+│   │   ├── index.ts                            # activate() — registers all providers + goToPreset command
+│   │   ├── constants.ts                        # VARIABLE_RE, PREFIX_RE, SUFFIX_RE, PRESETS_FILENAME
+│   │   ├── resolver.ts                         # findPresetsFiles(), parsePresetsFile(), resolveVariables()
+│   │   ├── hover.ts                            # PresetsHoverProvider — shows variable values per preset
+│   │   ├── definition.ts                       # PresetsDefinitionProvider — Ctrl+Click / F12 to presets.yaml
+│   │   ├── completion.ts                       # PresetsCompletionProvider — suggests variables inside {{ }}
+│   │   ├── link.ts                             # PresetsLinkProvider — underlines {{var}} as links
+│   │   └── utils.ts                            # formatEntries() — markdown table formatter for hover
 │   ├── main/sidebar.ts                         # Sidebar WebviewViewProvider
 │   ├── md-editor/editor.ts                     # Markdown visual editor (WebviewPanel)
 │   └── toc-editor/editor.ts                    # TOC visual editor (WebviewPanel)
@@ -522,6 +531,34 @@ When a `.md` or blocks-yaml file is renamed and was referenced in `toc.yaml` or 
 - Incremental: FileSystemWatcher triggers refresh on toc/md/yaml file events
 - `.md` content changes use debounced refresh (500ms)
 - `provideFileDecoration` is O(1) Set lookup, called only for visible files
+
+## Preset Variables
+
+`src/modules/presets/` provides hover, go-to-definition, completion, and link highlighting for `{{variable}}` references in Markdown and YAML files.
+
+### How it works
+
+1. `resolver.ts` walks from the document directory up to the YFM root (`.yfm`), collecting all `presets.yaml` files (closest first = highest priority)
+2. Each `presets.yaml` is parsed with `js-yaml`. Variables are collected across all preset groups (`default`, `external`, etc.)
+3. Four providers are registered for `[{language: 'markdown'}, {language: 'yaml'}]`:
+
+| Provider                    | API                              | Trigger                       | Behavior                                                                                                                      |
+| --------------------------- | -------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `PresetsHoverProvider`      | `registerHoverProvider`          | Mouse hover on `{{var}}`      | Shows markdown table of values per preset, with file paths when multiple `presets.yaml` files exist                           |
+| `PresetsDefinitionProvider` | `registerDefinitionProvider`     | Ctrl+Click / F12 on `{{var}}` | Navigates to the variable definition line in the closest `presets.yaml`                                                       |
+| `PresetsLinkProvider`       | `registerDocumentLinkProvider`   | Always (document links)       | Underlines `{{var}}` as a clickable link if the variable exists in presets; click navigates via `diplodoc.goToPreset` command |
+| `PresetsCompletionProvider` | `registerCompletionItemProvider` | Type `{` inside `{{ }}`       | Suggests available variable names with default values as detail                                                               |
+
+### Preset hierarchy
+
+Multiple `presets.yaml` files can exist at different directory levels. Closer files (to the document) have higher priority. The `default` preset is always applied first, then named presets override it.
+
+### Key functions in `resolver.ts`
+
+- `findPresetsFiles(fsPath)` — returns all `presets.yaml` paths from document dir to YFM root (closest first)
+- `resolveVariables(fsPath)` — returns `Map<varName, VariableEntry[]>` with preset name, value, file path, and line number
+- `getVariableAtPosition(lineText, character)` — detects `{{variable}}` at cursor position
+- `findVariableLine(content, preset, varName)` — finds the line number of a variable definition within a preset block
 
 ## Color Provider
 
