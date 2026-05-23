@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.7.0](https://github.com/diplodoc-platform/vsc/compare/v0.6.9...v0.7.0) (2026-05-23)
+
+
+### Features
+
+* added presets module ([b857c24](https://github.com/diplodoc-platform/vsc/commit/b857c247876e5dd57b1b9ea00a2d9490bceb84b9))
+* added presets module ([46a5888](https://github.com/diplodoc-platform/vsc/commit/46a58880d0f429a8617012e74c461895c8b6d023))
+
+
+### Bug Fixes
+
+* fixed tests ([3c8db88](https://github.com/diplodoc-platform/vsc/commit/3c8db885553a484841f2ae11a0810bd9ff7f7df3))
+
 ## [0.6.9](https://github.com/diplodoc-platform/vsc/compare/v0.6.8...v0.6.9) (2026-05-19)
 
 
