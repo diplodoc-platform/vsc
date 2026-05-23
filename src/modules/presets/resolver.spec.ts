@@ -1,4 +1,5 @@
 import {existsSync, readFileSync} from 'fs';
+import {join} from 'path';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {findYfmRoot} from '../utils';
@@ -20,6 +21,8 @@ vi.mock('../utils', () => ({
     findYfmRoot: vi.fn(),
 }));
 
+const p = (...parts: string[]) => join(...parts);
+
 describe('findPresetsFiles', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -33,20 +36,23 @@ describe('findPresetsFiles', () => {
 
     it('finds single presets.yaml at root', () => {
         vi.mocked(findYfmRoot).mockReturnValue('/project');
-        vi.mocked(existsSync).mockImplementation((p) => p === '/project/presets.yaml');
+        vi.mocked(existsSync).mockImplementation((f) => f === p('/project', 'presets.yaml'));
 
-        expect(findPresetsFiles('/project/page.md')).toEqual(['/project/presets.yaml']);
+        expect(findPresetsFiles('/project/page.md')).toEqual([p('/project', 'presets.yaml')]);
     });
 
     it('finds multiple presets.yaml files ordered closest first', () => {
         vi.mocked(findYfmRoot).mockReturnValue('/project');
         vi.mocked(existsSync).mockImplementation(
-            (p) => p === '/project/pages/presets.yaml' || p === '/project/presets.yaml',
+            (f) => f === p('/project/pages', 'presets.yaml') || f === p('/project', 'presets.yaml'),
         );
 
         const result = findPresetsFiles('/project/pages/faq.md');
 
-        expect(result).toEqual(['/project/pages/presets.yaml', '/project/presets.yaml']);
+        expect(result).toEqual([
+            p('/project/pages', 'presets.yaml'),
+            p('/project', 'presets.yaml'),
+        ]);
     });
 
     it('returns empty array when no presets.yaml exists', () => {
@@ -58,11 +64,11 @@ describe('findPresetsFiles', () => {
 
     it('skips own presets.yaml when document is presets.yaml', () => {
         vi.mocked(findYfmRoot).mockReturnValue('/project');
-        vi.mocked(existsSync).mockImplementation((p) => p === '/project/presets.yaml');
+        vi.mocked(existsSync).mockImplementation((f) => f === p('/project', 'presets.yaml'));
 
         const result = findPresetsFiles('/project/sub/presets.yaml');
 
-        expect(result).toEqual(['/project/presets.yaml']);
+        expect(result).toEqual([p('/project', 'presets.yaml')]);
     });
 });
 
@@ -120,7 +126,7 @@ describe('resolveVariables', () => {
 
     it('collects variables from single file', () => {
         vi.mocked(findYfmRoot).mockReturnValue('/project');
-        vi.mocked(existsSync).mockImplementation((p) => p === '/project/presets.yaml');
+        vi.mocked(existsSync).mockImplementation((f) => f === p('/project', 'presets.yaml'));
 
         const content = 'default:\n  text: Hello\n  user: Alice\nexternal:\n  text: World';
         vi.mocked(readFileSync).mockReturnValue(content);
@@ -139,14 +145,16 @@ describe('resolveVariables', () => {
     it('collects variables from multiple files', () => {
         vi.mocked(findYfmRoot).mockReturnValue('/project');
         vi.mocked(existsSync).mockImplementation(
-            (p) => p === '/project/pages/presets.yaml' || p === '/project/presets.yaml',
+            (f) => f === p('/project/pages', 'presets.yaml') || f === p('/project', 'presets.yaml'),
         );
 
         const nearContent = 'default:\n  text: Near';
         const farContent = 'default:\n  text: Far\n  extra: Value';
+        const nearPath = p('/project/pages', 'presets.yaml');
+        const farPath = p('/project', 'presets.yaml');
 
-        vi.mocked(readFileSync).mockImplementation((p) => {
-            if (p === '/project/pages/presets.yaml') return nearContent;
+        vi.mocked(readFileSync).mockImplementation((f) => {
+            if (f === nearPath) return nearContent;
             return farContent;
         });
 
@@ -154,8 +162,8 @@ describe('resolveVariables', () => {
 
         const textEntries = result.get('text') ?? [];
         expect(textEntries).toHaveLength(2);
-        expect(textEntries[0].filePath).toBe('/project/pages/presets.yaml');
-        expect(textEntries[1].filePath).toBe('/project/presets.yaml');
+        expect(textEntries[0].filePath).toBe(nearPath);
+        expect(textEntries[1].filePath).toBe(farPath);
 
         expect(result.has('extra')).toBe(true);
     });

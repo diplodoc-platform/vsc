@@ -1,5 +1,5 @@
 import {existsSync, readFileSync} from 'fs';
-import {basename, dirname, resolve} from 'path';
+import {basename, dirname, join} from 'path';
 import {load as yamlLoad} from 'js-yaml';
 
 import {findYfmRoot} from '../utils';
@@ -28,7 +28,7 @@ export function findPresetsFiles(fsPath: string): string[] {
     }
 
     for (let parent = dirname(dir); ; parent = dirname(dir)) {
-        const candidate = resolve(dir, PRESETS_FILENAME);
+        const candidate = join(dir, PRESETS_FILENAME);
 
         if (existsSync(candidate)) {
             files.push(candidate);
