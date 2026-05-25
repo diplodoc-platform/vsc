@@ -17,10 +17,6 @@ $color: #63d590;
 
     --g-color-base-background: var(--vscode-editor-background);
     --g-color-base-float: var(--vscode-editorWidget-background, var(--vscode-editor-background));
-    --g-color-base-float-heavy: var(
-        --vscode-editorWidget-background,
-        var(--vscode-editor-background)
-    );
     --g-color-text-primary: var(--vscode-editor-foreground);
     --g-color-text-secondary: var(--vscode-descriptionForeground, var(--vscode-editor-foreground));
     --g-color-line-generic: var(--vscode-widget-border, var(--vscode-editorWidget-border));

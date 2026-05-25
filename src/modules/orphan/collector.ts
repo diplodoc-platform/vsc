@@ -136,17 +136,22 @@ export async function collectBlocksYamlFiles(): Promise<Set<string>> {
 
     const skipNames = new Set(['toc.yaml', 'presets.yaml', 'redirects.yaml', 'theme.yaml']);
 
-    for (const uri of yamlUris) {
+    const candidates = yamlUris.filter((uri) => {
         const fileName = uri.fsPath.split(/[/\\]/).pop() ?? '';
+        return !skipNames.has(fileName) && !fileName.startsWith('.');
+    });
 
-        if (skipNames.has(fileName) || fileName.startsWith('.')) {
-            continue;
-        }
+    const checks = await Promise.all(
+        candidates.map(async (uri) => {
+            const text = await readFileText(uri);
 
-        const text = await readFileText(uri);
+            return {fsPath: uri.fsPath, isBlocks: text !== null && BLOCKS_RE.test(text)};
+        }),
+    );
 
-        if (text && BLOCKS_RE.test(text)) {
-            result.add(uri.fsPath);
+    for (const {fsPath, isBlocks} of checks) {
+        if (isBlocks) {
+            result.add(fsPath);
         }
     }
 

@@ -8,6 +8,7 @@ import {tmpdir} from 'os';
 
 import {
     buildLintConfig,
+    clearConfigCache,
     findConfig,
     formatLintMessage,
     formatPluginMessage,
@@ -162,6 +163,7 @@ describe('findConfig', () => {
     }
 
     afterEach(() => {
+        clearConfigCache();
         rmSync(testRoot, {recursive: true, force: true});
     });
 
