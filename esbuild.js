@@ -99,6 +99,7 @@ if (target === 'ext' || target === 'all') {
             target: 'node18',
             format: 'cjs',
             sourcemap: true,
+            minify: !isWatch,
             plugins: [yamlServerFixes],
             mainFields: ['module', 'main'],
             loader: {'.json': 'json'},

@@ -46,6 +46,13 @@ function serializeCompactBody(state: State, tbody: PMNode) {
             if (hasContent && td.firstChild) {
                 state.write(' ');
                 state.renderInline(td.firstChild);
+
+                const id = (td.firstChild.attrs as Record<string, unknown>)?.id;
+
+                if (id && typeof id === 'string') {
+                    state.write(` {#${id}}`);
+                }
+
                 state.write(' ');
             } else {
                 state.write(' ');

@@ -22,6 +22,10 @@ export class OrphanDecorationProvider implements vscode.FileDecorationProvider {
     }
 
     update(referenced: Set<string>, blocksYaml?: Set<string>) {
+        const oldReferenced = this.referencedFiles;
+        const oldBlocksYaml = this.blocksYamlFiles;
+        const wasActive = this.active;
+
         this.referencedFiles = referenced;
 
         if (blocksYaml) {
@@ -29,7 +33,48 @@ export class OrphanDecorationProvider implements vscode.FileDecorationProvider {
         }
 
         this.active = referenced.size > 0;
-        this._onDidChange.fire(undefined);
+
+        if (this.active !== wasActive) {
+            this._onDidChange.fire(undefined);
+
+            return;
+        }
+
+        if (!this.active) {
+            return;
+        }
+
+        const changed: vscode.Uri[] = [];
+
+        for (const path of referenced) {
+            if (!oldReferenced.has(path)) {
+                changed.push(vscode.Uri.file(path));
+            }
+        }
+
+        for (const path of oldReferenced) {
+            if (!referenced.has(path)) {
+                changed.push(vscode.Uri.file(path));
+            }
+        }
+
+        if (blocksYaml) {
+            for (const path of blocksYaml) {
+                if (!oldBlocksYaml.has(path)) {
+                    changed.push(vscode.Uri.file(path));
+                }
+            }
+
+            for (const path of oldBlocksYaml) {
+                if (!blocksYaml.has(path)) {
+                    changed.push(vscode.Uri.file(path));
+                }
+            }
+        }
+
+        if (changed.length > 0) {
+            this._onDidChange.fire(changed);
+        }
     }
 
     provideFileDecoration(

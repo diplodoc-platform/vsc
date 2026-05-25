@@ -2,7 +2,7 @@ import {watch} from 'fs';
 import * as vscode from 'vscode';
 
 import {debounce} from '../../utils';
-import {isYfmFile} from '../utils';
+import {clearExcludeDirsCache, clearYfmRootCache, isYfmFile} from '../utils';
 
 import {collectBlocksYamlFiles, collectReferencedFiles} from './collector';
 import {OrphanDecorationProvider, isAutoIncluded} from './decorator';
@@ -70,6 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
     const tocWatcher = vscode.workspace.createFileSystemWatcher('**/toc.yaml');
     const mdWatcher = vscode.workspace.createFileSystemWatcher('**/*.md');
     const yamlWatcher = vscode.workspace.createFileSystemWatcher('**/*.yaml');
+    const yfmWatcher = vscode.workspace.createFileSystemWatcher('**/.yfm');
 
     const renamedPaths = new Set<string>();
 
@@ -145,6 +146,7 @@ export function activate(context: vscode.ExtensionContext) {
         tocWatcher,
         mdWatcher,
         yamlWatcher,
+        yfmWatcher,
         tocWatcher.onDidChange(() => debouncedRefresh()),
         tocWatcher.onDidCreate(() => debouncedRefresh()),
         tocWatcher.onDidDelete(() => debouncedRefresh()),
@@ -154,6 +156,25 @@ export function activate(context: vscode.ExtensionContext) {
         yamlWatcher.onDidCreate(() => debouncedRefresh()),
         yamlWatcher.onDidDelete((uri) => onFileDeleted(uri)),
         yamlWatcher.onDidChange(() => debouncedRefresh()),
+        yfmWatcher.onDidCreate(() => {
+            clearYfmRootCache();
+            clearExcludeDirsCache();
+            debouncedRefresh();
+        }),
+        yfmWatcher.onDidDelete(() => {
+            clearYfmRootCache();
+            clearExcludeDirsCache();
+            debouncedRefresh();
+        }),
+        yfmWatcher.onDidChange(() => {
+            clearExcludeDirsCache();
+        }),
+        vscode.workspace.onDidChangeConfiguration((e) => {
+            if (e.affectsConfiguration('diplodoc.exclude')) {
+                clearExcludeDirsCache();
+                debouncedRefresh();
+            }
+        }),
         vscode.workspace.onDidRenameFiles(onFileRenamed),
         vscode.workspace.onDidOpenTextDocument(() => {
             updateOrphanDiagnostics(lastReferenced, lastBlocksYaml);

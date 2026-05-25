@@ -94,7 +94,7 @@ blocks:
 - type: 'header-block'
   title: 'Заголовок страницы'
   description: 'Описание страницы'
-  :::
+:::
 
 ## OpenAPI (только markup-режим)
 
