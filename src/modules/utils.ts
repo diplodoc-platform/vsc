@@ -11,7 +11,7 @@ export function logger(message: unknown) {
 const yfmRootCache = new Map<string, string | null>();
 
 export function findYfmRoot(fsPath: string): string | null {
-    let dir = dirname(fsPath);
+    const dir = dirname(fsPath);
 
     const cached = yfmRootCache.get(dir);
 
