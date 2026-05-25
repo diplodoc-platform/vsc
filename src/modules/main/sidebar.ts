@@ -119,17 +119,26 @@ export class Sidebar implements vscode.WebviewViewProvider {
             vscode.workspace.findFiles('**/*.yaml', exclude),
         ]);
 
-        const blockYamlUris: vscode.Uri[] = [];
+        const skipNames = new Set(['toc.yaml', 'presets.yaml', 'redirects.yaml', 'theme.yaml']);
+        const blocksRe = /^\s*blocks\s*:/m;
 
-        for (const uri of yamlUris) {
-            try {
-                const doc = await vscode.workspace.openTextDocument(uri);
+        const candidates = yamlUris.filter((uri) => {
+            const fileName = uri.fsPath.split(/[/\\]/).pop() ?? '';
+            return !skipNames.has(fileName) && !fileName.startsWith('.');
+        });
 
-                if (isBlocksYaml(doc)) {
-                    blockYamlUris.push(uri);
+        const checks = await Promise.all(
+            candidates.map(async (uri) => {
+                try {
+                    const bytes = await vscode.workspace.fs.readFile(uri);
+                    return blocksRe.test(Buffer.from(bytes).toString('utf-8')) ? uri : null;
+                } catch {
+                    return null;
                 }
-            } catch {}
-        }
+            }),
+        );
+
+        const blockYamlUris = checks.filter((uri): uri is vscode.Uri => uri !== null);
 
         return [...mdUris, ...tocUris, ...blockYamlUris]
             .map((uri) => {
