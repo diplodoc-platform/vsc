@@ -10,6 +10,7 @@ import {isInExcludedDir, logger} from '../utils';
 import {parseContent} from './parser';
 import {validateMarkdown} from './markdown';
 import {validatePageConstructor} from './page-constructor';
+import {clearConfigCache} from './utils';
 import {YamlHoverProvider} from './providers/hover';
 import {YamlCompletionProvider} from './providers/completion';
 import {DEBOUNCE_MS, MAX_CONCURRENCY, MAX_DIAGNOSTICS_PER_FILE} from './constants';
@@ -165,8 +166,19 @@ function enqueueValidation(document: vscode.TextDocument) {
 export function activate(context: vscode.ExtensionContext) {
     collection = vscode.languages.createDiagnosticCollection('diplodoc');
 
+    const yfmConfigWatcher = vscode.workspace.createFileSystemWatcher('**/.yfm');
+    const yfmlintConfigWatcher = vscode.workspace.createFileSystemWatcher('**/.yfmlint');
+
     context.subscriptions.push(
         collection,
+        yfmConfigWatcher,
+        yfmlintConfigWatcher,
+        yfmConfigWatcher.onDidChange(() => clearConfigCache()),
+        yfmConfigWatcher.onDidCreate(() => clearConfigCache()),
+        yfmConfigWatcher.onDidDelete(() => clearConfigCache()),
+        yfmlintConfigWatcher.onDidChange(() => clearConfigCache()),
+        yfmlintConfigWatcher.onDidCreate(() => clearConfigCache()),
+        yfmlintConfigWatcher.onDidDelete(() => clearConfigCache()),
         vscode.workspace.onDidOpenTextDocument((doc) => {
             if (isSupportedDocument(doc)) {
                 scheduleValidation(doc);

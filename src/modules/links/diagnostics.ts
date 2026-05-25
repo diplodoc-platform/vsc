@@ -129,6 +129,7 @@ export async function validateLinks(
     const baseUri = vscode.Uri.joinPath(document.uri, '..');
     const navigationLines = getNavigationLines(document);
     const listCtx: ListContext = {field: null, indent: -1};
+    const checks: Promise<void>[] = [];
 
     for (let i = 0; i < document.lineCount; i++) {
         const line = document.lineAt(i);
@@ -145,7 +146,7 @@ export async function validateLinks(
             const value = extractFieldLinkValue(match);
 
             if (value) {
-                await checkLink(value, line, i, baseUri, diagnostics);
+                checks.push(checkLink(value, line, i, baseUri, diagnostics));
             }
 
             continue;
@@ -162,7 +163,7 @@ export async function validateLinks(
                 const value = itemMatch[1].replace(/['"]$/, '');
 
                 if (value && !isExternalUrl(value)) {
-                    await checkLink(value, line, i, baseUri, diagnostics);
+                    checks.push(checkLink(value, line, i, baseUri, diagnostics));
                 }
 
                 continue;
@@ -175,6 +176,8 @@ export async function validateLinks(
             }
         }
     }
+
+    await Promise.all(checks);
 
     collection.set(document.uri, diagnostics.slice(0, MAX_DIAGNOSTICS_PER_FILE));
 }

@@ -300,7 +300,16 @@ function isYfmLintError(error: ValidationMessage): error is YfmLintError {
     return 'ruleDescription' in error;
 }
 
+const configCache = new Map<string, Record<string, unknown> | null>();
+
 export function findConfig(startDir: string, config: string): Record<string, unknown> | null {
+    const cacheKey = `${startDir}\0${config}`;
+    const cached = configCache.get(cacheKey);
+
+    if (cached !== undefined) {
+        return cached;
+    }
+
     let dir = startDir;
     let parent = dirname(dir);
 
@@ -310,9 +319,11 @@ export function findConfig(startDir: string, config: string): Record<string, unk
         if (existsSync(yfmPath)) {
             try {
                 const content = readFileSync(yfmPath, 'utf8');
-
-                return (yamlLoad(content) as Record<string, unknown>) ?? null;
+                const result = (yamlLoad(content) as Record<string, unknown>) ?? null;
+                configCache.set(cacheKey, result);
+                return result;
             } catch {
+                configCache.set(cacheKey, null);
                 return null;
             }
         }
@@ -321,7 +332,12 @@ export function findConfig(startDir: string, config: string): Record<string, unk
         parent = dirname(dir);
     }
 
+    configCache.set(cacheKey, null);
     return null;
+}
+
+export function clearConfigCache(): void {
+    configCache.clear();
 }
 
 export function processYfmlintConfig(

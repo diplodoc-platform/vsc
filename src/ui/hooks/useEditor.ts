@@ -91,6 +91,26 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
                 builder.use(YfmDirective);
                 builder.use(YfmTables);
                 builder.use(YfmSerializer);
+                builder.overrideNodeSpec('paragraph', (prev) => ({
+                    ...prev,
+                    attrs: {...prev.attrs, id: {default: null}},
+                }));
+                builder.overrideNodeSerializerSpec(
+                    'paragraph',
+                    (prev) => (state, node, parent, index) => {
+                        prev(state, node, parent, index);
+
+                        const id = node.attrs?.id;
+
+                        if (id && typeof id === 'string') {
+                            if (state.out.endsWith('\n')) {
+                                state.out = state.out.slice(0, -1) + ` {#${id}}\n`;
+                            } else {
+                                state.out += ` {#${id}}`;
+                            }
+                        }
+                    },
+                );
             },
             extensionOptions: {
                 commandMenu: {
