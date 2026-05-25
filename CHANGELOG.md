@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.7.1](https://github.com/diplodoc-platform/vsc/compare/v0.7.0...v0.7.1) (2026-05-25)
+
+
+### Bug Fixes
+
+* fixed bugs and optimization ([dc6297e](https://github.com/diplodoc-platform/vsc/commit/dc6297ed183df18cf1db412318b48597f151181a))
+* fixed bugs and optimization ([df16739](https://github.com/diplodoc-platform/vsc/commit/df167397e85dbdec6fd90a8a89f54307b2c3a8dc))
+* fixed linter ([69caed0](https://github.com/diplodoc-platform/vsc/commit/69caed0de00b0c5accfaa742e713b0cf44b6b56d))
+* removed vsix ([d20e461](https://github.com/diplodoc-platform/vsc/commit/d20e461b23df735c1b5025f5c589eef41e998e91))
+
 ## [0.7.0](https://github.com/diplodoc-platform/vsc/compare/v0.6.9...v0.7.0) (2026-05-23)
 
 
