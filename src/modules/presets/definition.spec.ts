@@ -20,16 +20,20 @@ vi.mock('./resolver', () => ({
     getVariableAtPosition: vi.fn(),
     resolveVariables: vi.fn(),
     findVariableLine: vi.fn(),
+    findPresetsFiles: vi.fn().mockReturnValue([]),
+    parsePresetsFile: vi.fn().mockReturnValue(null),
 }));
 
 function mockDocument(text: string, fsPath = '/project/page.md'): vscode.TextDocument {
     const lines = text.split('\n');
+    const fileName = fsPath.split('/').pop() ?? '';
 
     return {
         lineCount: lines.length,
         lineAt: (line: number) => ({text: lines[line] ?? ''}),
         getText: () => text,
         uri: {fsPath},
+        fileName,
     } as unknown as vscode.TextDocument;
 }
 
@@ -127,5 +131,46 @@ describe('PresetsDefinitionProvider', () => {
 
         expect(result).toHaveLength(1);
         expect(result[0].uri).toMatchObject({fsPath: '/project/presets.yaml'});
+    });
+
+    it('navigates from external preset key to default in same presets.yaml', () => {
+        const presetsContent = 'default:\n  text: Hello\nexternal:\n  text: World';
+        const doc = mockDocument(presetsContent, '/project/presets.yaml');
+
+        vi.mocked(findVariableLine).mockReturnValue(1);
+
+        const result = provider.provideDefinition(doc, {
+            line: 3,
+            character: 3,
+        } as vscode.Position) as vscode.Location[];
+
+        expect(result).toHaveLength(1);
+        expect(result[0].range.start.line).toBe(1);
+    });
+
+    it('returns null for default preset keys in presets.yaml', () => {
+        const presetsContent = 'default:\n  text: Hello';
+        const doc = mockDocument(presetsContent, '/project/presets.yaml');
+
+        vi.mocked(findVariableLine).mockReturnValue(0);
+
+        const result = provider.provideDefinition(doc, {
+            line: 1,
+            character: 3,
+        } as vscode.Position);
+
+        expect(result).toBeNull();
+    });
+
+    it('returns null for non-key positions in presets.yaml', () => {
+        const presetsContent = 'default:\n  text: Hello';
+        const doc = mockDocument(presetsContent, '/project/presets.yaml');
+
+        const result = provider.provideDefinition(doc, {
+            line: 1,
+            character: 10,
+        } as vscode.Position);
+
+        expect(result).toBeNull();
     });
 });

@@ -34,7 +34,9 @@ export class MdEditor extends BaseEditor {
         this._leadingWhitespace = leading;
         this._trailingWhitespace = trailing;
 
-        return isBlocksYaml(document) ? wrapPageConstructor(body) : body;
+        const escaped = body.replace(/\{\{([\s\S]*?)\}\}/g, '\\{\\{$1\\}\\}');
+
+        return isBlocksYaml(document) ? wrapPageConstructor(escaped) : escaped;
     }
 
     protected _transformFromWebview(text: string, document: vscode.TextDocument) {

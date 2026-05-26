@@ -44,11 +44,7 @@ export class PresetsCompletionProvider implements vscode.CompletionItemProvider 
             item.insertText = hasSuffix ? name : name + '}}';
 
             const replaceStart = position.character - partial.length;
-            const suffixMatch = textAfter.match(SUFFIX_RE);
-            const replaceEnd =
-                hasSuffix && suffixMatch
-                    ? position.character + suffixMatch[0].length
-                    : position.character;
+            const replaceEnd = position.character;
 
             item.range = new vscode.Range(position.line, replaceStart, position.line, replaceEnd);
 
