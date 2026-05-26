@@ -167,6 +167,40 @@ describe('resolveVariables', () => {
 
         expect(result.has('extra')).toBe(true);
     });
+
+    it('flattens nested objects with dot notation', () => {
+        vi.mocked(findYfmRoot).mockReturnValue('/project');
+        vi.mocked(existsSync).mockImplementation((f) => f === p('/project', 'presets.yaml'));
+
+        const content = 'default:\n  aaa:\n    b: 1\n    c: x';
+        vi.mocked(readFileSync).mockReturnValue(content);
+
+        const result = resolveVariables('/project/page.md');
+
+        expect(result.has('aaa.b')).toBe(true);
+        expect(result.has('aaa.c')).toBe(true);
+        expect(result.has('aaa')).toBe(false);
+
+        const bEntries = result.get('aaa.b') ?? [];
+        expect(bEntries[0]).toMatchObject({value: '1'});
+    });
+
+    it('processes i18n variables', () => {
+        vi.mocked(findYfmRoot).mockReturnValue('/project');
+        vi.mocked(existsSync).mockImplementation((f) => f === p('/project', 'presets.yaml'));
+
+        const content = 'default:\n  greeting: Hello\n  i18n:\n    ru:\n      greeting: Привет';
+        vi.mocked(readFileSync).mockReturnValue(content);
+
+        const result = resolveVariables('/project/page.md');
+
+        expect(result.has('greeting')).toBe(true);
+
+        const entries = result.get('greeting') ?? [];
+        expect(entries).toHaveLength(2);
+        expect(entries[0]).toMatchObject({preset: 'default', value: 'Hello'});
+        expect(entries[1]).toMatchObject({preset: 'default/i18n/ru', value: 'Привет'});
+    });
 });
 
 describe('getVariableAtPosition', () => {
@@ -200,6 +234,12 @@ describe('getVariableAtPosition', () => {
         const result = getVariableAtPosition("  name: '{{presets_text}}'", 15);
 
         expect(result).toEqual({name: 'presets_text', start: 9, end: 25});
+    });
+
+    it('returns dot-notation variable', () => {
+        const result = getVariableAtPosition('{{aaa.b}}', 5);
+
+        expect(result).toEqual({name: 'aaa.b', start: 0, end: 9});
     });
 });
 
