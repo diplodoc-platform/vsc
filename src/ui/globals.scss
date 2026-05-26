@@ -14,6 +14,9 @@ $color: #63d590;
     --g-color-text-link-visited: #{$color};
     --g-color-text-link-visited-hover: #4eec7a;
     --g-color-button: #fff;
+    --yfm-color-hljs-section: #dd1f1f;
+    --yfm-color-hljs-deletion: #dd1f1f;
+    --yfm-color-hljs-literal: #78be55;
 
     --g-color-base-background: var(--vscode-editor-background);
     --g-color-base-float: var(--vscode-editorWidget-background, var(--vscode-editor-background));
@@ -25,4 +28,8 @@ $color: #63d590;
     .g-md-wysiwyg-editor__toolbar {
         padding: 0 12px 12px 8px;
     }
+}
+
+:root .g-root_theme_dark {
+    --yfm-color-hljs-subst: #fff;
 }
