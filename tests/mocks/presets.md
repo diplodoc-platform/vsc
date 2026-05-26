@@ -1,5 +1,3 @@
 # Presets
 
-{{text}}
-
-'{{text}}'
+{{}}

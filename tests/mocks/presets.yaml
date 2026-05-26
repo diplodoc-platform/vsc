@@ -1,8 +1,9 @@
 default:
   presets_text: Presets
   text: Hello
-  uer: Alice
+  user: Alice
   img_3: 4.png
+  aaa: {b: 1, c: {d: 2}}
 external:
   presets_text: Presets external
   text: Hello external
