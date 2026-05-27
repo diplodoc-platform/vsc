@@ -64,7 +64,10 @@
     },
     "outputFormat": {
       "type": "string",
-      "enum": ["html", "md"],
+      "enum": [
+        "html",
+        "md"
+      ],
       "description": "Output format. html — render to static HTML. md — render to enriched Markdown with metadata.",
       "markdownDescription": "**`'html' | 'md'`** Output format for the build.",
       "markdownEnumDescriptions": [
@@ -135,7 +138,12 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["new", "preview", "tech-preview", "skip"],
+        "enum": [
+          "new",
+          "preview",
+          "tech-preview",
+          "skip"
+        ],
         "markdownDescription": "**`'new' | 'preview' | 'tech-preview' | 'skip'`**",
         "markdownEnumDescriptions": [
           "Exclude pages tagged `new`.",
@@ -516,13 +524,20 @@
             },
             "position": {
               "type": "string",
-              "enum": ["toc", "header"],
+              "enum": [
+                "toc",
+                "header"
+              ],
               "description": "Where to render the PDF download button. toc — below the table of contents (default). header — in the page header next to other controls.",
               "markdownDescription": "**`'toc' | 'header'`** Where to render the PDF download button. toc — below the table of contents (default). header — in the page header next to other controls."
             },
             "size": {
               "type": "string",
-              "enum": ["S", "M", "L"],
+              "enum": [
+                "S",
+                "M",
+                "L"
+              ],
               "description": "Size of the PDF download button icon.",
               "markdownDescription": "**`'S' | 'M' | 'L'`** Size of the PDF download button icon."
             },
@@ -716,7 +731,9 @@
           "body": {
             "project-name": "${1:my-project}",
             "lang": "${2:en}",
-            "langs": ["${3:en}"]
+            "langs": [
+              "${3:en}"
+            ]
           }
         }
       ]
@@ -847,7 +864,9 @@
         },
         {
           "type": "object",
-          "required": ["lang"],
+          "required": [
+            "lang"
+          ],
           "properties": {
             "lang": {
               "type": "string",
@@ -916,7 +935,9 @@
         },
         {
           "type": "object",
-          "required": ["name"],
+          "required": [
+            "name"
+          ],
           "properties": {
             "name": {
               "type": "string",
@@ -1014,7 +1035,9 @@
                 },
                 {
                   "type": "string",
-                  "enum": ["strict"],
+                  "enum": [
+                    "strict"
+                  ],
                   "markdownDescription": "**`'strict'`**"
                 }
               ],
@@ -1076,7 +1099,10 @@
         },
         "provider": {
           "type": "string",
-          "enum": ["local", "algolia"],
+          "enum": [
+            "local",
+            "algolia"
+          ],
           "description": "Search provider identifier (local or algolia).",
           "markdownDescription": "**`'local' | 'algolia'`** Search provider.",
           "markdownEnumDescriptions": [
@@ -1124,13 +1150,19 @@
         },
         "confidence": {
           "type": "string",
-          "enum": ["phrased", "sparsed"],
+          "enum": [
+            "phrased",
+            "sparsed"
+          ],
           "description": "Search scoring strategy (provider=local).",
           "markdownDescription": "**`'phrased' | 'sparsed'`** Search scoring strategy for local provider.\n\n- `phrased` — prefer exact phrase matches\n- `sparsed` — allow sparse word matches"
         },
         "confidense": {
           "type": "string",
-          "enum": ["phrased", "sparsed"],
+          "enum": [
+            "phrased",
+            "sparsed"
+          ],
           "description": "Alternative spelling of confidence. Search scoring strategy (provider=local).",
           "markdownDescription": "**`'phrased' | 'sparsed'`** Alternative spelling of confidence. Search scoring strategy (provider=local)."
         },
@@ -1199,7 +1231,10 @@
         },
         "type": {
           "type": "string",
-          "enum": ["widget", "search"],
+          "enum": [
+            "widget",
+            "search"
+          ],
           "description": "Widget integration type. widget — floating widget initialized on page load. search — widget activated via search suggest button.",
           "markdownDescription": "**`'widget' | 'search'`** Widget integration type.\n\n- `widget` — floating widget initialized on page load\n- `search` — widget activated via search suggest button"
         }
@@ -1377,7 +1412,10 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["light", "dark"],
+            "enum": [
+              "light",
+              "dark"
+            ],
             "markdownDescription": "**`'light' | 'dark'`**"
           },
           "description": "Available themes. Server-only.",
@@ -1393,7 +1431,10 @@
             },
             "mode": {
               "type": "string",
-              "enum": ["base", "notification"],
+              "enum": [
+                "base",
+                "notification"
+              ],
               "description": "GTM consent mode (base or notification).",
               "markdownDescription": "**`'base' | 'notification'`** GTM consent mode (base or notification)."
             }
@@ -1750,7 +1791,9 @@
                   "markdownDescription": "**`string`**"
                 }
               },
-              "required": ["language"],
+              "required": [
+                "language"
+              ],
               "markdownDescription": "**`{language, locale}`**"
             }
           ],
@@ -1885,7 +1928,10 @@
         },
         "mode": {
           "type": "string",
-          "enum": ["base", "notification"],
+          "enum": [
+            "base",
+            "notification"
+          ],
           "markdownDescription": "**`'base' | 'notification'`**"
         }
       },
@@ -1894,7 +1940,9 @@
     "AnalyticsMetrikaConfig": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id"],
+      "required": [
+        "id"
+      ],
       "properties": {
         "id": {
           "type": "integer",
@@ -1905,7 +1953,10 @@
           "additionalProperties": false,
           "properties": {
             "accurateTrackBounce": {
-              "type": ["boolean", "number"]
+              "type": [
+                "boolean",
+                "number"
+              ]
             },
             "childIframe": {
               "type": "boolean",

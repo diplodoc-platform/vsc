@@ -174,7 +174,12 @@
     },
     "stage": {
       "type": "string",
-      "enum": ["new", "preview", "tech-preview", "skip"],
+      "enum": [
+        "new",
+        "preview",
+        "tech-preview",
+        "skip"
+      ],
       "description": "Document lifecycle stage (inherited from toc.yaml or set manually).",
       "markdownDescription": "**`'new' | 'preview' | 'tech-preview' | 'skip'`** Document lifecycle stage.\n\nInherited from the parent `toc.yaml` entry; override here for this page only.",
       "markdownEnumDescriptions": [
@@ -393,7 +398,9 @@
           "markdownDescription": "**`string`** BCP-47 language code (e.g. `en`, `ru`, `zh-Hans`)."
         }
       },
-      "required": ["href"],
+      "required": [
+        "href"
+      ],
       "additionalProperties": false,
       "markdownDescription": "**`Alternate`** Alternate language version of this page for `<link rel=\"alternate\">`.",
       "description": "Alternate language version of this page."
@@ -422,7 +429,9 @@
           "markdownDescription": "**`string`** Content value of the meta tag. **Required.**"
         }
       },
-      "required": ["content"],
+      "required": [
+        "content"
+      ],
       "additionalProperties": false,
       "markdownDescription": "**`MetaItem`** One custom HTML `<meta>` tag. Must have exactly one of `name`, `property`, or `http-equiv`, plus `content`.",
       "description": "Custom HTML meta tag definition."
