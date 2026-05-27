@@ -3,11 +3,11 @@ import type {VariableEntry} from './resolver';
 
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {getVariableAtPosition, resolveVariables} from './resolver';
+import {getVariable, resolveVariables} from './resolver';
 import {PresetsHoverProvider} from './hover';
 
 vi.mock('./resolver', () => ({
-    getVariableAtPosition: vi.fn(),
+    getVariable: vi.fn(),
     resolveVariables: vi.fn(),
 }));
 
@@ -38,7 +38,7 @@ describe('PresetsHoverProvider', () => {
     });
 
     it('returns null when cursor is not on a variable', () => {
-        vi.mocked(getVariableAtPosition).mockReturnValue(null);
+        vi.mocked(getVariable).mockReturnValue(null);
 
         const doc = mockDocument('Hello world');
         const result = provider.provideHover(doc, {line: 0, character: 3} as vscode.Position);
@@ -47,7 +47,7 @@ describe('PresetsHoverProvider', () => {
     });
 
     it('returns null when variable not found in presets', () => {
-        vi.mocked(getVariableAtPosition).mockReturnValue({name: 'unknown', start: 2, end: 15});
+        vi.mocked(getVariable).mockReturnValue({name: 'unknown', start: 2, end: 15});
         vi.mocked(resolveVariables).mockReturnValue(new Map());
 
         const doc = mockDocument('{{unknown}}');
@@ -57,7 +57,7 @@ describe('PresetsHoverProvider', () => {
     });
 
     it('returns hover with single preset value', () => {
-        vi.mocked(getVariableAtPosition).mockReturnValue({name: 'user', start: 0, end: 8});
+        vi.mocked(getVariable).mockReturnValue({name: 'user', start: 0, end: 8});
 
         const entries: VariableEntry[] = [
             {preset: 'default', value: 'Alice', filePath: '/project/presets.yaml', line: 2},
@@ -76,7 +76,7 @@ describe('PresetsHoverProvider', () => {
     });
 
     it('returns hover with multiple preset values', () => {
-        vi.mocked(getVariableAtPosition).mockReturnValue({
+        vi.mocked(getVariable).mockReturnValue({
             name: 'presets_text',
             start: 9,
             end: 25,
@@ -112,7 +112,7 @@ describe('PresetsHoverProvider', () => {
     });
 
     it('shows file paths when variables come from multiple files', () => {
-        vi.mocked(getVariableAtPosition).mockReturnValue({name: 'text', start: 0, end: 8});
+        vi.mocked(getVariable).mockReturnValue({name: 'text', start: 0, end: 8});
 
         const entries: VariableEntry[] = [
             {preset: 'default', value: 'Near', filePath: '/project/pages/presets.yaml', line: 1},
@@ -131,7 +131,7 @@ describe('PresetsHoverProvider', () => {
     });
 
     it('sets correct range on hover', () => {
-        vi.mocked(getVariableAtPosition).mockReturnValue({name: 'text', start: 6, end: 14});
+        vi.mocked(getVariable).mockReturnValue({name: 'text', start: 6, end: 14});
         vi.mocked(resolveVariables).mockReturnValue(
             new Map([
                 ['text', [{preset: 'default', value: 'v', filePath: '/p/presets.yaml', line: 0}]],

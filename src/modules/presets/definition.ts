@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
 import {
     findPresetsFiles,
     findVariableLine,
-    getVariableAtPosition,
+    getVariable,
     parsePresetsFile,
     resolveVariables,
 } from './resolver';
@@ -102,7 +102,7 @@ export class PresetsDefinitionProvider implements vscode.DefinitionProvider {
         }
 
         const lineText = document.lineAt(position.line).text;
-        const variable = getVariableAtPosition(lineText, position.character);
+        const variable = getVariable(lineText, position.character);
 
         if (!variable) {
             return null;
