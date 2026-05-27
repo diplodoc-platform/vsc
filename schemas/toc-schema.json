@@ -19,7 +19,12 @@
       "type": "string",
       "markdownDescription": "**`'new' | 'preview' | 'tech-preview' | 'skip'`** Publication stage controlling which builds include this entire section.",
       "description": "Publication stage: new | preview | tech-preview | skip.",
-      "enum": ["new", "preview", "tech-preview", "skip"],
+      "enum": [
+        "new",
+        "preview",
+        "tech-preview",
+        "skip"
+      ],
       "markdownEnumDescriptions": [
         "New section — visible only in **preview** builds. Excluded from production.",
         "Preview — visible in preview and tech-preview builds.",
@@ -76,7 +81,10 @@
       ]
     },
     "when": {
-      "type": ["string", "boolean"],
+      "type": [
+        "string",
+        "boolean"
+      ],
       "description": "Condition expression for including this TOC. Liquid expression (string) or boolean.",
       "markdownDescription": "**`string | boolean`** Condition for including this TOC in the build.\n\nUse Liquid-style expressions with variables from `presets.yaml`:\n```yaml\nwhen: env == 'production'\nwhen: feature_flag\nwhen: false  # always hidden\n```"
     },
@@ -206,7 +214,9 @@
   "definitions": {
     "TocLabel": {
       "type": "object",
-      "required": ["title"],
+      "required": [
+        "title"
+      ],
       "properties": {
         "title": {
           "type": "string",
@@ -220,7 +230,16 @@
         },
         "theme": {
           "type": "string",
-          "enum": ["normal", "info", "danger", "warning", "success", "utility", "unknown", "clear"],
+          "enum": [
+            "normal",
+            "info",
+            "danger",
+            "warning",
+            "success",
+            "utility",
+            "unknown",
+            "clear"
+          ],
           "markdownDescription": "**`string`** Visual color theme of the badge.",
           "description": "Visual theme of the badge: normal | info | danger | warning | success | utility | unknown | clear.",
           "markdownEnumDescriptions": [
@@ -235,7 +254,10 @@
           ]
         },
         "when": {
-          "type": ["string", "boolean"],
+          "type": [
+            "string",
+            "boolean"
+          ],
           "description": "Liquid condition expression. Badge is hidden when false.",
           "markdownDescription": "**`string | boolean`** Liquid condition — badge is hidden when the expression is falsy."
         }
@@ -274,6 +296,20 @@
           "markdownDescription": "**`boolean`** Hide this item in the sidebar. The page is still built and accessible by direct URL.",
           "description": "Exclude this item from the sidebar (but the page is still built)."
         },
+        "analyticsEvents": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AnalyticsEvent"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AnalyticsEvent"
+              },
+              "markdownDescription": "**`AnalyticsEvent[]`**"
+            }
+          ]
+        },
         "restricted-access": {
           "oneOf": [
             {
@@ -293,7 +329,10 @@
           "markdownDescription": "**`string | string[]`** Access restriction conditions. The user must satisfy at least one condition to see this item."
         },
         "when": {
-          "type": ["string", "boolean"],
+          "type": [
+            "string",
+            "boolean"
+          ],
           "description": "Liquid condition. Item is excluded when false.",
           "markdownDescription": "**`string | boolean`** Liquid condition — item is excluded from the build when the expression is falsy.\n\n```yaml\nwhen: env == 'internal'\n```"
         },
@@ -336,7 +375,9 @@
       }
     },
     "TocItemWithInclude": {
-      "required": ["include"],
+      "required": [
+        "include"
+      ],
       "properties": {
         "name": {
           "type": "string",
@@ -352,7 +393,11 @@
       "properties": {
         "mode": {
           "type": "string",
-          "enum": ["link", "merge", "root_merge"],
+          "enum": [
+            "link",
+            "merge",
+            "root_merge"
+          ],
           "markdownDescription": "**`'link' | 'merge' | 'root_merge'`** How the included TOC is grafted into the current tree.",
           "description": "Inclusion mode: link | merge | root_merge.",
           "markdownEnumDescriptions": [
@@ -392,7 +437,9 @@
     },
     "Includer": {
       "type": "object",
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "properties": {
         "name": {
           "type": "string",
@@ -404,7 +451,9 @@
     },
     "OpenApiIncluder": {
       "type": "object",
-      "required": ["input"],
+      "required": [
+        "input"
+      ],
       "properties": {
         "input": {
           "type": "string",
@@ -443,7 +492,10 @@
             },
             "mode": {
               "type": "string",
-              "enum": ["section", "leaf"],
+              "enum": [
+                "section",
+                "leaf"
+              ],
               "markdownDescription": "**`'section' | 'leaf'`**"
             },
             "spec": {
@@ -451,7 +503,10 @@
               "properties": {
                 "renderMode": {
                   "type": "string",
-                  "enum": ["inline", "hidden"],
+                  "enum": [
+                    "inline",
+                    "hidden"
+                  ],
                   "markdownDescription": "**`'inline' | 'hidden'`**"
                 }
               },
@@ -587,7 +642,9 @@
     },
     "NavigationItem": {
       "type": "object",
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "properties": {
         "type": {
           "type": "string",
@@ -641,7 +698,10 @@
           "markdownDescription": "**`number`** Icon size in pixels (overrides the header-level `iconSize`)."
         },
         "when": {
-          "type": ["string", "boolean"],
+          "type": [
+            "string",
+            "boolean"
+          ],
           "markdownDescription": "**`string | boolean`** Liquid visibility condition — item is hidden when falsy."
         }
       },
@@ -668,7 +728,10 @@
           "markdownDescription": "**`boolean`**"
         }
       },
-      "required": ["type", "text"],
+      "required": [
+        "type",
+        "text"
+      ],
       "markdownDescription": "**`{text, type, target, arrow}`**"
     },
     "NavigationButtonItem": {
@@ -702,7 +765,9 @@
             },
             {
               "type": "object",
-              "required": ["data"],
+              "required": [
+                "data"
+              ],
               "properties": {
                 "data": {
                   "type": "string",
@@ -710,7 +775,10 @@
                 },
                 "position": {
                   "type": "string",
-                  "enum": ["left", "right"],
+                  "enum": [
+                    "left",
+                    "right"
+                  ],
                   "markdownDescription": "**`'left' | 'right'`**"
                 },
                 "alt": {
@@ -725,14 +793,14 @@
         "analyticsEvents": {
           "oneOf": [
             {
-              "$ref": "#/definitions/NavigationAnalyticsEvent"
+              "$ref": "#/definitions/AnalyticsEvent"
             },
             {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/NavigationAnalyticsEvent"
+                "$ref": "#/definitions/AnalyticsEvent"
               },
-              "markdownDescription": "**`NavigationAnalyticsEvent[]`**"
+              "markdownDescription": "**`AnalyticsEvent[]`**"
             }
           ]
         },
@@ -741,11 +809,18 @@
         },
         "width": {
           "type": "string",
-          "enum": ["auto", "max"],
+          "enum": [
+            "auto",
+            "max"
+          ],
           "markdownDescription": "**`'auto' | 'max'`**"
         }
       },
-      "required": ["type", "text", "url"]
+      "required": [
+        "type",
+        "text",
+        "url"
+      ]
     },
     "NavigationDropdownItem": {
       "type": "object",
@@ -763,7 +838,10 @@
           "markdownDescription": "**`NavigationLinkItem[]`**"
         }
       },
-      "required": ["type", "items"],
+      "required": [
+        "type",
+        "items"
+      ],
       "markdownDescription": "**`{type, items}`**"
     },
     "NavigationControlsItem": {
@@ -775,12 +853,19 @@
           "markdownDescription": "**`string`**"
         }
       },
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "markdownDescription": "**`{type}`**"
     },
     "NavigationLinkTarget": {
       "type": "string",
-      "enum": ["_self", "_blank", "_parent", "_top"],
+      "enum": [
+        "_self",
+        "_blank",
+        "_parent",
+        "_top"
+      ],
       "markdownDescription": "**`string`** HTML link target attribute.",
       "description": "Link target: _self | _blank | _parent | _top.",
       "markdownEnumDescriptions": [
@@ -873,7 +958,10 @@
         },
         "mode": {
           "type": "string",
-          "enum": ["base", "notification"],
+          "enum": [
+            "base",
+            "notification"
+          ],
           "markdownDescription": "**`'base' | 'notification'`** Consent integration mode.\n\n- `base` — default consent mode with full popup\n- `notification` — notification-style consent banner",
           "description": "Consent mode: base | notification.",
           "markdownEnumDescriptions": [
@@ -888,7 +976,9 @@
     "AnalyticsMetrikaConfig": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id"],
+      "required": [
+        "id"
+      ],
       "properties": {
         "id": {
           "type": "integer",
@@ -900,7 +990,10 @@
           "additionalProperties": false,
           "properties": {
             "accurateTrackBounce": {
-              "type": ["boolean", "number"]
+              "type": [
+                "boolean",
+                "number"
+              ]
             },
             "childIframe": {
               "type": "boolean",
@@ -974,19 +1067,19 @@
       "markdownDescription": "**`AnalyticsMetrikaConfig`** Yandex Metrika counter configuration.\n\n- `id` **`number`** — counter ID (**required**)\n- `params` **`{id, params}`** — initialization parameters",
       "description": "Yandex Metrika counter configuration."
     },
-    "NavigationAnalyticsEvent": {
+    "AnalyticsEvent": {
       "type": "object",
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "properties": {
         "name": {
           "type": "string",
-          "markdownDescription": "**`string`** Analytics event name. **Required.**",
-          "description": "Analytics event name. Required."
+          "markdownDescription": "**`string`**"
         },
         "type": {
           "type": "string",
-          "markdownDescription": "**`string`** Analytics event type identifier.",
-          "description": "Analytics event type."
+          "markdownDescription": "**`string`**"
         },
         "counters": {
           "type": "object",
@@ -1008,17 +1101,40 @@
               "markdownDescription": "**`string[]`**"
             }
           },
-          "markdownDescription": "**`{include, exclude}`** Counter filter for this event.\n\n- `include` **`string[]`** — counter IDs to include\n- `exclude` **`string[]`** — counter IDs to exclude",
-          "description": "Counter filter. Fields: include (string[]), exclude (string[])."
+          "markdownDescription": "**`{include, exclude}`**"
         },
         "context": {
           "type": "string",
-          "markdownDescription": "**`string`** Event context string passed with the analytics event.",
-          "description": "Event context string."
+          "markdownDescription": "**`string`**"
+        },
+        "target": {
+          "type": "string",
+          "markdownDescription": "**`string`**"
         }
       },
-      "markdownDescription": "**`NavigationAnalyticsEvent`** Analytics event attached to a navigation item click.\n\n- `name` **`string`** — event name (**required**)\n- `type` **`string`** — event type\n- `counters` **`{name, type, counters, context}`** — counter filter (`include: string[]`, `exclude: string[]`)\n- `context` **`string`** — event context string",
-      "description": "Analytics event. Fields: name (string, required), type (string), counters (object), context (string)."
+      "markdownDescription": "**`{name, type, counters, ...}`**"
+    },
+    "NavigationAnalyticsEvent": {
+      "description": "Analytics event. Fields: name (string, required), type (string), counters (object), context (string).",
+      "markdownDescription": "**`NavigationAnalyticsEvent`** Analytics event attached to a navigation item click.\n\n- `name` **`string`** — event name (**required**)\n- `type` **`string`** — event type\n- `counters` **`object`** — counter filter (`include: string[]`, `exclude: string[]`)\n- `context` **`string`** — event context string",
+      "properties": {
+        "name": {
+          "description": "Analytics event name. Required.",
+          "markdownDescription": "**`string`** Analytics event name. **Required.**"
+        },
+        "type": {
+          "description": "Analytics event type.",
+          "markdownDescription": "**`string`** Analytics event type identifier."
+        },
+        "counters": {
+          "description": "Counter filter. Fields: include (string[]), exclude (string[]).",
+          "markdownDescription": "**`object`** Counter filter for this event.\n\n- `include` **`string[]`** — counter IDs to include\n- `exclude` **`string[]`** — counter IDs to exclude"
+        },
+        "context": {
+          "description": "Event context string.",
+          "markdownDescription": "**`string`** Event context string passed with the analytics event."
+        }
+      }
     }
   },
   "markdownDescription": "Diplodoc table-of-contents file (`toc.yaml`).\nDefines the structure, navigation hierarchy, and metadata of a documentation section.\n```yaml title: My Docs href: index.yaml items:\n  - name: Getting started\n    href: quickstart.md\n  - name: Reference\n    items:\n      - name: API\n        href: api.md\n```",
