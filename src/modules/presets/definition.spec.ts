@@ -4,7 +4,7 @@ import type {VariableEntry} from './resolver';
 import {readFileSync} from 'fs';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {findVariableLine, getVariableAtPosition, resolveVariables} from './resolver';
+import {findVariableLine, getVariable, resolveVariables} from './resolver';
 import {PresetsDefinitionProvider} from './definition';
 
 vi.mock('fs', () => ({
@@ -17,7 +17,7 @@ vi.mock('../utils', () => ({
 }));
 
 vi.mock('./resolver', () => ({
-    getVariableAtPosition: vi.fn(),
+    getVariable: vi.fn(),
     resolveVariables: vi.fn(),
     findVariableLine: vi.fn(),
     findPresetsFiles: vi.fn().mockReturnValue([]),
@@ -45,7 +45,7 @@ describe('PresetsDefinitionProvider', () => {
     });
 
     it('returns null when cursor is not on a variable', () => {
-        vi.mocked(getVariableAtPosition).mockReturnValue(null);
+        vi.mocked(getVariable).mockReturnValue(null);
 
         const doc = mockDocument('Hello world');
         const result = provider.provideDefinition(doc, {line: 0, character: 3} as vscode.Position);
@@ -54,7 +54,7 @@ describe('PresetsDefinitionProvider', () => {
     });
 
     it('returns null when variable not found in presets', () => {
-        vi.mocked(getVariableAtPosition).mockReturnValue({name: 'unknown', start: 0, end: 13});
+        vi.mocked(getVariable).mockReturnValue({name: 'unknown', start: 0, end: 13});
         vi.mocked(resolveVariables).mockReturnValue(new Map());
 
         const doc = mockDocument('{{unknown}}');
@@ -64,7 +64,7 @@ describe('PresetsDefinitionProvider', () => {
     });
 
     it('returns location pointing to correct line', () => {
-        vi.mocked(getVariableAtPosition).mockReturnValue({name: 'text', start: 0, end: 8});
+        vi.mocked(getVariable).mockReturnValue({name: 'text', start: 0, end: 8});
 
         const entries: VariableEntry[] = [
             {preset: 'default', value: 'Hello', filePath: '/project/presets.yaml', line: 1},
@@ -85,7 +85,7 @@ describe('PresetsDefinitionProvider', () => {
     });
 
     it('returns locations from multiple files', () => {
-        vi.mocked(getVariableAtPosition).mockReturnValue({name: 'text', start: 0, end: 8});
+        vi.mocked(getVariable).mockReturnValue({name: 'text', start: 0, end: 8});
 
         const entries: VariableEntry[] = [
             {preset: 'default', value: 'Near', filePath: '/project/pages/presets.yaml', line: 1},
@@ -108,7 +108,7 @@ describe('PresetsDefinitionProvider', () => {
     });
 
     it('skips files that fail to read', () => {
-        vi.mocked(getVariableAtPosition).mockReturnValue({name: 'text', start: 0, end: 8});
+        vi.mocked(getVariable).mockReturnValue({name: 'text', start: 0, end: 8});
 
         const entries: VariableEntry[] = [
             {preset: 'default', value: 'v', filePath: '/project/missing/presets.yaml', line: 1},

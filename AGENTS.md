@@ -557,7 +557,7 @@ Multiple `presets.yaml` files can exist at different directory levels. Closer fi
 
 - `findPresetsFiles(fsPath)` — returns all `presets.yaml` paths from document dir to YFM root (closest first)
 - `resolveVariables(fsPath)` — returns `Map<varName, VariableEntry[]>` with preset name, value, file path, and line number
-- `getVariableAtPosition(lineText, character)` — detects `{{variable}}` at cursor position
+- `getVariable(lineText, character)` — detects `{{variable}}` at cursor position
 - `findVariableLine(content, preset, varName)` — finds the line number of a variable definition within a preset block
 
 ## Color Provider

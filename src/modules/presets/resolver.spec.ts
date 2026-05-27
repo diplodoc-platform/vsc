@@ -7,7 +7,7 @@ import {findYfmRoot} from '../utils';
 import {
     findPresetsFiles,
     findVariableLine,
-    getVariableAtPosition,
+    getVariable,
     parsePresetsFile,
     resolveVariables,
 } from './resolver';
@@ -203,41 +203,41 @@ describe('resolveVariables', () => {
     });
 });
 
-describe('getVariableAtPosition', () => {
+describe('getVariable', () => {
     it('returns variable when cursor is on it', () => {
-        const result = getVariableAtPosition('Hello {{text}} world', 9);
+        const result = getVariable('Hello {{text}} world', 9);
 
         expect(result).toEqual({name: 'text', start: 6, end: 14});
     });
 
     it('returns variable with spaces inside braces', () => {
-        const result = getVariableAtPosition('{{ text }}', 5);
+        const result = getVariable('{{ text }}', 5);
 
         expect(result).toEqual({name: 'text', start: 0, end: 10});
     });
 
     it('returns null when cursor is outside variable', () => {
-        expect(getVariableAtPosition('Hello {{text}} world', 2)).toBeNull();
+        expect(getVariable('Hello {{text}} world', 2)).toBeNull();
     });
 
     it('returns null when no variables in line', () => {
-        expect(getVariableAtPosition('Hello world', 5)).toBeNull();
+        expect(getVariable('Hello world', 5)).toBeNull();
     });
 
     it('finds correct variable among multiple', () => {
-        const result = getVariableAtPosition('{{a}} and {{b}}', 12);
+        const result = getVariable('{{a}} and {{b}}', 12);
 
         expect(result).toEqual({name: 'b', start: 10, end: 15});
     });
 
     it('returns variable in yaml context', () => {
-        const result = getVariableAtPosition("  name: '{{presets_text}}'", 15);
+        const result = getVariable("  name: '{{presets_text}}'", 15);
 
         expect(result).toEqual({name: 'presets_text', start: 9, end: 25});
     });
 
     it('returns dot-notation variable', () => {
-        const result = getVariableAtPosition('{{aaa.b}}', 5);
+        const result = getVariable('{{aaa.b}}', 5);
 
         expect(result).toEqual({name: 'aaa.b', start: 0, end: 9});
     });

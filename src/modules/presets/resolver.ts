@@ -1,10 +1,12 @@
+import type {Variable} from './types';
+
 import {existsSync, readFileSync} from 'fs';
 import {basename, dirname, join} from 'path';
 import {load as yamlLoad} from 'js-yaml';
 
 import {findYfmRoot} from '../utils';
 
-import {PRESETS_FILENAME, VARIABLE_RE} from './constants';
+import {PRESETS_FILENAME, PRESET_END, PRESET_START} from './constants';
 
 export interface VariableEntry {
     preset: string;
@@ -153,20 +155,23 @@ export function resolveVariables(fsPath: string): Map<string, VariableEntry[]> {
     return result;
 }
 
-export function getVariableAtPosition(
-    lineText: string,
-    character: number,
-): {name: string; start: number; end: number} | null {
-    const re = new RegExp(VARIABLE_RE.source, 'g');
-    let match;
+export function getVariable(lineText: string, charPos: number): Variable | null {
+    let startIdx = lineText.indexOf(PRESET_START);
 
-    while ((match = re.exec(lineText)) !== null) {
-        const start = match.index;
-        const end = start + match[0].length;
+    while (startIdx !== -1) {
+        const endIdx = lineText.indexOf(PRESET_END, startIdx + PRESET_START.length);
 
-        if (character >= start && character < end) {
-            return {name: match[1], start, end};
+        if (endIdx >= 0 && charPos >= startIdx && charPos <= endIdx + PRESET_END.length) {
+            const preset: Variable = {
+                name: lineText.slice(startIdx + PRESET_START.length, endIdx).trim(),
+                start: startIdx,
+                end: endIdx + PRESET_END.length,
+            };
+
+            return preset;
         }
+
+        startIdx = lineText.indexOf(PRESET_START, startIdx + 1);
     }
 
     return null;
