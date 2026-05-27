@@ -2,13 +2,13 @@ import * as vscode from 'vscode';
 
 import {findYfmRoot} from '../utils';
 
-import {getVariableAtPosition, resolveVariables} from './resolver';
+import {getVariable, resolveVariables} from './resolver';
 import {formatEntries} from './utils';
 
 export class PresetsHoverProvider implements vscode.HoverProvider {
     provideHover(document: vscode.TextDocument, position: vscode.Position): vscode.Hover | null {
         const lineText = document.lineAt(position.line).text;
-        const variable = getVariableAtPosition(lineText, position.character);
+        const variable = getVariable(lineText, position.character);
 
         if (!variable) {
             return null;
