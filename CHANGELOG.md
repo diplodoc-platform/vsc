@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.7.2](https://github.com/diplodoc-platform/vsc/compare/v0.7.1...v0.7.2) (2026-05-27)
+
+
+### Bug Fixes
+
+* fixed presets ([57585dd](https://github.com/diplodoc-platform/vsc/commit/57585dd300765d59e36578612a872e257ccab170))
+* fixed presets ([7cf5318](https://github.com/diplodoc-platform/vsc/commit/7cf53185dcccd58ba75951d0daf02aba252e347e))
+* fixed presets ([bb29198](https://github.com/diplodoc-platform/vsc/commit/bb2919830a50a08b60e5ba6d9461d47bcf167860))
+* fixed presets ([b1c934d](https://github.com/diplodoc-platform/vsc/commit/b1c934dfda2929297793ee871c28cdd95d625ca2))
+* removed vsix ([d1e0e66](https://github.com/diplodoc-platform/vsc/commit/d1e0e66c4e260b89ca49fda673765d5619f99810))
+
 ## [0.7.1](https://github.com/diplodoc-platform/vsc/compare/v0.7.0...v0.7.1) (2026-05-25)
 
 
