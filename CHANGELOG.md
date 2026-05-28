@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.3](https://github.com/diplodoc-platform/vsc/compare/v0.7.2...v0.7.3) (2026-05-28)
+
+
+### Bug Fixes
+
+* removed vsix ([359a96b](https://github.com/diplodoc-platform/vsc/commit/359a96b762f1c29627e23352d08e1f910ec31b17))
+
 ## [0.7.2](https://github.com/diplodoc-platform/vsc/compare/v0.7.1...v0.7.2) (2026-05-27)
 
 
