@@ -124,3 +124,10 @@ export function isInExcludedDir(fsPath: string): boolean {
 
     return segments.some((s) => dirs.has(s));
 }
+
+export function isIncluded(fsPath: string): boolean {
+    const parts = fsPath.split(/[/\\]/);
+    const dirs = parts.slice(0, -1);
+
+    return dirs.some((dir) => dir === 'includes' || dir.startsWith('_'));
+}

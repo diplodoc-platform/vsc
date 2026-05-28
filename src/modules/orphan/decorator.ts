@@ -1,13 +1,6 @@
 import * as vscode from 'vscode';
 
-import {isYfmFile} from '../utils';
-
-export function isAutoIncluded(fsPath: string): boolean {
-    const parts = fsPath.split(/[/\\]/);
-    const dirs = parts.slice(0, -1);
-
-    return dirs.some((dir) => dir === 'includes' || dir.startsWith('_'));
-}
+import {isIncluded, isYfmFile} from '../utils';
 
 export class OrphanDecorationProvider implements vscode.FileDecorationProvider {
     onDidChangeFileDecorations: vscode.Event<vscode.Uri | vscode.Uri[] | undefined>;
@@ -92,7 +85,7 @@ export class OrphanDecorationProvider implements vscode.FileDecorationProvider {
             return;
         }
 
-        if (isAutoIncluded(uri.fsPath)) {
+        if (isIncluded(uri.fsPath)) {
             return;
         }
 

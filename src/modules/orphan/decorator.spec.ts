@@ -2,41 +2,21 @@ import type * as vscode from 'vscode';
 
 import {describe, expect, it, vi} from 'vitest';
 
-import {OrphanDecorationProvider, isAutoIncluded} from './decorator';
+import {OrphanDecorationProvider} from './decorator';
 
 vi.mock('../utils', () => ({
     isYfmFile: (fsPath: string) => fsPath.startsWith('/docs/'),
+    isIncluded: (fsPath: string) => {
+        const parts = fsPath.split(/[/\\]/);
+        const dirs = parts.slice(0, -1);
+
+        return dirs.some((dir) => dir === 'includes' || dir.startsWith('_'));
+    },
 }));
 
 function uri(path: string) {
     return {fsPath: path} as vscode.Uri;
 }
-
-describe('isAutoIncluded', () => {
-    it('returns true for files in includes directory', () => {
-        expect(isAutoIncluded('/docs/includes/fragment.md')).toBe(true);
-    });
-
-    it('returns true for files in nested includes directory', () => {
-        expect(isAutoIncluded('/docs/guides/includes/snippet.md')).toBe(true);
-    });
-
-    it('returns true for files in directory starting with _', () => {
-        expect(isAutoIncluded('/docs/_includes/fragment.md')).toBe(true);
-        expect(isAutoIncluded('/docs/_assets/image.md')).toBe(true);
-        expect(isAutoIncluded('/docs/_hidden/page.md')).toBe(true);
-    });
-
-    it('returns false for regular files', () => {
-        expect(isAutoIncluded('/docs/guide/intro.md')).toBe(false);
-        expect(isAutoIncluded('/docs/index.md')).toBe(false);
-    });
-
-    it('does not match filename, only directories', () => {
-        expect(isAutoIncluded('/docs/guide/_hidden.md')).toBe(false);
-        expect(isAutoIncluded('/docs/includes.md')).toBe(false);
-    });
-});
 
 describe('OrphanDecorationProvider', () => {
     it('marks unreferenced .md files in yfm project', () => {
