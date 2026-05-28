@@ -275,7 +275,7 @@
   },
   "dependencies": {
     "@diplodoc/html-extension": "^2.9.9",
-    "@diplodoc/latex-extension": "^2.0.0",
+    "@diplodoc/latex-extension": "^1.4.1",
     "@diplodoc/mermaid-extension": "^2.1.1",
     "@diplodoc/transform": "^4.75.4",
     "@diplodoc/yfmlint": "^1.7.6",
