@@ -2,6 +2,5 @@ log-levels:
   MD001: disabled
   MD007: error
   MD040: disabled
-  MD041: disabled
   MD026: warn
   # MD013: warn
