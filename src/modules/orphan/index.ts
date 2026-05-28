@@ -2,10 +2,10 @@ import {watch} from 'fs';
 import * as vscode from 'vscode';
 
 import {debounce} from '../../utils';
-import {clearExcludeDirsCache, clearYfmRootCache, isYfmFile} from '../utils';
+import {clearExcludeDirsCache, clearYfmRootCache, isIncluded, isYfmFile} from '../utils';
 
 import {collectBlocksYamlFiles, collectReferencedFiles} from './collector';
-import {OrphanDecorationProvider, isAutoIncluded} from './decorator';
+import {OrphanDecorationProvider} from './decorator';
 import {handleFileDeleted} from './on-delete';
 import {handleFileRenamed} from './on-rename';
 import {findVcsDir, isVcsOperationInProgress} from './utils';
@@ -31,11 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
                 continue;
             }
 
-            if (
-                isAutoIncluded(uri.fsPath) ||
-                referenced.has(uri.fsPath) ||
-                !isYfmFile(uri.fsPath)
-            ) {
+            if (isIncluded(uri.fsPath) || referenced.has(uri.fsPath) || !isYfmFile(uri.fsPath)) {
                 continue;
             }
 

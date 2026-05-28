@@ -12,6 +12,8 @@ import imagesPlugin from '@diplodoc/transform/lib/plugins/images';
 import includesPlugin from '@diplodoc/transform/lib/plugins/includes';
 import linksPlugin from '@diplodoc/transform/lib/plugins/links';
 
+import {isIncluded} from '../utils';
+
 import {buildLintConfig, findConfig, toDiagnostics} from './utils';
 
 const FRONTMATTER_RE = /^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/;
@@ -35,8 +37,9 @@ export async function validateMarkdown(document: TextDocument) {
     const yfmConfig = findConfig(root, '.yfm');
     const yfmlintConfig = findConfig(root, '.yfmlint');
     const allowHtml = yfmConfig?.allowHtml ?? yfmConfig?.allowHTML ?? false;
+    const isFileIncluded = isIncluded(filePath);
 
-    const lintConfig = buildLintConfig(yfmlintConfig, Boolean(allowHtml));
+    const lintConfig = buildLintConfig(yfmlintConfig, Boolean(allowHtml), isFileIncluded);
 
     const lintErrors = await yfmlint(content, filePath, {
         plugins: allPlugins,

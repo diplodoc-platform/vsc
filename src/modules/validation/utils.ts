@@ -367,7 +367,8 @@ export function processYfmlintConfig(
 
 export function buildLintConfig(
     yfmlintConfig: Record<string, unknown> | null,
-    allowHtml: boolean,
+    allowHtml?: boolean,
+    isFileIncluded?: boolean,
 ): RawLintConfig {
     const userConfig = processYfmlintConfig(yfmlintConfig);
 
@@ -378,6 +379,7 @@ export function buildLintConfig(
         MD026: false,
         MD033: !allowHtml,
         MD034: false,
+        MD041: !isFileIncluded,
         MD051: false,
         ...userConfig,
     } as RawLintConfig;
