@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.7.4](https://github.com/diplodoc-platform/vsc/compare/v0.7.3...v0.7.4) (2026-05-28)
+
+
+### Bug Fixes
+
+* fixed ([9cfdae5](https://github.com/diplodoc-platform/vsc/commit/9cfdae5f123d1a6bcf5444b85500b331e1c1c411))
+* fixed ([29fb55f](https://github.com/diplodoc-platform/vsc/commit/29fb55f124f23dfdbc0ed70ccf213dd9fbe73ef8))
+* fixed MD041 in includes ([09e9c32](https://github.com/diplodoc-platform/vsc/commit/09e9c32f7eb6565a6c01f9b955578b6d3762e9d3))
+* fixed MD041 in includes ([5754aa8](https://github.com/diplodoc-platform/vsc/commit/5754aa854622f1cd1e4d60cd20a9706a19da7ba6))
+
 ## [0.7.3](https://github.com/diplodoc-platform/vsc/compare/v0.7.2...v0.7.3) (2026-05-28)
 
 
