@@ -8,15 +8,12 @@ interface:
 
 ## Notes
 
-{% note tip "" %}
+Привет, мир
 
-Это примечание.
+---
 
-{% endnote %}
+Привет, мир
 
-## Таблица с якорями в ячейках
+---
 
-```javascript
-Ya.adfoxCode.reload(containerId, {onlyIfWasVisible: true});
-```
-
+Привет, мир
