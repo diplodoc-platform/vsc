@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.5](https://github.com/diplodoc-platform/vsc/compare/v0.7.4...v0.7.5) (2026-05-30)
+
+
+### Bug Fixes
+
+* fixed frontmatter extension ([468af6e](https://github.com/diplodoc-platform/vsc/commit/468af6e75e176d73fbe2079a613fce0c95ecb463))
+* fixed frontmatter extension ([f78ca8d](https://github.com/diplodoc-platform/vsc/commit/f78ca8d1efec8ef25223b72f39b52ffa96ca8b11))
+
 ## [0.7.4](https://github.com/diplodoc-platform/vsc/compare/v0.7.3...v0.7.4) (2026-05-28)
 
 
