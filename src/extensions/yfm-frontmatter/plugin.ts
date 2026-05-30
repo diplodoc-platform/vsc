@@ -1,7 +1,7 @@
 import type MarkdownIt from 'markdown-it';
 import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 
-const FENCE = /^---\s*$/;
+const FENCE_REGEX = /^---\s*$/;
 
 export const yfmFrontmatterTokenName = 'yfm_frontmatter';
 
@@ -11,22 +11,33 @@ function yfmFrontmatterBlockRule(
     endLine: number,
     silent: boolean,
 ): boolean {
+    for (let i = 0; i < startLine; i++) {
+        const pos = state.bMarks[i] + state.tShift[i];
+        const max = state.eMarks[i];
+
+        if (state.src.slice(pos, max).trim().length !== 0) {
+            return false;
+        }
+    }
+
     const openPos = state.bMarks[startLine] + state.tShift[startLine];
     const openMax = state.eMarks[startLine];
     const openStr = state.src.slice(openPos, openMax);
 
-    if (!FENCE.test(openStr)) {
+    if (!FENCE_REGEX.test(openStr)) {
         return false;
     }
 
     let closeLine = -1;
+
     for (let i = startLine + 1; i < endLine; i++) {
         const pos = state.bMarks[i] + state.tShift[i];
         const max = state.eMarks[i];
         const line = state.src.slice(pos, max);
 
-        if (FENCE.test(line)) {
+        if (FENCE_REGEX.test(line)) {
             closeLine = i;
+
             break;
         }
     }
@@ -48,6 +59,7 @@ function yfmFrontmatterBlockRule(
     }
 
     const token = state.push(yfmFrontmatterTokenName, 'pre', 0);
+
     token.map = [startLine, closeLine + 1];
     token.content = content;
 

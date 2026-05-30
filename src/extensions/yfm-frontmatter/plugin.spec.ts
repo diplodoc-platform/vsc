@@ -43,15 +43,6 @@ describe('yfmFrontmatterPlugin', () => {
         expect(token).toBeUndefined();
     });
 
-    it('parses frontmatter after preceding content when body is non-empty', () => {
-        const md = createMd();
-        const tokens = md.parse('# Title\n\n---\nkey: value\n---', {});
-        const token = findToken(tokens, TOKEN_NAME);
-
-        expect(token).toBeDefined();
-        expect(token?.content).toBe('key: value');
-    });
-
     it('does not match empty --- pair in the middle of the document', () => {
         const md = createMd();
         const tokens = md.parse('# Title\n\n---\n---\n\nMore text', {});
@@ -85,14 +76,13 @@ describe('yfmFrontmatterPlugin', () => {
         expect(hr).toBeUndefined();
     });
 
-    it('parses frontmatter when text precedes the opening ---', () => {
+    it('If there is text before --- it is not a frontmatter', () => {
         const md = createMd();
-        const src = 's\n\n---\ninterface:\n  toc: true\n  search: true\n  feedback: true\n---';
+        const src =
+            '#First line\n\n---\ninterface:\n  toc: true\n  search: true\n  feedback: true\n---';
         const tokens = md.parse(src, {});
         const token = findToken(tokens, TOKEN_NAME);
 
-        expect(token).toBeDefined();
-        expect(token?.content).toContain('interface:');
-        expect(token?.content).toContain('toc: true');
+        expect(token).not.toBeDefined();
     });
 });
