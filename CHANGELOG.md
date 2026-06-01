@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.6](https://github.com/diplodoc-platform/vsc/compare/v0.7.5...v0.7.6) (2026-06-01)
+
+
+### Bug Fixes
+
+* fixed MD032 in terms ([dc3e5d6](https://github.com/diplodoc-platform/vsc/commit/dc3e5d6535a8c38f7e57d5635ded9fddcc02b0f3))
+* fixed MD032 in terms ([4374be8](https://github.com/diplodoc-platform/vsc/commit/4374be8ce363f410cbcc5ee6ae6bd535cbb7eac0))
+
 ## [0.7.5](https://github.com/diplodoc-platform/vsc/compare/v0.7.4...v0.7.5) (2026-05-30)
 
 
