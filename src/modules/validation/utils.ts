@@ -31,6 +31,30 @@ const DIRECTIVE_HANDLERS: Array<{
     {message: /^Circular includes:/, open: /{%\s*include\b[^%]*%}/, close: /^$/},
 ];
 
+const TERM_DEFINITION_RE = /^\[\*[^\]]+\]:/;
+
+export function isTermDefinition(error: ValidationMessage, content: string): boolean {
+    if (!isYfmLintError(error) || !error.ruleNames?.includes('MD032') || !error.lineNumber) {
+        return false;
+    }
+
+    const lines = content.split('\n');
+
+    for (let line = error.lineNumber - 1; line >= 0; line--) {
+        const text = lines[line]?.replace(/\r$/, '') ?? '';
+
+        if (text.trim() === '') {
+            return false;
+        }
+
+        if (TERM_DEFINITION_RE.test(text)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 export function toDiagnostics(
     errors: ValidationMessage[],
     document: vscode.TextDocument,
