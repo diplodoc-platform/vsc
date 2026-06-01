@@ -31,4 +31,23 @@ describe('validateMarkdown', () => {
         expect(diagnostics.some((diagnostic) => diagnostic.code === 'MD041')).toBe(false);
         expect(diagnostics.some((diagnostic) => diagnostic.code === 'MD022')).toBe(false);
     });
+
+    it('does not report MD032 for lists inside term definitions', async () => {
+        const diagnostics = await validateMarkdown(
+            createDocument(
+                [
+                    '# Index',
+                    '',
+                    '[*term1]: Определение _термина_ может **включать** базовую разметку',
+                    '* списки;',
+                    '* ссылки;',
+                    '* картинки и т.д.',
+                    '',
+                    '[*term2]: Определение термина или сокращения.',
+                ].join('\n'),
+            ) as never,
+        );
+
+        expect(diagnostics.some((diagnostic) => diagnostic.code === 'MD032')).toBe(false);
+    });
 });

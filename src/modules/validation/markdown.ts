@@ -14,7 +14,7 @@ import linksPlugin from '@diplodoc/transform/lib/plugins/links';
 
 import {isIncluded} from '../utils';
 
-import {buildLintConfig, findConfig, toDiagnostics} from './utils';
+import {buildLintConfig, findConfig, isTermDefinition, toDiagnostics} from './utils';
 
 const FRONTMATTER_RE = /^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/;
 
@@ -62,7 +62,9 @@ export async function validateMarkdown(document: TextDocument) {
         lintConfig,
     });
 
-    const errors = [...(lintErrors || []), ...pluginMessages];
+    const errors = [...(lintErrors || []), ...pluginMessages].filter(
+        (error) => !isTermDefinition(error, content),
+    );
 
     return toDiagnostics(errors, document);
 }
