@@ -12,6 +12,7 @@ import {
     findConfig,
     formatLintMessage,
     formatPluginMessage,
+    isTermDefinition,
     processYfmlintConfig,
     toDiagnostic,
     toDiagnostics,
@@ -44,6 +45,41 @@ function mockPluginError(overrides: Partial<PluginMessage> = {}): PluginMessage 
         ...overrides,
     };
 }
+
+describe('isMd032InsideTermDefinition', () => {
+    const termContent = [
+        '# Index',
+        '',
+        '[*term1]: Определение термина',
+        '* списки;',
+        '* ссылки;',
+        '',
+        '[*term2]: Определение.',
+    ].join('\n');
+
+    it('suppresses MD032 for a list inside a term definition', () => {
+        const error = mockLintError({ruleNames: ['MD032', 'blanks-around-lists'], lineNumber: 4});
+
+        expect(isTermDefinition(error, termContent)).toBe(true);
+    });
+
+    it('does not suppress MD032 for a regular list', () => {
+        const content = ['# Index', 'text', '* item', '* item'].join('\n');
+        const error = mockLintError({ruleNames: ['MD032', 'blanks-around-lists'], lineNumber: 3});
+
+        expect(isTermDefinition(error, content)).toBe(false);
+    });
+
+    it('does not suppress other rules inside a term definition', () => {
+        const error = mockLintError({ruleNames: ['MD030'], lineNumber: 4});
+
+        expect(isTermDefinition(error, termContent)).toBe(false);
+    });
+
+    it('ignores plugin messages', () => {
+        expect(isTermDefinition(mockPluginError(), termContent)).toBe(false);
+    });
+});
 
 describe('formatLintMessage', () => {
     it('formats basic lint error', () => {
