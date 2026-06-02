@@ -10,7 +10,7 @@ import {
     NOT_ONLY_LINKS_FIELDS,
     SKIP_DIAGNOSTIC_FIELDS,
 } from './constants';
-import {isExternalUrl, isInternalPath} from './utils';
+import {findIncluderBlocks, isExternalUrl, isInternalPath} from './utils';
 
 export function getNavigationLines(document: vscode.TextDocument): Set<number> {
     const lines = new Set<number>();
@@ -45,6 +45,18 @@ export function getNavigationLines(document: vscode.TextDocument): Set<number> {
     }
 
     return lines;
+}
+
+export function getIncluderLines(document: vscode.TextDocument): Set<number> {
+    const result = new Set<number>();
+
+    for (const {startLine, endLine} of findIncluderBlocks(document)) {
+        for (let line = startLine + 1; line < endLine; line++) {
+            result.add(line);
+        }
+    }
+
+    return result;
 }
 
 async function checkLink(
@@ -128,13 +140,14 @@ export async function validateLinks(
     const diagnostics: vscode.Diagnostic[] = [];
     const baseUri = vscode.Uri.joinPath(document.uri, '..');
     const navigationLines = getNavigationLines(document);
+    const includerLines = getIncluderLines(document);
     const listCtx: ListContext = {field: null, indent: -1};
     const checks: Promise<void>[] = [];
 
     for (let i = 0; i < document.lineCount; i++) {
         const line = document.lineAt(i);
 
-        if (navigationLines.has(i)) {
+        if (navigationLines.has(i) || includerLines.has(i)) {
             continue;
         }
 

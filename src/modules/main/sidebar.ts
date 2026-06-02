@@ -6,7 +6,7 @@ import {exec} from 'child_process';
 
 import {t} from '../../i18n';
 import {getBaseHtml} from '../../ui/html';
-import {debounce, isBlocksYaml} from '../../utils';
+import {debounce, isBlocksYaml, isToc} from '../../utils';
 import {getExcludePattern} from '../utils';
 
 export class Sidebar implements vscode.WebviewViewProvider {
@@ -64,6 +64,10 @@ export class Sidebar implements vscode.WebviewViewProvider {
             if (message.command === 'initProject') {
                 await this._handleInitProject();
             }
+
+            if (message.command === 'openSettings') {
+                await vscode.commands.executeCommand('workbench.action.openSettings', 'Diplodoc');
+            }
         });
 
         webviewView.onDidChangeVisibility(() => {
@@ -115,16 +119,17 @@ export class Sidebar implements vscode.WebviewViewProvider {
         const exclude = getExcludePattern();
         const [mdUris, tocUris, yamlUris] = await Promise.all([
             vscode.workspace.findFiles('**/*.md', exclude),
-            vscode.workspace.findFiles('**/toc.yaml', exclude),
+            vscode.workspace.findFiles('**/{toc.yaml,toc-*.yaml}', exclude),
             vscode.workspace.findFiles('**/*.yaml', exclude),
         ]);
 
-        const skipNames = new Set(['toc.yaml', 'presets.yaml', 'redirects.yaml', 'theme.yaml']);
+        const tocRe = /^toc(-.+)?\.yaml$/;
+        const skipNames = new Set(['presets.yaml', 'redirects.yaml', 'theme.yaml']);
         const blocksRe = /^\s*blocks\s*:/m;
 
         const candidates = yamlUris.filter((uri) => {
             const fileName = uri.fsPath.split(/[/\\]/).pop() ?? '';
-            return !skipNames.has(fileName) && !fileName.startsWith('.');
+            return !skipNames.has(fileName) && !tocRe.test(fileName) && !fileName.startsWith('.');
         });
 
         const checks = await Promise.all(
@@ -201,7 +206,7 @@ export class Sidebar implements vscode.WebviewViewProvider {
 
         if (relativePath.endsWith('.md')) {
             await this._mdEditor.showFile(fileUri, vscode.ViewColumn.Active);
-        } else if (relativePath.endsWith('toc.yaml')) {
+        } else if (isToc(relativePath)) {
             await this._tocEditor.showFile(fileUri, vscode.ViewColumn.Active);
         } else if (relativePath.endsWith('.yaml')) {
             const doc = await vscode.workspace.openTextDocument(fileUri);

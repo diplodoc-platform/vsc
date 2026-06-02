@@ -52,6 +52,16 @@ The editor supports two modes: **WYSIWYG** and **Markup**. Set the default mode 
 }
 ```
 
+### Settings
+
+| Setting                  | Type    | Default                              | Description                                                                                                              |
+| ------------------------ | ------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `diplodoc.editorMode`    | string  | `wysiwyg`                            | Default mode for the Markdown editor (`wysiwyg` or `markup`).                                                            |
+| `diplodoc.isOnlyYfm`     | boolean | `false`                              | Validate only Markdown files inside a YFM project. Page-constructor blocks are validated regardless.                     |
+| `diplodoc.excludedDirs`  | array   | `[]`                                 | Extra directories to exclude from validation and file scanning. `node_modules`, `_build`, output are always excluded.    |
+| `diplodoc.excludedFiles` | array   | README/AGENTS/CONTRIBUTING/CHANGELOG | Files inside a YFM project that are neither validated nor flagged as orphans. Matched by exact name, basename, or regex. |
+| `diplodoc.lintRules`     | object  | `{}`                                 | MD/YFM lint rules applied to all Markdown files. Same format as `.yfmlint`; a project's `.yfmlint` takes precedence.     |
+
 ### Keyboard Shortcuts
 
 | Shortcut | Action                  |

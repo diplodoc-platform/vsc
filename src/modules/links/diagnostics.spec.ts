@@ -3,7 +3,7 @@ import type * as vscode from 'vscode';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import * as vscodeModule from 'vscode';
 
-import {getNavigationLines, validateLinks} from './diagnostics';
+import {getIncluderLines, getNavigationLines, validateLinks} from './diagnostics';
 
 const statMock = vi.mocked(vscodeModule.workspace.fs.stat);
 
@@ -251,6 +251,82 @@ describe('validateLinks', () => {
         const {diagnostics} = getSetCall();
         expect(diagnostics).toHaveLength(1);
         expect(diagnostics[0].message).toBe('Link is unreachable: missing.md');
+    });
+
+    it('skips path and input inside openapi include (includers)', async () => {
+        statMock.mockRejectedValue(new Error('not found'));
+        const doc = mockDocument(
+            [
+                'items:',
+                '  - name: API',
+                '    include:',
+                '      path: custom/backend/api',
+                '      includers:',
+                '        - name: openapi',
+                '          input: ru/openapi/api.yaml',
+            ].join('\n'),
+        );
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        expect(getSetCall().diagnostics).toHaveLength(0);
+    });
+
+    it('still checks path inside a normal include without includers', async () => {
+        statMock.mockRejectedValue(new Error('not found'));
+        const doc = mockDocument(
+            ['items:', '  - include:', '      path: sub/toc.yaml', '      mode: link'].join('\n'),
+        );
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        const {diagnostics} = getSetCall();
+        expect(diagnostics).toHaveLength(1);
+        expect(diagnostics[0].message).toBe('Link is unreachable: sub/toc.yaml');
+    });
+});
+
+describe('getIncluderLines', () => {
+    it('returns body lines of an include block that has includers', () => {
+        const doc = mockDocument(
+            [
+                'items:',
+                '  - name: API',
+                '    include:',
+                '      path: custom/backend/api',
+                '      includers:',
+                '        - name: openapi',
+                '          input: ru/openapi/api.yaml',
+                '  - name: Page',
+                '    href: page.md',
+            ].join('\n'),
+        );
+
+        const lines = getIncluderLines(doc);
+
+        expect(lines.has(3)).toBe(true);
+        expect(lines.has(4)).toBe(true);
+        expect(lines.has(5)).toBe(true);
+        expect(lines.has(6)).toBe(true);
+        expect(lines.has(2)).toBe(false);
+        expect(lines.has(7)).toBe(false);
+        expect(lines.has(8)).toBe(false);
+    });
+
+    it('returns empty set for an include block without includers', () => {
+        const doc = mockDocument(
+            ['  - include:', '      path: sub/toc.yaml', '      mode: link'].join('\n'),
+        );
+
+        expect(getIncluderLines(doc).size).toBe(0);
+    });
+
+    it('ignores inline-flow include', () => {
+        const doc = mockDocument('  - include: { mode: merge, path: toc-common.yaml }');
+
+        expect(getIncluderLines(doc).size).toBe(0);
     });
 });
 

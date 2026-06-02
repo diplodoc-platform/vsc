@@ -52,6 +52,16 @@ code --install-extension diplodoc.diplodoc-vsc-extension
 }
 ```
 
+### Настройки
+
+| Настройка                | Тип     | По умолчанию                         | Описание                                                                                                          |
+| ------------------------ | ------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `diplodoc.editorMode`    | string  | `wysiwyg`                            | Режим редактора Markdown по умолчанию (`wysiwyg` или `markup`).                                                   |
+| `diplodoc.isOnlyYfm`     | boolean | `false`                              | Валидировать только Markdown-файлы внутри YFM-проекта. Блоки page-constructor валидируются всегда.                |
+| `diplodoc.excludedDirs`  | array   | `[]`                                 | Доп. каталоги, исключаемые из валидации и сканирования. `node_modules`, `_build` и output исключены всегда.       |
+| `diplodoc.excludedFiles` | array   | README/AGENTS/CONTRIBUTING/CHANGELOG | Файлы внутри YFM-проекта, которые не валидируются и не помечаются как orphan. Совпадение по имени/basename/regex. |
+| `diplodoc.lintRules`     | object  | `{}`                                 | MD/YFM lint-правила для всех Markdown-файлов. Формат как у `.yfmlint`; `.yfmlint` проекта приоритетнее.           |
+
 ### Горячие клавиши
 
 | Сочетание | Действие                   |
