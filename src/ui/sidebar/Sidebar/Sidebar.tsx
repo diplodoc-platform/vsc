@@ -1,4 +1,5 @@
-import {Button, ThemeProvider, Toaster, ToasterProvider} from '@gravity-ui/uikit';
+import {Button, Icon, ThemeProvider, Toaster, ToasterProvider} from '@gravity-ui/uikit';
+import {Gear} from '@gravity-ui/icons';
 import {useEffect, useState} from 'react';
 
 import {FilesList} from '../FilesList/FilesList';
@@ -44,9 +45,21 @@ export function Sidebar() {
         vscodeApi.postMessage({command: 'initProject'});
     };
 
+    const handleSettingsClick = () => {
+        vscodeApi.postMessage({command: 'openSettings'});
+    };
+
     return (
         <div className={styles.sidebar}>
-            <Search fileName={fileName} setFileName={setFileName} />
+            <div className={styles.searchBar}>
+                <Search fileName={fileName} setFileName={setFileName} />
+                <Button
+                    size="l"
+                    view="normal"
+                    onClick={handleSettingsClick}
+                    children={<Icon data={Gear} size={18} />}
+                />
+            </div>
             <FilesList fileName={fileName} files={files} onFileClick={handleFileClick} />
             <Button size="l" view="action" className={styles.initButton} onClick={handleInitClick}>
                 {t('sidebar.init')}

@@ -24,7 +24,10 @@ async function readFileText(uri: vscode.Uri): Promise<string | null> {
 }
 
 export async function findTocReferences(deletedUri: vscode.Uri): Promise<TocReference[]> {
-    const tocUris = await vscode.workspace.findFiles('**/toc.yaml', getExcludePattern());
+    const tocUris = await vscode.workspace.findFiles(
+        '**/{toc.yaml,toc-*.yaml}',
+        getExcludePattern(),
+    );
     const results: TocReference[] = [];
 
     for (const tocUri of tocUris) {
@@ -138,16 +141,27 @@ function computeRedirectFrom(deletedFsPath: string): string | null {
     return `/${withoutExt}`;
 }
 
-function buildDeleteChoices(hasToc: boolean, hasMd: boolean): Array<{label: string; id: string}> {
+export function tocLabel(tocRefs: TocReference[]): string {
+    const names = [...new Set(tocRefs.map((r) => r.tocUri.fsPath.split(/[/\\]/).pop() ?? ''))];
+
+    return names.length === 1 ? names[0] : 'TOC files';
+}
+
+function buildDeleteChoices(
+    tocRefs: TocReference[],
+    hasMd: boolean,
+): Array<{label: string; id: string}> {
     const choices: Array<{label: string; id: string}> = [];
+    const hasToc = tocRefs.length > 0;
+    const toc = tocLabel(tocRefs);
 
     if (hasToc) {
-        choices.push({label: 'Remove from toc.yaml', id: 'remove'});
+        choices.push({label: `Remove from ${toc}`, id: 'remove'});
     }
 
     if (hasToc && hasMd) {
         choices.push({
-            label: 'Remove from toc + replace links in markdown',
+            label: `Remove from ${toc} + replace links in markdown`,
             id: 'remove-and-replace',
         });
     } else if (hasMd) {
@@ -155,7 +169,7 @@ function buildDeleteChoices(hasToc: boolean, hasMd: boolean): Array<{label: stri
     }
 
     if (hasToc) {
-        choices.push({label: 'Remove from toc + add redirect', id: 'redirect'});
+        choices.push({label: `Remove from ${toc} + add redirect`, id: 'redirect'});
     }
 
     choices.push({label: 'Do nothing', id: 'nothing'});
@@ -226,7 +240,7 @@ export async function handleFileDeleted(deletedUri: vscode.Uri): Promise<void> {
 
     const hasToc = tocRefs.length > 0;
     const hasMd = mdRefs.length > 0;
-    const choices = buildDeleteChoices(hasToc, hasMd);
+    const choices = buildDeleteChoices(tocRefs, hasMd);
     const fileName = hasToc ? tocRefs[0].hrefValue : (deletedUri.fsPath.split('/').pop() ?? '');
 
     const choice = await vscode.window.showQuickPick(choices, {

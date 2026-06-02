@@ -12,6 +12,8 @@ vi.mock('../utils', () => ({
 
         return dirs.some((dir) => dir === 'includes' || dir.startsWith('_'));
     },
+    getVscConfig: (_name: string, defaultValue: unknown) => defaultValue,
+    isFileExcluded: () => false,
 }));
 
 function uri(path: string) {

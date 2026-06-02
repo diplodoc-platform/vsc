@@ -153,7 +153,7 @@ YAML files containing a top-level `blocks:` key (page-constructor files) can be 
 
 3. **Wrap/unwrap**: When sending YAML content to the Markdown editor webview, the YAML body is wrapped in `::: page-constructor\n...\n:::` via `wrapPageConstructor()`. When receiving edits back from the webview, `unwrapPageConstructor()` strips the directive wrapper before writing back to the YAML file.
 
-4. **Sidebar integration**: `_getMarkdownFiles()` in `sidebar.ts` scans `**/*.yaml` (excluding `node_modules`), opens each document, and includes URIs where `isBlocksYaml()` returns true. A `yamlWatcher` refreshes the file list on YAML create/delete. Clicking a blocks-YAML file opens it in the Markdown editor via `_mdEditor.showFile()`.
+4. **Sidebar integration**: `_getMarkdownFiles()` in `sidebar.ts` scans `**/*.md`, `**/{toc.yaml,toc-*.yaml}`, and `**/*.yaml` (excluding `node_modules`). TOC files are included directly; other YAML files are checked for `blocks:` key and included as blocks-YAML. Clicking a file opens it in the appropriate editor: `.md` and blocks-YAML in Markdown editor, TOC files (matched via `isToc()`) in TOC editor.
 
 5. **package.json contributions**: The `diplodoc.openMdEditor` command has `enablement` and `when` conditions that include `diplodoc.hasBlocksYaml` alongside `resourceLangId == markdown`.
 
@@ -259,13 +259,14 @@ Errors arrive via **two independent channels** — do not confuse them:
 
 #### yfmlint configuration
 
-`@diplodoc/yfmlint` has `default: false` in its built-in config, meaning rules won't run unless enabled. The extension builds the lint config via `buildLintConfig()` (`markdown.ts`) in the following merge order:
+`@diplodoc/yfmlint` has `default: false` in its built-in config, meaning rules won't run unless enabled. The extension builds the lint config via `buildLintConfig()` (`validation/utils.ts`, called from `markdown.ts`) in the following merge order (lowest to highest priority):
 
-1. **Extension defaults**: `{ default: true, MD013: false }` — all rules enabled, line length disabled
-2. **User's `.yfmlint` overrides**: processed by `processYfmlintConfig()` — the user can change `default`, enable/disable any rule, set severity levels
-3. **Forced overrides**: `MD033: !allowHtml` — always controlled by `.yfm`, cannot be overridden by `.yfmlint` (matches CLI behavior)
+1. **Extension defaults**: `{ default: true, MD013: false, MD018: false, MD026: false, MD034: false, MD051: false }` — all rules enabled, a few noisy ones disabled
+2. **Project-derived**: `MD033: !allowHtml` (from `.yfm`), `MD041: !isFileIncluded`
+3. **VS Code `diplodoc.lintRules` setting**: an object in the same format as `.yfmlint`, spread on top of the defaults
+4. **User's `.yfmlint` overrides**: processed by `processYfmlintConfig()` — **highest priority**, spread last, can override everything above (including `MD033`/`MD041` and `diplodoc.lintRules`)
 
-User config entries spread on top of extension defaults, so the user **can** re-enable `MD013` or set `default: false` in `.yfmlint`.
+Both `diplodoc.lintRules` and `.yfmlint` entries spread on top of extension defaults, so the user **can** re-enable `MD013` or set `default: false`. `.yfmlint` wins over `diplodoc.lintRules` on any conflicting key. `diplodoc.lintRules` is read in `validation/index.ts` and passed through `validateMd()` → `validateMarkdown()` → `buildLintConfig()`.
 
 ##### `.yfmlint` config format
 
@@ -473,45 +474,59 @@ Fields from all Diplodoc YAML schemas:
 
 Add the field name to `LINK_FIELDS` in `src/modules/links/constants.ts`. No other changes needed — both link navigation and diagnostics will pick it up automatically.
 
+## Extension Settings
+
+Declared in `package.json` under `contributes.configuration.properties`, read via the `getVscConfig()` helper (`src/modules/utils.ts`).
+
+| Setting                  | Type    | Used by                                                         | Notes                                                                                                    |
+| ------------------------ | ------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `diplodoc.editorMode`    | string  | `md-editor/editor.ts`                                           | `wysiwyg`/`markup`, sent to webview on creation and config change.                                       |
+| `diplodoc.isOnlyYfm`     | boolean | `validation/index.ts` (`validateMd`)                            | When `true`, only Markdown files inside a YFM project are validated (`isYfmFile`).                       |
+| `diplodoc.excludedDirs`  | array   | `utils.ts` (`getExcludeDirs`)                                   | Extra dirs excluded from validation/scanning, on top of `node_modules`, `_build`, `.yfm` output.         |
+| `diplodoc.excludedFiles` | array   | `validation/index.ts`, `orphan/decorator.ts`, `orphan/index.ts` | Files (exact name / basename / regex) inside a YFM project that are neither validated nor orphan-marked. |
+| `diplodoc.lintRules`     | object  | `validation/index.ts` → `buildLintConfig`                       | Lint rules in `.yfmlint` format; merged below `.yfmlint` (see Markdown Linting merge order).             |
+
 ## Orphan File Detection
 
-`src/modules/orphan/` marks `.md` and blocks-yaml files not connected to any `toc.yaml` with a `?` badge in the Explorer (via `FileDecorationProvider`).
+`src/modules/orphan/` marks `.md` and blocks-yaml files not connected to any `toc.yaml` or `toc-*.yaml` with a `?` badge in the Explorer (via `FileDecorationProvider`).
 
 ### How it works
 
-1. `collectReferencedFiles()` scans all `toc.yaml` files for `href` and `include.path` values
+1. `collectReferencedFiles()` scans all `toc.yaml` and `toc-*.yaml` files (e.g., `toc-common.yaml`, `toc-api.yaml`) for `href` and `include.path` values
 2. For each referenced `.md` file, it recursively extracts `{% include [...](path) %}` paths
 3. `collectBlocksYamlFiles()` finds all `.yaml` files with a `blocks:` key (page-constructor files)
 4. Result: `Set<string>` of all referenced file paths (toc + includes chain), `Set<string>` of blocks-yaml files
 5. `OrphanDecorationProvider` marks any `.md` or blocks-yaml file NOT in the referenced set with badge `?` and yellow color
 6. Files in `includes/` directories or directories starting with `_` are automatically excluded (`isAutoIncluded`)
-7. Refresh triggers: `toc.yaml` change/create/delete, `.md` create/delete/change, `.yaml` create/delete/change
+7. Files matching `diplodoc.excludedFiles` are excluded from orphan marking too (`isFileExcluded` in `decorator.ts` / `index.ts`) — they are neither validated nor flagged as orphans
+8. Refresh triggers: `toc.yaml` change/create/delete, `.md` create/delete/change, `.yaml` create/delete/change
 
 ### On-delete behavior
 
-When a `.md` or blocks-yaml file is deleted and was referenced in `toc.yaml` or linked from other markdown files:
+When a `.md` or blocks-yaml file is deleted and was referenced in any TOC file (`toc.yaml` or `toc-*.yaml`) or linked from other markdown files:
 
 1. `handleFileDeleted()` detects toc references via `findTocReferences()` and markdown references via `findMarkdownReferences()` (from `links/md-links.ts`)
-2. Shows `QuickPick` with context-aware options based on what references were found:
-   - If toc refs exist: "Remove from toc.yaml"
-   - If both toc + md refs: "Remove from toc + replace links in markdown"
+2. `tocLabel()` computes the display name: if all refs come from one TOC file, uses its basename (e.g. `toc-common.yaml`); otherwise shows `TOC files`
+3. Shows `QuickPick` with context-aware options using the dynamic label:
+   - If toc refs exist: "Remove from <toc-name>"
+   - If both toc + md refs: "Remove from <toc-name> + replace links in markdown"
    - If only md refs: "Replace links in markdown files"
-   - If toc refs exist: "Remove from toc + add redirect"
+   - If toc refs exist: "Remove from <toc-name> + add redirect"
    - Always: "Do nothing"
-3. "Remove from toc" — deletes the `href:` line (and preceding `name:` line) from toc.yaml
-4. "Replace links in markdown" — prompts for replacement URL via `InputBox`, replaces all `[text](deleted.md)` hrefs with the provided URL across the workspace
-5. "Add redirect" — prompts for target path via `InputBox`, appends entry to `redirects.yaml`
+4. "Remove from toc" — deletes the `href:` line (and preceding `name:` line) from the specific TOC file
+5. "Replace links in markdown" — prompts for replacement URL via `InputBox`, replaces all `[text](deleted.md)` hrefs with the provided URL across the workspace
+6. "Add redirect" — prompts for target path via `InputBox`, appends entry to `redirects.yaml`
 
 ### On-rename behavior
 
-When a `.md` or blocks-yaml file is renamed and was referenced in `toc.yaml` or linked from other markdown files:
+When a `.md` or blocks-yaml file is renamed and was referenced in any TOC file or linked from other markdown files:
 
 1. `handleFileRenamed()` detects toc references via `findTocReferences()` and markdown references via `findMarkdownReferences()`
-2. Shows `QuickPick` with context-aware options:
-   - "Rename in toc.yaml" / "Rename in markdown files" / "Rename in toc.yaml and markdown files" (depending on what refs exist)
-   - If toc refs exist: "Rename in toc + add redirect"
+2. Shows `QuickPick` with context-aware options using the dynamic `tocLabel()`:
+   - "Rename in <toc-name>" / "Rename in markdown files" / "Rename in <toc-name> and markdown files" (depending on what refs exist)
+   - If toc refs exist: "Rename in <toc-name> + add redirect"
    - Always: "Do nothing"
-3. Updates toc.yaml href values to the new relative path
+3. Updates href values in the specific TOC file to the new relative path
 4. Updates markdown link hrefs across the workspace, computing the correct relative path from each referencing file to the new location via `computeNewMdHref()`
 5. All markdown replacements are batched into a single `WorkspaceEdit` for atomic undo
 

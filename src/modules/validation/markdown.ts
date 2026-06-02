@@ -1,7 +1,8 @@
-import type {PluginMessage} from './types';
+import type {PluginMessage, ValidationMessage} from './types';
 import type {TextDocument} from 'vscode';
 
 import * as path from 'path';
+import {readFileSync} from 'fs';
 import {yfmlint} from '@diplodoc/yfmlint';
 import defaultPlugins from '@diplodoc/transform/lib/plugins';
 import changelogPlugin from '@diplodoc/transform/lib/plugins/changelog';
@@ -14,7 +15,36 @@ import linksPlugin from '@diplodoc/transform/lib/plugins/links';
 
 import {isIncluded} from '../utils';
 
-import {buildLintConfig, findConfig, isTermDefinition, toDiagnostics} from './utils';
+import {
+    buildLintConfig,
+    findConfig,
+    hasExplicitAnchor,
+    isTermDefinition,
+    parseMissingAnchor,
+    toDiagnostics,
+} from './utils';
+
+function isResolvedConditionalAnchor(error: ValidationMessage): boolean {
+    if (!('message' in error) || typeof error.message !== 'string') {
+        return false;
+    }
+
+    const parsed = parseMissingAnchor(error.message);
+
+    if (!parsed) {
+        return false;
+    }
+
+    const targetPath = parsed.link
+        ? path.resolve(path.dirname(parsed.source), parsed.link)
+        : parsed.source;
+
+    try {
+        return hasExplicitAnchor(readFileSync(targetPath, 'utf8'), parsed.anchor);
+    } catch {
+        return false;
+    }
+}
 
 const FRONTMATTER_RE = /^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/;
 
@@ -29,7 +59,10 @@ const allPlugins = [
     linksPlugin,
 ];
 
-export async function validateMarkdown(document: TextDocument) {
+export async function validateMarkdown(
+    document: TextDocument,
+    vscLintRules: Record<string, unknown> = {},
+) {
     const content = document.getText();
     const filePath = document.fileName;
     const root = path.dirname(filePath);
@@ -39,7 +72,12 @@ export async function validateMarkdown(document: TextDocument) {
     const allowHtml = yfmConfig?.allowHtml ?? yfmConfig?.allowHTML ?? false;
     const isFileIncluded = isIncluded(filePath);
 
-    const lintConfig = buildLintConfig(yfmlintConfig, Boolean(allowHtml), isFileIncluded);
+    const lintConfig = buildLintConfig(
+        yfmlintConfig,
+        Boolean(allowHtml),
+        isFileIncluded,
+        vscLintRules,
+    );
 
     const lintErrors = await yfmlint(content, filePath, {
         plugins: allPlugins,
@@ -63,7 +101,7 @@ export async function validateMarkdown(document: TextDocument) {
     });
 
     const errors = [...(lintErrors || []), ...pluginMessages].filter(
-        (error) => !isTermDefinition(error, content),
+        (error) => !isTermDefinition(error, content) && !isResolvedConditionalAnchor(error),
     );
 
     return toDiagnostics(errors, document);

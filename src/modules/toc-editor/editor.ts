@@ -1,6 +1,7 @@
 import type * as vscode from 'vscode';
 
 import {BaseEditor} from '../shared/base-editor';
+import {isToc} from '../../utils';
 
 export class TocEditor extends BaseEditor {
     protected _panelId() {
@@ -16,7 +17,7 @@ export class TocEditor extends BaseEditor {
     }
 
     protected _canSync(editor: vscode.TextEditor) {
-        return editor.document.fileName.endsWith('toc.yaml');
+        return isToc(editor.document.fileName);
     }
 
     protected _transformForWebview(text: string, _document: vscode.TextDocument) {
