@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.8.0](https://github.com/diplodoc-platform/vsc/compare/v0.7.6...v0.8.0) (2026-06-02)
+
+
+### Features
+
+* added new logic of toc processing ([87a7107](https://github.com/diplodoc-platform/vsc/commit/87a710738e5623c8536e6a74b2af771302d31c01))
+* added new logic of toc processing ([346eb68](https://github.com/diplodoc-platform/vsc/commit/346eb68d0b02dfc3968b127262818fc84f37da11))
+
+
+### Bug Fixes
+
+* fixed ([1831702](https://github.com/diplodoc-platform/vsc/commit/18317026ccaea0a0a63f71dbe3d236dde0286d87))
+* fixed excluded dirs ([9b1381a](https://github.com/diplodoc-platform/vsc/commit/9b1381a544cb2b3b2edbfb23246bc11d346b7135))
+* remove vsix ([9a68163](https://github.com/diplodoc-platform/vsc/commit/9a68163be1caae2fffac87f3bbe1012d1a08f3ab))
+* updated schema ([068b0a1](https://github.com/diplodoc-platform/vsc/commit/068b0a10503f68e7127e6f754a32e49d5e7d26e4))
+
 ## [0.7.6](https://github.com/diplodoc-platform/vsc/compare/v0.7.5...v0.7.6) (2026-06-01)
 
 
