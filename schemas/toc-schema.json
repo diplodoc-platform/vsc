@@ -337,9 +337,6 @@
       "description": "A single navigation item — either a page link, a section, or a TOC include."
     },
     "TocItemWithLink": {
-      "not": {
-        "required": ["include"]
-      },
       "properties": {
         "name": {
           "type": "string",
