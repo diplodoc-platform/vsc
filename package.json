@@ -46,7 +46,7 @@
             "type": "string"
           },
           "default": [],
-          "markdownDescription": "Additional directories to exclude from validation and file scanning. Useful when build output directory is specified via CLI flag (e.g. `yfm -o docs-gen`). The extension always excludes `node_modules`, `_build`, and the `output` directory from `.yfm` config."
+          "markdownDescription": "Additional directories to exclude from validation and file scanning. Each entry is matched against path segments by exact name or as a regular expression (e.g. `^docs-gen.*`). Useful when build output directory is specified via CLI flag (e.g. `yfm -o docs-gen`). The extension always excludes `node_modules`, `_build`, and the `output` directory from `.yfm` config."
         },
         "diplodoc.excludedFiles": {
           "type": "array",

@@ -135,16 +135,30 @@ export function clearExcludeDirsCache(): void {
 }
 
 export function getExcludePattern(): string {
-    const dirs = getExcludeDirs();
+    // Only plain directory names are usable in a glob; regex entries are enforced
+    // by isInExcludedDir instead.
+    const dirs = [...getExcludeDirs()].filter((d) => /^[\w.-]+$/.test(d));
 
-    return `{${[...dirs].map((d) => `**/${d}/**`).join(',')}}`;
+    return `{${dirs.map((d) => `**/${d}/**`).join(',')}}`;
 }
 
 export function isInExcludedDir(fsPath: string): boolean {
     const dirs = getExcludeDirs();
     const segments = fsPath.split(/[/\\]/);
 
-    return segments.some((s) => dirs.has(s));
+    return [...dirs].some((dir) => {
+        if (segments.includes(dir)) {
+            return true;
+        }
+
+        try {
+            const pattern = new RegExp(dir);
+
+            return segments.some((segment) => pattern.test(segment));
+        } catch {
+            return false;
+        }
+    });
 }
 
 export function isIncluded(fsPath: string): boolean {
