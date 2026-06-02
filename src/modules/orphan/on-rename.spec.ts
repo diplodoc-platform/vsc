@@ -114,6 +114,19 @@ describe('handleFileRenamed', () => {
         expect(options.map((o) => o.id)).toEqual(['rename', 'redirect', 'nothing']);
     });
 
+    it('shows QuickPick when file is in toc-common.yaml', async () => {
+        mockFindFiles(['/docs/toc-common.yaml'], []);
+        mockFiles({
+            '/docs/toc-common.yaml': '  - name: Page\n    href: old.md',
+        });
+
+        vi.mocked(vscode.window.showQuickPick).mockResolvedValue(undefined);
+
+        await handleFileRenamed(makeUri('/docs/old.md'), makeUri('/docs/new.md'));
+
+        expect(vi.mocked(vscode.window.showQuickPick)).toHaveBeenCalledOnce();
+    });
+
     it('does nothing when file is outside yfm root', async () => {
         await handleFileRenamed(makeUri('/other/old.md'), makeUri('/other/new.md'));
 
@@ -175,5 +188,24 @@ describe('handleFileRenamed', () => {
             id: string;
         }>;
         expect(options[0].label).toBe('Rename in toc.yaml and markdown files');
+    });
+
+    it('uses toc-common.yaml in labels when ref is from toc-common.yaml', async () => {
+        mockFindFiles(['/docs/toc-common.yaml'], ['/docs/guide.md']);
+        mockFiles({
+            '/docs/toc-common.yaml': '  - name: Page\n    href: old.md',
+            '/docs/guide.md': 'See [link](old.md)',
+        });
+
+        vi.mocked(vscode.window.showQuickPick).mockResolvedValue(undefined);
+
+        await handleFileRenamed(makeUri('/docs/old.md'), makeUri('/docs/new.md'));
+
+        const options = vi.mocked(vscode.window.showQuickPick).mock.calls[0][0] as Array<{
+            label: string;
+            id: string;
+        }>;
+        expect(options[0].label).toBe('Rename in toc-common.yaml and markdown files');
+        expect(options[1].label).toBe('Rename in toc-common.yaml + add redirect');
     });
 });

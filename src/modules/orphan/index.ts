@@ -2,7 +2,14 @@ import {watch} from 'fs';
 import * as vscode from 'vscode';
 
 import {debounce} from '../../utils';
-import {clearExcludeDirsCache, clearYfmRootCache, isIncluded, isYfmFile} from '../utils';
+import {
+    clearExcludeDirsCache,
+    clearYfmRootCache,
+    getVscConfig,
+    isFileExcluded,
+    isIncluded,
+    isYfmFile,
+} from '../utils';
 
 import {collectBlocksYamlFiles, collectReferencedFiles} from './collector';
 import {OrphanDecorationProvider} from './decorator';
@@ -23,9 +30,15 @@ export function activate(context: vscode.ExtensionContext) {
                 .map((d) => d.uri),
         ];
 
+        const excludedFiles = getVscConfig<string[]>('excludedFiles', []);
+
         for (const uri of allUris) {
             const isMd = uri.fsPath.endsWith('.md');
             const isBlocksYaml = uri.fsPath.endsWith('.yaml') && blocksYaml.has(uri.fsPath);
+
+            if (isFileExcluded(uri.fsPath, excludedFiles)) {
+                continue;
+            }
 
             if (!isMd && !isBlocksYaml) {
                 continue;
@@ -63,7 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     const debouncedRefresh = debounce(refresh, 500);
 
-    const tocWatcher = vscode.workspace.createFileSystemWatcher('**/toc.yaml');
+    const tocWatcher = vscode.workspace.createFileSystemWatcher('**/toc{,-*}.yaml');
     const mdWatcher = vscode.workspace.createFileSystemWatcher('**/*.md');
     const yamlWatcher = vscode.workspace.createFileSystemWatcher('**/*.yaml');
     const yfmWatcher = vscode.workspace.createFileSystemWatcher('**/.yfm');
@@ -166,7 +179,7 @@ export function activate(context: vscode.ExtensionContext) {
             clearExcludeDirsCache();
         }),
         vscode.workspace.onDidChangeConfiguration((e) => {
-            if (e.affectsConfiguration('diplodoc.exclude')) {
+            if (e.affectsConfiguration('diplodoc.excludedDirs')) {
                 clearExcludeDirsCache();
                 debouncedRefresh();
             }

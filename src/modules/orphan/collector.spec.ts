@@ -93,6 +93,48 @@ describe('collectReferencedFiles', () => {
         expect(result.has('/docs/page.md')).toBe(true);
     });
 
+    it('follows inline-flow include { path: ... } (merged toc)', async () => {
+        findFilesMock.mockResolvedValue([makeUri('/docs/toc.yaml')]);
+        mockFiles({
+            '/docs/toc.yaml': 'items:\n  - include: { mode: merge, path: toc-common.yaml }',
+            '/docs/toc-common.yaml': 'items:\n  - href: common-page.md',
+        });
+
+        const result = await collectReferencedFiles();
+
+        expect(result.has('/docs/common-page.md')).toBe(true);
+    });
+
+    it('collects href from toc-common.yaml when found via findFiles', async () => {
+        findFilesMock.mockResolvedValue([
+            makeUri('/docs/toc.yaml'),
+            makeUri('/docs/toc-common.yaml'),
+        ]);
+        mockFiles({
+            '/docs/toc.yaml': 'items:\n  - include: { mode: merge, path: toc-common.yaml }',
+            '/docs/toc-common.yaml': 'items:\n  - href: common-page.md',
+        });
+
+        const result = await collectReferencedFiles();
+
+        expect(result.has('/docs/common-page.md')).toBe(true);
+    });
+
+    it('collects href from toc-api.yaml (nested toc-*.yaml)', async () => {
+        findFilesMock.mockResolvedValue([
+            makeUri('/docs/toc.yaml'),
+            makeUri('/docs/api/toc-api.yaml'),
+        ]);
+        mockFiles({
+            '/docs/toc.yaml': 'items:\n  - include: { mode: merge, path: api/toc-api.yaml }',
+            '/docs/api/toc-api.yaml': 'items:\n  - href: api-page.md',
+        });
+
+        const result = await collectReferencedFiles();
+
+        expect(result.has('/docs/api/api-page.md')).toBe(true);
+    });
+
     it('collects {% include %} from referenced .md files', async () => {
         findFilesMock.mockResolvedValue([makeUri('/docs/toc.yaml')]);
         mockFiles({

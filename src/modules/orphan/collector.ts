@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import {isExternalUrl} from '../../utils';
 import {getExcludePattern} from '../utils';
 
-import {HREF_RE, INCLUDE_PATH_RE, MD_INCLUDE_RE} from './constants';
+import {HREF_RE, INCLUDE_INLINE_PATH_RE, INCLUDE_PATH_RE, MD_INCLUDE_RE} from './constants';
 
 function stripFragment(value: string): string {
     const idx = value.indexOf('#');
@@ -58,7 +58,7 @@ async function collectFromToc(
             continue;
         }
 
-        const pathMatch = INCLUDE_PATH_RE.exec(line);
+        const pathMatch = INCLUDE_PATH_RE.exec(line) ?? INCLUDE_INLINE_PATH_RE.exec(line);
 
         if (pathMatch && !isExternalUrl(pathMatch[1])) {
             const includedTocUri = vscode.Uri.joinPath(tocDir, pathMatch[1]);
@@ -113,7 +113,10 @@ const BLOCKS_RE = /^\s*blocks\s*:/m;
 
 export async function collectReferencedFiles(): Promise<Set<string>> {
     const referenced = new Set<string>();
-    const tocUris = await vscode.workspace.findFiles('**/toc.yaml', getExcludePattern());
+    const tocUris = await vscode.workspace.findFiles(
+        '**/{toc.yaml,toc-*.yaml}',
+        getExcludePattern(),
+    );
     const visitedTocs = new Set<string>();
 
     for (const tocUri of tocUris) {

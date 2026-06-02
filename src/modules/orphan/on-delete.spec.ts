@@ -6,7 +6,13 @@ vi.mock('../utils', () => ({
     getExcludePattern: () => '**/node_modules/**',
 }));
 
-import {addRedirect, findTocReferences, handleFileDeleted, removeTocEntry} from './on-delete';
+import {
+    addRedirect,
+    findTocReferences,
+    handleFileDeleted,
+    removeTocEntry,
+    tocLabel,
+} from './on-delete';
 
 const findFilesMock = vi.mocked(vscode.workspace.findFiles);
 const readFileMock = vi.mocked(vscode.workspace.fs.readFile);
@@ -98,6 +104,56 @@ describe('findTocReferences', () => {
         const refs = await findTocReferences(makeUri('/docs/https://example.com'));
 
         expect(refs).toHaveLength(0);
+    });
+
+    it('finds references in toc-common.yaml', async () => {
+        findFilesMock.mockResolvedValue([makeUri('/docs/toc-common.yaml')]);
+        mockFiles({
+            '/docs/toc-common.yaml': '  - name: Page\n    href: common-page.md',
+        });
+
+        const refs = await findTocReferences(makeUri('/docs/common-page.md'));
+
+        expect(refs).toHaveLength(1);
+        expect(refs[0].hrefValue).toBe('common-page.md');
+    });
+
+    it('finds references in toc-api.yaml', async () => {
+        findFilesMock.mockResolvedValue([makeUri('/docs/api/toc-api.yaml')]);
+        mockFiles({
+            '/docs/api/toc-api.yaml': '  - name: API Page\n    href: api-page.md',
+        });
+
+        const refs = await findTocReferences(makeUri('/docs/api/api-page.md'));
+
+        expect(refs).toHaveLength(1);
+        expect(refs[0].hrefValue).toBe('api-page.md');
+    });
+});
+
+describe('tocLabel', () => {
+    it('returns filename when all refs come from the same toc', () => {
+        const refs = [
+            {tocUri: makeUri('/docs/toc-common.yaml'), hrefValue: 'a.md', lineIndex: 0},
+            {tocUri: makeUri('/docs/toc-common.yaml'), hrefValue: 'b.md', lineIndex: 1},
+        ];
+
+        expect(tocLabel(refs)).toBe('toc-common.yaml');
+    });
+
+    it('returns "TOC files" when refs come from different toc files', () => {
+        const refs = [
+            {tocUri: makeUri('/docs/toc.yaml'), hrefValue: 'a.md', lineIndex: 0},
+            {tocUri: makeUri('/docs/toc-common.yaml'), hrefValue: 'a.md', lineIndex: 1},
+        ];
+
+        expect(tocLabel(refs)).toBe('TOC files');
+    });
+
+    it('returns toc.yaml for standard toc references', () => {
+        const refs = [{tocUri: makeUri('/docs/toc.yaml'), hrefValue: 'a.md', lineIndex: 0}];
+
+        expect(tocLabel(refs)).toBe('toc.yaml');
     });
 });
 
@@ -298,5 +354,22 @@ describe('handleFileDeleted', () => {
             'redirect',
             'nothing',
         ]);
+    });
+
+    it('uses toc-common.yaml in labels when ref is from toc-common.yaml', async () => {
+        mockFindFiles(['/docs/toc-common.yaml'], []);
+        mockFiles({
+            '/docs/toc-common.yaml': '  - name: Page\n    href: deleted.md',
+        });
+
+        vi.mocked(vscode.window.showQuickPick).mockResolvedValue(undefined);
+
+        await handleFileDeleted(makeUri('/docs/deleted.md'));
+
+        const options = vi.mocked(vscode.window.showQuickPick).mock.calls[0][0] as Array<{
+            label: string;
+            id: string;
+        }>;
+        expect(options[0].label).toBe('Remove from toc-common.yaml');
     });
 });

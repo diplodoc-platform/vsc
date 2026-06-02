@@ -4,7 +4,7 @@ import type {ElementType} from './utils';
 
 import * as vscode from 'vscode';
 
-import {insertElement, isBlocksYaml} from './utils';
+import {insertElement, isBlocksYaml, isToc} from './utils';
 
 export function openMdEditor(mdEditor: MdEditor) {
     const editor = vscode.window.activeTextEditor;
@@ -20,7 +20,7 @@ export function openMdEditor(mdEditor: MdEditor) {
 export function openTocEditor(tocEditor: TocEditor) {
     const editor = vscode.window.activeTextEditor;
 
-    if (!editor || !editor.document.fileName.endsWith('toc.yaml')) {
+    if (!editor || !isToc(editor.document.fileName)) {
         return;
     }
 

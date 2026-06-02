@@ -33,15 +33,39 @@
             "markup"
           ],
           "default": "wysiwyg",
-          "description": "Default mode for Markdown editor"
+          "description": "Default mode for Markdown editor."
         },
-        "diplodoc.exclude": {
+        "diplodoc.isOnlyYfm": {
+          "type": "boolean",
+          "default": false,
+          "description": "Should only MD files within a YFM project be validated? Valid page-constructor blocks are validated regardless of this option."
+        },
+        "diplodoc.excludedDirs": {
           "type": "array",
           "items": {
             "type": "string"
           },
           "default": [],
-          "markdownDescription": "Additional directories to exclude from validation and file scanning. Useful when build output directory is specified via CLI flag (e.g. `yfm -o docs-gen`). The extension always excludes `node_modules`, `_build`, and the `output` directory from `.yfm` config."
+          "markdownDescription": "Additional directories to exclude from validation and file scanning. Each entry is matched against path segments by exact name or as a regular expression (e.g. `^docs-gen.*`). Useful when build output directory is specified via CLI flag (e.g. `yfm -o docs-gen`). The extension always excludes `node_modules`, `_build`, and the `output` directory from `.yfm` config."
+        },
+        "diplodoc.excludedFiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "^README(?:\\.[a-z]{2})?\\.md$",
+            "^AGENTS(?:\\.[a-z]{2})?\\.md$",
+            "^CONTRIBUTING(?:\\.[a-z]{2})?\\.md$",
+            "^CHANGELOG(?:\\.[a-z]{2})?\\.md$"
+          ],
+          "markdownDescription": "Files located inside the yfm project, but which do not need to be validated."
+        },
+        "diplodoc.lintRules": {
+          "type": "object",
+          "default": {},
+          "additionalProperties": true,
+          "markdownDescription": "MD/YFM lint rules applied to all Markdown files. Same format as `.yfmlint` (e.g. `{ \"MD013\": false, \"YFM003\": \"error\" }`). A project's `.yfmlint` takes precedence over these settings."
         }
       }
     },
@@ -221,7 +245,7 @@
         },
         {
           "command": "diplodoc.openTocEditor",
-          "when": "resourceFilename == toc.yaml",
+          "when": "resourceFilename =~ /^toc(-.+)?\\.yaml$/",
           "group": "navigation@1"
         }
       ],

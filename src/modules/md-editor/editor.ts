@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 
 import {BaseEditor} from '../shared/base-editor';
 import {isBlocksYaml, unwrapPageConstructor, wrapPageConstructor} from '../../utils';
+import {getVscConfig} from '../utils';
 
 export class MdEditor extends BaseEditor {
     private _pendingSync?: {text: string; fileName: string};
@@ -47,7 +48,7 @@ export class MdEditor extends BaseEditor {
 
     protected async _onWebviewMessage(message: Record<string, unknown>) {
         if (message.command === 'ready') {
-            const mode = this._getConfiguredMode();
+            const mode = getVscConfig<'wysiwyg' | 'markup'>('editorMode', 'wysiwyg');
             this._panel?.webview.postMessage({command: 'setMode', mode});
 
             if (this._pendingSync) {
@@ -82,7 +83,7 @@ export class MdEditor extends BaseEditor {
     protected _onPanelCreated() {
         this._configListener = vscode.workspace.onDidChangeConfiguration((e) => {
             if (e.affectsConfiguration('diplodoc.editorMode')) {
-                const mode = this._getConfiguredMode();
+                const mode = getVscConfig<'wysiwyg' | 'markup'>('editorMode', 'wysiwyg');
                 this._panel?.webview.postMessage({command: 'setMode', mode});
             }
         });
@@ -90,11 +91,6 @@ export class MdEditor extends BaseEditor {
 
     protected _onPanelDisposed() {
         this._configListener?.dispose();
-    }
-
-    private _getConfiguredMode(): 'wysiwyg' | 'markup' {
-        const config = vscode.workspace.getConfiguration('diplodoc');
-        return config.get<'wysiwyg' | 'markup'>('editorMode', 'wysiwyg');
     }
 
     private _extractWhitespace(text: string): {leading: string; trailing: string; body: string} {
