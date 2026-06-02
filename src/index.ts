@@ -9,7 +9,7 @@ import * as orphan from './modules/orphan';
 import * as presets from './modules/presets';
 import {TocEditor} from './modules/toc-editor/editor';
 import {insertBlock, openMdEditor, openTocEditor} from './commands';
-import {isBlocksYaml} from './utils';
+import {isBlocksYaml, isToc} from './utils';
 
 export function activate(context: vscode.ExtensionContext) {
     validation.activate(context);
@@ -96,7 +96,7 @@ export function activate(context: vscode.ExtensionContext) {
                     mdEditor.syncFromEditor(editor);
                 }
 
-                if (editor.document.fileName.endsWith('toc.yaml')) {
+                if (isToc(editor.document.fileName)) {
                     tocEditor.syncFromEditor(editor);
                 }
             }

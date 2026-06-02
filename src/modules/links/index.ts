@@ -1,24 +1,48 @@
 import * as vscode from 'vscode';
 
 import {debounceByKey} from '../../utils';
-import {isInExcludedDir} from '../utils';
+import {findYfmRoot, isInExcludedDir} from '../utils';
 
 import {LINK_FIELDS, LIST_ITEM_RE, LIST_PARENT_RE} from './constants';
 import {validateLinks} from './diagnostics';
 import {FilePathCompletionProvider} from './file-completion';
 import {FileReferenceProvider, findFileReferences} from './references';
-import {isExternalUrl, parseLinkFromLine} from './utils';
+import {findIncluderBlocks, isExternalUrl, isInIncluderBlock, parseLinkFromLine} from './utils';
+
+const INPUT_FIELD_RE = /^(\s*)input:\s+['"]?([^'"#\s][^'"\n]*)['"]?\s*$/;
 
 export class LinkProvider implements vscode.DocumentLinkProvider {
     provideDocumentLinks(document: vscode.TextDocument): vscode.DocumentLink[] {
         const links: vscode.DocumentLink[] = [];
         const baseUri = vscode.Uri.joinPath(document.uri, '..');
+        const includerBlocks = findIncluderBlocks(document);
+
+        const yfmRoot = findYfmRoot(document.uri.fsPath);
+        const rootUri = yfmRoot ? vscode.Uri.file(yfmRoot) : baseUri;
 
         let activeListField: string | null = null;
         let activeListIndent = -1;
 
         for (let i = 0; i < document.lineCount; i++) {
             const line = document.lineAt(i);
+            const lineText = line.text;
+
+            const inputMatch = INPUT_FIELD_RE.exec(lineText);
+            const inIncluder = isInIncluderBlock(i, includerBlocks);
+
+            if (inputMatch && inIncluder) {
+                const value = inputMatch[2].trim().replace(/['"]$/, '');
+
+                if (value && !isExternalUrl(value)) {
+                    const valueStart = lineText.indexOf(value);
+                    const range = new vscode.Range(i, valueStart, i, valueStart + value.length);
+                    const target = vscode.Uri.joinPath(rootUri, value);
+
+                    links.push(new vscode.DocumentLink(range, target));
+                }
+
+                continue;
+            }
 
             const link = parseLinkFromLine(line, baseUri);
 
@@ -28,7 +52,7 @@ export class LinkProvider implements vscode.DocumentLinkProvider {
                 continue;
             }
 
-            const parentMatch = LIST_PARENT_RE.exec(line.text);
+            const parentMatch = LIST_PARENT_RE.exec(lineText);
 
             if (parentMatch) {
                 const [, indent, field] = parentMatch;
@@ -44,14 +68,14 @@ export class LinkProvider implements vscode.DocumentLinkProvider {
             }
 
             if (activeListField) {
-                const itemMatch = LIST_ITEM_RE.exec(line.text);
+                const itemMatch = LIST_ITEM_RE.exec(lineText);
 
                 if (itemMatch) {
-                    const itemIndent = line.text.search(/\S/);
+                    const itemIndent = lineText.search(/\S/);
 
                     if (itemIndent > activeListIndent) {
                         const value = itemMatch[1].replace(/['"]$/, '');
-                        const valueStart = line.text.indexOf(value);
+                        const valueStart = lineText.indexOf(value);
                         const range = new vscode.Range(i, valueStart, i, valueStart + value.length);
                         const target = isExternalUrl(value)
                             ? vscode.Uri.parse(value)
@@ -62,7 +86,7 @@ export class LinkProvider implements vscode.DocumentLinkProvider {
                     }
                 }
 
-                const trimmed = line.text.trim();
+                const trimmed = lineText.trim();
 
                 if (trimmed && !trimmed.startsWith('#')) {
                     activeListField = null;

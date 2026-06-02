@@ -148,3 +148,13 @@ export function isInternalPath(value: string): boolean {
 
     return /\.[a-zA-Z0-9]+$/.test(normalized);
 }
+
+function getBaseName(fileName: string): string {
+    return fileName.split(/[\\/]/).pop() || fileName;
+}
+
+export function isToc(fileName: string): boolean {
+    const baseName = getBaseName(fileName);
+
+    return baseName === 'toc.yaml' || /^toc-.+\.yaml$/.test(baseName);
+}

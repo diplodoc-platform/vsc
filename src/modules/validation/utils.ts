@@ -324,6 +324,24 @@ function isYfmLintError(error: ValidationMessage): error is YfmLintError {
     return 'ruleDescription' in error;
 }
 
+const MISSING_ANCHOR_RE = /^Title not found: (.*?)#([^#\s]+) in (.+?)\s*$/;
+
+export function parseMissingAnchor(
+    message: string,
+): {link: string; anchor: string; source: string} | null {
+    const match = MISSING_ANCHOR_RE.exec(stripAnsi(message));
+
+    if (!match) {
+        return null;
+    }
+
+    return {link: match[1], anchor: match[2], source: match[3]};
+}
+
+export function hasExplicitAnchor(content: string, anchor: string): boolean {
+    return content.includes(`{#${anchor}}`);
+}
+
 const configCache = new Map<string, Record<string, unknown> | null>();
 
 export function findConfig(startDir: string, config: string): Record<string, unknown> | null {
@@ -393,6 +411,7 @@ export function buildLintConfig(
     yfmlintConfig: Record<string, unknown> | null,
     allowHtml?: boolean,
     isFileIncluded?: boolean,
+    vscLintRules: Record<string, unknown> = {},
 ): RawLintConfig {
     const userConfig = processYfmlintConfig(yfmlintConfig);
 
@@ -405,6 +424,7 @@ export function buildLintConfig(
         MD034: false,
         MD041: !isFileIncluded,
         MD051: false,
+        ...vscLintRules,
         ...userConfig,
     } as RawLintConfig;
 }

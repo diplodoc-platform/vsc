@@ -13,6 +13,10 @@ vi.mock('vscode', () => ({
 vi.mock('./utils', () => ({
     insertElement: vi.fn(),
     isBlocksYaml: vi.fn().mockReturnValue(false),
+    isToc: (fileName: string) => {
+        const baseName = fileName.split(/[/\\]/).pop() ?? '';
+        return baseName === 'toc.yaml' || /^toc-.+\.yaml$/.test(baseName);
+    },
 }));
 
 type MockEditor = {

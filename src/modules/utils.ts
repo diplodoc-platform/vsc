@@ -1,5 +1,5 @@
 import {existsSync, readFileSync} from 'fs';
-import {dirname, resolve} from 'path';
+import {basename, dirname, resolve} from 'path';
 import * as vscode from 'vscode';
 
 const output = vscode.window.createOutputChannel('Diplodoc');
@@ -63,6 +63,30 @@ export function isYfmFile(fsPath: string): boolean {
     return findYfmRoot(fsPath) !== null;
 }
 
+export function getVscConfig<T>(configName: string, defaultValue: T): T {
+    const config = vscode.workspace.getConfiguration('diplodoc');
+
+    return config.get<T>(configName, defaultValue);
+}
+
+export function isFileExcluded(fullFileName: string, excludedFiles: string[]): boolean {
+    const baseFileName = basename(fullFileName);
+
+    return excludedFiles.some((excludedFile) => {
+        if (excludedFile === fullFileName || excludedFile === baseFileName) {
+            return true;
+        }
+
+        try {
+            const pattern = new RegExp(excludedFile);
+
+            return pattern.test(fullFileName) || pattern.test(baseFileName);
+        } catch {
+            return false;
+        }
+    });
+}
+
 let excludeDirsCache: Set<string> | null = null;
 
 function getExcludeDirs(): Set<string> {
@@ -72,13 +96,11 @@ function getExcludeDirs(): Set<string> {
 
     const dirs = new Set(['node_modules', '_build']);
 
-    const userExclude = vscode.workspace.getConfiguration('diplodoc').get<string[]>('exclude');
+    const userExclude = getVscConfig<string[]>('excludedDirs', []);
 
-    if (userExclude) {
-        for (const dir of userExclude) {
-            if (dir) {
-                dirs.add(dir);
-            }
+    for (const dir of userExclude) {
+        if (dir) {
+            dirs.add(dir);
         }
     }
 

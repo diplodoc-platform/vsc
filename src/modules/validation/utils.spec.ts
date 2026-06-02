@@ -12,7 +12,9 @@ import {
     findConfig,
     formatLintMessage,
     formatPluginMessage,
+    hasExplicitAnchor,
     isTermDefinition,
+    parseMissingAnchor,
     processYfmlintConfig,
     toDiagnostic,
     toDiagnostics,
@@ -356,5 +358,76 @@ describe('buildLintConfig', () => {
 
         expect(config.MD001).toBe('disabled');
         expect(config.MD041).toBe('disabled');
+    });
+
+    it('applies vscLintRules over extension defaults', () => {
+        const config = buildLintConfig(null, false, false, {MD013: true});
+        expect(config.MD013).toBe(true);
+    });
+
+    it('lets .yfmlint override vscLintRules', () => {
+        const config = buildLintConfig({MD013: false}, false, false, {MD013: true});
+        expect(config.MD013).toBe(false);
+    });
+
+    it('empty vscLintRules keeps default behavior', () => {
+        const config = buildLintConfig(null, false, false, {});
+        expect(config.default).toBe(true);
+        expect(config.MD013).toBe(false);
+        expect(config.MD033).toBe(true);
+    });
+});
+
+describe('parseMissingAnchor', () => {
+    it('parses link, anchor and source from a Title not found message', () => {
+        const result = parseMissingAnchor(
+            'Title not found: ./console/settings.md#cloud-cash-register in /docs/ru/fiscalization.md',
+        );
+
+        expect(result).toEqual({
+            link: './console/settings.md',
+            anchor: 'cloud-cash-register',
+            source: '/docs/ru/fiscalization.md',
+        });
+    });
+
+    it('parses a same-file anchor with empty link', () => {
+        const result = parseMissingAnchor('Title not found: #section in /docs/ru/page.md');
+
+        expect(result).toEqual({link: '', anchor: 'section', source: '/docs/ru/page.md'});
+    });
+
+    it('strips ANSI codes before parsing', () => {
+        const result = parseMissingAnchor(
+            'Title not found: \u001B[35ma.md\u001B[0m#anchor in /docs/page.md',
+        );
+
+        expect(result).toEqual({link: 'a.md', anchor: 'anchor', source: '/docs/page.md'});
+    });
+
+    it('returns null for unrelated messages', () => {
+        expect(parseMissingAnchor('Link is unreachable: a.md in /docs/page.md')).toBeNull();
+    });
+});
+
+describe('hasExplicitAnchor', () => {
+    it('finds an explicit {#anchor} even inside a liquid condition', () => {
+        const content = [
+            '{% if tld == "ru" %}',
+            '## Настройка облачной кассы {#cloud-cash-register}',
+            '{% endif %}',
+        ].join('\n');
+
+        expect(hasExplicitAnchor(content, 'cloud-cash-register')).toBe(true);
+    });
+
+    it('returns false when the anchor is absent', () => {
+        expect(hasExplicitAnchor('# Title {#intro}', 'cloud-cash-register')).toBe(false);
+    });
+
+    it('does not match a partial anchor', () => {
+        expect(
+            hasExplicitAnchor('# Title {#cloud-cash-register-extra}', 'cloud-cash-register'),
+        ).toBe(false);
     });
 });

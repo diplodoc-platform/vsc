@@ -6,6 +6,7 @@ import {
     isBlocksYaml,
     isExternalUrl,
     isInternalPath,
+    isToc,
     unwrapPageConstructor,
     wrapPageConstructor,
 } from './utils';
@@ -285,5 +286,33 @@ describe('isInternalPath', () => {
     it('returns false for external http/https URLs', () => {
         expect(isInternalPath('http://example.com')).toBe(false);
         expect(isInternalPath('https://example.com/docs')).toBe(false);
+    });
+});
+
+describe('isToc', () => {
+    it('returns true for toc.yaml and toc-*.yaml', () => {
+        expect(isToc('toc.yaml')).toBe(true);
+        expect(isToc('toc-common.yaml')).toBe(true);
+        expect(isToc('toc-new.yaml')).toBe(true);
+        expect(isToc('toc-common-new.yaml')).toBe(true);
+        expect(isToc('/docs/toc-common.yaml')).toBe(true);
+        expect(isToc('C:\\docs\\toc-common.yaml')).toBe(true);
+    });
+
+    it('returns false for non-toc yaml files', () => {
+        expect(isToc('index.yaml')).toBe(false);
+        expect(isToc('presets.yaml')).toBe(false);
+        expect(isToc('redirects.yaml')).toBe(false);
+        expect(isToc('theme.yaml')).toBe(false);
+        expect(isToc('my-toc.yaml')).toBe(false);
+        expect(isToc('toccommon.yaml')).toBe(false);
+    });
+
+    it('returns false for invalid toc-like names', () => {
+        expect(isToc('toc-.yaml')).toBe(false);
+        expect(isToc('toc.yaml.bak')).toBe(false);
+        expect(isToc('toc-common.yml')).toBe(false);
+        expect(isToc('toc-common.json')).toBe(false);
+        expect(isToc('toc-common')).toBe(false);
     });
 });

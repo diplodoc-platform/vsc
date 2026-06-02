@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import {isIncluded, isYfmFile} from '../utils';
+import {getVscConfig, isFileExcluded, isIncluded, isYfmFile} from '../utils';
 
 export class OrphanDecorationProvider implements vscode.FileDecorationProvider {
     onDidChangeFileDecorations: vscode.Event<vscode.Uri | vscode.Uri[] | undefined>;
@@ -75,6 +75,12 @@ export class OrphanDecorationProvider implements vscode.FileDecorationProvider {
         _token: vscode.CancellationToken,
     ): vscode.FileDecoration | undefined {
         if (!this.active) {
+            return;
+        }
+
+        const excludedFiles = getVscConfig<string[]>('excludedFiles', []);
+
+        if (isFileExcluded(uri.fsPath, excludedFiles)) {
             return;
         }
 

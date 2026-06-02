@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import {computeNewMdHref, findMarkdownReferences} from '../links/md-links';
 import {findYfmRoot} from '../utils';
 
-import {addRedirect, findTocReferences} from './on-delete';
+import {addRedirect, findTocReferences, tocLabel} from './on-delete';
 
 export async function renameTocEntry(
     tocUri: vscode.Uri,
@@ -68,19 +68,20 @@ export async function handleFileRenamed(oldUri: vscode.Uri, newUri: vscode.Uri):
 
     const hasToc = tocRefs.length > 0;
     const hasMd = mdRefs.length > 0;
+    const toc = tocLabel(tocRefs);
 
     let renameLabel = 'Rename in markdown files';
 
     if (hasToc && hasMd) {
-        renameLabel = 'Rename in toc.yaml and markdown files';
+        renameLabel = `Rename in ${toc} and markdown files`;
     } else if (hasToc) {
-        renameLabel = 'Rename in toc.yaml';
+        renameLabel = `Rename in ${toc}`;
     }
 
     const choices: Array<{label: string; id: string}> = [{label: renameLabel, id: 'rename'}];
 
     if (hasToc) {
-        choices.push({label: 'Rename + add redirect', id: 'redirect'});
+        choices.push({label: `Rename in ${toc} + add redirect`, id: 'redirect'});
     }
 
     choices.push({label: 'Do nothing', id: 'nothing'});

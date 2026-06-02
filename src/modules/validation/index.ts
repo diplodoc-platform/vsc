@@ -5,7 +5,8 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import {load as yamlLoad} from 'js-yaml';
 
-import {isInExcludedDir, logger} from '../utils';
+import {getVscConfig, isFileExcluded, isInExcludedDir, isYfmFile, logger} from '../utils';
+import {isToc} from '../../utils';
 
 import {parseContent} from './parser';
 import {validateMarkdown} from './markdown';
@@ -62,7 +63,7 @@ function capDiagnostics(diags: vscode.Diagnostic[]): vscode.Diagnostic[] {
 }
 
 const YAML_FILE_SCHEMAS: Array<{test: (name: string) => boolean; type: SchemaType}> = [
-    {test: (n) => n === 'toc.yaml', type: 'toc'},
+    {test: isToc, type: 'toc'},
     {test: (n) => n === '.yfm', type: 'yfm'},
     {test: (n) => n === '.yfmlint', type: 'yfmlint'},
     {test: (n) => n === 'presets.yaml', type: 'presets'},
@@ -206,6 +207,7 @@ export function activate(context: vscode.ExtensionContext) {
             blocksCache.delete(key);
             pendingVersions.delete(key);
             const timer = debounceTimers.get(key);
+
             if (timer) {
                 clearTimeout(timer);
                 debounceTimers.delete(key);
@@ -236,7 +238,11 @@ async function validate(document: vscode.TextDocument) {
         return validateYaml(document);
     }
 
-    return validateMd(document);
+    const isOnlyYfm = getVscConfig<boolean>('isOnlyYfm', false);
+    const excludedFiles = getVscConfig<string[]>('excludedFiles', []);
+    const lintRules = getVscConfig<Record<string, unknown>>('lintRules', {});
+
+    return validateMd(document, isOnlyYfm, excludedFiles, lintRules);
 }
 
 async function validateYaml(document: vscode.TextDocument) {
@@ -261,7 +267,19 @@ async function validateYaml(document: vscode.TextDocument) {
     collection.set(document.uri, capDiagnostics(diags));
 }
 
-async function validateMd(document: vscode.TextDocument) {
+async function validateMd(
+    document: vscode.TextDocument,
+    isOnlyYfm: boolean,
+    excludedFiles: string[],
+    lintRules: Record<string, unknown>,
+) {
+    if (
+        (isOnlyYfm && !isYfmFile(document.uri.fsPath)) ||
+        isFileExcluded(document.fileName, excludedFiles)
+    ) {
+        return;
+    }
+
     const content = document.getText();
     const {pcContent, fmContent} = parseContent(content);
 
@@ -285,7 +303,7 @@ async function validateMd(document: vscode.TextDocument) {
         fmDiags.push(...d);
     }
 
-    const mdDiags = await validateMarkdown(document);
+    const mdDiags = await validateMarkdown(document, lintRules);
 
     collection.set(document.uri, capDiagnostics([...mdDiags, ...pcDiags, ...fmDiags]));
 }
