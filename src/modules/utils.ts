@@ -135,8 +135,6 @@ export function clearExcludeDirsCache(): void {
 }
 
 export function getExcludePattern(): string {
-    // Only plain directory names are usable in a glob; regex entries are enforced
-    // by isInExcludedDir instead.
     const dirs = [...getExcludeDirs()].filter((d) => /^[\w.-]+$/.test(d));
 
     return `{${dirs.map((d) => `**/${d}/**`).join(',')}}`;
