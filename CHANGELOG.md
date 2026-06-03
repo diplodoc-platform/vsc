@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.1](https://github.com/diplodoc-platform/vsc/compare/v0.8.0...v0.8.1) (2026-06-03)
+
+
+### Bug Fixes
+
+* fixed includes in schema ([a417a09](https://github.com/diplodoc-platform/vsc/commit/a417a094f8a0b0af9c3d8275824e6b98c14fa3d2))
+* fixed includes in schema ([da21a34](https://github.com/diplodoc-platform/vsc/commit/da21a34ced9b858c842f30161dfe07592068d1f1))
+
 ## [0.8.0](https://github.com/diplodoc-platform/vsc/compare/v0.7.6...v0.8.0) (2026-06-02)
 
 
