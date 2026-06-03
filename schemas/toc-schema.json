@@ -321,7 +321,7 @@
         },
         "include": {
           "description": "Include directive to merge another toc.yaml.",
-          "markdownDescription": "**`Include`** Directive to include another `toc.yaml` into this navigation tree."
+          "markdownDescription": "**`Include`** Directive to include another `toc.yaml` into this navigation tree.\n\n```yaml\n- include:\n    path: ../shared/toc.yaml\n    mode: merge # link | merge | root_merge\n```"
         }
       },
       "oneOf": [
@@ -347,6 +347,9 @@
           "markdownDescription": "**`string`** Relative path to the `.md` page (e.g. `guide/intro.md`) or an external URL.",
           "description": "Relative path to the target .md file or URL."
         }
+      },
+      "not": {
+        "required": ["include"]
       }
     },
     "TocItemWithInclude": {

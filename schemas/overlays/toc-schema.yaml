@@ -159,7 +159,7 @@ definitions:
         type: string
       include:
         description: Include directive to merge another toc.yaml.
-        markdownDescription: '**`Include`** Directive to include another `toc.yaml` into this navigation tree.'
+        markdownDescription: "**`Include`** Directive to include another `toc.yaml` into this navigation tree.\n\n```yaml\n- include:\n    path: ../shared/toc.yaml\n    mode: merge # link | merge | root_merge\n```"
       expanded:
         description: Whether this section starts expanded in the sidebar.
         markdownDescription: '**`boolean`** Start this section expanded in the sidebar (`true`) or collapsed (`false`).'
@@ -177,6 +177,9 @@ definitions:
         markdownDescription: '**`string | string[]`** Access restriction conditions. The user must satisfy at least one condition to see this item.'
 
   TocItemWithLink:
+    not:
+      required:
+        - include
     properties:
       href:
         description: Relative path to the target .md file or URL.
