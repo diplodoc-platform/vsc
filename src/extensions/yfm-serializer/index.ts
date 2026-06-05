@@ -25,6 +25,10 @@ function isNodeEmpty(node: PMNode): boolean {
 }
 
 export const YfmSerializer: ExtensionAuto = (builder) => {
+    builder.overrideNodeSerializerSpec('bullet_list', () => (state, node) => {
+        state.renderList(node, '  ', () => '- ');
+    });
+
     builder.overrideNodeSerializerSpec('yfm_note_title', (prev) => (state, node, parent, index) => {
         if (hasContent(node)) {
             prev(state, node, parent, index);

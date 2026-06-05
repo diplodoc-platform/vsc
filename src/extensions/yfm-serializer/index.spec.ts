@@ -143,6 +143,7 @@ describe('YfmSerializer', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, new-cap
         YfmSerializer(builder as any);
 
+        expect(overrides).toContain('bullet_list');
         expect(overrides).toContain('yfm_note_title');
         expect(overrides).toContain('yfm_cut_title');
         expect(overrides).toContain('yfm_note_content');
@@ -290,5 +291,24 @@ describe('yfm_cut_content serializer fix', () => {
 
         expect(state.out).toBe('\n');
         expect(state.out).not.toContain('Cut');
+    });
+});
+
+describe('bullet_list serializer', () => {
+    it('always renders list items with dash regardless of bullet attr', () => {
+        const renderedItems: string[] = [];
+        const state = {
+            ...makeMockState(),
+            renderList(_node: unknown, _delim: string, firstDelim: () => string) {
+                renderedItems.push(firstDelim());
+            },
+        };
+
+        const serialize = getSerializer('bullet_list');
+        const node = makeNode({bullet: '*'});
+
+        serialize(state, node, makeNode(), 0);
+
+        expect(renderedItems[0]).toBe('- ');
     });
 });
