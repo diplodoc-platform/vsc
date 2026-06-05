@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.8.3](https://github.com/diplodoc-platform/vsc/compare/v0.8.2...v0.8.3) (2026-06-05)
+
+
+### Bug Fixes
+
+* removed vsix ([679e42e](https://github.com/diplodoc-platform/vsc/commit/679e42ee76d23c08f05575412e702910d0bb3793))
+* updated schemas ([4b1e556](https://github.com/diplodoc-platform/vsc/commit/4b1e5568fbebbf51a55649afe7607483e68ccf90))
+* updated schemas ([fdaf52b](https://github.com/diplodoc-platform/vsc/commit/fdaf52b8095899718dbac1505359e3fe3708fbfe))
+
 ## [0.8.2](https://github.com/diplodoc-platform/vsc/compare/v0.8.1...v0.8.2) (2026-06-05)
 
 
