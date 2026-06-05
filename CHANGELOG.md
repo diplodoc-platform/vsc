@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.2](https://github.com/diplodoc-platform/vsc/compare/v0.8.1...v0.8.2) (2026-06-05)
+
+
+### Bug Fixes
+
+* fixed bullett list ([211d958](https://github.com/diplodoc-platform/vsc/commit/211d95867881dca9dca103f84b008a8416c697eb))
+* fixed bullett list ([6bd80fd](https://github.com/diplodoc-platform/vsc/commit/6bd80fd0c7cde5eb72ecae0dc54c57ba7a1138eb))
+
 ## [0.8.1](https://github.com/diplodoc-platform/vsc/compare/v0.8.0...v0.8.1) (2026-06-03)
 
 
