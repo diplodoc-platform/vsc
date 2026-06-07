@@ -837,20 +837,7 @@
       "type": "object",
       "properties": {
         "notifications": {
-          "$ref": "#/definitions/CrawlerNotificationsConfig",
-          "markdownDescription": "**`CrawlerNotificationsConfig`** Broken-link notification settings.\n\n- `receivers` **`string[]`** — recipients (required)\n- `channels` **`('email'|'messenger')[]`** — delivery channels (default: `['email']`)\n- `interval` **`'daily'|'weekly'|'monthly'`** — frequency (default: `weekly`)",
-          "properties": {
-            "channels": {
-              "markdownDescription": "**`('email' | 'messenger')[]`** Notification delivery channels. Default: `['email']`."
-            },
-            "interval": {
-              "markdownDescription": "**`'daily' | 'weekly' | 'monthly'`** How often to send notifications. Default: `weekly`.",
-              "markdownEnumDescriptions": ["Once per day.", "Once per week.", "Once per month."]
-            },
-            "receivers": {
-              "markdownDescription": "**`string[]`** List of recipient usernames. **Required.**"
-            }
-          }
+          "$ref": "#/definitions/CrawlerNotificationsConfig"
         },
         "exclude": {
           "type": "object",
@@ -880,7 +867,7 @@
       },
       "additionalProperties": false,
       "description": "Crawler-manifest settings.",
-      "markdownDescription": "**`{notifications, exclude}`** Crawler-manifest settings.\n\n- `notifications` **`{notifications, exclude}`** — broken-link report delivery settings (`receivers` required)\n- `exclude` **`{notifications, exclude}`** — URLs/patterns to skip"
+      "markdownDescription": "**`{notifications, exclude}`** Crawler-manifest settings.\n\n- `notifications` **`CrawlerNotificationsConfig`** — broken-link report delivery settings (`receivers` required)\n- `exclude` **`{url, regexp}`** — URLs/patterns to skip"
     },
     "translate": {
       "markdownDescription": "**`TranslateConfig`** Configuration for the `translate` command."

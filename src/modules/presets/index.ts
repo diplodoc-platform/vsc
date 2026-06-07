@@ -4,12 +4,19 @@ import {PresetsCompletionProvider} from './completion';
 import {PresetsDefinitionProvider} from './definition';
 import {PresetsHoverProvider} from './hover';
 import {PresetsLinkProvider} from './link';
-import {PREFIX_RE} from './constants';
+import {clearPresetsCache} from './resolver';
+import {PREFIX_RE, PRESETS_FILENAME} from './constants';
 
 export function activate(context: vscode.ExtensionContext) {
     const selector: vscode.DocumentSelector = [{language: 'markdown'}, {language: 'yaml'}];
 
+    const presetsWatcher = vscode.workspace.createFileSystemWatcher(`**/${PRESETS_FILENAME}`);
+
     context.subscriptions.push(
+        presetsWatcher,
+        presetsWatcher.onDidChange(() => clearPresetsCache()),
+        presetsWatcher.onDidCreate(() => clearPresetsCache()),
+        presetsWatcher.onDidDelete(() => clearPresetsCache()),
         vscode.languages.registerHoverProvider(selector, new PresetsHoverProvider()),
         vscode.languages.registerDefinitionProvider(selector, new PresetsDefinitionProvider()),
         vscode.languages.registerDocumentLinkProvider(selector, new PresetsLinkProvider()),

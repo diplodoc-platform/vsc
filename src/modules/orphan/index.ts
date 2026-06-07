@@ -7,6 +7,7 @@ import {
     clearYfmRootCache,
     getVscConfig,
     isFileExcluded,
+    isInExcludedDir,
     isIncluded,
     isYfmFile,
 } from '../utils';
@@ -87,16 +88,28 @@ export function activate(context: vscode.ExtensionContext) {
     let switchTimeout: ReturnType<typeof setTimeout> | undefined;
 
     function onGitDirChange(_event: string, filename: string | null) {
-        if (filename === 'HEAD' || filename === 'HEAD.lock') {
+        if (!filename) {
+            return;
+        }
+
+        const isHeadChange = filename === 'HEAD' || filename === 'HEAD.lock';
+        const isRebaseActive = isVcsOperationInProgress(
+            (vscode.workspace.workspaceFolders ?? []).map((f) => f.uri.fsPath),
+        );
+
+        if (isHeadChange || isRebaseActive) {
             gitSwitching = true;
 
             if (switchTimeout) {
                 clearTimeout(switchTimeout);
             }
 
+            const delay = isRebaseActive ? 5000 : 2000;
+
             switchTimeout = setTimeout(() => {
                 gitSwitching = false;
-            }, 2000);
+                switchTimeout = undefined;
+            }, delay);
         }
     }
 
@@ -119,6 +132,10 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     async function onFileDeleted(uri: vscode.Uri) {
+        if (isInExcludedDir(uri.fsPath)) {
+            return;
+        }
+
         if (renamedPaths.has(uri.fsPath)) {
             renamedPaths.delete(uri.fsPath);
             return;
