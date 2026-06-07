@@ -1,10 +1,11 @@
-import {existsSync, readFileSync} from 'fs';
+import {existsSync, readFileSync, statSync} from 'fs';
 import {join} from 'path';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {findYfmRoot} from '../utils';
 
 import {
+    clearPresetsCache,
     findPresetsFiles,
     findVariableLine,
     getVariable,
@@ -15,6 +16,7 @@ import {
 vi.mock('fs', () => ({
     existsSync: vi.fn(),
     readFileSync: vi.fn(),
+    statSync: vi.fn(() => ({mtimeMs: 0})),
 }));
 
 vi.mock('../utils', () => ({
@@ -114,6 +116,7 @@ describe('parsePresetsFile', () => {
 describe('resolveVariables', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        clearPresetsCache();
     });
 
     it('returns empty map when no presets files', () => {
@@ -201,6 +204,36 @@ describe('resolveVariables', () => {
         expect(entries[0]).toMatchObject({preset: 'default', value: 'Hello'});
         expect(entries[1]).toMatchObject({preset: 'default/i18n/ru', value: 'Привет'});
     });
+
+    it('reuses cached result without re-reading files when mtime is unchanged', () => {
+        vi.mocked(findYfmRoot).mockReturnValue('/project');
+        vi.mocked(existsSync).mockImplementation((f) => f === p('/project', 'presets.yaml'));
+        vi.mocked(statSync).mockReturnValue({mtimeMs: 100} as ReturnType<typeof statSync>);
+        vi.mocked(readFileSync).mockReturnValue('default:\n  text: Hello');
+
+        resolveVariables('/project/page.md');
+        const readsAfterFirst = vi.mocked(readFileSync).mock.calls.length;
+
+        resolveVariables('/project/page.md');
+
+        expect(vi.mocked(readFileSync).mock.calls.length).toBe(readsAfterFirst);
+    });
+
+    it('invalidates cache when a presets file mtime changes', () => {
+        vi.mocked(findYfmRoot).mockReturnValue('/project');
+        vi.mocked(existsSync).mockImplementation((f) => f === p('/project', 'presets.yaml'));
+        vi.mocked(statSync).mockReturnValue({mtimeMs: 100} as ReturnType<typeof statSync>);
+        vi.mocked(readFileSync).mockReturnValue('default:\n  text: Hello');
+
+        const first = resolveVariables('/project/page.md');
+        expect(first.get('text')?.[0]).toMatchObject({value: 'Hello'});
+
+        vi.mocked(statSync).mockReturnValue({mtimeMs: 200} as ReturnType<typeof statSync>);
+        vi.mocked(readFileSync).mockReturnValue('default:\n  text: Updated');
+
+        const second = resolveVariables('/project/page.md');
+        expect(second.get('text')?.[0]).toMatchObject({value: 'Updated'});
+    });
 });
 
 describe('getVariable', () => {
@@ -270,5 +303,19 @@ describe('findVariableLine', () => {
 
     it('returns 0 when preset not found', () => {
         expect(findVariableLine(content, 'internal', 'presets_text')).toBe(0);
+    });
+
+    it('treats preset names with regex metacharacters literally', () => {
+        const metaContent = ['foo.bar:', '  text: Value'].join('\n');
+
+        // The dot must match literally, not as the regex "any char".
+        expect(findVariableLine(metaContent, 'foo.bar', 'text')).toBe(1);
+        expect(findVariableLine(metaContent, 'fooXbar', 'text')).toBe(0);
+    });
+
+    it('treats variable keys with regex metacharacters literally', () => {
+        const metaContent = ['default:', '  a+b: Value'].join('\n');
+
+        expect(findVariableLine(metaContent, 'default', 'a+b')).toBe(1);
     });
 });

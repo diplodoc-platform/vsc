@@ -6,6 +6,7 @@ import * as path from 'path';
 import {load as yamlLoad} from 'js-yaml';
 
 import {getVscConfig, isFileExcluded, isInExcludedDir, isYfmFile, logger} from '../utils';
+import {LruCache} from '../shared/lru-cache';
 import {isToc} from '../../utils';
 
 import {parseContent} from './parser';
@@ -14,11 +15,16 @@ import {validatePageConstructor} from './page-constructor';
 import {clearConfigCache} from './utils';
 import {YamlHoverProvider} from './providers/hover';
 import {YamlCompletionProvider} from './providers/completion';
-import {DEBOUNCE_MS, MAX_CONCURRENCY, MAX_DIAGNOSTICS_PER_FILE} from './constants';
+import {
+    BLOCKS_CACHE_MAX,
+    DEBOUNCE_MS,
+    MAX_CONCURRENCY,
+    MAX_DIAGNOSTICS_PER_FILE,
+} from './constants';
 
 let collection: vscode.DiagnosticCollection;
 
-const blocksCache = new Map<string, Content[]>();
+const blocksCache = new LruCache<string, Content[]>(BLOCKS_CACHE_MAX);
 const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
 const pendingVersions = new Map<string, number>();
 
@@ -306,6 +312,19 @@ async function validateMd(
     const mdDiags = await validateMarkdown(document, lintRules);
 
     collection.set(document.uri, capDiagnostics([...mdDiags, ...pcDiags, ...fmDiags]));
+}
+
+export function deactivate() {
+    for (const timer of debounceTimers.values()) {
+        clearTimeout(timer);
+    }
+
+    debounceTimers.clear();
+    pendingVersions.clear();
+    blocksCache.clear();
+    queue.length = 0;
+    runningCount = 0;
+    clearConfigCache();
 }
 
 function isSupportedDocument(doc: vscode.TextDocument): boolean {

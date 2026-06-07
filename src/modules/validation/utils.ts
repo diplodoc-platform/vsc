@@ -6,6 +6,10 @@ import {existsSync, readFileSync} from 'fs';
 import {dirname, resolve} from 'path';
 import {load as yamlLoad} from 'js-yaml';
 
+import {LruCache} from '../shared/lru-cache';
+
+import {CONFIG_CACHE_MAX} from './constants';
+
 const DIRECTIVE_HANDLERS: Array<{
     message: RegExp;
     open: RegExp;
@@ -342,14 +346,13 @@ export function hasExplicitAnchor(content: string, anchor: string): boolean {
     return content.includes(`{#${anchor}}`);
 }
 
-const configCache = new Map<string, Record<string, unknown> | null>();
+const configCache = new LruCache<string, Record<string, unknown> | null>(CONFIG_CACHE_MAX);
 
 export function findConfig(startDir: string, config: string): Record<string, unknown> | null {
     const cacheKey = `${startDir}\0${config}`;
-    const cached = configCache.get(cacheKey);
 
-    if (cached !== undefined) {
-        return cached;
+    if (configCache.has(cacheKey)) {
+        return configCache.get(cacheKey) ?? null;
     }
 
     let dir = startDir;

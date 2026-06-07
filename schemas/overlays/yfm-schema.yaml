@@ -203,21 +203,7 @@ properties:
   crawlerManifest:
     markdownDescription: '**`boolean`** Emit `crawler-manifest.json` mapping each source file to its external links. Useful for link-health checks (404/403 detection).'
   crawler:
-    markdownDescription: "**`object`** Crawler-manifest settings.\n\n- `notifications` **`object`** — broken-link report delivery settings (`receivers` required)\n- `exclude` **`object`** — URLs/patterns to skip"
-    properties:
-      notifications:
-        markdownDescription: "**`object`** Broken-link notification settings.\n\n- `receivers` **`string[]`** — recipients (required)\n- `channels` **`('email'|'messenger')[]`** — delivery channels (default: `['email']`)\n- `interval` **`'daily'|'weekly'|'monthly'`** — frequency (default: `weekly`)"
-        properties:
-          channels:
-            markdownDescription: "**`('email' | 'messenger')[]`** Notification delivery channels. Default: `['email']`."
-          interval:
-            markdownDescription: "**`'daily' | 'weekly' | 'monthly'`** How often to send notifications. Default: `weekly`."
-            markdownEnumDescriptions:
-              - 'Once per day.'
-              - 'Once per week.'
-              - 'Once per month.'
-          receivers:
-            markdownDescription: '**`string[]`** List of recipient usernames. **Required.**'
+    markdownDescription: "**`object`** Crawler-manifest settings.\n\n- `notifications` **`CrawlerNotificationsConfig`** — broken-link report delivery settings (`receivers` required)\n- `exclude` **`{url, regexp}`** — URLs/patterns to skip"
   changelogs:
     markdownDescription: '**`boolean | string`** Enable changelog generation. String value selects the output format.'
   watch:
