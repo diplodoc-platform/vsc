@@ -89,8 +89,27 @@ export async function removeTocEntry(tocUri: vscode.Uri, lineIndex: number): Pro
     } else {
         let startLine = lineIndex;
 
-        if (startLine > 0 && /^\s*-?\s*name:\s/.test(lines[startLine - 1])) {
-            startLine--;
+        while (startLine > 0) {
+            const prevLine = lines[startLine - 1];
+            const prevTrimmed = prevLine.trimStart();
+
+            if (!prevTrimmed) {
+                break;
+            }
+
+            const prevIndent = prevLine.search(/\S/);
+
+            if (prevIndent === hrefIndent && /^\w[\w-]*\s*:/.test(prevTrimmed)) {
+                startLine--;
+                continue;
+            }
+
+            if (/^-[\s{]/.test(prevTrimmed) && prevIndent < hrefIndent) {
+                startLine--;
+                break;
+            }
+
+            break;
         }
 
         const range = new vscode.Range(startLine, 0, lineIndex + 1, 0);

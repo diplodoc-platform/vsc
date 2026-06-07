@@ -7,6 +7,7 @@ export abstract class BaseEditor {
     protected readonly _extensionUri: vscode.Uri;
     protected _panel?: vscode.WebviewPanel;
     protected _currentDocUri?: vscode.Uri;
+    private _panelDisposables: vscode.Disposable[] = [];
 
     constructor(extensionUri: vscode.Uri) {
         this._extensionUri = extensionUri;
@@ -129,6 +130,8 @@ export abstract class BaseEditor {
 
         this._panel.onDidDispose(() => {
             this._onPanelDisposed();
+            this._panelDisposables.forEach((d) => d.dispose());
+            this._panelDisposables = [];
             this._panel = undefined;
         });
     }
@@ -147,9 +150,11 @@ export abstract class BaseEditor {
             vscode.env.language,
         );
 
-        webview.onDidReceiveMessage((message: Record<string, unknown>) => {
-            this._onWebviewMessage(message);
-        });
+        this._panelDisposables.push(
+            webview.onDidReceiveMessage((message: Record<string, unknown>) => {
+                this._onWebviewMessage(message);
+            }),
+        );
     }
 
     protected async _applyToDocument(text: string) {

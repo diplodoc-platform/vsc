@@ -96,12 +96,13 @@ export class Sidebar implements vscode.WebviewViewProvider {
         yamlWatcher.onDidCreate(debouncedRefreshFiles);
         yamlWatcher.onDidDelete(debouncedRefreshFiles);
 
-        vscode.workspace.onDidChangeWorkspaceFolders(debouncedRefreshFiles);
+        const foldersListener = vscode.workspace.onDidChangeWorkspaceFolders(debouncedRefreshFiles);
 
         webviewView.onDidDispose(() => {
             mdWatcher.dispose();
             tocWatcher.dispose();
             yamlWatcher.dispose();
+            foldersListener.dispose();
         });
     }
 

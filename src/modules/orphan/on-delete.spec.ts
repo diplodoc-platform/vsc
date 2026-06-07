@@ -229,6 +229,43 @@ describe('removeTocEntry', () => {
         expect(range.start.line).toBe(0);
         expect(range.end.line).toBe(2);
     });
+
+    it('removes name+when+href when entry has a when condition', async () => {
+        const toc = [
+            '  - name: Guide',
+            "    when: env == 'production'",
+            '    href: guide.md',
+            '  - name: Other',
+            '    href: other.md',
+        ].join('\n');
+
+        mockFiles({'/docs/toc.yaml': toc});
+
+        await removeTocEntry(makeUri('/docs/toc.yaml'), 2);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const edit = vi.mocked(vscode.workspace.applyEdit).mock.calls[0][0] as any;
+        const range = edit.edits[0].edit.range;
+
+        // All three lines (name + when + href) should be removed.
+        expect(range.start.line).toBe(0);
+        expect(range.end.line).toBe(3);
+    });
+
+    it('removes only href when href is at top level (no preceding name/when)', async () => {
+        const toc = ['href: index.md', '- name: Other', '  href: other.md'].join('\n');
+
+        mockFiles({'/docs/toc.yaml': toc});
+
+        await removeTocEntry(makeUri('/docs/toc.yaml'), 0);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const edit = vi.mocked(vscode.workspace.applyEdit).mock.calls[0][0] as any;
+        const range = edit.edits[0].edit.range;
+
+        expect(range.start.line).toBe(0);
+        expect(range.end.line).toBe(1);
+    });
 });
 
 describe('addRedirect', () => {

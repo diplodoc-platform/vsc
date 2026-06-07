@@ -1,6 +1,6 @@
 import type {Variable} from './types';
 
-import {existsSync, readFileSync} from 'fs';
+import {existsSync, readFileSync, statSync} from 'fs';
 import {basename, dirname, join} from 'path';
 import {load as yamlLoad} from 'js-yaml';
 
@@ -13,6 +13,37 @@ export interface VariableEntry {
     value: string;
     filePath: string;
     line: number;
+}
+
+function escapeRegExp(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+interface CachedResolution {
+    /** Per-file modification times the cached result was built from. */
+    mtimes: Map<string, number>;
+    result: Map<string, VariableEntry[]>;
+}
+
+/**
+ * Memoizes resolveVariables() keyed by the resolved preset-file list. The hover,
+ * completion, definition and link providers all call resolveVariables() on every
+ * editor interaction; without this cache each call re-reads and re-parses every
+ * presets.yaml on the directory chain. The cache is invalidated whenever any of
+ * the underlying files changes mtime, so results stay correct after edits.
+ */
+const resolutionCache = new Map<string, CachedResolution>();
+
+function fileMtime(filePath: string): number {
+    try {
+        return statSync(filePath).mtimeMs;
+    } catch {
+        return -1;
+    }
+}
+
+export function clearPresetsCache(): void {
+    resolutionCache.clear();
 }
 
 export function findPresetsFiles(fsPath: string): string[] {
@@ -106,6 +137,30 @@ function processI18n(
 
 export function resolveVariables(fsPath: string): Map<string, VariableEntry[]> {
     const files = findPresetsFiles(fsPath);
+    const cacheKey = files.join('\0');
+    const cached = resolutionCache.get(cacheKey);
+
+    if (cached) {
+        let stale = false;
+
+        for (const filePath of files) {
+            if (cached.mtimes.get(filePath) !== fileMtime(filePath)) {
+                stale = true;
+                break;
+            }
+        }
+
+        if (!stale) {
+            return cached.result;
+        }
+    }
+
+    const mtimes = new Map<string, number>();
+
+    for (const filePath of files) {
+        mtimes.set(filePath, fileMtime(filePath));
+    }
+
     const result = new Map<string, VariableEntry[]>();
 
     for (const filePath of files) {
@@ -152,6 +207,8 @@ export function resolveVariables(fsPath: string): Map<string, VariableEntry[]> {
         }
     }
 
+    resolutionCache.set(cacheKey, {mtimes, result});
+
     return result;
 }
 
@@ -180,7 +237,7 @@ export function getVariable(lineText: string, charPos: number): Variable | null 
 export function findVariableLine(content: string, preset: string, varName: string): number {
     const lines = content.split('\n');
     const parts = varName.split('.');
-    const presetRe = new RegExp(`^${preset}:\\s*$`);
+    const presetRe = new RegExp(`^${escapeRegExp(preset)}:\\s*$`);
 
     let inPreset = false;
     let depth = 0;
@@ -201,7 +258,7 @@ export function findVariableLine(content: string, preset: string, varName: strin
                 continue;
             }
 
-            const keyRe = new RegExp(`^\\s+${parts[depth]}:\\s?`);
+            const keyRe = new RegExp(`^\\s+${escapeRegExp(parts[depth])}:\\s?`);
 
             if (keyRe.test(lines[i])) {
                 if (depth === parts.length - 1) {
@@ -223,9 +280,9 @@ function findVariableLineInI18n(
     varName: string,
 ): number {
     const lines = content.split('\n');
-    const presetRe = new RegExp(`^${preset}:\\s*$`);
+    const presetRe = new RegExp(`^${escapeRegExp(preset)}:\\s*$`);
     const i18nRe = /^\s+i18n:\s*$/;
-    const langRe = new RegExp(`^\\s+${lang}:\\s*$`);
+    const langRe = new RegExp(`^\\s+${escapeRegExp(lang)}:\\s*$`);
     const parts = varName.split('.');
 
     let inPreset = false;
@@ -264,7 +321,7 @@ function findVariableLineInI18n(
         }
 
         if (inLang) {
-            const keyRe = new RegExp(`^\\s+${parts[depth]}:\\s?`);
+            const keyRe = new RegExp(`^\\s+${escapeRegExp(parts[depth])}:\\s?`);
 
             if (keyRe.test(lines[i])) {
                 if (depth === parts.length - 1) {
