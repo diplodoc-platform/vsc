@@ -132,4 +132,6 @@ async function updateYamlContext(editor?: vscode.TextEditor) {
     await vscode.commands.executeCommand('setContext', 'diplodoc.hasBlocksYaml', hasBlocks);
 }
 
-export function deactivate() {}
+export function deactivate() {
+    validation.deactivate();
+}
