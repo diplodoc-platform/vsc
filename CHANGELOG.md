@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.9.0](https://github.com/diplodoc-platform/vsc/compare/v0.8.3...v0.9.0) (2026-06-07)
+
+
+### Features
+
+* added lru cache ([6bea027](https://github.com/diplodoc-platform/vsc/commit/6bea027bb12c9aab082d6f971034a54f4c765ea6))
+* added lru cache ([0dd539d](https://github.com/diplodoc-platform/vsc/commit/0dd539d9bc4e3f5650ebcd3e45573b6edbbbe7ae))
+
 ## [0.8.3](https://github.com/diplodoc-platform/vsc/compare/v0.8.2...v0.8.3) (2026-06-05)
 
 
