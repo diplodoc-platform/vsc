@@ -3,6 +3,8 @@ import * as vscode from 'vscode';
 
 import {computeNewMdHref, findMarkdownReferences} from '../links/md-links';
 import {findYfmRoot} from '../utils';
+import * as telemetry from '../telemetry';
+import {EVENTS} from '../telemetry/constants';
 
 import {addRedirect, findTocReferences, tocLabel} from './on-delete';
 
@@ -91,6 +93,14 @@ export async function handleFileRenamed(oldUri: vscode.Uri, newUri: vscode.Uri):
     const choice = await vscode.window.showQuickPick(choices, {
         placeHolder: `"${fileName}" was renamed. What would you like to do?`,
     });
+
+    if (choice) {
+        telemetry.sendEvent(
+            EVENTS.ORPHAN_RENAME_ACTION,
+            {action: choice.id},
+            {tocRefs: tocRefs.length, mdRefs: mdRefs.length},
+        );
+    }
 
     if (!choice || choice.id === 'nothing') {
         return;

@@ -8,6 +8,8 @@ import {load as yamlLoad} from 'js-yaml';
 import {getVscConfig, isFileExcluded, isInExcludedDir, isYfmFile, logger} from '../utils';
 import {LruCache} from '../shared/lru-cache';
 import {isToc} from '../../utils';
+import * as telemetry from '../telemetry';
+import {EVENTS} from '../telemetry/constants';
 
 import {parseContent} from './parser';
 import {validateMarkdown} from './markdown';
@@ -35,7 +37,15 @@ function runQueued(fn: () => Promise<void>): void {
     const execute = () => {
         runningCount++;
         fn()
-            .catch((err) => logger(`[diplodoc] validation error: ${JSON.stringify(err)}`))
+            .catch((err) => {
+                logger(`[diplodoc] validation error: ${JSON.stringify(err)}`);
+
+                if (err instanceof Error) {
+                    telemetry.sendException(err, {event: EVENTS.VALIDATION_ERROR});
+                } else {
+                    telemetry.sendError(EVENTS.VALIDATION_ERROR, {message: String(err)});
+                }
+            })
             .finally(() => {
                 runningCount--;
                 const next = queue.shift();

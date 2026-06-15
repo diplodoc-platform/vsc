@@ -877,38 +877,35 @@
   "definitions": {
     "CrawlerNotificationsConfig": {
       "type": "object",
-      "required": ["receivers"],
       "properties": {
-        "channels": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": ["email", "messenger"],
-            "markdownDescription": "**`'email' | 'messenger'`**"
-          },
-          "description": "Notification channels. Default: ['email'].",
-          "markdownDescription": "**`'email' | 'messenger'[]`** Notification channels. Default: ['email']."
-        },
         "interval": {
           "type": "string",
           "enum": ["daily", "weekly", "monthly"],
           "description": "How often to send notifications. Default: weekly.",
           "markdownDescription": "**`'daily' | 'weekly' | 'monthly'`** How often to send notifications. Default: weekly."
         },
-        "receivers": {
+        "emailReceivers": {
           "type": "array",
           "items": {
             "type": "string",
             "markdownDescription": "**`string`**"
           },
-          "minItems": 1,
-          "description": "List of recipients (usernames). Required.",
-          "markdownDescription": "**`string[]`** List of recipients (usernames). Required."
+          "description": "Recipients of the email report (usernames or emails). Sent only when non-empty.",
+          "markdownDescription": "**`string[]`** Recipients of the email report (usernames or emails). Sent only when non-empty."
+        },
+        "messengerReceivers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "**`string`**"
+          },
+          "description": "Recipients of the Yandex Messenger report (usernames or numeric uid of a user or chat). Sent only when non-empty.",
+          "markdownDescription": "**`string[]`** Recipients of the Yandex Messenger report (usernames or numeric uid of a user or chat). Sent only when non-empty."
         }
       },
       "additionalProperties": false,
-      "description": "Crawler broken-link notification settings.",
-      "markdownDescription": "**`{channels, interval, receivers}`** Crawler broken-link notification settings."
+      "description": "Crawler broken-link notification settings. At least one of emailReceivers / messengerReceivers must be set.",
+      "markdownDescription": "**`{interval, emailReceivers, messengerReceivers}`** Crawler broken-link notification settings. At least one of `emailReceivers` / `messengerReceivers` must be set."
     },
     "LangItem": {
       "oneOf": [

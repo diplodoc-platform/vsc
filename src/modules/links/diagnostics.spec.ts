@@ -3,7 +3,12 @@ import type * as vscode from 'vscode';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import * as vscodeModule from 'vscode';
 
-import {getIncluderLines, getNavigationLines, validateLinks} from './diagnostics';
+import {
+    getBlockScalarLines,
+    getIncluderLines,
+    getNavigationLines,
+    validateLinks,
+} from './diagnostics';
 
 const statMock = vi.mocked(vscodeModule.workspace.fs.stat);
 
@@ -273,6 +278,175 @@ describe('validateLinks', () => {
         expect(getSetCall().diagnostics).toHaveLength(0);
     });
 
+    it('skips link fields inside a folded block scalar example', async () => {
+        statMock.mockRejectedValue(new Error('not found'));
+        const doc = mockDocument(
+            [
+                'markdownDescription: >-',
+                '  Example config:',
+                '',
+                '  ```yaml',
+                '  input: ./docs',
+                '  output: ./build',
+                '  ```',
+                'properties:',
+                '  href: missing.md',
+            ].join('\n'),
+        );
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        const {diagnostics} = getSetCall();
+        expect(diagnostics).toHaveLength(1);
+        expect(diagnostics[0].message).toBe('Link is unreachable: missing.md');
+    });
+
+    it('skips link fields inside a literal block scalar', async () => {
+        statMock.mockRejectedValue(new Error('not found'));
+        const doc = mockDocument(
+            ['description: |', '  input: ./docs', '  config: ./cfg'].join('\n'),
+        );
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        expect(statMock).not.toHaveBeenCalled();
+        expect(getSetCall().diagnostics).toHaveLength(0);
+    });
+
+    it('skips snippet placeholder values', async () => {
+        statMock.mockRejectedValue(new Error('not found'));
+        const doc = mockDocument("    config: '${1:.yfmlint}'");
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        expect(statMock).not.toHaveBeenCalled();
+        expect(getSetCall().diagnostics).toHaveLength(0);
+    });
+
+    it('reports error for missing image path fields', async () => {
+        statMock.mockRejectedValue(new Error('not found'));
+        const doc = mockDocument(
+            [
+                'image:',
+                '  mobile: ../_images/cover.png',
+                '  desktop: ../_images/cover-wide.png',
+            ].join('\n'),
+        );
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        const {diagnostics} = getSetCall();
+        expect(diagnostics.map((d) => d.message)).toEqual([
+            'Link is unreachable: ../_images/cover.png',
+            'Link is unreachable: ../_images/cover-wide.png',
+        ]);
+    });
+
+    it('validates a direct image path field', async () => {
+        statMock.mockRejectedValue(new Error('not found'));
+        const doc = mockDocument('  image: ../_images/cover.png');
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        expect(getSetCall().diagnostics).toHaveLength(1);
+        expect(getSetCall().diagnostics[0].message).toBe(
+            'Link is unreachable: ../_images/cover.png',
+        );
+    });
+
+    it('skips external image path fields', async () => {
+        const doc = mockDocument('  desktop: https://example.com/cover.png');
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        expect(statMock).not.toHaveBeenCalled();
+        expect(getSetCall().diagnostics).toHaveLength(0);
+    });
+
+    it('does not treat non-path image-field values as links', async () => {
+        const doc = mockDocument('  mobile: true');
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        expect(statMock).not.toHaveBeenCalled();
+        expect(getSetCall().diagnostics).toHaveLength(0);
+    });
+
+    it('reports error for missing markdown link inside a block scalar', async () => {
+        statMock.mockRejectedValue(new Error('not found'));
+        const doc = mockDocument(['text: |', '  [Extensions](extensions/index.md)'].join('\n'));
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        const {diagnostics} = getSetCall();
+        expect(diagnostics).toHaveLength(1);
+        expect(diagnostics[0].message).toBe('Link is unreachable: extensions/index.md');
+        expect(diagnostics[0].range.start.character).toBe(15);
+        expect(diagnostics[0].range.end.character).toBe(34);
+    });
+
+    it('reports no error for existing markdown link inside a block scalar', async () => {
+        const doc = mockDocument(['text: |', '  [Index](index.md)'].join('\n'));
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        expect(getSetCall().diagnostics).toHaveLength(0);
+    });
+
+    it('checks only the file part of a markdown link with an anchor', async () => {
+        const doc = mockDocument(['text: |', '  [Prepare](quickstart.md#prepare)'].join('\n'));
+        const {collection} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        const targetArg = statMock.mock.calls[0][0] as {path?: string; fsPath?: string};
+        const checked = String(targetArg.path ?? targetArg.fsPath ?? targetArg);
+        expect(checked.endsWith('quickstart.md')).toBe(true);
+    });
+
+    it('skips external markdown links inside a block scalar', async () => {
+        const doc = mockDocument(['text: |', '  [Site](https://example.com/a)'].join('\n'));
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        expect(statMock).not.toHaveBeenCalled();
+        expect(getSetCall().diagnostics).toHaveLength(0);
+    });
+
+    it('skips pure-anchor markdown links inside a block scalar', async () => {
+        const doc = mockDocument(['text: |', '  [Top](#section)'].join('\n'));
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        expect(statMock).not.toHaveBeenCalled();
+        expect(getSetCall().diagnostics).toHaveLength(0);
+    });
+
+    it('reports multiple missing markdown links on one block scalar line', async () => {
+        statMock.mockRejectedValue(new Error('not found'));
+        const doc = mockDocument(['text: |', '  [a](one.md) and [b](two.md)'].join('\n'));
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        const {diagnostics} = getSetCall();
+        expect(diagnostics.map((d) => d.message)).toEqual([
+            'Link is unreachable: one.md',
+            'Link is unreachable: two.md',
+        ]);
+    });
+
     it('still checks path inside a normal include without includers', async () => {
         statMock.mockRejectedValue(new Error('not found'));
         const doc = mockDocument(
@@ -327,6 +501,38 @@ describe('getIncluderLines', () => {
         const doc = mockDocument('  - include: { mode: merge, path: toc-common.yaml }');
 
         expect(getIncluderLines(doc).size).toBe(0);
+    });
+});
+
+describe('getBlockScalarLines', () => {
+    it('returns content lines of a block scalar', () => {
+        const doc = mockDocument(
+            ['title: x', 'desc: >-', '  line one', '', '  line two', 'next: y'].join('\n'),
+        );
+
+        const lines = getBlockScalarLines(doc);
+
+        expect(lines.has(0)).toBe(false);
+        expect(lines.has(1)).toBe(false);
+        expect(lines.has(2)).toBe(true);
+        expect(lines.has(3)).toBe(true);
+        expect(lines.has(4)).toBe(true);
+        expect(lines.has(5)).toBe(false);
+    });
+
+    it('handles literal block scalar with indentation indicator', () => {
+        const doc = mockDocument(['data: |2-', '  kept', 'after: y'].join('\n'));
+
+        const lines = getBlockScalarLines(doc);
+
+        expect(lines.has(1)).toBe(true);
+        expect(lines.has(2)).toBe(false);
+    });
+
+    it('returns empty set when no block scalar', () => {
+        const doc = mockDocument(['a: 1', 'b: 2'].join('\n'));
+
+        expect(getBlockScalarLines(doc).size).toBe(0);
     });
 });
 

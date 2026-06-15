@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 
 import {getBaseHtml} from '../../ui/html';
+import * as telemetry from '../telemetry';
+import {EVENTS} from '../telemetry/constants';
 
 export abstract class BaseEditor {
     isUpdatingFromWebview = false;
@@ -180,6 +182,12 @@ export abstract class BaseEditor {
 
             edit.replace(this._currentDocUri, fullRange, content);
             await vscode.workspace.applyEdit(edit);
+        } catch (error) {
+            telemetry.sendException(error instanceof Error ? error : new Error(String(error)), {
+                event: EVENTS.EDITOR_APPLY_ERROR,
+                panel: this._panelId(),
+            });
+            throw error;
         } finally {
             this.isUpdatingFromWebview = false;
         }
