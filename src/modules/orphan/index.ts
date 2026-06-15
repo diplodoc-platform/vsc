@@ -11,6 +11,8 @@ import {
     isIncluded,
     isYfmFile,
 } from '../utils';
+import * as telemetry from '../telemetry';
+import {EVENTS} from '../telemetry/constants';
 
 import {collectBlocksYamlFiles, collectReferencedFiles} from './collector';
 import {OrphanDecorationProvider} from './decorator';
@@ -146,7 +148,15 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
-        await handleFileDeleted(uri);
+        try {
+            await handleFileDeleted(uri);
+        } catch (error) {
+            telemetry.sendException(error instanceof Error ? error : new Error(String(error)), {
+                event: EVENTS.ORPHAN_ERROR,
+                operation: 'delete',
+            });
+        }
+
         debouncedRefresh();
     }
 
@@ -159,7 +169,14 @@ export function activate(context: vscode.ExtensionContext) {
             }
 
             if (oldUri.fsPath.endsWith('.md') || oldUri.fsPath.endsWith('.yaml')) {
-                await handleFileRenamed(oldUri, newUri);
+                try {
+                    await handleFileRenamed(oldUri, newUri);
+                } catch (error) {
+                    telemetry.sendException(
+                        error instanceof Error ? error : new Error(String(error)),
+                        {event: EVENTS.ORPHAN_ERROR, operation: 'rename'},
+                    );
+                }
             }
         }
 
