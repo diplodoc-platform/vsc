@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.11.0](https://github.com/diplodoc-platform/vsc/compare/v0.10.0...v0.11.0) (2026-06-15)
+
+
+### Features
+
+* added telemetry ([ff6c80d](https://github.com/diplodoc-platform/vsc/commit/ff6c80df24b26600791f778b5957162f2545b98b))
+* added telemetry ([b397ec0](https://github.com/diplodoc-platform/vsc/commit/b397ec08c8f5843df193f9955c8da4e8e3953b8d))
+
 ## [0.10.0](https://github.com/diplodoc-platform/vsc/compare/v0.9.0...v0.10.0) (2026-06-10)
 
 
