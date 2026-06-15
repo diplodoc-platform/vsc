@@ -126,6 +126,35 @@ export function isExternalUrl(value: string): boolean {
     return /^https?:\/\//.test(value);
 }
 
+export interface MarkdownLink {
+    value: string;
+    start: number;
+    end: number;
+}
+
+const MARKDOWN_LINK_RE = /\[[^\]]*\]\(\s*([^)\s]+)/g;
+
+export function extractMarkdownLinks(text: string): MarkdownLink[] {
+    const links: MarkdownLink[] = [];
+
+    MARKDOWN_LINK_RE.lastIndex = 0;
+
+    let match: RegExpExecArray | null;
+
+    while ((match = MARKDOWN_LINK_RE.exec(text)) !== null) {
+        const value = match[1];
+        const start = match.index + match[0].length - value.length;
+
+        links.push({value, start, end: start + value.length});
+    }
+
+    return links;
+}
+
+export function stripLinkAnchor(value: string): string {
+    return value.replace(/[#?].*$/, '');
+}
+
 export function isInternalPath(value: string): boolean {
     const normalized = value.trim();
 

@@ -1,5 +1,8 @@
 import * as vscode from 'vscode';
 
+import * as telemetry from '../telemetry';
+import {EVENTS} from '../telemetry/constants';
+
 import {PresetsCompletionProvider} from './completion';
 import {PresetsDefinitionProvider} from './definition';
 import {PresetsHoverProvider} from './hover';
@@ -54,6 +57,8 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand(
             'diplodoc.goToPreset',
             async (filePath: string, line: number) => {
+                telemetry.sendEvent(EVENTS.PRESET_GOTO);
+
                 const uri = vscode.Uri.file(filePath);
                 const doc = await vscode.workspace.openTextDocument(uri);
                 const editor = await vscode.window.showTextDocument(doc);

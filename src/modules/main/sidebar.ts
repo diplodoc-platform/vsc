@@ -8,6 +8,8 @@ import {t} from '../../i18n';
 import {getBaseHtml} from '../../ui/html';
 import {debounce, isBlocksYaml, isToc} from '../../utils';
 import {getExcludePattern} from '../utils';
+import * as telemetry from '../telemetry';
+import {EVENTS} from '../telemetry/constants';
 
 export class Sidebar implements vscode.WebviewViewProvider {
     isUpdatingFromWebview = false;
@@ -66,6 +68,7 @@ export class Sidebar implements vscode.WebviewViewProvider {
             }
 
             if (message.command === 'openSettings') {
+                telemetry.sendEvent(EVENTS.SETTINGS_OPENED);
                 await vscode.commands.executeCommand('workbench.action.openSettings', 'Diplodoc');
             }
         });
@@ -168,6 +171,8 @@ export class Sidebar implements vscode.WebviewViewProvider {
         }
 
         exec('yfm --version', async (error) => {
+            telemetry.sendEvent(EVENTS.PROJECT_INIT, {yfmInstalled: error ? 'false' : 'true'});
+
             if (error) {
                 const result = await vscode.window.showErrorMessage(
                     t('sidebar.install_yfm'),
@@ -206,13 +211,19 @@ export class Sidebar implements vscode.WebviewViewProvider {
         const fileUri = vscode.Uri.joinPath(workspaceFolder.uri, relativePath);
 
         if (relativePath.endsWith('.md')) {
+            telemetry.sendEvent(EVENTS.MD_EDITOR_OPENED, {source: 'sidebar', fileType: 'md'});
             await this._mdEditor.showFile(fileUri, vscode.ViewColumn.Active);
         } else if (isToc(relativePath)) {
+            telemetry.sendEvent(EVENTS.TOC_EDITOR_OPENED, {source: 'sidebar'});
             await this._tocEditor.showFile(fileUri, vscode.ViewColumn.Active);
         } else if (relativePath.endsWith('.yaml')) {
             const doc = await vscode.workspace.openTextDocument(fileUri);
 
             if (isBlocksYaml(doc)) {
+                telemetry.sendEvent(EVENTS.MD_EDITOR_OPENED, {
+                    source: 'sidebar',
+                    fileType: 'blocks-yaml',
+                });
                 await this._mdEditor.showFile(fileUri, vscode.ViewColumn.Active);
             }
         }

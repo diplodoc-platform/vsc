@@ -2,20 +2,51 @@ import * as vscode from 'vscode';
 
 import {debounceByKey} from '../../utils';
 import {findYfmRoot, isInExcludedDir} from '../utils';
+import * as telemetry from '../telemetry';
+import {EVENTS} from '../telemetry/constants';
 
 import {LINK_FIELDS, LIST_ITEM_RE, LIST_PARENT_RE} from './constants';
-import {validateLinks} from './diagnostics';
+import {getBlockScalarLines, validateLinks} from './diagnostics';
 import {FilePathCompletionProvider} from './file-completion';
 import {FileReferenceProvider, findFileReferences} from './references';
-import {findIncluderBlocks, isExternalUrl, isInIncluderBlock, parseLinkFromLine} from './utils';
+import {
+    extractMarkdownLinks,
+    findIncluderBlocks,
+    isExternalUrl,
+    isInIncluderBlock,
+    parseLinkFromLine,
+    stripLinkAnchor,
+} from './utils';
 
 const INPUT_FIELD_RE = /^(\s*)input:\s+['"]?([^'"#\s][^'"\n]*)['"]?\s*$/;
+
+function collectMarkdownLinks(
+    lineText: string,
+    lineIndex: number,
+    baseUri: vscode.Uri,
+    links: vscode.DocumentLink[],
+): void {
+    for (const {value, start} of extractMarkdownLinks(lineText)) {
+        const external = isExternalUrl(value);
+        const path = external ? value : stripLinkAnchor(value);
+
+        if (!path) {
+            continue;
+        }
+
+        const range = new vscode.Range(lineIndex, start, lineIndex, start + value.length);
+        const target = external ? vscode.Uri.parse(value) : vscode.Uri.joinPath(baseUri, path);
+
+        links.push(new vscode.DocumentLink(range, target));
+    }
+}
 
 export class LinkProvider implements vscode.DocumentLinkProvider {
     provideDocumentLinks(document: vscode.TextDocument): vscode.DocumentLink[] {
         const links: vscode.DocumentLink[] = [];
         const baseUri = vscode.Uri.joinPath(document.uri, '..');
         const includerBlocks = findIncluderBlocks(document);
+        const blockScalarLines = getBlockScalarLines(document);
 
         const yfmRoot = findYfmRoot(document.uri.fsPath);
         const rootUri = yfmRoot ? vscode.Uri.file(yfmRoot) : baseUri;
@@ -26,6 +57,11 @@ export class LinkProvider implements vscode.DocumentLinkProvider {
         for (let i = 0; i < document.lineCount; i++) {
             const line = document.lineAt(i);
             const lineText = line.text;
+
+            if (blockScalarLines.has(i)) {
+                collectMarkdownLinks(lineText, i, baseUri, links);
+                continue;
+            }
 
             const inputMatch = INPUT_FIELD_RE.exec(lineText);
             const inIncluder = isInIncluderBlock(i, includerBlocks);
@@ -127,6 +163,8 @@ export function activate(context: vscode.ExtensionContext) {
             }
 
             const locations = await findFileReferences(targetUri);
+
+            telemetry.sendEvent(EVENTS.REFERENCES_FIND, undefined, {found: locations.length});
 
             await vscode.commands.executeCommand(
                 'editor.action.showReferences',

@@ -78,4 +78,47 @@ describe('LinkProvider', () => {
         expect(pathLink).toBeDefined();
         expect(pathLink?.target?.toString()).toBe('/docs/ru/sub/toc.yaml');
     });
+
+    it('provides links for markdown links inside a block scalar', () => {
+        const doc = mockDocument(['text: |', '  [Index](index.md)'].join('\n'));
+        const links = provider.provideDocumentLinks(doc);
+
+        expect(links).toHaveLength(1);
+        expect(links[0].target?.toString()).toBe('/docs/ru/index.md');
+        expect(links[0].range.start.character).toBe(10);
+        expect(links[0].range.end.character).toBe(18);
+    });
+
+    it('provides links for several markdown links on one block scalar line', () => {
+        const doc = mockDocument(['text: |', '  [a](one.md) and [b](two.md)'].join('\n'));
+        const links = provider.provideDocumentLinks(doc);
+
+        expect(links.map((l) => l.target?.toString())).toEqual([
+            '/docs/ru/one.md',
+            '/docs/ru/two.md',
+        ]);
+    });
+
+    it('strips the anchor from a markdown link target inside a block scalar', () => {
+        const doc = mockDocument(['text: |', '  [Prepare](quickstart.md#prepare)'].join('\n'));
+        const links = provider.provideDocumentLinks(doc);
+
+        expect(links).toHaveLength(1);
+        expect(links[0].target?.toString()).toBe('/docs/ru/quickstart.md');
+    });
+
+    it('provides external markdown links inside a block scalar', () => {
+        const doc = mockDocument(['text: |', '  [Site](https://example.com/a)'].join('\n'));
+        const links = provider.provideDocumentLinks(doc);
+
+        expect(links).toHaveLength(1);
+        expect(links[0].target?.toString()).toBe('https://example.com/a');
+    });
+
+    it('skips pure-anchor markdown links inside a block scalar', () => {
+        const doc = mockDocument(['text: |', '  [Top](#section)'].join('\n'));
+        const links = provider.provideDocumentLinks(doc);
+
+        expect(links).toHaveLength(0);
+    });
 });

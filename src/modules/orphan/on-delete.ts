@@ -4,6 +4,8 @@ import * as vscode from 'vscode';
 import {isExternalUrl} from '../../utils';
 import {type MdReference, findMarkdownReferences} from '../links/md-links';
 import {findYfmRoot, getExcludePattern} from '../utils';
+import * as telemetry from '../telemetry';
+import {EVENTS} from '../telemetry/constants';
 
 import {HREF_RE} from './constants';
 
@@ -265,6 +267,14 @@ export async function handleFileDeleted(deletedUri: vscode.Uri): Promise<void> {
     const choice = await vscode.window.showQuickPick(choices, {
         placeHolder: `"${fileName}" was deleted. What would you like to do?`,
     });
+
+    if (choice) {
+        telemetry.sendEvent(
+            EVENTS.ORPHAN_DELETE_ACTION,
+            {action: choice.id},
+            {tocRefs: tocRefs.length, mdRefs: mdRefs.length},
+        );
+    }
 
     if (!choice || choice.id === 'nothing') {
         return;
