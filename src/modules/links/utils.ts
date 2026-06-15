@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 
-import {isExternalUrl, isInternalPath} from '../../utils';
+import {extractMarkdownLinks, isExternalUrl, isInternalPath, stripLinkAnchor} from '../../utils';
 
 import {FIELD_RE, LINK_FIELDS} from './constants';
 
-export {isExternalUrl, isInternalPath};
+export {extractMarkdownLinks, isExternalUrl, isInternalPath, stripLinkAnchor};
 
 const INCLUDE_HEADER_RE = /^(\s*)include:\s*(?:#.*)?$/;
 const INCLUDERS_RE = /^includers:\s*(?:#.*)?$/;

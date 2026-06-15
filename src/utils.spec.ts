@@ -1,12 +1,14 @@
 import {describe, expect, it, vi} from 'vitest';
 
 import {
+    extractMarkdownLinks,
     insertAtCursor,
     insertElement,
     isBlocksYaml,
     isExternalUrl,
     isInternalPath,
     isToc,
+    stripLinkAnchor,
     unwrapPageConstructor,
     wrapPageConstructor,
 } from './utils';
@@ -314,5 +316,70 @@ describe('isToc', () => {
         expect(isToc('toc-common.yml')).toBe(false);
         expect(isToc('toc-common.json')).toBe(false);
         expect(isToc('toc-common')).toBe(false);
+    });
+});
+
+describe('extractMarkdownLinks', () => {
+    it('extracts a single markdown link with its value position', () => {
+        const links = extractMarkdownLinks('  [Index](index.md)');
+
+        expect(links).toHaveLength(1);
+        expect(links[0].value).toBe('index.md');
+        expect(links[0].start).toBe(10);
+        expect(links[0].end).toBe(18);
+    });
+
+    it('extracts multiple links from one line', () => {
+        const text = '[Install](tools/docs/index.md) and [usage](tools/docs/build.md)';
+        const links = extractMarkdownLinks(text);
+
+        expect(links.map((l) => l.value)).toEqual(['tools/docs/index.md', 'tools/docs/build.md']);
+        expect(text.slice(links[0].start, links[0].end)).toBe('tools/docs/index.md');
+        expect(text.slice(links[1].start, links[1].end)).toBe('tools/docs/build.md');
+    });
+
+    it('keeps the anchor inside the captured value', () => {
+        const links = extractMarkdownLinks('[Prepare](quickstart.md#prepare)');
+
+        expect(links).toHaveLength(1);
+        expect(links[0].value).toBe('quickstart.md#prepare');
+    });
+
+    it('captures external urls', () => {
+        const links = extractMarkdownLinks('[Site](https://example.com/a)');
+
+        expect(links[0].value).toBe('https://example.com/a');
+    });
+
+    it('stops the value at an optional title', () => {
+        const links = extractMarkdownLinks('[x](index.md "Title")');
+
+        expect(links[0].value).toBe('index.md');
+    });
+
+    it('returns empty array when there is no link', () => {
+        expect(extractMarkdownLinks('just some text')).toEqual([]);
+    });
+
+    it('ignores empty link targets', () => {
+        expect(extractMarkdownLinks('[empty]()')).toEqual([]);
+    });
+});
+
+describe('stripLinkAnchor', () => {
+    it('removes the anchor part', () => {
+        expect(stripLinkAnchor('quickstart.md#prepare')).toBe('quickstart.md');
+    });
+
+    it('removes a query part', () => {
+        expect(stripLinkAnchor('page.md?x=1')).toBe('page.md');
+    });
+
+    it('returns the value unchanged when there is no anchor', () => {
+        expect(stripLinkAnchor('index.md')).toBe('index.md');
+    });
+
+    it('returns empty string for a pure anchor', () => {
+        expect(stripLinkAnchor('#section')).toBe('');
     });
 });

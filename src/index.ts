@@ -7,11 +7,18 @@ import * as color from './modules/color';
 import * as links from './modules/links';
 import * as orphan from './modules/orphan';
 import * as presets from './modules/presets';
+import * as telemetry from './modules/telemetry';
 import {TocEditor} from './modules/toc-editor/editor';
 import {insertBlock, openMdEditor, openTocEditor} from './commands';
 import {isBlocksYaml, isToc} from './utils';
+import {EVENTS, TELEMETRY_CONNECTION_STRING} from './modules/telemetry/constants';
 
 export function activate(context: vscode.ExtensionContext) {
+    const reporter = telemetry.activate(TELEMETRY_CONNECTION_STRING);
+
+    context.subscriptions.push(reporter);
+    telemetry.sendEvent(EVENTS.EXTENSION_ACTIVATED);
+
     validation.activate(context);
     color.activate(context);
     links.activate(context);

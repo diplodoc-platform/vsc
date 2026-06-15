@@ -3,6 +3,8 @@ import * as vscode from 'vscode';
 import {BaseEditor} from '../shared/base-editor';
 import {isBlocksYaml, unwrapPageConstructor, wrapPageConstructor} from '../../utils';
 import {getVscConfig} from '../utils';
+import * as telemetry from '../telemetry';
+import {EVENTS} from '../telemetry/constants';
 
 export class MdEditor extends BaseEditor {
     private _pendingSync?: {text: string; fileName: string};
@@ -51,6 +53,8 @@ export class MdEditor extends BaseEditor {
             const mode = getVscConfig<'wysiwyg' | 'markup'>('editorMode', 'wysiwyg');
             this._panel?.webview.postMessage({command: 'setMode', mode});
 
+            telemetry.sendEvent(EVENTS.MD_EDITOR_MODE, {mode});
+
             if (this._pendingSync) {
                 this._panel?.webview.postMessage({
                     command: 'setContent',
@@ -65,6 +69,8 @@ export class MdEditor extends BaseEditor {
                 await this._applyToDocument(message.text as string);
             }
             await this._saveDocument();
+
+            telemetry.sendEvent(EVENTS.MD_EDITOR_SAVED);
         }
     }
 
@@ -109,7 +115,15 @@ export class MdEditor extends BaseEditor {
         if (!this._currentDocUri) {
             return;
         }
-        const document = await vscode.workspace.openTextDocument(this._currentDocUri);
-        await document.save();
+
+        try {
+            const document = await vscode.workspace.openTextDocument(this._currentDocUri);
+            await document.save();
+        } catch (error) {
+            telemetry.sendException(error instanceof Error ? error : new Error(String(error)), {
+                event: EVENTS.MD_EDITOR_SAVE_ERROR,
+            });
+            throw error;
+        }
     }
 }

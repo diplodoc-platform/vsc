@@ -203,7 +203,7 @@ properties:
   crawlerManifest:
     markdownDescription: '**`boolean`** Emit `crawler-manifest.json` mapping each source file to its external links. Useful for link-health checks (404/403 detection).'
   crawler:
-    markdownDescription: "**`object`** Crawler-manifest settings.\n\n- `notifications` **`CrawlerNotificationsConfig`** — broken-link report delivery settings (`receivers` required)\n- `exclude` **`{url, regexp}`** — URLs/patterns to skip"
+    markdownDescription: "**`object`** Crawler-manifest settings.\n\n- `notifications` **`CrawlerNotificationsConfig`** — broken-link report delivery settings (at least one of `emailReceivers` / `messengerReceivers`)\n- `exclude` **`{url, regexp}`** — URLs/patterns to skip"
   changelogs:
     markdownDescription: '**`boolean | string`** Enable changelog generation. String value selects the output format.'
   watch:

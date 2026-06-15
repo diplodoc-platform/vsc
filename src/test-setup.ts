@@ -1,5 +1,13 @@
 import {vi} from 'vitest';
 
+vi.mock('@vscode/extension-telemetry', () => ({
+    TelemetryReporter: class {
+        sendTelemetryEvent = vi.fn();
+        sendTelemetryErrorEvent = vi.fn();
+        dispose = vi.fn();
+    },
+}));
+
 class MockPosition {
     line: number;
     character: number;

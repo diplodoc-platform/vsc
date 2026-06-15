@@ -3,14 +3,22 @@ import * as vscode from 'vscode';
 import {MAX_DIAGNOSTICS_PER_FILE} from '../validation/constants';
 
 import {
+    BLOCK_SCALAR_RE,
     FIELD_RE,
     LINK_FIELDS,
     LIST_ITEM_RE,
     LIST_PARENT_RE,
     NOT_ONLY_LINKS_FIELDS,
     SKIP_DIAGNOSTIC_FIELDS,
+    SNIPPET_RE,
 } from './constants';
-import {findIncluderBlocks, isExternalUrl, isInternalPath} from './utils';
+import {
+    extractMarkdownLinks,
+    findIncluderBlocks,
+    isExternalUrl,
+    isInternalPath,
+    stripLinkAnchor,
+} from './utils';
 
 export function getNavigationLines(document: vscode.TextDocument): Set<number> {
     const lines = new Set<number>();
@@ -59,10 +67,44 @@ export function getIncluderLines(document: vscode.TextDocument): Set<number> {
     return result;
 }
 
+export function getBlockScalarLines(document: vscode.TextDocument): Set<number> {
+    const lines = new Set<number>();
+    let blockIndent = -1;
+
+    for (let i = 0; i < document.lineCount; i++) {
+        const text = document.lineAt(i).text;
+        const stripped = text.trimStart();
+
+        if (blockIndent >= 0) {
+            if (stripped === '') {
+                lines.add(i);
+                continue;
+            }
+
+            const indent = text.length - stripped.length;
+
+            if (indent > blockIndent) {
+                lines.add(i);
+                continue;
+            }
+
+            blockIndent = -1;
+        }
+
+        const match = BLOCK_SCALAR_RE.exec(text);
+
+        if (match) {
+            blockIndent = match[1].length;
+        }
+    }
+
+    return lines;
+}
+
 async function checkLink(
     value: string,
-    line: vscode.TextLine,
     lineIndex: number,
+    start: number,
     baseUri: vscode.Uri,
     diagnostics: vscode.Diagnostic[],
 ): Promise<void> {
@@ -71,13 +113,7 @@ async function checkLink(
     try {
         await vscode.workspace.fs.stat(targetUri);
     } catch {
-        const valueStart = line.text.indexOf(value);
-
-        if (valueStart === -1) {
-            return;
-        }
-
-        const range = new vscode.Range(lineIndex, valueStart, lineIndex, valueStart + value.length);
+        const range = new vscode.Range(lineIndex, start, lineIndex, start + value.length);
         const diagnostic = new vscode.Diagnostic(
             range,
             `Link is unreachable: ${value}`,
@@ -85,6 +121,28 @@ async function checkLink(
         );
         diagnostic.source = 'Diplodoc';
         diagnostics.push(diagnostic);
+    }
+}
+
+function checkMarkdownLinks(
+    line: vscode.TextLine,
+    lineIndex: number,
+    baseUri: vscode.Uri,
+    diagnostics: vscode.Diagnostic[],
+    checks: Promise<void>[],
+): void {
+    for (const {value, start} of extractMarkdownLinks(line.text)) {
+        if (isExternalUrl(value) || SNIPPET_RE.test(value)) {
+            continue;
+        }
+
+        const path = stripLinkAnchor(value);
+
+        if (!path) {
+            continue;
+        }
+
+        checks.push(checkLink(path, lineIndex, start, baseUri, diagnostics));
     }
 }
 
@@ -97,6 +155,7 @@ function extractFieldLinkValue(match: RegExpExecArray): string | null {
         SKIP_DIAGNOSTIC_FIELDS.has(field) ||
         !value ||
         isExternalUrl(value) ||
+        SNIPPET_RE.test(value) ||
         (NOT_ONLY_LINKS_FIELDS.has(field) && !isInternalPath(value))
     ) {
         return null;
@@ -141,6 +200,7 @@ export async function validateLinks(
     const baseUri = vscode.Uri.joinPath(document.uri, '..');
     const navigationLines = getNavigationLines(document);
     const includerLines = getIncluderLines(document);
+    const blockScalarLines = getBlockScalarLines(document);
     const listCtx: ListContext = {field: null, indent: -1};
     const checks: Promise<void>[] = [];
 
@@ -148,6 +208,11 @@ export async function validateLinks(
         const line = document.lineAt(i);
 
         if (navigationLines.has(i) || includerLines.has(i)) {
+            continue;
+        }
+
+        if (blockScalarLines.has(i)) {
+            checkMarkdownLinks(line, i, baseUri, diagnostics, checks);
             continue;
         }
 
@@ -159,7 +224,9 @@ export async function validateLinks(
             const value = extractFieldLinkValue(match);
 
             if (value) {
-                checks.push(checkLink(value, line, i, baseUri, diagnostics));
+                const valueStart = line.text.indexOf(value);
+
+                checks.push(checkLink(value, i, valueStart, baseUri, diagnostics));
             }
 
             continue;
@@ -175,8 +242,10 @@ export async function validateLinks(
             if (itemMatch && line.text.search(/\S/) > listCtx.indent) {
                 const value = itemMatch[1].replace(/['"]$/, '');
 
-                if (value && !isExternalUrl(value)) {
-                    checks.push(checkLink(value, line, i, baseUri, diagnostics));
+                if (value && !isExternalUrl(value) && !SNIPPET_RE.test(value)) {
+                    const valueStart = line.text.indexOf(value);
+
+                    checks.push(checkLink(value, i, valueStart, baseUri, diagnostics));
                 }
 
                 continue;
