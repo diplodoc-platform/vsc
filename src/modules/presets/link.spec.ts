@@ -17,7 +17,7 @@ vi.mock('../utils', () => ({
 }));
 
 vi.mock('./resolver', () => ({
-    VARIABLE_RE: /\{\{\s*(\w+)\s*\}\}/g,
+    VARIABLE_RE: /\{\{\s*([\w.-]+)\s*\}\}/g,
     resolveVariables: vi.fn(),
     findPresetsFiles: vi.fn(),
     findVariableLine: vi.fn(),
@@ -72,6 +72,19 @@ describe('PresetsLinkProvider', () => {
         expect(links[0].range).toMatchObject({
             start: {line: 0, character: 0},
             end: {line: 0, character: 8},
+        });
+    });
+
+    it('creates link for variable with dash in name', () => {
+        vi.mocked(resolveVariables).mockReturnValue(makeVariables({'presets-num': '42'}));
+
+        const doc = mockDocument('{{presets-num}}');
+        const links = provider.provideDocumentLinks(doc);
+
+        expect(links).toHaveLength(1);
+        expect(links[0].range).toMatchObject({
+            start: {line: 0, character: 0},
+            end: {line: 0, character: 15},
         });
     });
 
