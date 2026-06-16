@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.11.1](https://github.com/diplodoc-platform/vsc/compare/v0.11.0...v0.11.1) (2026-06-16)
+
+
+### Bug Fixes
+
+* fixed presets ([65ff89d](https://github.com/diplodoc-platform/vsc/commit/65ff89da8942af35eea81d7ea9cc4b998f0eceff))
+* fixed presets ([1c3edc1](https://github.com/diplodoc-platform/vsc/commit/1c3edc1738ef01c3f42056cee77331342ed8e15c))
+
 ## [0.11.0](https://github.com/diplodoc-platform/vsc/compare/v0.10.0...v0.11.0) (2026-06-15)
 
 
