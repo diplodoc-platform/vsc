@@ -24,7 +24,7 @@ function findCurrentPreset(document: vscode.TextDocument, line: number): string 
 }
 
 function getYamlKeyAtPosition(lineText: string, character: number): string | null {
-    const match = /^\s+([\w.]+)\s*:/.exec(lineText);
+    const match = /^\s+([\w.-]+)\s*:/.exec(lineText);
 
     if (match && character < match[0].length) {
         return match[1];
