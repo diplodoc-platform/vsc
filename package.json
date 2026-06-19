@@ -298,7 +298,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@diplodoc/ajv": "^0.0.4",
+    "@diplodoc/ajv": "^0.0.5",
     "@diplodoc/html-extension": "^2.9.9",
     "@diplodoc/latex-extension": "^1.4.1",
     "@diplodoc/mermaid-extension": "^2.1.1",
