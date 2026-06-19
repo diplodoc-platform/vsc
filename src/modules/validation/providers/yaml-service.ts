@@ -2,17 +2,16 @@ import type {LanguageService, LanguageSettings} from 'yaml-language-server';
 
 import {getLanguageService} from 'yaml-language-server';
 import {TextDocument} from 'vscode-languageserver-textdocument';
-
 import {
     frontmatterSchemaJson,
     leadingSchemaJson,
     pageConstructorSchemaJson,
-    tocSchemaJson,
-    yfmSchemaJson,
-    yfmlintSchemaJson,
     presetsSchemaJson,
     redirectsSchemaJson,
     themeSchemaJson,
+    tocSchemaJson,
+    yfmSchemaJson,
+    yfmlintSchemaJson,
 } from '@diplodoc/ajv';
 
 export type SchemaType =
