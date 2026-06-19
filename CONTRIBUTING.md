@@ -88,8 +88,6 @@ src/
 schemas/
 ├── *.json                            # Generated JSON Schema files (committed)
 ├── overlays/*.yaml                   # VS Code-specific schema extensions
-scripts/
-└── merge-schemas.js                  # CLI schema → JSON Schema pipeline
 syntaxes/
 └── markdown-page-constructor.json    # TextMate grammar for ::: page-constructor
 tests/mocks/                          # Manual test files
@@ -130,31 +128,7 @@ BaseEditor (abstract)          — src/modules/shared/base-editor.ts
 
 To add a new visual editor: extend `BaseEditor`, implement abstract methods (`_panelId`, `_panelTitle`, `_buildSubdir`, `_canSync`, `_onWebviewMessage`, `_transformForWebview`, `_transformFromWebview`).
 
-## Working with schemas
-
-JSON schemas are generated from `@diplodoc/cli` YAML schemas, with VS Code-specific overlays merged on top.
-
-### Updating schemas
-
-```bash
-npm run merge-schemas
-```
-
-This reads from `../packages/cli/schemas/`, applies overlays from `schemas/overlays/`, and writes to `schemas/*.json`. If the CLI schemas are elsewhere, the script prompts for the path.
-
-### Adding a new schema type
-
-1. Ensure the CLI schema exists at `../packages/cli/schemas/<name>.yaml`
-2. Create an overlay at `schemas/overlays/<name>.yaml` (minimum: `title` and `additionalProperties: false`)
-3. Add entry to `SCHEMAS` in `scripts/merge-schemas.js`
-4. Run `npm run merge-schemas`
-5. In `yaml-service.ts`: import the schema, add entry to `SCHEMA_ENTRIES`
-6. In `validation/index.ts`: add entry to `YAML_FILE_SCHEMAS`
-7. Optionally add the filename to `contributes.languages` in `package.json`
-
 ### Modifying hover/completion content
-
-Edit `schemas/overlays/<name>.yaml` and run `npm run merge-schemas`. Overlays support:
 
 - `markdownDescription` — rich hover content
 - `defaultSnippets` — autocompletion snippets
