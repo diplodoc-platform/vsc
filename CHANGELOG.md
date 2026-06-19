@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.12.0](https://github.com/diplodoc-platform/vsc/compare/v0.11.1...v0.12.0) (2026-06-19)
+
+
+### Features
+
+* move schemas to @diplodoc/ajv ([be875ee](https://github.com/diplodoc-platform/vsc/commit/be875ee9c8368675e44f24ea748db944ee18d71f))
+* move schemas to @diplodoc/ajv ([91e43d5](https://github.com/diplodoc-platform/vsc/commit/91e43d59a5ebae01514f17c1abddb1542a9bc270))
+
+
+### Bug Fixes
+
+* fixed linter ([38bbe55](https://github.com/diplodoc-platform/vsc/commit/38bbe558b7ab29490ebd3979ae70dd6d25639226))
+
 ## [0.11.1](https://github.com/diplodoc-platform/vsc/compare/v0.11.0...v0.11.1) (2026-06-16)
 
 
