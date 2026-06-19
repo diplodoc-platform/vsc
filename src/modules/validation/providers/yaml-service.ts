@@ -3,15 +3,17 @@ import type {LanguageService, LanguageSettings} from 'yaml-language-server';
 import {getLanguageService} from 'yaml-language-server';
 import {TextDocument} from 'vscode-languageserver-textdocument';
 
-import pageConstructorSchema from '../../../../schemas/page-constructor-schema.json';
-import frontmatterSchema from '../../../../schemas/frontmatter-schema.json';
-import leadingSchema from '../../../../schemas/leading-schema.json';
-import tocSchema from '../../../../schemas/toc-schema.json';
-import yfmSchema from '../../../../schemas/yfm-schema.json';
-import yfmlintSchema from '../../../../schemas/yfmlint-schema.json';
-import presetsSchema from '../../../../schemas/presets-schema.json';
-import redirectsSchema from '../../../../schemas/redirects-schema.json';
-import themeSchema from '../../../../schemas/theme-schema.json';
+import {
+    frontmatterSchemaJson,
+    leadingSchemaJson,
+    pageConstructorSchemaJson,
+    tocSchemaJson,
+    yfmSchemaJson,
+    yfmlintSchemaJson,
+    presetsSchemaJson,
+    redirectsSchemaJson,
+    themeSchemaJson,
+} from '@diplodoc/ajv';
 
 export type SchemaType =
     | 'pc'
@@ -34,15 +36,18 @@ function title(schema: object): string {
 }
 
 const SCHEMA_ENTRIES: Record<SchemaType, SchemaEntry> = {
-    pc: {schema: pageConstructorSchema, name: title(pageConstructorSchema) || 'Page Constructor'},
-    fm: {schema: frontmatterSchema, name: title(frontmatterSchema) || 'Frontmatter'},
-    leading: {schema: leadingSchema, name: title(leadingSchema) || 'Leading'},
-    toc: {schema: tocSchema, name: title(tocSchema) || 'TOC'},
-    yfm: {schema: yfmSchema, name: title(yfmSchema) || '.yfm'},
-    yfmlint: {schema: yfmlintSchema, name: title(yfmlintSchema) || '.yfmlint'},
-    presets: {schema: presetsSchema, name: title(presetsSchema) || 'Presets'},
-    redirects: {schema: redirectsSchema, name: title(redirectsSchema) || 'Redirects'},
-    theme: {schema: themeSchema, name: title(themeSchema) || 'Theme'},
+    pc: {
+        schema: pageConstructorSchemaJson,
+        name: title(pageConstructorSchemaJson) || 'Page Constructor',
+    },
+    fm: {schema: frontmatterSchemaJson, name: title(frontmatterSchemaJson) || 'Frontmatter'},
+    leading: {schema: leadingSchemaJson, name: title(leadingSchemaJson) || 'Leading'},
+    toc: {schema: tocSchemaJson, name: title(tocSchemaJson) || 'TOC'},
+    yfm: {schema: yfmSchemaJson, name: title(yfmSchemaJson) || '.yfm'},
+    yfmlint: {schema: yfmlintSchemaJson, name: title(yfmlintSchemaJson) || '.yfmlint'},
+    presets: {schema: presetsSchemaJson, name: title(presetsSchemaJson) || 'Presets'},
+    redirects: {schema: redirectsSchemaJson, name: title(redirectsSchemaJson) || 'Redirects'},
+    theme: {schema: themeSchemaJson, name: title(themeSchemaJson) || 'Theme'},
 };
 
 export const SCHEMA_NAMES: Record<SchemaType, string> = Object.fromEntries(

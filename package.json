@@ -287,7 +287,6 @@
     "watch:webview": "BUILD_TARGET=webview node esbuild.js --watch",
     "typecheck": "tsc -p . --noEmit",
     "vsce": "vsce package --no-dependencies",
-    "merge-schemas": "node scripts/merge-schemas.js",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
@@ -299,6 +298,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@diplodoc/ajv": "^0.0.2",
     "@diplodoc/html-extension": "^2.9.9",
     "@diplodoc/latex-extension": "^1.4.1",
     "@diplodoc/mermaid-extension": "^2.1.1",

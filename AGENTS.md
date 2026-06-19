@@ -39,7 +39,6 @@ npm run watch:ext            # Watch mode — extension host
 npm run watch:webview        # Watch mode — webviews
 npm run typecheck            # TypeScript type-check (no emit)
 npm run vsce                 # Package into .vsix (uses --no-dependencies)
-npm run merge-schemas        # Regenerate JSON schemas from @diplodoc/cli sources
 ```
 
 Install locally: `code --install-extension diplodoc-vsc-extension-0.0.1.vsix --force`
@@ -97,8 +96,6 @@ src/
 schemas/                                        # Generated JSON Schema Draft-07 files
 ├── *.json                                      # Output schemas (committed, used at build time)
 └── overlays/*.yaml                             # VSCode-specific additions merged onto CLI schemas
-scripts/
-└── merge-schemas.js                            # CLI schema → JSON Schema pipeline
 syntaxes/
 └── markdown-page-constructor.json              # TextMate grammar: YAML highlighting in ::: page-constructor
 tests/mocks/                                    # Test files for manual testing
@@ -358,36 +355,6 @@ Add one entry to `DIRECTIVE_HANDLERS` in `validation/utils.ts`:
 - `open` regex should capture the full directive (`/{%\s*note\b[^%]*%}/`) for precise highlighting
 
 ## Schema System
-
-### Files
-
-| Schema                         | Target Files                    | Validated By  |
-| ------------------------------ | ------------------------------- | ------------- |
-| `page-constructor-schema.json` | YAML with `blocks` key          | Our extension |
-| `frontmatter-schema.json`      | Markdown frontmatter `---..---` | Our extension |
-| `leading-schema.json`          | `index.yaml` with `blocks`      | Our extension |
-| `toc-schema.json`              | `toc.yaml`                      | Our extension |
-| `yfm-schema.json`              | `.yfm`                          | Our extension |
-| `yfmlint-schema.json`          | `.yfmlint`                      | Our extension |
-| `presets-schema.json`          | `presets.yaml`                  | Our extension |
-| `redirects-schema.json`        | `redirects.yaml`                | Our extension |
-| `theme-schema.json`            | `theme.yaml`                    | Our extension |
-
-### Generation Pipeline (`scripts/merge-schemas.js`)
-
-Source: `@diplodoc/cli` YAML schemas at `../packages/cli/schemas/`.
-
-```
-CLI YAML schema
-  → stripCliKeys()         Remove 'translate', 'optionName'
-  → convertSelectToOneOf() Convert ajv select/selectCases → JSON Schema allOf+if/then
-  → addMarkdownDescriptions()  Auto-generate markdownDescription from description+type
-  → deepMerge(overlay)     Merge VSCode-specific overlay
-  → fixObjectTypeLabels()  Replace **`object`** with inferred concrete type
-  → write JSON
-```
-
-Run: `npm run merge-schemas` (auto-detects CLI schemas at `../packages/cli/schemas`, prompts for path if missing).
 
 ### Key Transformations
 
@@ -682,20 +649,6 @@ All webviews communicate with the extension host via `postMessage()`.
 3. **`ui/shortcuts/commands.ts`**: All WYSIWYG shortcuts use `(editor as any).actions?.X?.run()` — fragile, breaks silently if @gravity-ui API changes.
 
 ## Common Tasks
-
-### Adding a new schema type
-
-1. Ensure the CLI schema YAML exists at `../packages/cli/schemas/<name>.yaml`
-2. Create overlay at `schemas/overlays/<name>.yaml` (at minimum: `title` and `additionalProperties: false`)
-3. Add entry to `SCHEMAS` array in `scripts/merge-schemas.js`
-4. Run `npm run merge-schemas`
-5. In `yaml-service.ts`: add import, add entry to `SCHEMA_ENTRIES`
-6. In `validation/index.ts`: add entry to `YAML_FILE_SCHEMAS` array
-7. Optionally add filename to `package.json` `contributes.languages[0].filenames`
-
-### Modifying schema validation
-
-Edit `schemas/overlays/<name>.yaml` and run `npm run merge-schemas`. Overlays are deep-merged — you can override any nested property. Use `additionalProperties: false` for strict checking.
 
 ### Debugging
 

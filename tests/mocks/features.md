@@ -15,8 +15,6 @@ meta:
 
 <a href="/root_folder/path_to_file">Ссылка</a>
 
-My favorite search engine is [Yandex](./ssss/ "The best search engine").
-
 привет
 
 {% note alert "Note" %}
@@ -101,4 +99,3 @@ blocks:
 ::: openapi
 path: ./openapi.yaml
 :::
-
