@@ -1,23 +1,32 @@
-import * as vscode from 'vscode';
+import type * as vscode from 'vscode';
+
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {LiquidHighlightProvider} from './highlight';
 
 vi.mock('vscode', () => {
     class Range {
-        constructor(
-            public startLine: number,
-            public startChar: number,
-            public endLine: number,
-            public endChar: number,
-        ) {}
+        startLine: number;
+        startChar: number;
+        endLine: number;
+        endChar: number;
+
+        constructor(startLine: number, startChar: number, endLine: number, endChar: number) {
+            this.startLine = startLine;
+            this.startChar = startChar;
+            this.endLine = endLine;
+            this.endChar = endChar;
+        }
     }
 
     class DocumentHighlight {
-        constructor(
-            public range: Range,
-            public kind: number,
-        ) {}
+        range: Range;
+        kind: number;
+
+        constructor(range: Range, kind: number) {
+            this.range = range;
+            this.kind = kind;
+        }
     }
 
     return {
@@ -41,6 +50,24 @@ function makePosition(line: number, char: number): vscode.Position {
     return {line, character: char} as vscode.Position;
 }
 
+function getHighlights(
+    provider: LiquidHighlightProvider,
+    document: vscode.TextDocument,
+    position: vscode.Position,
+): vscode.DocumentHighlight[] {
+    const result = provider.provideDocumentHighlights(document, position);
+
+    expect(result).not.toBeNull();
+
+    return result as vscode.DocumentHighlight[];
+}
+
+function getStartLines(highlights: vscode.DocumentHighlight[]): number[] {
+    return highlights.map((highlight) => {
+        return (highlight.range as unknown as {startLine: number}).startLine;
+    });
+}
+
 describe('LiquidHighlightProvider', () => {
     let provider: LiquidHighlightProvider;
 
@@ -58,26 +85,24 @@ describe('LiquidHighlightProvider', () => {
     it('highlights {% if %} and {% endif %} as a pair', () => {
         const doc = makeDocument(["{% if x == 'a' %}", 'Content', '{% endif %}']);
 
-        const result = provider.provideDocumentHighlights(doc, makePosition(0, 4));
+        const result = getHighlights(provider, doc, makePosition(0, 4));
 
-        expect(result).not.toBeNull();
         expect(result).toHaveLength(2);
-        expect((result![0].range as unknown as {startLine: number}).startLine).toBe(0);
-        expect((result![1].range as unknown as {startLine: number}).startLine).toBe(2);
+        expect((result[0].range as unknown as {startLine: number}).startLine).toBe(0);
+        expect((result[1].range as unknown as {startLine: number}).startLine).toBe(2);
     });
 
     it('highlights {% if %}, {% else %}, and {% endif %}', () => {
         const doc = makeDocument(["{% if x == 'a' %}", 'A', '{% else %}', 'B', '{% endif %}']);
 
-        const result = provider.provideDocumentHighlights(doc, makePosition(0, 4));
+        const result = getHighlights(provider, doc, makePosition(0, 4));
+        const lines = getStartLines(result);
 
         expect(result).toHaveLength(3);
-        const lines = result!.map((h) => (h.range as unknown as {startLine: number}).startLine);
-
         expect(lines).toEqual([0, 2, 4]);
     });
 
-    it('highlights {% if %}, {% elsif %}, {% else %}, {% endif %}', () => {
+    it('highlights {% if %}, {% elsif %}, {% else %}, and {% endif %}', () => {
         const doc = makeDocument([
             "{% if x == 'a' %}",
             'A',
@@ -88,7 +113,7 @@ describe('LiquidHighlightProvider', () => {
             '{% endif %}',
         ]);
 
-        const result = provider.provideDocumentHighlights(doc, makePosition(6, 4));
+        const result = getHighlights(provider, doc, makePosition(6, 4));
 
         expect(result).toHaveLength(4);
     });
@@ -96,11 +121,10 @@ describe('LiquidHighlightProvider', () => {
     it('highlights {% for %} and {% endfor %}', () => {
         const doc = makeDocument(['{% for item in items %}', '{{ item }}', '{% endfor %}']);
 
-        const result = provider.provideDocumentHighlights(doc, makePosition(0, 4));
+        const result = getHighlights(provider, doc, makePosition(0, 4));
+        const lines = getStartLines(result);
 
         expect(result).toHaveLength(2);
-        const lines = result!.map((h) => (h.range as unknown as {startLine: number}).startLine);
-
         expect(lines).toEqual([0, 2]);
     });
 
@@ -120,13 +144,10 @@ describe('LiquidHighlightProvider', () => {
             '{% endif %}',
         ]);
 
-        const outerResult = provider.provideDocumentHighlights(doc, makePosition(0, 4));
+        const outerResult = getHighlights(provider, doc, makePosition(0, 4));
+        const lines = getStartLines(outerResult);
 
         expect(outerResult).toHaveLength(2);
-        const lines = outerResult!.map(
-            (h) => (h.range as unknown as {startLine: number}).startLine,
-        );
-
         expect(lines).toEqual([0, 4]);
     });
 });
