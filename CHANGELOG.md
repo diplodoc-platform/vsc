@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.14.0](https://github.com/diplodoc-platform/vsc/compare/v0.13.0...v0.14.0) (2026-06-23)
+
+
+### Features
+
+* added orphan intention actions ([b7ed9e9](https://github.com/diplodoc-platform/vsc/commit/b7ed9e90094fd701cfd2f248f63ff251b4eb2a6c))
+* added orphan intention actions ([6d6619c](https://github.com/diplodoc-platform/vsc/commit/6d6619c55a87c0c7fd4cd544eb88b7ffc2558a63))
+
 ## [0.13.0](https://github.com/diplodoc-platform/vsc/compare/v0.12.3...v0.13.0) (2026-06-23)
 
 
