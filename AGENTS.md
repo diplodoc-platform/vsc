@@ -69,13 +69,16 @@ src/
 │   │   ├── constants.ts                        # LINK_FIELDS set, FIELD_RE regex
 │   │   ├── utils.ts                            # isExternalUrl(), parseLinkFromLine()
 │   │   ├── diagnostics.ts                      # validateLinks() — unreachable file detection
-│   │   └── md-links.ts                         # findMarkdownReferences() + computeNewMdHref()
+│   │   ├── md-links.ts                         # findMarkdownReferences() + computeNewMdHref()
+│   │   ├── file-completion.ts                  # FilePathCompletionProvider — YAML path suggestions
+│   │   └── anchor-completion.ts                # AnchorCompletionProvider + parseAnchors() + findAnchorLine()
 │   ├── orphan/                                 # Orphan file detection (FileDecorationProvider)
 │   │   ├── index.ts                            # activate() — watchers + provider registration
 │   │   ├── collector.ts                        # collectReferencedFiles() + collectBlocksYamlFiles()
 │   │   ├── decorator.ts                        # OrphanDecorationProvider — marks unreferenced .md/.yaml
 │   │   ├── on-delete.ts                        # handleFileDeleted() — remove from toc / replace md links / add redirect
 │   │   ├── on-rename.ts                        # handleFileRenamed() — rename in toc + update md links / add redirect
+│   │   ├── code-actions.ts                     # OrphanCodeActionProvider — Code Actions: open / add to nearest or root toc
 │   │   └── constants.ts                        # HREF_RE, INCLUDE_PATH_RE, MD_INCLUDE_RE
 │   ├── liquid/                                  # Liquid syntax support: presets, highlighting, hover, completion, links
 │   │   ├── index.ts                            # activate() — registers all providers + goToPreset command
@@ -445,6 +448,38 @@ Fields from all Diplodoc YAML schemas:
 
 Add the field name to `LINK_FIELDS` in `src/modules/links/constants.ts`. No other changes needed — both link navigation and diagnostics will pick it up automatically.
 
+### Markdown anchor navigation
+
+`LinkProvider` now also registers for `{language: 'markdown'}`. When a markdown link or `{% include %}` contains a fragment (`file.md#anchor`), it creates an `AnchorDocumentLink` (internal subclass with `fileUri` and `fragment` properties) with `target` left `undefined`. VS Code calls `resolveDocumentLink` before the user follows the link. The resolver:
+
+1. Reads the target file
+2. Calls `findAnchorLine(content, fragment)` from `anchor-completion.ts`
+3. Sets `target = fileUri.with({fragment: 'Lnn'})` (1-based line number) if found, or `fileUri` as fallback
+
+**`findAnchorLine(content, anchorId)`** in `src/modules/links/anchor-completion.ts`:
+
+- Explicit heading anchor: `## Title {#id}` — matched by `id`
+- Auto-slug heading anchor: `## My Section` — matched by slug `my-section`
+- Inline anchor: `{#id}` in a paragraph — matched by `id`
+
+### Anchor completion
+
+`AnchorCompletionProvider` in `src/modules/links/anchor-completion.ts` is registered for `{language: 'markdown'}` with trigger character `#`.
+
+**`getAnchorContext(lineText, character)`** matches text up to cursor:
+
+- Include: `{%\s*include\s*\[[^\]]*\]\(path#prefix$`
+- Link: `\[[^\]]*\]\(path#prefix$`
+
+**`parseAnchors(content, mode)`**:
+
+- `'sections-only'` (includes): heading anchors only
+- `'all'` (links): heading anchors + inline `{#id}` anchors
+
+For headings with `{#id}`, the anchor ID is the explicit id — not the slug of the full text including `{#id}` (which is what VS Code's built-in incorrectly produces for YFM, e.g. `installation-install` instead of `install`).
+
+Completion items use `sortText = '0_<id>'` to appear above VS Code's built-in heading suggestions. `detail` shows the clean heading text.
+
 ## Extension Settings
 
 Declared in `package.json` under `contributes.configuration.properties`, read via the `getVscConfig()` helper (`src/modules/utils.ts`).
@@ -517,6 +552,27 @@ When a `.md` or blocks-yaml file is renamed and was referenced in any TOC file o
 - Incremental: FileSystemWatcher triggers refresh on toc/md/yaml file events
 - `.md` content changes use debounced refresh (500ms)
 - `provideFileDecoration` is O(1) Set lookup, called only for visible files
+
+### Code Actions
+
+`src/modules/orphan/code-actions.ts` implements `OrphanCodeActionProvider` (registered for `{language: 'markdown'}`). When an orphan diagnostic is present on line 0, a lightbulb appears offering:
+
+- **Open [toc-name]** — opens the nearest or root `toc*.yaml` without changes
+- **Add to [toc-name]** — inserts `- name: ''\n  href: <relative-path>` after the last `href:` in the toc, then reveals the new line
+
+Two toc targets appear when they differ (nearest ≠ root). When nearest equals root, only one pair of actions is shown.
+
+**`findNearestToc(fsPath)`** — walks up from the file's directory to the yfm root, returning the first directory that contains a `toc*.yaml` (prefers `toc.yaml` over `toc-*.yaml`).
+
+**`findRootToc(fsPath)`** — returns the `toc*.yaml` at the yfm root directory.
+
+**`buildInsertEdit(tocUri, content, orphanPath, tocPath)`** — locates the last `href:` line, inserts the new entry after it preserving the file's indentation style.
+
+**`resolveCodeAction`** (async) — reads the toc content lazily when the user opens the lightbulb, avoiding file I/O in `provideCodeActions`.
+
+The orphan diagnostic range was fixed from `(0,0,0,0)` to `(0,0,0,Number.MAX_SAFE_INTEGER)` — the full first line is now underlined (the previous zero-length range produced no squiggly, only a Problems panel entry).
+
+The constructor accepts injectable `(_findNearestToc, _findRootToc, _isYfmFile)` with real implementations as defaults — this enables unit testing without module mocking.
 
 ## Liquid Syntax Support
 

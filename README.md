@@ -13,8 +13,9 @@ VS Code extension for the [Diplodoc](https://diplodoc.com) documentation platfor
 - **YAML Validation** — JSON Schema-based validation for `toc.yaml`, `.yfm`, `.yfmlint`, `presets.yaml`, `redirects.yaml`, `theme.yaml`, and page-constructor files
 - **Markdown Linting** — real-time diagnostics via `@diplodoc/yfmlint` with full plugin support
 - **Autocompletion & Hover** — YAML property completion with schema documentation
-- **Link Navigation** — Ctrl+Click on file paths and URLs in YAML files to open them
-- **Orphan Detection** — highlights `.md` and page-constructor `.yaml` files not connected to any `toc.yaml` in the Explorer; offers to remove from toc or add redirect when files are deleted
+- **Link Navigation** — Ctrl+Click on file paths and URLs in YAML and Markdown files to open them; links with `#anchor` fragments navigate to the exact line of the anchor
+- **Anchor Completion** — when typing `#` in a Markdown link or `{% include %}`, suggests correct YFM anchors from the target file: headings with explicit `{#id}` show only the id (not the full slug), inline `{#id}` anchors are included in links but excluded from includes
+- **Orphan Detection** — highlights `.md` and page-constructor `.yaml` files not connected to any `toc.yaml` in the Explorer with a `?` badge; offers to remove from toc or add redirect when files are deleted; shows Code Actions on orphan files to **open** or **add to** the nearest/root `toc.yaml`
 - **Markdown Link Updates** — when renaming or deleting a `.md` file, finds and updates all markdown links (`[text](path.md)`) across the project, not just `toc.yaml` references
 - **Preset Variables** — hover over `{{variable}}` to see values across all presets; Ctrl+Click to navigate to definition in `presets.yaml`; autocompletion inside `{{ }}`
 - **Liquid Syntax** — syntax highlighting for `{{ }}` output tags and `{% %}` control tags in Markdown; paired tag highlighting for `{% if %}` / `{% elsif %}` / `{% else %}` / `{% endif %}` and `{% for %}` / `{% endfor %}`; hover and navigation for variables inside control tags
