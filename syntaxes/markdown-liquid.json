@@ -1,0 +1,83 @@
+{
+  "scopeName": "markdown.liquid.inline",
+  "injectionSelector": "L:text.html.markdown",
+  "patterns": [
+    {"include": "#liquid-not-var"},
+    {"include": "#liquid-output"},
+    {"include": "#liquid-tag"}
+  ],
+  "repository": {
+    "liquid-not-var": {
+      "comment": "not_var{{ variable }}",
+      "begin": "(not_var)(\\{\\{)",
+      "end": "(\\}\\})",
+      "beginCaptures": {
+        "1": {"name": "keyword.control.liquid"},
+        "2": {"name": "keyword.operator.expression.liquid"}
+      },
+      "endCaptures": {
+        "1": {"name": "keyword.operator.expression.liquid"}
+      },
+      "contentName": "variable.other.liquid"
+    },
+    "liquid-output": {
+      "comment": "{{ variable }}",
+      "begin": "(\\{\\{)",
+      "end": "(\\}\\})",
+      "beginCaptures": {
+        "1": {"name": "keyword.operator.expression.liquid"}
+      },
+      "endCaptures": {
+        "1": {"name": "keyword.operator.expression.liquid"}
+      },
+      "contentName": "variable.other.liquid"
+    },
+    "liquid-tag": {
+      "comment": "{% keyword expression %}",
+      "begin": "(\\{%-?)",
+      "end": "(-?%\\})",
+      "beginCaptures": {
+        "1": {"name": "keyword.operator.expression.liquid"}
+      },
+      "endCaptures": {
+        "1": {"name": "keyword.operator.expression.liquid"}
+      },
+      "patterns": [
+        {
+          "match": "\\b(if|elsif|else|endif|for|endfor|in|and|or|not|not_var|contains)\\b",
+          "captures": {
+            "1": {"name": "keyword.control.liquid"}
+          }
+        },
+        {
+          "match": "'[^']*'",
+          "name": "string.quoted.single.liquid"
+        },
+        {
+          "match": "\"[^\"]*\"",
+          "name": "string.quoted.double.liquid"
+        },
+        {
+          "match": "\\b\\d+(\\.\\d+)?\\b",
+          "name": "constant.numeric.liquid"
+        },
+        {
+          "match": "\\b(true|false|nil|null)\\b",
+          "name": "constant.language.liquid"
+        },
+        {
+          "match": "==|!=|>=|<=|>|<",
+          "name": "keyword.operator.comparison.liquid"
+        },
+        {
+          "match": "\\.\\.(?=\\d)",
+          "name": "keyword.operator.range.liquid"
+        },
+        {
+          "match": "[\\w][\\w.-]*",
+          "name": "variable.other.liquid"
+        }
+      ]
+    }
+  }
+}

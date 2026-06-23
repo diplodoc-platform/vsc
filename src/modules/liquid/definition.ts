@@ -92,7 +92,7 @@ function providePresetsFileDefinition(
     return null;
 }
 
-export class PresetsDefinitionProvider implements vscode.DefinitionProvider {
+export class LiquidDefinitionProvider implements vscode.DefinitionProvider {
     provideDefinition(
         document: vscode.TextDocument,
         position: vscode.Position,

@@ -1,4 +1,4 @@
-import type {PluginMessage, ValidationMessage} from './types';
+import type {PluginMessage, ValidationMessage, YfmLintError} from './types';
 import type {TextDocument} from 'vscode';
 
 import * as path from 'path';
@@ -101,7 +101,10 @@ export async function validateMarkdown(
     });
 
     const errors = [...(lintErrors || []), ...pluginMessages].filter(
-        (error) => !isTermDefinition(error, content) && !isResolvedConditionalAnchor(error),
+        (error) =>
+            !isTermDefinition(error, content) &&
+            !isResolvedConditionalAnchor(error) &&
+            (error as YfmLintError).level !== 'disabled',
     );
 
     return toDiagnostics(errors, document);

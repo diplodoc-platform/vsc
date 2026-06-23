@@ -77,15 +77,18 @@ src/
 │   │   ├── on-delete.ts                        # handleFileDeleted() — remove from toc / replace md links / add redirect
 │   │   ├── on-rename.ts                        # handleFileRenamed() — rename in toc + update md links / add redirect
 │   │   └── constants.ts                        # HREF_RE, INCLUDE_PATH_RE, MD_INCLUDE_RE
-│   ├── presets/                                 # Preset variable support (hover, go-to-definition, completion, links)
+│   ├── liquid/                                  # Liquid syntax support: presets, highlighting, hover, completion, links
 │   │   ├── index.ts                            # activate() — registers all providers + goToPreset command
-│   │   ├── constants.ts                        # VARIABLE_RE, PREFIX_RE, SUFFIX_RE, PRESETS_FILENAME
+│   │   ├── constants.ts                        # VARIABLE_RE, PREFIX_RE, LIQUID_KEYWORDS, LIQUID_BLOCK_OPENERS
+│   │   ├── types.ts                            # Variable, LiquidTag interfaces
 │   │   ├── resolver.ts                         # findPresetsFiles(), parsePresetsFile(), resolveVariables()
-│   │   ├── hover.ts                            # PresetsHoverProvider — shows variable values per preset
-│   │   ├── definition.ts                       # PresetsDefinitionProvider — Ctrl+Click / F12 to presets.yaml
-│   │   ├── completion.ts                       # PresetsCompletionProvider — suggests variables inside {{ }}
-│   │   ├── link.ts                             # PresetsLinkProvider — underlines {{var}} as links
-│   │   └── utils.ts                            # formatEntries() — markdown table formatter for hover
+│   │   ├── hover.ts                            # LiquidHoverProvider — hover for {{var}} and vars inside {% %}
+│   │   ├── definition.ts                       # LiquidDefinitionProvider — Ctrl+Click / F12 to presets.yaml
+│   │   ├── completion.ts                       # LiquidCompletionProvider — suggests variables inside {{ }}
+│   │   ├── link.ts                             # LiquidLinkProvider — underlines vars as links in {{ }} and {% %}
+│   │   ├── highlight.ts                        # LiquidHighlightProvider — highlights paired {% if/else/endif %} tags
+│   │   └── utils.ts                            # formatEntries(), getLiquidTagKeyword(), findVariableInTag()
+│   ├── presets/                                 # (Legacy, replaced by liquid/) Preset variable support
 │   ├── main/sidebar.ts                         # Sidebar WebviewViewProvider
 │   ├── md-editor/editor.ts                     # Markdown visual editor (WebviewPanel)
 │   └── toc-editor/editor.ts                    # TOC visual editor (WebviewPanel)
@@ -97,7 +100,8 @@ schemas/                                        # Generated JSON Schema Draft-07
 ├── *.json                                      # Output schemas (committed, used at build time)
 └── overlays/*.yaml                             # VSCode-specific additions merged onto CLI schemas
 syntaxes/
-└── markdown-page-constructor.json              # TextMate grammar: YAML highlighting in ::: page-constructor
+├── markdown-page-constructor.json              # TextMate grammar: YAML highlighting in ::: page-constructor
+└── markdown-liquid.json                        # TextMate grammar: Liquid syntax highlighting in Markdown
 tests/mocks/                                    # Test files for manual testing
 ```
 
@@ -135,7 +139,7 @@ The editor (`useEditor` hook) configures the following extensions:
 - `YfmPageConstructorExtension` — `::: page-constructor ... :::` blocks
 - `YfmInclude` (custom, `src/extensions/yfm-include/`) — `{% include []() %}` blocks without escaping
 - `YfmFrontmatter` (custom, `src/extensions/yfm-frontmatter/`) — `---` YAML frontmatter blocks without escaping
-- `YfmDirective` (custom, `src/extensions/yfm-directive/`) — generic passthrough for any `:::` directive block not handled by other extensions (e.g. `::: no-translate`, `::: custom-block`). Preserves content without escaping. Directive name stored in `token.info` / `node.attrs.directiveName`.
+- `YfmDirective` (custom, `src/extensions/yfm-directive/`) — generic passthrough for any `:::` directive block not handled by other extensions (e.g. `::: no-translate`, `::: custom-block`). Preserves content without escaping. Directive name stored in `token.info` / `node.attrs.directiveName`. Also registers `yfmLiquidTagBlockRule` for `{% %}` Liquid tags (see Liquid Syntax Support section).
 - `Math`, `Mermaid` — LaTeX and diagram support
 
 Toolbar includes `wYfmHtmlBlockItemData` and `wYfmPageConstructorItemData` in the command menu.
@@ -400,7 +404,7 @@ Add one entry to `DIRECTIVE_HANDLERS` in `validation/utils.ts`:
 
 - **activationEvents**: `onLanguage:markdown`, `onLanguage:yaml`
 - **languages**: `.yfm`/`.yfmlint` as YAML; `toc.yaml`/`presets.yaml`/`redirects.yaml`/`theme.yaml` filenames as YAML
-- **grammars**: Injects YAML syntax highlighting into `::: page-constructor` blocks in Markdown
+- **grammars**: Injects YAML syntax highlighting into `::: page-constructor` blocks in Markdown; injects Liquid syntax highlighting (`{{ }}`, `{% %}`) into Markdown
 - **commands**: `diplodoc.openMdEditor` (works for both Markdown and blocks-YAML), `diplodoc.openTocEditor`, `diplodoc.insertTable`, `diplodoc.insertNote`, `diplodoc.insertCut`, `diplodoc.insertTab`, `diplodoc.insertCodeBlock`, `diplodoc.insertInclude`, `diplodoc.insertQuote`, `diplodoc.insertMermaid`, `diplodoc.insertFrontmatter`, `diplodoc.insertPageConstructor`, `diplodoc.insertHtmlBlock`, `diplodoc.insertVideo`
 - **keybindings**: `Alt+T` (table), `Alt+R` (note), `Alt+C` (cut), `Alt+A` (tabs), `Alt+O` (code block), `Alt+Z` (include), `Alt+Q` (quote), `Alt+M` (mermaid), `Alt+F` (frontmatter), `Alt+P` (page-constructor), `Alt+H` (HTML block), `Alt+V` (video)
 - **views**: Sidebar webview in activity bar
@@ -514,22 +518,49 @@ When a `.md` or blocks-yaml file is renamed and was referenced in any TOC file o
 - `.md` content changes use debounced refresh (500ms)
 - `provideFileDecoration` is O(1) Set lookup, called only for visible files
 
-## Preset Variables
+## Liquid Syntax Support
 
-`src/modules/presets/` provides hover, go-to-definition, completion, and link highlighting for `{{variable}}` references in Markdown and YAML files.
+`src/modules/liquid/` (replaces the legacy `src/modules/presets/`) provides comprehensive support for Diplodoc's Liquid syntax: preset variable hover/completion/navigation, syntax highlighting, and paired tag highlighting.
 
 ### How it works
 
 1. `resolver.ts` walks from the document directory up to the YFM root (`.yfm`), collecting all `presets.yaml` files (closest first = highest priority)
 2. Each `presets.yaml` is parsed with `js-yaml`. Variables are collected across all preset groups (`default`, `external`, etc.)
-3. Four providers are registered for `[{language: 'markdown'}, {language: 'yaml'}]`:
+3. Five providers are registered:
 
-| Provider                    | API                              | Trigger                       | Behavior                                                                                                                      |
-| --------------------------- | -------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `PresetsHoverProvider`      | `registerHoverProvider`          | Mouse hover on `{{var}}`      | Shows markdown table of values per preset, with file paths when multiple `presets.yaml` files exist                           |
-| `PresetsDefinitionProvider` | `registerDefinitionProvider`     | Ctrl+Click / F12 on `{{var}}` | Navigates to the variable definition line in the closest `presets.yaml`                                                       |
-| `PresetsLinkProvider`       | `registerDocumentLinkProvider`   | Always (document links)       | Underlines `{{var}}` as a clickable link if the variable exists in presets; click navigates via `diplodoc.goToPreset` command |
-| `PresetsCompletionProvider` | `registerCompletionItemProvider` | Type `{` inside `{{ }}`       | Suggests available variable names with default values as detail                                                               |
+| Provider                   | API                                 | Trigger                                    | Behavior                                                                                                             |
+| -------------------------- | ----------------------------------- | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `LiquidHoverProvider`      | `registerHoverProvider`             | Mouse hover on `{{var}}` or var in `{% %}` | Shows markdown table of values per preset                                                                            |
+| `LiquidDefinitionProvider` | `registerDefinitionProvider`        | Ctrl+Click / F12 on `{{var}}`              | Navigates to the variable definition line in the closest `presets.yaml`                                              |
+| `LiquidLinkProvider`       | `registerDocumentLinkProvider`      | Always (document links)                    | Underlines vars as clickable links in `{{ }}` and `{% %}` tags                                                       |
+| `LiquidCompletionProvider` | `registerCompletionItemProvider`    | Type `{` inside `{{ }}`                    | Suggests available variable names with default values as detail                                                      |
+| `LiquidHighlightProvider`  | `registerDocumentHighlightProvider` | Cursor on a `{% %}` control tag            | Highlights all paired tags (`{% if %}` / `{% elsif %}` / `{% else %}` / `{% endif %}`, `{% for %}` / `{% endfor %}`) |
+
+### Highlight provider
+
+`LiquidHighlightProvider` (registered only for `{language: 'markdown'}`) highlights paired Liquid control tags:
+
+- Collects all `{% %}` tags with control keywords (`if`, `elsif`, `else`, `endif`, `for`, `endfor`)
+- Uses a depth-based algorithm to find matching opener/closer groups, handling nested blocks correctly
+- When cursor is on any tag in a group, all tags in that group are highlighted with `DocumentHighlightKind.Read`
+- Returns `null` for unpaired tags or non-control keywords
+
+### TextMate grammar
+
+`syntaxes/markdown-liquid.json` injects Liquid syntax highlighting into Markdown files:
+
+- `not_var{{ variable }}` — `not_var` as keyword, `{{ }}` delimiters, variable name
+- `{{ variable }}` — output tag with variable highlighting
+- `{% keyword expression %}` — control tags with keywords (`if`, `elsif`, `else`, `endif`, `for`, `endfor`, `in`, `and`, `or`, `not`, `not_var`, `contains`), string literals, numbers, boolean constants, comparison operators, and variables
+
+### WYSIWYG editor support
+
+`yfm-directive/plugin.ts` adds a `yfmLiquidTagBlockRule` markdown-it block rule that preserves Liquid tags in the WYSIWYG editor:
+
+- Control tags (`{% if %}`, `{% else %}`, `{% endif %}`, etc.) become individual `yfm_liquid_tag` tokens (one per line) so inner content renders normally as Markdown
+- Tags with known block semantics (`{% note %}`, `{% cut %}`, `{% list %}`) are skipped — handled by their own extensions
+- Unknown paired tags (e.g. `{% custom %}` / `{% endcustom %}`) are grouped into a single token
+- `{% include %}` is explicitly excluded (handled by `YfmInclude` extension)
 
 ### Preset hierarchy
 
@@ -541,6 +572,13 @@ Multiple `presets.yaml` files can exist at different directory levels. Closer fi
 - `resolveVariables(fsPath)` — returns `Map<varName, VariableEntry[]>` with preset name, value, file path, and line number
 - `getVariable(lineText, character)` — detects `{{variable}}` at cursor position
 - `findVariableLine(content, preset, varName)` — finds the line number of a variable definition within a preset block
+
+### Key functions in `utils.ts`
+
+- `getLiquidTagKeyword(lineText, charPos)` — returns the control keyword and tag boundaries if cursor is inside a `{% %}` tag
+- `findVariableInTag(lineText, charPos)` — finds a non-keyword variable name at cursor position inside a `{% %}` tag
+- `getVariableFromOutput(lineText, charPos)` — finds a variable at cursor position inside a `{{ }}` output tag
+- `formatEntries(entries, root)` — formats variable entries as a Markdown table for hover display
 
 ## Color Provider
 

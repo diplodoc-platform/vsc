@@ -13,6 +13,8 @@ const INCLUDE_RE = /^{%\s*include\s/;
 
 const KNOWN_LIQUID_TAGS = new Set(['note', 'cut', 'list']);
 
+const LIQUID_CONTROL_TAGS = new Set(['if', 'elsif', 'else', 'endif', 'for', 'endfor']);
+
 function makeCloseRe(tagName: string): RegExp {
     return new RegExp(`^{%[-\\s]*end${tagName}\\s*-?%}\\s*$`);
 }
@@ -95,8 +97,22 @@ function yfmLiquidTagBlockRule(
     if (silent) {
         return true;
     }
-    const isEndTag = tagName.startsWith('end');
 
+    if (LIQUID_CONTROL_TAGS.has(tagName)) {
+        const contentStart = state.bMarks[startLine];
+        const contentEnd = state.eMarks[startLine];
+        const content = state.src.slice(contentStart, contentEnd);
+
+        const token = state.push(yfmLiquidTagTokenName, 'div', 0);
+        token.map = [startLine, startLine + 1];
+        token.content = content;
+
+        state.line = startLine + 1;
+
+        return true;
+    }
+
+    const isEndTag = tagName.startsWith('end');
     let closeLine = -1;
 
     if (tagName && !isEndTag) {

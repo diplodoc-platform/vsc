@@ -63,6 +63,7 @@ src/
 │   ├── toc-editor/editor.ts          # TOC editor (extends BaseEditor)
 │   ├── main/sidebar.ts               # Sidebar file browser
 │   ├── color/                        # YAML color picker provider
+│   ├── liquid/                       # Liquid syntax: presets, highlighting, hover, completion, links
 │   ├── links/                        # Link navigation, validation, md-link parsing
 │   ├── orphan/                       # Orphan detection + on-rename/on-delete with md link updates
 │   └── validation/                   # YAML schema validation + Markdown linting
@@ -83,13 +84,14 @@ src/
 ├── extensions/                       # Custom markdown-it plugins
 │   ├── yfm-include/                  # {% include %}
 │   ├── yfm-frontmatter/              # --- frontmatter ---
-│   └── yfm-directive/                # ::: directives + {% liquid %} tags passthrough
+│   └── yfm-directive/                # ::: directives + {% liquid %} tags (WYSIWYG passthrough)
 ├── i18n/                             # Localization (en, ru)
 schemas/
 ├── *.json                            # Generated JSON Schema files (committed)
 ├── overlays/*.yaml                   # VS Code-specific schema extensions
 syntaxes/
-└── markdown-page-constructor.json    # TextMate grammar for ::: page-constructor
+├── markdown-page-constructor.json    # TextMate grammar for ::: page-constructor
+└── markdown-liquid.json              # TextMate grammar for Liquid syntax in Markdown
 tests/mocks/                          # Manual test files
 ```
 

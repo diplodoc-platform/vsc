@@ -63,6 +63,7 @@ src/
 │   ├── toc-editor/editor.ts          # TOC редактор (наследует BaseEditor)
 │   ├── main/sidebar.ts               # Сайдбар — браузер файлов
 │   ├── color/                        # YAML color picker
+│   ├── liquid/                       # Liquid-синтаксис: пресеты, подсветка, hover, completion, ссылки
 │   ├── links/                        # Навигация по ссылкам, валидация, парсинг md-ссылок
 │   ├── orphan/                       # Обнаружение orphan-файлов + rename/delete с обновлением md-ссылок
 │   └── validation/                   # YAML схема-валидация + Markdown линтинг
@@ -83,7 +84,7 @@ src/
 ├── extensions/                       # Кастомные markdown-it плагины
 │   ├── yfm-include/                  # {% include %}
 │   ├── yfm-frontmatter/              # --- frontmatter ---
-│   └── yfm-directive/                # Passthrough для ::: директив и {% liquid %} тегов
+│   └── yfm-directive/                # Passthrough для ::: директив и {% liquid %} тегов (WYSIWYG)
 ├── i18n/                             # Локализация (en, ru)
 schemas/
 ├── *.json                            # Сгенерированные JSON Schema файлы (закоммичены)
@@ -91,7 +92,8 @@ schemas/
 scripts/
 └── merge-schemas.js                  # Пайплайн CLI schema → JSON Schema
 syntaxes/
-└── markdown-page-constructor.json    # TextMate грамматика для ::: page-constructor
+├── markdown-page-constructor.json    # TextMate грамматика для ::: page-constructor
+└── markdown-liquid.json              # TextMate грамматика для Liquid-синтаксиса в Markdown
 tests/mocks/                          # Файлы для ручного тестирования
 ```
 

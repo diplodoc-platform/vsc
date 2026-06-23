@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import {resolveVariables} from './resolver';
 import {PREFIX_RE, SUFFIX_RE} from './constants';
 
-export class PresetsCompletionProvider implements vscode.CompletionItemProvider {
+export class LiquidCompletionProvider implements vscode.CompletionItemProvider {
     provideCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
@@ -19,7 +19,6 @@ export class PresetsCompletionProvider implements vscode.CompletionItemProvider 
         const partial = prefixMatch[1];
         const textAfter = lineText.substring(position.character);
         const hasSuffix = SUFFIX_RE.test(textAfter);
-
         const allVariables = resolveVariables(document.uri.fsPath);
 
         if (allVariables.size === 0) {
@@ -34,7 +33,6 @@ export class PresetsCompletionProvider implements vscode.CompletionItemProvider 
             }
 
             const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Variable);
-
             const defaultEntry = entries.find((e) => e.preset === 'default');
 
             if (defaultEntry) {

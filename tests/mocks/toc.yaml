@@ -20,6 +20,8 @@ items:
     href: html.md
   - name: '{{presets_text}}'
     href: presets.md
+  - name: Liquid
+    href: liquid.md
   - name: Level 1
     items:
       - name: Page 1

@@ -20,18 +20,10 @@ function escapeRegExp(value: string): string {
 }
 
 interface CachedResolution {
-    /** Per-file modification times the cached result was built from. */
     mtimes: Map<string, number>;
     result: Map<string, VariableEntry[]>;
 }
 
-/**
- * Memoizes resolveVariables() keyed by the resolved preset-file list. The hover,
- * completion, definition and link providers all call resolveVariables() on every
- * editor interaction; without this cache each call re-reads and re-parses every
- * presets.yaml on the directory chain. The cache is invalidated whenever any of
- * the underlying files changes mtime, so results stay correct after edits.
- */
 const resolutionCache = new Map<string, CachedResolution>();
 
 function fileMtime(filePath: string): number {
