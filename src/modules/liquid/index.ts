@@ -3,10 +3,11 @@ import * as vscode from 'vscode';
 import * as telemetry from '../telemetry';
 import {EVENTS} from '../telemetry/constants';
 
-import {PresetsCompletionProvider} from './completion';
-import {PresetsDefinitionProvider} from './definition';
-import {PresetsHoverProvider} from './hover';
-import {PresetsLinkProvider} from './link';
+import {LiquidCompletionProvider} from './completion';
+import {LiquidDefinitionProvider} from './definition';
+import {LiquidHighlightProvider} from './highlight';
+import {LiquidHoverProvider} from './hover';
+import {LiquidLinkProvider} from './link';
 import {clearPresetsCache} from './resolver';
 import {PREFIX_RE, PRESETS_FILENAME} from './constants';
 
@@ -20,12 +21,16 @@ export function activate(context: vscode.ExtensionContext) {
         presetsWatcher.onDidChange(() => clearPresetsCache()),
         presetsWatcher.onDidCreate(() => clearPresetsCache()),
         presetsWatcher.onDidDelete(() => clearPresetsCache()),
-        vscode.languages.registerHoverProvider(selector, new PresetsHoverProvider()),
-        vscode.languages.registerDefinitionProvider(selector, new PresetsDefinitionProvider()),
-        vscode.languages.registerDocumentLinkProvider(selector, new PresetsLinkProvider()),
+        vscode.languages.registerHoverProvider(selector, new LiquidHoverProvider()),
+        vscode.languages.registerDefinitionProvider(selector, new LiquidDefinitionProvider()),
+        vscode.languages.registerDocumentLinkProvider(selector, new LiquidLinkProvider()),
+        vscode.languages.registerDocumentHighlightProvider(
+            {language: 'markdown'},
+            new LiquidHighlightProvider(),
+        ),
         vscode.languages.registerCompletionItemProvider(
             selector,
-            new PresetsCompletionProvider(),
+            new LiquidCompletionProvider(),
             '{',
             '.',
         ),

@@ -6,7 +6,7 @@ import * as validation from './modules/validation';
 import * as color from './modules/color';
 import * as links from './modules/links';
 import * as orphan from './modules/orphan';
-import * as presets from './modules/presets';
+import * as liquid from './modules/liquid';
 import * as telemetry from './modules/telemetry';
 import {TocEditor} from './modules/toc-editor/editor';
 import {insertBlock, openMdEditor, openTocEditor} from './commands';
@@ -23,7 +23,7 @@ export function activate(context: vscode.ExtensionContext) {
     color.activate(context);
     links.activate(context);
     orphan.activate(context);
-    presets.activate(context);
+    liquid.activate(context);
     updateYamlContext(vscode.window.activeTextEditor);
 
     const mdEditor = new MdEditor(context.extensionUri);

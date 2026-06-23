@@ -4,6 +4,7 @@ default:
   user: Alice
   img_3: 4.png
   aaa: {b: 1, c: {d: 2}}
+  products: [{title: product1, price: 40}]
 external:
   presets_text: Presets external
   text: Hello external

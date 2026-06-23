@@ -17,9 +17,10 @@ VS Code extension for the [Diplodoc](https://diplodoc.com) documentation platfor
 - **Orphan Detection** — highlights `.md` and page-constructor `.yaml` files not connected to any `toc.yaml` in the Explorer; offers to remove from toc or add redirect when files are deleted
 - **Markdown Link Updates** — when renaming or deleting a `.md` file, finds and updates all markdown links (`[text](path.md)`) across the project, not just `toc.yaml` references
 - **Preset Variables** — hover over `{{variable}}` to see values across all presets; Ctrl+Click to navigate to definition in `presets.yaml`; autocompletion inside `{{ }}`
+- **Liquid Syntax** — syntax highlighting for `{{ }}` output tags and `{% %}` control tags in Markdown; paired tag highlighting for `{% if %}` / `{% elsif %}` / `{% else %}` / `{% endif %}` and `{% for %}` / `{% endfor %}`; hover and navigation for variables inside control tags
 - **Color Picker** — inline color preview and picker for YAML color values
 - **Sidebar** — file browser with search, quick navigation, and project initialization
-- **Syntax Highlighting** — YAML highlighting inside `::: page-constructor` blocks in Markdown
+- **Syntax Highlighting** — YAML highlighting inside `::: page-constructor` blocks in Markdown; Liquid syntax highlighting in Markdown
 
 ## Requirements
 

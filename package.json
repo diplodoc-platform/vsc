@@ -235,6 +235,13 @@
         "embeddedLanguages": {
           "meta.embedded.block.yaml": "yaml"
         }
+      },
+      {
+        "path": "./syntaxes/markdown-liquid.json",
+        "scopeName": "markdown.liquid.inline",
+        "injectTo": [
+          "text.html.markdown"
+        ]
       }
     ],
     "menus": {
