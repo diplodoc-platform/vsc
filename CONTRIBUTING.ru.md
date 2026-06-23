@@ -64,8 +64,11 @@ src/
 │   ├── main/sidebar.ts               # Сайдбар — браузер файлов
 │   ├── color/                        # YAML color picker
 │   ├── liquid/                       # Liquid-синтаксис: пресеты, подсветка, hover, completion, ссылки
-│   ├── links/                        # Навигация по ссылкам, валидация, парсинг md-ссылок
+│   ├── links/                        # Навигация по ссылкам, валидация, парсинг md-ссылок, дополнение якорей
+│   │   ├── anchor-completion.ts      # AnchorCompletionProvider, parseAnchors(), findAnchorLine()
+│   │   └── file-completion.ts        # FilePathCompletionProvider — подсказка путей в YAML
 │   ├── orphan/                       # Обнаружение orphan-файлов + rename/delete с обновлением md-ссылок
+│   │   └── code-actions.ts           # OrphanCodeActionProvider — переход / добавление в ближайший или корневой toc
 │   └── validation/                   # YAML схема-валидация + Markdown линтинг
 │       ├── index.ts                  # Оркестратор: события, кэш, debounce
 │       ├── parser.ts                 # Извлечение frontmatter + page-constructor блоков
@@ -203,6 +206,8 @@ npm run test:coverage   # С отчётом о покрытии
 - **Новые фичи валидации**: конвертация диагностик, расчёт диапазонов, форматирование ошибок
 - **Новые типы схем**: через `getDiagnostics()` с реальным контентом + тип схемы
 - **Новые фичи редакторов**: мок протокола webview-сообщений
+- **Новые Code Action провайдеры**: используйте dependency injection для функций поиска (`_findNearestToc`, `_findRootToc`, `_isYfmFile`) вместо мока модулей
+- **Новые completion провайдеры**: мокайте `vscode.workspace.fs.readFile` и создавайте минимальный `vscode.TextDocument` с одной строкой
 - **Новые UI-компоненты**: тестирование с мок `window` и `MessageEvent`
 
 ## Отладка

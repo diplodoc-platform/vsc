@@ -115,6 +115,44 @@ class MockSnippetString {
 }
 
 vi.mock('vscode', () => ({
+    CodeActionKind: {
+        Empty: '',
+        QuickFix: 'quickfix',
+        Refactor: 'refactor',
+        RefactorExtract: 'refactor.extract',
+        RefactorInline: 'refactor.inline',
+        RefactorRewrite: 'refactor.rewrite',
+        Source: 'source',
+        SourceOrganizeImports: 'source.organizeImports',
+        SourceFixAll: 'source.fixAll',
+    },
+    CodeAction: class {
+        title: string;
+        kind: string | undefined;
+        command: unknown;
+        edit: unknown;
+        diagnostics: unknown[];
+        isPreferred: boolean | undefined;
+        constructor(title: string, kind?: string) {
+            this.title = title;
+            this.kind = kind;
+            this.diagnostics = [];
+        }
+    },
+    TextEditorRevealType: {
+        Default: 0,
+        InCenter: 1,
+        InCenterIfOutsideViewport: 2,
+        AtTop: 3,
+    },
+    Selection: class {
+        anchor: MockPosition;
+        active: MockPosition;
+        constructor(anchor: MockPosition, active: MockPosition) {
+            this.anchor = anchor;
+            this.active = active;
+        }
+    },
     Range: MockRange,
     Position: MockPosition,
     Color: MockColor,

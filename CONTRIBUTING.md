@@ -64,8 +64,11 @@ src/
 │   ├── main/sidebar.ts               # Sidebar file browser
 │   ├── color/                        # YAML color picker provider
 │   ├── liquid/                       # Liquid syntax: presets, highlighting, hover, completion, links
-│   ├── links/                        # Link navigation, validation, md-link parsing
+│   ├── links/                        # Link navigation, validation, md-link parsing, anchor completion
+│   │   ├── anchor-completion.ts      # AnchorCompletionProvider, parseAnchors(), findAnchorLine()
+│   │   └── file-completion.ts        # FilePathCompletionProvider — YAML path suggestions
 │   ├── orphan/                       # Orphan detection + on-rename/on-delete with md link updates
+│   │   └── code-actions.ts           # OrphanCodeActionProvider — open / add to nearest or root toc
 │   └── validation/                   # YAML schema validation + Markdown linting
 │       ├── index.ts                  # Orchestrator: events, cache, debounce
 │       ├── parser.ts                 # Extract frontmatter + page-constructor blocks
@@ -177,6 +180,8 @@ Tests live next to the code they test (`*.spec.ts`). Manual test files for integ
 - **New validation features**: test the diagnostic conversion, range calculation, and error formatting
 - **New schema types**: test via `getDiagnostics()` with real content + schema type
 - **New editor features**: mock the webview message protocol
+- **New Code Action providers**: use dependency injection for finders (`_findNearestToc`, `_findRootToc`, `_isYfmFile`) rather than mocking modules
+- **New completion providers**: mock `vscode.workspace.fs.readFile` and create a minimal `vscode.TextDocument` mock with a single line
 - **New UI components**: test with mock `window` and `MessageEvent`
 
 ## Debugging

@@ -99,12 +99,13 @@ describe('LinkProvider', () => {
         ]);
     });
 
-    it('strips the anchor from a markdown link target inside a block scalar', () => {
+    it('creates anchor link with no initial target for markdown links with fragments', () => {
         const doc = mockDocument(['text: |', '  [Prepare](quickstart.md#prepare)'].join('\n'));
         const links = provider.provideDocumentLinks(doc);
 
         expect(links).toHaveLength(1);
-        expect(links[0].target?.toString()).toBe('/docs/ru/quickstart.md');
+        // target is undefined until resolveDocumentLink is called
+        expect(links[0].target).toBeUndefined();
     });
 
     it('provides external markdown links inside a block scalar', () => {

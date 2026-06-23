@@ -16,13 +16,17 @@ import {EVENTS} from '../telemetry/constants';
 
 import {collectBlocksYamlFiles, collectReferencedFiles} from './collector';
 import {OrphanDecorationProvider} from './decorator';
+import {ORPHAN_DIAGNOSTIC_MESSAGE, OrphanCodeActionProvider} from './code-actions';
 import {handleFileDeleted} from './on-delete';
 import {handleFileRenamed} from './on-rename';
 import {findVcsDir, isVcsOperationInProgress} from './utils';
 
 export function activate(context: vscode.ExtensionContext) {
     const decorator = new OrphanDecorationProvider();
+    const codeActions = new OrphanCodeActionProvider();
     const diagnostics = vscode.languages.createDiagnosticCollection('diplodoc-orphans');
+
+    codeActions.activate(context);
 
     function updateOrphanDiagnostics(referenced: Set<string>, blocksYaml: Set<string>) {
         diagnostics.clear();
@@ -52,8 +56,8 @@ export function activate(context: vscode.ExtensionContext) {
             }
 
             const diagnostic = new vscode.Diagnostic(
-                new vscode.Range(0, 0, 0, 0),
-                'File is not referenced in toc.yaml or included via {% include %}',
+                new vscode.Range(0, 0, 0, Number.MAX_SAFE_INTEGER),
+                ORPHAN_DIAGNOSTIC_MESSAGE,
                 vscode.DiagnosticSeverity.Warning,
             );
             diagnostic.source = 'Diplodoc';
@@ -74,6 +78,7 @@ export function activate(context: vscode.ExtensionContext) {
         lastBlocksYaml = blocksYaml;
 
         decorator.update(referenced, blocksYaml);
+        codeActions.update(referenced, blocksYaml);
         updateOrphanDiagnostics(referenced, blocksYaml);
     }
 

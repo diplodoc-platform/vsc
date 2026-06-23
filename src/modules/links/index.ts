@@ -7,6 +7,7 @@ import {EVENTS} from '../telemetry/constants';
 
 import {LINK_FIELDS, LIST_ITEM_RE, LIST_PARENT_RE} from './constants';
 import {getBlockScalarLines, validateLinks} from './diagnostics';
+import {AnchorCompletionProvider, findAnchorLine} from './anchor-completion';
 import {FilePathCompletionProvider} from './file-completion';
 import {FileReferenceProvider, findFileReferences} from './references';
 import {
@@ -19,6 +20,18 @@ import {
 } from './utils';
 
 const INPUT_FIELD_RE = /^(\s*)input:\s+['"]?([^'"#\s][^'"\n]*)['"]?\s*$/;
+const FRAGMENT_RE = /#(.+)$/;
+
+class AnchorDocumentLink extends vscode.DocumentLink {
+    readonly fileUri: vscode.Uri;
+    readonly fragment: string;
+
+    constructor(range: vscode.Range, fileUri: vscode.Uri, fragment: string) {
+        super(range);
+        this.fileUri = fileUri;
+        this.fragment = fragment;
+    }
+}
 
 function collectMarkdownLinks(
     lineText: string,
@@ -35,9 +48,21 @@ function collectMarkdownLinks(
         }
 
         const range = new vscode.Range(lineIndex, start, lineIndex, start + value.length);
-        const target = external ? vscode.Uri.parse(value) : vscode.Uri.joinPath(baseUri, path);
 
-        links.push(new vscode.DocumentLink(range, target));
+        if (external) {
+            links.push(new vscode.DocumentLink(range, vscode.Uri.parse(value)));
+            continue;
+        }
+
+        const fragmentMatch = FRAGMENT_RE.exec(value);
+
+        if (fragmentMatch) {
+            const fileUri = vscode.Uri.joinPath(baseUri, path);
+            links.push(new AnchorDocumentLink(range, fileUri, fragmentMatch[1]));
+            continue;
+        }
+
+        links.push(new vscode.DocumentLink(range, vscode.Uri.joinPath(baseUri, path)));
     }
 }
 
@@ -132,6 +157,27 @@ export class LinkProvider implements vscode.DocumentLinkProvider {
 
         return links;
     }
+
+    async resolveDocumentLink(link: vscode.DocumentLink): Promise<vscode.DocumentLink> {
+        if (!(link instanceof AnchorDocumentLink)) {
+            return link;
+        }
+
+        try {
+            const bytes = await vscode.workspace.fs.readFile(link.fileUri);
+            const content = Buffer.from(bytes).toString('utf-8');
+            const lineIndex = findAnchorLine(content, link.fragment);
+
+            link.target =
+                lineIndex === null
+                    ? link.fileUri
+                    : link.fileUri.with({fragment: `L${lineIndex + 1}`});
+        } catch {
+            link.target = link.fileUri;
+        }
+
+        return link;
+    }
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -145,11 +191,19 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         collection,
-        vscode.languages.registerDocumentLinkProvider({language: 'yaml'}, new LinkProvider()),
+        vscode.languages.registerDocumentLinkProvider(
+            [{language: 'yaml'}, {language: 'markdown'}],
+            new LinkProvider(),
+        ),
         vscode.languages.registerCompletionItemProvider(
             {language: 'yaml'},
             new FilePathCompletionProvider(),
             '/',
+        ),
+        vscode.languages.registerCompletionItemProvider(
+            {language: 'markdown'},
+            new AnchorCompletionProvider(),
+            '#',
         ),
         vscode.languages.registerReferenceProvider(
             [{language: 'markdown'}, {language: 'yaml'}],
