@@ -180,6 +180,16 @@ function enqueueValidation(document: vscode.TextDocument) {
     });
 }
 
+function revalidateOnConfigChange() {
+    clearConfigCache();
+
+    for (const doc of vscode.workspace.textDocuments) {
+        if (isSupportedDocument(doc)) {
+            scheduleValidation(doc);
+        }
+    }
+}
+
 export function activate(context: vscode.ExtensionContext) {
     collection = vscode.languages.createDiagnosticCollection('diplodoc');
 
@@ -190,12 +200,12 @@ export function activate(context: vscode.ExtensionContext) {
         collection,
         yfmConfigWatcher,
         yfmlintConfigWatcher,
-        yfmConfigWatcher.onDidChange(() => clearConfigCache()),
-        yfmConfigWatcher.onDidCreate(() => clearConfigCache()),
-        yfmConfigWatcher.onDidDelete(() => clearConfigCache()),
-        yfmlintConfigWatcher.onDidChange(() => clearConfigCache()),
-        yfmlintConfigWatcher.onDidCreate(() => clearConfigCache()),
-        yfmlintConfigWatcher.onDidDelete(() => clearConfigCache()),
+        yfmConfigWatcher.onDidChange(() => revalidateOnConfigChange()),
+        yfmConfigWatcher.onDidCreate(() => revalidateOnConfigChange()),
+        yfmConfigWatcher.onDidDelete(() => revalidateOnConfigChange()),
+        yfmlintConfigWatcher.onDidChange(() => revalidateOnConfigChange()),
+        yfmlintConfigWatcher.onDidCreate(() => revalidateOnConfigChange()),
+        yfmlintConfigWatcher.onDidDelete(() => revalidateOnConfigChange()),
         vscode.workspace.onDidOpenTextDocument((doc) => {
             if (isSupportedDocument(doc)) {
                 scheduleValidation(doc);
