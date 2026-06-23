@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.13.0](https://github.com/diplodoc-platform/vsc/compare/v0.12.3...v0.13.0) (2026-06-23)
+
+
+### Features
+
+* added support for liquid syntax ([1812872](https://github.com/diplodoc-platform/vsc/commit/1812872b39bf85e7b5901997bfc0e7b306ed9427))
+* added support for liquid syntax ([03ec4f5](https://github.com/diplodoc-platform/vsc/commit/03ec4f56fbbdef2f095a646c43212f0dc38dfa09))
+
+
+### Bug Fixes
+
+* fixed cache in validation ([22c15ea](https://github.com/diplodoc-platform/vsc/commit/22c15eae4ecd217d18a910a83e40c13dc1875c05))
+* fixed cache in validation ([19b2765](https://github.com/diplodoc-platform/vsc/commit/19b2765d737df2dce171099e7457b6198d1a9724))
+* fixed linter ([ed6fce5](https://github.com/diplodoc-platform/vsc/commit/ed6fce52a887b379c66ff7812dfcb641fd37c56a))
+
 ## [0.12.3](https://github.com/diplodoc-platform/vsc/compare/v0.12.2...v0.12.3) (2026-06-19)
 
 
