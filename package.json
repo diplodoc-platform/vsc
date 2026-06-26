@@ -302,7 +302,7 @@
     "lint:update": "lint update",
     "remove-vsix": "rm -f *.vsix",
     "pre-commit": "lint-staged",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "dependencies": {
     "@diplodoc/ajv": "^0.0.5",

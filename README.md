@@ -2,6 +2,13 @@
 
 ---
 
+[![NPM version](https://img.shields.io/npm/v/diplodoc-vsc-extension.svg?style=flat)](https://www.npmjs.org/package/diplodoc-vsc-extension)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=diplodoc-platform_diplodoc-vsc-extension&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=diplodoc-platform_diplodoc-vsc-extension)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=diplodoc-platform_diplodoc-vsc-extension&metric=coverage)](https://sonarcloud.io/summary/new_code?id=diplodoc-platform_diplodoc-vsc-extension)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=diplodoc-platform_diplodoc-vsc-extension&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=diplodoc-platform_diplodoc-vsc-extension)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=diplodoc-platform_diplodoc-vsc-extension&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=diplodoc-platform_diplodoc-vsc-extension)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=diplodoc-platform_diplodoc-vsc-extension&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=diplodoc-platform_diplodoc-vsc-extension)
+
 # Diplodoc Extension for VS Code
 
 VS Code extension for the [Diplodoc](https://diplodoc.com) documentation platform. Provides a WYSIWYG Markdown editor, YAML validation, autocompletion, linting, and visual editors for `.md`, `toc.yaml`, and page-constructor `.yaml` files.
