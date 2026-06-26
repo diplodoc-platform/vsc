@@ -16,25 +16,24 @@ jobs:
   update-package-lock:
     name: Update package-lock.json
     runs-on: ubuntu-latest
+    # Skip for PRs from forks: the bot token isn't available in fork context
+    # (actions/checkout fails with "Input required: token"), and we couldn't
+    # push back into the fork's branch anyway.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
           token: ${{ secrets.YC_UI_BOT_GITHUB_TOKEN }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: diplodoc-platform/setup-node-action@v1
         with:
-          node-version: ${{ vars.NODE_VERSION }}
+          node-version: ${{ vars.NODE_VERSION || '24' }}
           registry-url: 'https://registry.npmjs.org'
-          cache: 'npm'
-
-      - name: Install latest npm (>= 11.5.1)
-        run: |
-          [ "$(printf '%s\n' "11.5.1" "$(npm -v)" | sort -V | head -n1)" = "11.5.1" ] || npm install -g npm@11.5.1
-        shell: bash
+          run-install: 'false'
 
       - name: Regenerate package-lock.json
         run: npm install --no-workspaces --package-lock-only --ignore-scripts
