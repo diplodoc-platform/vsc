@@ -184,4 +184,27 @@ describe('LinkProvider', () => {
 
         expect(links).toHaveLength(0);
     });
+
+    it('creates anchor link for markdown ya.make link with fragment', async () => {
+        const {getYaMakeSources} = await import('../shared/ya-make');
+        vi.mocked(getYaMakeSources).mockReturnValue(
+            new Map([['extra.md', '/docs/part2/extra.md']]),
+        );
+
+        const doc = mockDocument('[Part 2](extra.md#section)', 'markdown');
+        const links = provider.provideDocumentLinks(doc);
+
+        expect(links).toHaveLength(1);
+        expect(links[0].target).toBeUndefined();
+    });
+
+    it('does not redirect yaml href when target has no ya.make match', async () => {
+        const {getYaMakeSources} = await import('../shared/ya-make');
+        vi.mocked(getYaMakeSources).mockReturnValue(new Map([['other.md', '/docs/other.md']]));
+
+        const doc = mockDocument('items:\n  - name: Page\n    href: page.md');
+        const links = provider.provideDocumentLinks(doc);
+
+        expect(links[0].target?.toString()).toContain('/docs/ru/page.md');
+    });
 });
