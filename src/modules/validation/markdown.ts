@@ -14,6 +14,7 @@ import includesPlugin from '@diplodoc/transform/lib/plugins/includes';
 import linksPlugin from '@diplodoc/transform/lib/plugins/links';
 
 import {isIncluded} from '../utils';
+import {getYaMakeDests} from '../shared/ya-make';
 
 import {
     buildLintConfig,
@@ -59,6 +60,39 @@ const allPlugins = [
     linksPlugin,
 ];
 
+const UNREACHABLE_LINK_RULE = 'unreachable-link';
+const UNREACHABLE_LINK_RE = /Unreachable link:\s+"([^"]+)"/;
+const PLUGIN_UNREACHABLE_RE = /^Link is unreachable:\s+(.+)$/;
+
+function matchesYaMakeDest(linkPath: string, yaMakeDests: Set<string>): boolean {
+    const name = path.basename(linkPath.trim());
+
+    return yaMakeDests.has(name) || yaMakeDests.has(name + '.md');
+}
+
+function isYaMakeProvidedLink(error: ValidationMessage, yaMakeDests: Set<string>): boolean {
+    if (!yaMakeDests.size) {
+        return false;
+    }
+
+    if (!('ruleNames' in error) && 'message' in error) {
+        const match = PLUGIN_UNREACHABLE_RE.exec((error as PluginMessage).message);
+
+        return match ? matchesYaMakeDest(match[1], yaMakeDests) : false;
+    }
+
+    const ruleNames = (error as YfmLintError).ruleNames ?? [];
+
+    if (!ruleNames.includes(UNREACHABLE_LINK_RULE)) {
+        return false;
+    }
+
+    const errorContext = (error as YfmLintError).errorContext ?? '';
+    const match = UNREACHABLE_LINK_RE.exec(errorContext);
+
+    return match ? matchesYaMakeDest(match[1], yaMakeDests) : false;
+}
+
 export async function validateMarkdown(
     document: TextDocument,
     vscLintRules: Record<string, unknown> = {},
@@ -100,11 +134,14 @@ export async function validateMarkdown(
         lintConfig,
     });
 
+    const yaMakeDests = getYaMakeDests(root);
+
     const errors = [...(lintErrors || []), ...pluginMessages].filter(
         (error) =>
             !isTermDefinition(error, content) &&
             !isResolvedConditionalAnchor(error) &&
-            (error as YfmLintError).level !== 'disabled',
+            (error as YfmLintError).level !== 'disabled' &&
+            !isYaMakeProvidedLink(error, yaMakeDests),
     );
 
     return toDiagnostics(errors, document);

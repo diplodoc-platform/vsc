@@ -1,9 +1,11 @@
 import * as vscode from 'vscode';
+import {basename} from 'node:path';
 
 import {debounceByKey} from '../../utils';
 import {findYfmRoot, isInExcludedDir} from '../utils';
 import * as telemetry from '../telemetry';
 import {EVENTS} from '../telemetry/constants';
+import {getYaMakeSources} from '../shared/ya-make';
 
 import {LINK_FIELDS, LIST_ITEM_RE, LIST_PARENT_RE} from './constants';
 import {getBlockScalarLines, validateLinks} from './diagnostics';
@@ -33,11 +35,32 @@ class AnchorDocumentLink extends vscode.DocumentLink {
     }
 }
 
+function applyYaMakeSource(link: vscode.DocumentLink, yaMakeSources: Map<string, string>): void {
+    if (!link.target) {
+        return;
+    }
+    const src = yaMakeSources.get(basename(link.target.fsPath));
+
+    if (src) {
+        link.target = vscode.Uri.file(src);
+    }
+}
+
+function resolveLink(
+    value: string,
+    baseUri: vscode.Uri,
+    yaMakeSources: Map<string, string>,
+): vscode.Uri {
+    const src = yaMakeSources.get(value);
+    return src ? vscode.Uri.file(src) : vscode.Uri.joinPath(baseUri, value);
+}
+
 function collectMarkdownLinks(
     lineText: string,
     lineIndex: number,
     baseUri: vscode.Uri,
     links: vscode.DocumentLink[],
+    yaMakeSources: Map<string, string>,
 ): void {
     for (const {value, start} of extractMarkdownLinks(lineText)) {
         const external = isExternalUrl(value);
@@ -57,12 +80,46 @@ function collectMarkdownLinks(
         const fragmentMatch = FRAGMENT_RE.exec(value);
 
         if (fragmentMatch) {
-            const fileUri = vscode.Uri.joinPath(baseUri, path);
+            const fileUri = resolveLink(path, baseUri, yaMakeSources);
             links.push(new AnchorDocumentLink(range, fileUri, fragmentMatch[1]));
             continue;
         }
 
-        links.push(new vscode.DocumentLink(range, vscode.Uri.joinPath(baseUri, path)));
+        links.push(new vscode.DocumentLink(range, resolveLink(path, baseUri, yaMakeSources)));
+    }
+}
+
+function collectYaMakeMarkdownLinks(
+    lineText: string,
+    lineIndex: number,
+    links: vscode.DocumentLink[],
+    yaMakeSources: Map<string, string>,
+): void {
+    for (const {value, start} of extractMarkdownLinks(lineText)) {
+        if (isExternalUrl(value)) {
+            continue;
+        }
+
+        const linkPath = stripLinkAnchor(value);
+
+        if (!linkPath) {
+            continue;
+        }
+
+        const src = yaMakeSources.get(linkPath);
+
+        if (!src) {
+            continue;
+        }
+
+        const range = new vscode.Range(lineIndex, start, lineIndex, start + value.length);
+        const fragmentMatch = FRAGMENT_RE.exec(value);
+
+        if (fragmentMatch) {
+            links.push(new AnchorDocumentLink(range, vscode.Uri.file(src), fragmentMatch[1]));
+        } else {
+            links.push(new vscode.DocumentLink(range, vscode.Uri.file(src)));
+        }
     }
 }
 
@@ -70,6 +127,16 @@ export class LinkProvider implements vscode.DocumentLinkProvider {
     provideDocumentLinks(document: vscode.TextDocument): vscode.DocumentLink[] {
         const links: vscode.DocumentLink[] = [];
         const baseUri = vscode.Uri.joinPath(document.uri, '..');
+        const yaMakeSources = getYaMakeSources(baseUri.fsPath);
+
+        if (document.languageId === 'markdown') {
+            for (let i = 0; i < document.lineCount; i++) {
+                collectYaMakeMarkdownLinks(document.lineAt(i).text, i, links, yaMakeSources);
+            }
+
+            return links;
+        }
+
         const includerBlocks = findIncluderBlocks(document);
         const blockScalarLines = getBlockScalarLines(document);
 
@@ -84,7 +151,7 @@ export class LinkProvider implements vscode.DocumentLinkProvider {
             const lineText = line.text;
 
             if (blockScalarLines.has(i)) {
-                collectMarkdownLinks(lineText, i, baseUri, links);
+                collectMarkdownLinks(lineText, i, baseUri, links, yaMakeSources);
                 continue;
             }
 
@@ -108,8 +175,10 @@ export class LinkProvider implements vscode.DocumentLinkProvider {
             const link = parseLinkFromLine(line, baseUri);
 
             if (link) {
+                applyYaMakeSource(link, yaMakeSources);
                 activeListField = null;
                 links.push(link);
+
                 continue;
             }
 
@@ -140,7 +209,7 @@ export class LinkProvider implements vscode.DocumentLinkProvider {
                         const range = new vscode.Range(i, valueStart, i, valueStart + value.length);
                         const target = isExternalUrl(value)
                             ? vscode.Uri.parse(value)
-                            : vscode.Uri.joinPath(baseUri, value);
+                            : resolveLink(value, baseUri, yaMakeSources);
 
                         links.push(new vscode.DocumentLink(range, target));
                         continue;

@@ -10,6 +10,10 @@ import {
     validateLinks,
 } from './diagnostics';
 
+vi.mock('../shared/ya-make', () => ({
+    getYaMakeDests: vi.fn().mockReturnValue(new Set()),
+}));
+
 const statMock = vi.mocked(vscodeModule.workspace.fs.stat);
 
 function mockDocument(text: string, languageId = 'yaml'): vscode.TextDocument {
@@ -459,6 +463,33 @@ describe('validateLinks', () => {
         const {diagnostics} = getSetCall();
         expect(diagnostics).toHaveLength(1);
         expect(diagnostics[0].message).toBe('Link is unreachable: sub/toc.yaml');
+    });
+
+    it('suppresses error for file listed in ya.make destinations', async () => {
+        const {getYaMakeDests} = await import('../shared/ya-make');
+        vi.mocked(getYaMakeDests).mockReturnValue(new Set(['extra.md']));
+        statMock.mockRejectedValue(new Error('not found'));
+
+        const doc = mockDocument('  href: extra.md');
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        expect(getSetCall().diagnostics).toHaveLength(0);
+    });
+
+    it('still reports error for missing file not in ya.make', async () => {
+        const {getYaMakeDests} = await import('../shared/ya-make');
+        vi.mocked(getYaMakeDests).mockReturnValue(new Set(['other.md']));
+        statMock.mockRejectedValue(new Error('not found'));
+
+        const doc = mockDocument('  href: missing.md');
+        const {collection, getSetCall} = mockCollection();
+
+        await validateLinks(doc, collection);
+
+        expect(getSetCall().diagnostics).toHaveLength(1);
+        expect(getSetCall().diagnostics[0].message).toBe('Link is unreachable: missing.md');
     });
 });
 
