@@ -9,6 +9,10 @@ vi.mock('../utils', () => ({
     isInExcludedDir: () => false,
 }));
 
+vi.mock('../shared/ya-make', () => ({
+    getYaMakeSources: vi.fn().mockReturnValue(new Map()),
+}));
+
 function mockDocument(text: string, languageId = 'yaml'): vscode.TextDocument {
     const lines = text.split('\n');
 
@@ -121,5 +125,86 @@ describe('LinkProvider', () => {
         const links = provider.provideDocumentLinks(doc);
 
         expect(links).toHaveLength(0);
+    });
+
+    it('redirects yaml href to ya.make source when destination matches', async () => {
+        const {getYaMakeSources} = await import('../shared/ya-make');
+        vi.mocked(getYaMakeSources).mockReturnValue(
+            new Map([['extra.md', '/docs/part2/extra.md']]),
+        );
+
+        const doc = mockDocument('items:\n  - name: Page\n    href: extra.md');
+        const links = provider.provideDocumentLinks(doc);
+
+        const link = links.find((l) => l.target?.toString().includes('extra'));
+        expect(link?.target?.toString()).toBe('/docs/part2/extra.md');
+    });
+
+    it('does not redirect yaml href when not in ya.make', async () => {
+        const {getYaMakeSources} = await import('../shared/ya-make');
+        vi.mocked(getYaMakeSources).mockReturnValue(new Map());
+
+        const doc = mockDocument('items:\n  - name: Page\n    href: page.md');
+        const links = provider.provideDocumentLinks(doc);
+
+        expect(links[0].target?.toString()).toContain('/docs/ru/page.md');
+    });
+
+    it('provides link to ya.make source for markdown link', async () => {
+        const {getYaMakeSources} = await import('../shared/ya-make');
+        vi.mocked(getYaMakeSources).mockReturnValue(
+            new Map([['extra.md', '/docs/part2/extra.md']]),
+        );
+
+        const doc = mockDocument('[Part 2](extra.md)', 'markdown');
+        const links = provider.provideDocumentLinks(doc);
+
+        expect(links).toHaveLength(1);
+        expect(links[0].target?.toString()).toBe('/docs/part2/extra.md');
+    });
+
+    it('returns no links for markdown when ya.make has no matching destinations', async () => {
+        const {getYaMakeSources} = await import('../shared/ya-make');
+        vi.mocked(getYaMakeSources).mockReturnValue(new Map());
+
+        const doc = mockDocument('[Regular page](page.md)', 'markdown');
+        const links = provider.provideDocumentLinks(doc);
+
+        expect(links).toHaveLength(0);
+    });
+
+    it('skips external links in markdown ya.make handling', async () => {
+        const {getYaMakeSources} = await import('../shared/ya-make');
+        vi.mocked(getYaMakeSources).mockReturnValue(
+            new Map([['https://example.com', '/src/file.md']]),
+        );
+
+        const doc = mockDocument('[External](https://example.com)', 'markdown');
+        const links = provider.provideDocumentLinks(doc);
+
+        expect(links).toHaveLength(0);
+    });
+
+    it('creates anchor link for markdown ya.make link with fragment', async () => {
+        const {getYaMakeSources} = await import('../shared/ya-make');
+        vi.mocked(getYaMakeSources).mockReturnValue(
+            new Map([['extra.md', '/docs/part2/extra.md']]),
+        );
+
+        const doc = mockDocument('[Part 2](extra.md#section)', 'markdown');
+        const links = provider.provideDocumentLinks(doc);
+
+        expect(links).toHaveLength(1);
+        expect(links[0].target).toBeUndefined();
+    });
+
+    it('does not redirect yaml href when target has no ya.make match', async () => {
+        const {getYaMakeSources} = await import('../shared/ya-make');
+        vi.mocked(getYaMakeSources).mockReturnValue(new Map([['other.md', '/docs/other.md']]));
+
+        const doc = mockDocument('items:\n  - name: Page\n    href: page.md');
+        const links = provider.provideDocumentLinks(doc);
+
+        expect(links[0].target?.toString()).toContain('/docs/ru/page.md');
     });
 });

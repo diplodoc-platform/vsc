@@ -14,6 +14,7 @@ import includesPlugin from '@diplodoc/transform/lib/plugins/includes';
 import linksPlugin from '@diplodoc/transform/lib/plugins/links';
 
 import {isIncluded} from '../utils';
+import {getYaMakeDests} from '../shared/ya-make';
 
 import {
     buildLintConfig,
@@ -23,6 +24,7 @@ import {
     parseMissingAnchor,
     toDiagnostics,
 } from './utils';
+import {isYaMakeProvidedLink} from './ya-make';
 
 function isResolvedConditionalAnchor(error: ValidationMessage): boolean {
     if (!('message' in error) || typeof error.message !== 'string') {
@@ -100,11 +102,14 @@ export async function validateMarkdown(
         lintConfig,
     });
 
+    const yaMakeDests = getYaMakeDests(root);
+
     const errors = [...(lintErrors || []), ...pluginMessages].filter(
         (error) =>
             !isTermDefinition(error, content) &&
             !isResolvedConditionalAnchor(error) &&
-            (error as YfmLintError).level !== 'disabled',
+            (error as YfmLintError).level !== 'disabled' &&
+            !isYaMakeProvidedLink(error, yaMakeDests),
     );
 
     return toDiagnostics(errors, document);

@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import {MAX_DIAGNOSTICS_PER_FILE} from '../validation/constants';
+import {getYaMakeDests} from '../shared/ya-make';
 
 import {
     BLOCK_SCALAR_RE,
@@ -107,12 +108,17 @@ async function checkLink(
     start: number,
     baseUri: vscode.Uri,
     diagnostics: vscode.Diagnostic[],
+    yaMakeDests: Set<string>,
 ): Promise<void> {
     const targetUri = vscode.Uri.joinPath(baseUri, value);
 
     try {
         await vscode.workspace.fs.stat(targetUri);
     } catch {
+        if (yaMakeDests.has(value)) {
+            return;
+        }
+
         const range = new vscode.Range(lineIndex, start, lineIndex, start + value.length);
         const diagnostic = new vscode.Diagnostic(
             range,
@@ -130,6 +136,7 @@ function checkMarkdownLinks(
     baseUri: vscode.Uri,
     diagnostics: vscode.Diagnostic[],
     checks: Promise<void>[],
+    yaMakeDests: Set<string>,
 ): void {
     for (const {value, start} of extractMarkdownLinks(line.text)) {
         if (isExternalUrl(value) || SNIPPET_RE.test(value)) {
@@ -142,7 +149,7 @@ function checkMarkdownLinks(
             continue;
         }
 
-        checks.push(checkLink(path, lineIndex, start, baseUri, diagnostics));
+        checks.push(checkLink(path, lineIndex, start, baseUri, diagnostics, yaMakeDests));
     }
 }
 
@@ -198,6 +205,7 @@ export async function validateLinks(
 
     const diagnostics: vscode.Diagnostic[] = [];
     const baseUri = vscode.Uri.joinPath(document.uri, '..');
+    const yaMakeDests = getYaMakeDests(baseUri.fsPath);
     const navigationLines = getNavigationLines(document);
     const includerLines = getIncluderLines(document);
     const blockScalarLines = getBlockScalarLines(document);
@@ -212,7 +220,7 @@ export async function validateLinks(
         }
 
         if (blockScalarLines.has(i)) {
-            checkMarkdownLinks(line, i, baseUri, diagnostics, checks);
+            checkMarkdownLinks(line, i, baseUri, diagnostics, checks, yaMakeDests);
             continue;
         }
 
@@ -226,7 +234,7 @@ export async function validateLinks(
             if (value) {
                 const valueStart = line.text.indexOf(value);
 
-                checks.push(checkLink(value, i, valueStart, baseUri, diagnostics));
+                checks.push(checkLink(value, i, valueStart, baseUri, diagnostics, yaMakeDests));
             }
 
             continue;
@@ -245,7 +253,7 @@ export async function validateLinks(
                 if (value && !isExternalUrl(value) && !SNIPPET_RE.test(value)) {
                     const valueStart = line.text.indexOf(value);
 
-                    checks.push(checkLink(value, i, valueStart, baseUri, diagnostics));
+                    checks.push(checkLink(value, i, valueStart, baseUri, diagnostics, yaMakeDests));
                 }
 
                 continue;
