@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.15.0](https://github.com/diplodoc-platform/vsc/compare/v0.14.0...v0.15.0) (2026-06-29)
+
+
+### Features
+
+* added support for documentation with ya.make ([8f1a657](https://github.com/diplodoc-platform/vsc/commit/8f1a6579f3eee655c7599354a569fe2c0a58ffa9))
+* added support for documentation with ya.make ([c64f012](https://github.com/diplodoc-platform/vsc/commit/c64f012f1482c6fe0413ef80b5ae1ebba969ee62))
+
+
+### Bug Fixes
+
+* added infra ([f8baeec](https://github.com/diplodoc-platform/vsc/commit/f8baeec58381c065e724fc619c5020a86d3623ac))
+* fixed sonar ([f0264be](https://github.com/diplodoc-platform/vsc/commit/f0264be1be001f80912ac5c36f5d32b68fce1f73))
+
 ## [0.14.0](https://github.com/diplodoc-platform/vsc/compare/v0.13.0...v0.14.0) (2026-06-23)
 
 
