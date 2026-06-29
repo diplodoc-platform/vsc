@@ -5,7 +5,7 @@
 
 module.exports = {
     root: true,
-    extends: require.resolve('@diplodoc/lint/eslint-config'),
+    extends: require.resolve('@diplodoc/infra/eslint-config'),
     parserOptions: {
         tsconfigRootDir: __dirname,
         project: true,
