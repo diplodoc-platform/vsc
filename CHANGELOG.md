@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0](https://github.com/diplodoc-platform/vsc/compare/v0.15.1...v1.0.0) (2026-07-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* major release
+
+### Features
+
+* major release ([c3e3e84](https://github.com/diplodoc-platform/vsc/commit/c3e3e84b5c1aaf86a3f7b55f9ab740b1c8e4e929))
+
 ## [0.15.1](https://github.com/diplodoc-platform/vsc/compare/v0.15.0...v0.15.1) (2026-06-30)
 
 
