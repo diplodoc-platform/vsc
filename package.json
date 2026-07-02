@@ -302,7 +302,8 @@
     "lint:update": "lint update",
     "remove-vsix": "rm -f *.vsix",
     "pre-commit": "lint-staged",
-    "prepare": "husky || true"
+    "prepare": "husky || true",
+    "lock": "npm install --no-workspaces --package-lock-only --ignore-scripts"
   },
   "dependencies": {
     "@diplodoc/ajv": "^0.0.6",
@@ -332,7 +333,7 @@
     "yaml-language-server": "^1.21.0"
   },
   "devDependencies": {
-    "@diplodoc/infra": "^2.0.7",
+    "@diplodoc/infra": "2.1.0",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
