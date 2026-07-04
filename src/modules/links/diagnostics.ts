@@ -20,6 +20,7 @@ import {
     isInternalPath,
     stripLinkAnchor,
 } from './utils';
+import {findAnchorLine} from './anchor-completion';
 
 export function getNavigationLines(document: vscode.TextDocument): Set<number> {
     const lines = new Set<number>();
@@ -130,6 +131,77 @@ async function checkLink(
     }
 }
 
+async function checkAnchor(
+    value: string,
+    lineIndex: number,
+    valueStart: number,
+    baseUri: vscode.Uri,
+    selfContent: string | null,
+    diagnostics: vscode.Diagnostic[],
+    yaMakeDests: Set<string>,
+): Promise<void> {
+    const hashIndex = value.indexOf('#');
+
+    if (hashIndex < 0) {
+        return;
+    }
+
+    const filePath = value.substring(0, hashIndex);
+    const anchor = value.substring(hashIndex + 1);
+
+    if (!anchor) {
+        return;
+    }
+
+    let content: string;
+
+    if (filePath) {
+        if (yaMakeDests.has(filePath)) {
+            return;
+        }
+
+        const targetUri = vscode.Uri.joinPath(baseUri, filePath);
+
+        try {
+            await vscode.workspace.fs.stat(targetUri);
+        } catch {
+            return;
+        }
+
+        try {
+            const bytes = await vscode.workspace.fs.readFile(targetUri);
+            content = Buffer.from(bytes).toString('utf-8');
+        } catch {
+            return;
+        }
+    } else {
+        if (!selfContent) {
+            return;
+        }
+
+        content = selfContent;
+    }
+
+    if (findAnchorLine(content, anchor) !== null) {
+        return;
+    }
+
+    const anchorStart = valueStart + hashIndex;
+    const range = new vscode.Range(
+        lineIndex,
+        anchorStart,
+        lineIndex,
+        anchorStart + 1 + anchor.length,
+    );
+    const diagnostic = new vscode.Diagnostic(
+        range,
+        `Anchor not found: #${anchor}`,
+        vscode.DiagnosticSeverity.Warning,
+    );
+    diagnostic.source = 'Diplodoc';
+    diagnostics.push(diagnostic);
+}
+
 function checkMarkdownLinks(
     line: vscode.TextLine,
     lineIndex: number,
@@ -150,6 +222,12 @@ function checkMarkdownLinks(
         }
 
         checks.push(checkLink(path, lineIndex, start, baseUri, diagnostics, yaMakeDests));
+
+        if (value.includes('#')) {
+            checks.push(
+                checkAnchor(value, lineIndex, start, baseUri, null, diagnostics, yaMakeDests),
+            );
+        }
     }
 }
 
@@ -264,6 +342,51 @@ export async function validateLinks(
             if (trimmed && !trimmed.startsWith('#')) {
                 listCtx.field = null;
             }
+        }
+    }
+
+    await Promise.all(checks);
+
+    collection.set(document.uri, diagnostics.slice(0, MAX_DIAGNOSTICS_PER_FILE));
+}
+
+const FENCED_CODE_RE = /^\s*(`{3,}|~{3,})/;
+
+export async function validateMarkdownFileAnchors(
+    document: vscode.TextDocument,
+    collection: vscode.DiagnosticCollection,
+): Promise<void> {
+    if (document.languageId !== 'markdown') {
+        return;
+    }
+
+    const diagnostics: vscode.Diagnostic[] = [];
+    const baseUri = vscode.Uri.joinPath(document.uri, '..');
+    const yaMakeDests = getYaMakeDests(baseUri.fsPath);
+    const selfContent = document.getText();
+    const checks: Promise<void>[] = [];
+    let inCodeBlock = false;
+
+    for (let i = 0; i < document.lineCount; i++) {
+        const lineText = document.lineAt(i).text;
+
+        if (FENCED_CODE_RE.test(lineText)) {
+            inCodeBlock = !inCodeBlock;
+            continue;
+        }
+
+        if (inCodeBlock) {
+            continue;
+        }
+
+        for (const {value, start} of extractMarkdownLinks(lineText)) {
+            if (isExternalUrl(value) || SNIPPET_RE.test(value) || !value.includes('#')) {
+                continue;
+            }
+
+            checks.push(
+                checkAnchor(value, i, start, baseUri, selfContent, diagnostics, yaMakeDests),
+            );
         }
     }
 

@@ -65,6 +65,7 @@ src/
 │   ├── color/                        # YAML color picker provider
 │   ├── liquid/                       # Liquid syntax: presets, highlighting, hover, completion, links
 │   ├── links/                        # Link navigation, validation, md-link parsing, anchor completion
+│   │   ├── diagnostics.ts            # validateLinks() (YAML) + validateMarkdownFileAnchors() (Markdown)
 │   │   ├── anchor-completion.ts      # AnchorCompletionProvider, parseAnchors(), findAnchorLine()
 │   │   └── file-completion.ts        # FilePathCompletionProvider — YAML path suggestions
 │   ├── orphan/                       # Orphan detection + on-rename/on-delete with md link updates
@@ -147,6 +148,7 @@ The validation system has two independent paths:
 
 - **YAML validation** — `yaml-language-server` with in-process singleton, virtual documents, block-relative coordinates
 - **Markdown linting** — `@diplodoc/yfmlint` with all Diplodoc transform plugins
+- **Anchor validation** — `diagnostics.ts` checks that `#anchor` fragments in Markdown links resolve to an existing heading or `{#id}` in the target file; runs for both Markdown files (`validateMarkdownFileAnchors`) and YAML block scalar content (`checkAnchor` inside `checkMarkdownLinks`); produces Warning-severity diagnostics underlined on the `#anchor` portion
 
 Key design choices documented in AGENTS.md: singleton with all schemas pre-registered (no race conditions), virtual document version incrementing (no stale diagnostics), lazy block parsing (hover/completion work before first validation).
 

@@ -444,6 +444,16 @@ Fields from all Diplodoc YAML schemas:
 
 **Navigation section exception**: Links inside the `navigation:` block in `toc.yaml` are skipped entirely. Navigation items (`leftItems`/`rightItems`) contain URLs (not file paths) that are resolved from the documentation root, not the file location, and may point outside the doc root. The `getNavigationLines()` helper detects the navigation block via indentation tracking and returns the set of line numbers to skip. When `navigation` is a scalar value (`navigation: false` or `navigation: ./nav.yaml`), no lines are skipped.
 
+### Missing anchor diagnostics
+
+`diagnostics.ts` also validates that anchors (`#fragment`) in markdown links point to existing headings or inline anchors in the target file. For each link with a `#fragment`:
+
+1. If the target file does not exist — skipped (file-missing is reported separately)
+2. Target file is read and `findAnchorLine(content, anchor)` from `anchor-completion.ts` checks for explicit `{#id}`, slugified heading anchors, and inline `{#id}` anchors
+3. If the anchor is not found — **Warning** diagnostic: `Anchor not found: #<anchor>` (source: `Diplodoc`), underlines the `#anchor` portion of the link
+
+Supported in both YAML (block scalar markdown links) and standalone markdown files. For markdown files, same-file `#anchor` links are validated against the current document buffer. Fenced code blocks are skipped. Validation runs on open, save, and change (400ms debounce) via `validateMarkdownFileAnchors()`.
+
 ### Adding a new link field
 
 Add the field name to `LINK_FIELDS` in `src/modules/links/constants.ts`. No other changes needed — both link navigation and diagnostics will pick it up automatically.

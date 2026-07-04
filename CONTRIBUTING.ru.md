@@ -65,6 +65,7 @@ src/
 │   ├── color/                        # YAML color picker
 │   ├── liquid/                       # Liquid-синтаксис: пресеты, подсветка, hover, completion, ссылки
 │   ├── links/                        # Навигация по ссылкам, валидация, парсинг md-ссылок, дополнение якорей
+│   │   ├── diagnostics.ts            # validateLinks() (YAML) + validateMarkdownFileAnchors() (Markdown)
 │   │   ├── anchor-completion.ts      # AnchorCompletionProvider, parseAnchors(), findAnchorLine()
 │   │   └── file-completion.ts        # FilePathCompletionProvider — подсказка путей в YAML
 │   ├── orphan/                       # Обнаружение orphan-файлов + rename/delete с обновлением md-ссылок
@@ -173,6 +174,7 @@ npm run merge-schemas
 
 - **YAML-валидация** — `yaml-language-server` как in-process синглтон, виртуальные документы, блочные координаты
 - **Markdown-линтинг** — `@diplodoc/yfmlint` со всеми Diplodoc transform-плагинами
+- **Валидация якорей** — `diagnostics.ts` проверяет, что `#anchor` в Markdown-ссылках указывает на существующий заголовок или `{#id}` в целевом файле; работает для Markdown-файлов (`validateMarkdownFileAnchors`) и YAML block scalar контента (`checkAnchor` внутри `checkMarkdownLinks`); выдаёт Warning-диагностику с подчёркиванием части `#anchor`
 
 Ключевые решения задокументированы в AGENTS.md: синглтон с предрегистрацией всех схем (без гонок), инкрементация версии виртуальных документов (без устаревших диагностик), ленивый парсинг блоков (hover/completion работают до первой валидации).
 
