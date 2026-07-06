@@ -8,7 +8,7 @@ import {EVENTS} from '../telemetry/constants';
 import {getYaMakeSources} from '../shared/ya-make';
 
 import {LINK_FIELDS, LIST_ITEM_RE, LIST_PARENT_RE} from './constants';
-import {getBlockScalarLines, validateLinks} from './diagnostics';
+import {getBlockScalarLines, validateLinks, validateMarkdownFileAnchors} from './diagnostics';
 import {AnchorCompletionProvider, findAnchorLine} from './anchor-completion';
 import {FilePathCompletionProvider} from './file-completion';
 import {FileReferenceProvider, findFileReferences} from './references';
@@ -252,11 +252,15 @@ export class LinkProvider implements vscode.DocumentLinkProvider {
 export function activate(context: vscode.ExtensionContext) {
     const collection = vscode.languages.createDiagnosticCollection('diplodoc-links');
 
-    const debouncedValidate = debounceByKey(
-        (doc: vscode.TextDocument) => validateLinks(doc, collection),
-        400,
-        (doc) => doc.uri.toString(),
-    );
+    function validateDocument(doc: vscode.TextDocument) {
+        if (doc.languageId === 'yaml') {
+            validateLinks(doc, collection);
+        } else if (doc.languageId === 'markdown') {
+            validateMarkdownFileAnchors(doc, collection);
+        }
+    }
+
+    const debouncedValidate = debounceByKey(validateDocument, 400, (doc) => doc.uri.toString());
 
     context.subscriptions.push(
         collection,
@@ -297,21 +301,23 @@ export function activate(context: vscode.ExtensionContext) {
             );
         }),
         vscode.workspace.onDidOpenTextDocument((doc) => {
-            if (doc.languageId === 'yaml' && !isInExcludedDir(doc.uri.fsPath)) {
-                validateLinks(doc, collection);
+            if (!isInExcludedDir(doc.uri.fsPath)) {
+                validateDocument(doc);
             }
         }),
         vscode.workspace.onDidSaveTextDocument((doc) => {
-            if (doc.languageId === 'yaml' && !isInExcludedDir(doc.uri.fsPath)) {
-                validateLinks(doc, collection);
+            if (!isInExcludedDir(doc.uri.fsPath)) {
+                validateDocument(doc);
             }
         }),
         vscode.workspace.onDidChangeTextDocument((event) => {
+            const doc = event.document;
+
             if (
-                event.document.languageId === 'yaml' &&
-                !isInExcludedDir(event.document.uri.fsPath)
+                (doc.languageId === 'yaml' || doc.languageId === 'markdown') &&
+                !isInExcludedDir(doc.uri.fsPath)
             ) {
-                debouncedValidate(event.document);
+                debouncedValidate(doc);
             }
         }),
         vscode.workspace.onDidCloseTextDocument((doc) => {
@@ -321,8 +327,8 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     for (const doc of vscode.workspace.textDocuments) {
-        if (doc.languageId === 'yaml' && !isInExcludedDir(doc.uri.fsPath)) {
-            validateLinks(doc, collection);
+        if (!isInExcludedDir(doc.uri.fsPath)) {
+            validateDocument(doc);
         }
     }
 }
