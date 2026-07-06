@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/diplodoc-platform/vsc/compare/v1.0.0...v1.0.1) (2026-07-06)
+
+
+### Bug Fixes
+
+* added the anchor validation ([#154](https://github.com/diplodoc-platform/vsc/issues/154)) ([73a277c](https://github.com/diplodoc-platform/vsc/commit/73a277c6801a470507c5477175b0b33c4ac73925))
+
 ## [1.0.0](https://github.com/diplodoc-platform/vsc/compare/v0.15.1...v1.0.0) (2026-07-01)
 
 
