@@ -114,9 +114,107 @@ export interface MarkdownColorMatch {
     color: vscode.Color | null;
 }
 
+function maskCodeAndComments(text: string, inComment: boolean): {masked: string; open: boolean} {
+    const chars = text.split('');
+    const blank = (from: number, to: number) => {
+        for (let k = from; k < to && k < chars.length; k++) {
+            chars[k] = ' ';
+        }
+    };
+
+    let i = 0;
+    let open = inComment;
+
+    while (i < text.length) {
+        if (open) {
+            const end = text.indexOf('-->', i);
+            if (end === -1) {
+                blank(i, text.length);
+
+                break;
+            }
+
+            blank(i, end + 3);
+
+            open = false;
+            i = end + 3;
+        } else {
+            const start = text.indexOf('<!--', i);
+
+            if (start === -1) {
+                break;
+            }
+
+            const end = text.indexOf('-->', start + 4);
+            if (end === -1) {
+                blank(start, text.length);
+                open = true;
+
+                break;
+            }
+
+            blank(start, end + 3);
+
+            i = end + 3;
+        }
+    }
+
+    const scan = chars.join('');
+    let j = 0;
+
+    while (j < scan.length) {
+        if (scan[j] !== '`') {
+            j++;
+
+            continue;
+        }
+
+        let openEnd = j;
+
+        while (scan[openEnd] === '`') {
+            openEnd++;
+        }
+
+        const len = openEnd - j;
+
+        let k = openEnd;
+        let closed = false;
+
+        while (k < scan.length) {
+            if (scan[k] === '`') {
+                let runEnd = k;
+
+                while (scan[runEnd] === '`') {
+                    runEnd++;
+                }
+
+                if (runEnd - k === len) {
+                    blank(j, runEnd);
+
+                    j = runEnd;
+                    closed = true;
+
+                    break;
+                }
+
+                k = runEnd;
+            } else {
+                k++;
+            }
+        }
+
+        if (!closed) {
+            j = openEnd;
+        }
+    }
+
+    return {masked: chars.join(''), open};
+}
+
 export function findMarkdownColors(document: vscode.TextDocument): MarkdownColorMatch[] {
     const results: MarkdownColorMatch[] = [];
     let inFence = false;
+    let inComment = false;
 
     for (let i = 0; i < document.lineCount; i++) {
         const text = document.lineAt(i).text;
@@ -130,10 +228,13 @@ export function findMarkdownColors(document: vscode.TextDocument): MarkdownColor
             continue;
         }
 
+        const {masked, open} = maskCodeAndComments(text, inComment);
+        inComment = open;
+
         MD_COLOR_RE.lastIndex = 0;
         let m: RegExpExecArray | null;
 
-        while ((m = MD_COLOR_RE.exec(text)) !== null) {
+        while ((m = MD_COLOR_RE.exec(masked)) !== null) {
             const raw = m[1];
             const nameStart = m.index + 1;
 

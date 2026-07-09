@@ -62,7 +62,7 @@ src/
 │   ├── md-editor/editor.ts           # WYSIWYG Markdown редактор (наследует BaseEditor)
 │   ├── toc-editor/editor.ts          # TOC редактор (наследует BaseEditor)
 │   ├── main/sidebar.ts               # Сайдбар — браузер файлов
-│   ├── color/                        # YAML color picker
+│   ├── color/                        # Пипетки цвета (YAML + colorify в Markdown) + предупреждения о некорректных цветах
 │   ├── liquid/                       # Liquid-синтаксис: пресеты, подсветка, hover, completion, ссылки
 │   ├── links/                        # Навигация по ссылкам, валидация, парсинг md-ссылок, дополнение якорей
 │   │   ├── diagnostics.ts            # validateLinks() (YAML) + validateMarkdownFileAnchors() (Markdown)

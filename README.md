@@ -27,7 +27,7 @@ VS Code extension for the [Diplodoc](https://diplodoc.com) documentation platfor
 - **Markdown Link Updates** — when renaming or deleting a `.md` file, finds and updates all markdown links (`[text](path.md)`) across the project, not just `toc.yaml` references
 - **Preset Variables** — hover over `{{variable}}` to see values across all presets; Ctrl+Click to navigate to definition in `presets.yaml`; autocompletion inside `{{ }}`
 - **Liquid Syntax** — syntax highlighting for `{{ }}` output tags and `{% %}` control tags in Markdown; paired tag highlighting for `{% if %}` / `{% elsif %}` / `{% else %}` / `{% endif %}` and `{% for %}` / `{% endfor %}`; hover and navigation for variables inside control tags
-- **Color Picker** — inline color preview and picker for YAML color values
+- **Color Support** — inline color swatches and the native color picker for color values in YAML (`theme.yaml`, etc.) and for `{color}(text)` colorify markup in Markdown; the WYSIWYG editor renders `{color}(text)` in any CSS color (named, hex, `rgb()`, `hsl()`); values that aren't a valid color are flagged with a warning (yellow underline) in both YAML and Markdown
 - **Sidebar** — file browser with search, quick navigation, and project initialization
 - **Syntax Highlighting** — YAML highlighting inside `::: page-constructor` blocks in Markdown; Liquid syntax highlighting in Markdown
 

@@ -371,3 +371,31 @@ describe('findYamlColorProblems', () => {
         expect(findYamlColorProblems(doc)).toHaveLength(0);
     });
 });
+
+describe('findMarkdownColors — code and comments are not validated', () => {
+    it('ignores colorify inside inline code', () => {
+        const doc = mockDocument('`{red}(in code)` but {blue}(real)');
+        const matches = findMarkdownColors(doc);
+
+        expect(matches.map((m) => m.raw)).toEqual(['blue']);
+    });
+
+    it('ignores colorify inside double-backtick inline code', () => {
+        const doc = mockDocument('``{qwerty}(x)`` text');
+        expect(findMarkdownColors(doc)).toHaveLength(0);
+    });
+
+    it('ignores colorify inside a single-line HTML comment', () => {
+        const doc = mockDocument('<!-- {red}(x) --> {green}(real)');
+        const matches = findMarkdownColors(doc);
+
+        expect(matches.map((m) => m.raw)).toEqual(['green']);
+    });
+
+    it('ignores colorify inside a multi-line HTML comment', () => {
+        const doc = mockDocument(['<!--', '{red}(x)', '-->', '{blue}(real)'].join('\n'));
+        const matches = findMarkdownColors(doc);
+
+        expect(matches.map((m) => m.raw)).toEqual(['blue']);
+    });
+});
