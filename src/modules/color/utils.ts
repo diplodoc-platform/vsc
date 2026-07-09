@@ -114,99 +114,98 @@ export interface MarkdownColorMatch {
     color: vscode.Color | null;
 }
 
-function maskCodeAndComments(text: string, inComment: boolean): {masked: string; open: boolean} {
-    const chars = text.split('');
-    const blank = (from: number, to: number) => {
-        for (let k = from; k < to && k < chars.length; k++) {
-            chars[k] = ' ';
-        }
-    };
+function blankRange(chars: string[], from: number, to: number): void {
+    for (let k = from; k < to && k < chars.length; k++) {
+        chars[k] = ' ';
+    }
+}
 
+function backtickRunEnd(text: string, start: number): number {
+    let end = start;
+
+    while (text[end] === '`') {
+        end++;
+    }
+    return end;
+}
+
+function maskHtmlComments(chars: string[], text: string, inComment: boolean): boolean {
     let i = 0;
     let open = inComment;
 
     while (i < text.length) {
-        if (open) {
-            const end = text.indexOf('-->', i);
-            if (end === -1) {
-                blank(i, text.length);
+        const from = open ? i : text.indexOf('<!--', i);
 
-                break;
-            }
-
-            blank(i, end + 3);
-
-            open = false;
-            i = end + 3;
-        } else {
-            const start = text.indexOf('<!--', i);
-
-            if (start === -1) {
-                break;
-            }
-
-            const end = text.indexOf('-->', start + 4);
-            if (end === -1) {
-                blank(start, text.length);
-                open = true;
-
-                break;
-            }
-
-            blank(start, end + 3);
-
-            i = end + 3;
+        if (!open && from === -1) {
+            break;
         }
+
+        const searchFrom = open ? i : from + 4;
+        const end = text.indexOf('-->', searchFrom);
+
+        if (end === -1) {
+            blankRange(chars, from, text.length);
+
+            return true;
+        }
+
+        blankRange(chars, from, end + 3);
+        open = false;
+        i = end + 3;
     }
 
+    return open;
+}
+
+function maskInlineCode(chars: string[]): void {
     const scan = chars.join('');
     let j = 0;
 
     while (j < scan.length) {
         if (scan[j] !== '`') {
             j++;
+            continue;
+        }
+
+        const openEnd = backtickRunEnd(scan, j);
+        const close = findClosingRun(scan, openEnd, openEnd - j);
+
+        if (close === -1) {
+            j = openEnd;
+        } else {
+            blankRange(chars, j, close);
+            j = close;
+        }
+    }
+}
+
+function findClosingRun(scan: string, from: number, len: number): number {
+    let k = from;
+
+    while (k < scan.length) {
+        if (scan[k] !== '`') {
+            k++;
 
             continue;
         }
 
-        let openEnd = j;
+        const runEnd = backtickRunEnd(scan, k);
 
-        while (scan[openEnd] === '`') {
-            openEnd++;
+        if (runEnd - k === len) {
+            return runEnd;
         }
 
-        const len = openEnd - j;
-
-        let k = openEnd;
-        let closed = false;
-
-        while (k < scan.length) {
-            if (scan[k] === '`') {
-                let runEnd = k;
-
-                while (scan[runEnd] === '`') {
-                    runEnd++;
-                }
-
-                if (runEnd - k === len) {
-                    blank(j, runEnd);
-
-                    j = runEnd;
-                    closed = true;
-
-                    break;
-                }
-
-                k = runEnd;
-            } else {
-                k++;
-            }
-        }
-
-        if (!closed) {
-            j = openEnd;
-        }
+        k = runEnd;
     }
+
+    return -1;
+}
+
+function maskCodeAndComments(text: string, inComment: boolean): {masked: string; open: boolean} {
+    const chars = text.split('');
+    const open = maskHtmlComments(chars, text, inComment);
+
+    maskInlineCode(chars);
 
     return {masked: chars.join(''), open};
 }

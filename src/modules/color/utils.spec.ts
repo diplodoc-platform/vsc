@@ -399,3 +399,14 @@ describe('findMarkdownColors — code and comments are not validated', () => {
         expect(matches.map((m) => m.raw)).toEqual(['blue']);
     });
 });
+
+describe('findMarkdownColors — multi-line comment with blank lines', () => {
+    it('keeps the comment open across empty lines', () => {
+        const doc = mockDocument(
+            ['<!--', '{red}(x)', '', '{green}(y)', '-->', '{blue}(real)'].join('\n'),
+        );
+        const matches = findMarkdownColors(doc);
+
+        expect(matches.map((m) => m.raw)).toEqual(['blue']);
+    });
+});
