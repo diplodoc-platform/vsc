@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/diplodoc-platform/vsc/compare/v1.0.1...v1.1.0) (2026-07-09)
+
+
+### Features
+
+* added colors validation ([#156](https://github.com/diplodoc-platform/vsc/issues/156)) ([5a86d22](https://github.com/diplodoc-platform/vsc/commit/5a86d22ad0400263b83c88c76c881766c26997fd))
+
 ## [1.0.1](https://github.com/diplodoc-platform/vsc/compare/v1.0.0...v1.0.1) (2026-07-06)
 
 
