@@ -2,7 +2,16 @@ import type * as vscode from 'vscode';
 
 import {describe, expect, it} from 'vitest';
 
-import {colorToHex, colorToRgb, extractValueSpan, findColors, parseColor} from './utils';
+import {
+    colorToHex,
+    colorToRgb,
+    extractValueSpan,
+    findColors,
+    findMarkdownColors,
+    findYamlColorProblems,
+    isColorLike,
+    parseColor,
+} from './utils';
 
 function mockDocument(text: string): vscode.TextDocument {
     const lines = text.split('\n');
@@ -254,5 +263,111 @@ describe('findColors', () => {
 
         expect(colors).toHaveLength(1);
         expect(approx(colors[0].color.blue, 1)).toBe(true);
+    });
+});
+
+describe('findMarkdownColors', () => {
+    it('finds a valid named color and its name range', () => {
+        const doc = mockDocument('{red}(text)');
+        const matches = findMarkdownColors(doc);
+
+        expect(matches).toHaveLength(1);
+        expect(matches[0].raw).toBe('red');
+        expect(matches[0].color).not.toBeNull();
+        expect(matches[0].range.start.character).toBe(1);
+        expect(matches[0].range.end.character).toBe(4);
+    });
+
+    it('parses hex, rgb and hsl color names', () => {
+        const doc = mockDocument('{#00FF00}(a) {rgb(0,0,255)}(b) {hsl(30,100%,50%)}(c)');
+        const matches = findMarkdownColors(doc);
+
+        expect(matches.map((m) => m.raw)).toEqual(['#00FF00', 'rgb(0,0,255)', 'hsl(30,100%,50%)']);
+        expect(matches.every((m) => m.color !== null)).toBe(true);
+    });
+
+    it('marks unknown color names as invalid (color === null)', () => {
+        const doc = mockDocument('{qwerty}(text)');
+        const matches = findMarkdownColors(doc);
+
+        expect(matches).toHaveLength(1);
+        expect(matches[0].raw).toBe('qwerty');
+        expect(matches[0].color).toBeNull();
+    });
+
+    it('does not match anchors or attributes ({#id}, {.class} without `(`)', () => {
+        const doc = mockDocument('## Heading {#my-anchor}\n\nText {.some-class}');
+        expect(findMarkdownColors(doc)).toHaveLength(0);
+    });
+
+    it('finds multiple colors on one line', () => {
+        const doc = mockDocument('{red}(a) and {blue}(b)');
+        const matches = findMarkdownColors(doc);
+
+        expect(matches.map((m) => m.raw)).toEqual(['red', 'blue']);
+    });
+
+    it('skips fenced code blocks', () => {
+        const doc = mockDocument(
+            ['```', '{red}(not highlighted)', '```', '{blue}(yes)'].join('\n'),
+        );
+        const matches = findMarkdownColors(doc);
+
+        expect(matches.map((m) => m.raw)).toEqual(['blue']);
+    });
+});
+
+describe('isColorLike', () => {
+    it('treats #-prefixed and functional notations as colors', () => {
+        expect(isColorLike('#zzz', false)).toBe(true);
+        expect(isColorLike('rgb(1,2,3)', false)).toBe(true);
+        expect(isColorLike('hsl(1,2%,3%)', false)).toBe(true);
+    });
+
+    it('treats a quoted bare-hex string as a color', () => {
+        expect(isColorLike('dddd', true)).toBe(true);
+        expect(isColorLike('abcdef', true)).toBe(true);
+    });
+
+    it('does not treat unquoted bare words or plain text as colors', () => {
+        expect(isColorLike('dddd', false)).toBe(false);
+        expect(isColorLike('Hello', true)).toBe(false);
+        expect(isColorLike('hello world', true)).toBe(false);
+    });
+});
+
+describe('findYamlColorProblems', () => {
+    it('flags a quoted value that looks like a color but does not parse', () => {
+        const doc = mockDocument(
+            [
+                "base-brand: '#2878c7'",
+                "link: '#0068d0'",
+                "link-hover: 'dddd'",
+                "unknownColor: '#ff0000'",
+            ].join('\n'),
+        );
+        const problems = findYamlColorProblems(doc);
+
+        expect(problems).toHaveLength(1);
+        expect(problems[0].raw).toBe('dddd');
+        expect(problems[0].range.start.line).toBe(2);
+    });
+
+    it('flags an invalid #-prefixed value', () => {
+        const doc = mockDocument("brand: '#12g'");
+        const problems = findYamlColorProblems(doc);
+
+        expect(problems).toHaveLength(1);
+        expect(problems[0].raw).toBe('#12g');
+    });
+
+    it('does not flag non-color string values', () => {
+        const doc = mockDocument(['title: Hello', "description: 'some text'"].join('\n'));
+        expect(findYamlColorProblems(doc)).toHaveLength(0);
+    });
+
+    it('does not flag valid colors', () => {
+        const doc = mockDocument(["a: '#fff'", "b: 'rgb(0,0,0)'", "c: 'red'"].join('\n'));
+        expect(findYamlColorProblems(doc)).toHaveLength(0);
     });
 });

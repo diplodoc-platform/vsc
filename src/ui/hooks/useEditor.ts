@@ -2,6 +2,7 @@ import type {MarkdownEditorMode, MarkdownEditorPreset} from '@gravity-ui/markdow
 
 import {useMarkdownEditor, wysiwygToolbarConfigs} from '@gravity-ui/markdown-editor';
 import {useEffect, useMemo, useRef} from 'react';
+import {Color, colorMarkName} from '@gravity-ui/markdown-editor/extensions/yfm/Color/index.js';
 import {Math as MathExtension} from '@gravity-ui/markdown-editor/extensions/additional/Math/index.js';
 import {Mermaid as MermaidExtension} from '@gravity-ui/markdown-editor/extensions/additional/Mermaid/index.js';
 import {YfmHtmlBlock} from '@gravity-ui/markdown-editor/extensions/additional/YfmHtmlBlock/index.js';
@@ -69,6 +70,15 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
                 startOfLineEscape: /.^/,
             },
             extensions: (builder) => {
+                builder.use(Color);
+                builder.overrideMarkSpec(colorMarkName, (prev) => ({
+                    ...prev,
+                    toDOM(mark) {
+                        const color = mark.attrs[colorMarkName];
+
+                        return ['span', {style: `color: ${color};`, 'data-color': color}, 0];
+                    },
+                }));
                 builder.use(MathExtension, {
                     loadRuntimeScript: () => {
                         import('@diplodoc/latex-extension/runtime');

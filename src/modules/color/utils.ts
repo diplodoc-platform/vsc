@@ -1,7 +1,10 @@
 import * as vscode from 'vscode';
-import {colord} from 'colord';
+import {colord, extend} from 'colord';
+import namesPlugin from 'colord/plugins/names';
 
-import {KEY_VALUE_RE} from './constants';
+import {BARE_HEX_RE, COLOR_FUNCTION_RE, FENCE_RE, KEY_VALUE_RE, MD_COLOR_RE} from './constants';
+
+extend([namesPlugin]);
 
 export function parseColor(raw: string): vscode.Color | null {
     const c = colord(raw);
@@ -100,6 +103,85 @@ export function findColors(document: vscode.TextDocument): ColorMatch[] {
             range: new vscode.Range(i, span.start, i, span.end),
             color,
         });
+    }
+
+    return results;
+}
+
+export interface MarkdownColorMatch {
+    range: vscode.Range;
+    raw: string;
+    color: vscode.Color | null;
+}
+
+export function findMarkdownColors(document: vscode.TextDocument): MarkdownColorMatch[] {
+    const results: MarkdownColorMatch[] = [];
+    let inFence = false;
+
+    for (let i = 0; i < document.lineCount; i++) {
+        const text = document.lineAt(i).text;
+
+        if (FENCE_RE.test(text)) {
+            inFence = !inFence;
+            continue;
+        }
+
+        if (inFence) {
+            continue;
+        }
+
+        MD_COLOR_RE.lastIndex = 0;
+        let m: RegExpExecArray | null;
+
+        while ((m = MD_COLOR_RE.exec(text)) !== null) {
+            const raw = m[1];
+            const nameStart = m.index + 1;
+
+            results.push({
+                range: new vscode.Range(i, nameStart, i, nameStart + raw.length),
+                raw,
+                color: parseColor(raw),
+            });
+        }
+    }
+
+    return results;
+}
+
+export interface ColorProblem {
+    range: vscode.Range;
+    raw: string;
+}
+
+export function isColorLike(raw: string, quoted: boolean): boolean {
+    return raw.startsWith('#') || COLOR_FUNCTION_RE.test(raw) || (quoted && BARE_HEX_RE.test(raw));
+}
+
+export function findYamlColorProblems(document: vscode.TextDocument): ColorProblem[] {
+    const results: ColorProblem[] = [];
+
+    for (let i = 0; i < document.lineCount; i++) {
+        const text = document.lineAt(i).text;
+        const m = KEY_VALUE_RE.exec(text);
+
+        if (!m) {
+            continue;
+        }
+
+        const valueOffset = m[0].length;
+        const span = extractValueSpan(text, valueOffset);
+
+        if (!span) {
+            continue;
+        }
+
+        const quoted = text[valueOffset] === "'" || text[valueOffset] === '"';
+
+        if (!isColorLike(span.raw, quoted) || parseColor(span.raw)) {
+            continue;
+        }
+
+        results.push({range: new vscode.Range(i, span.start, i, span.end), raw: span.raw});
     }
 
     return results;
