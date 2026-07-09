@@ -2,7 +2,7 @@ import type * as vscode from 'vscode';
 
 import {describe, expect, it} from 'vitest';
 
-import {YamlColorProvider} from './index';
+import {MarkdownColorProvider, YamlColorProvider} from './index';
 
 function mockDocument(text: string): vscode.TextDocument {
     const lines = text.split('\n');
@@ -115,5 +115,32 @@ describe('YamlColorProvider', () => {
             expect(presentations[0].label).toBe("'#ffffff'");
             expect(presentations[1].label).toBe("'rgb(255, 255, 255)'");
         });
+    });
+});
+
+describe('MarkdownColorProvider', () => {
+    const provider = new MarkdownColorProvider();
+
+    it('provides color info only for valid colorify markup', () => {
+        const doc = mockDocument('{red}(a) {qwerty}(b) {#00ff00}(c)');
+        const colors = provider.provideDocumentColors(doc);
+
+        expect(colors).toHaveLength(2);
+        expect(approx(colors[0].color.red, 1)).toBe(true);
+        expect(colors[0].range.start.character).toBe(1);
+        expect(colors[0].range.end.character).toBe(4);
+    });
+
+    it('returns empty for a document without colorify markup', () => {
+        const doc = mockDocument('# Heading {#anchor}\n\nplain text');
+        expect(provider.provideDocumentColors(doc)).toHaveLength(0);
+    });
+
+    it('presents bare hex and rgb values (no quotes)', () => {
+        const color = {red: 1, green: 0, blue: 0, alpha: 1} as vscode.Color;
+        const presentations = provider.provideColorPresentations(color);
+
+        expect(presentations[0].label).toBe('#ff0000');
+        expect(presentations[1].label).toBe('rgb(255, 0, 0)');
     });
 });

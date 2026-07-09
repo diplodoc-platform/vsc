@@ -30,3 +30,5 @@ items:
         items:
           - name: Page 2
             href: level1/level2/page2.md
+  - name: 'Color'
+    href: color.md

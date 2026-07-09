@@ -648,24 +648,60 @@ Multiple `presets.yaml` files can exist at different directory levels. Closer fi
 
 ## Color Provider
 
-`src/modules/color/` provides a YAML color picker (color swatches in the gutter).
+`src/modules/color/` provides color pickers for both YAML and Markdown, plus warning
+diagnostics for values that look like a color but don't parse as one. Registered in
+`activate()` for `{language: 'yaml'}` and `{language: 'markdown'}`.
 
-### How it works
+`parseColor()` uses the `colord` library. **Important:** `colord` rejects CSS keyword
+colors (`red`, `orange`, …) unless the `names` plugin is loaded, so `utils.ts` calls
+`extend([namesPlugin])` once at module load. Without it, named colors would be treated
+as invalid (and flagged). Supported forms: hex (3/4/6/8), `rgb()/rgba()`, `hsl()/hsla()`,
+CSS keyword names.
 
-1. `YamlColorProvider.provideDocumentColors()` scans every line of YAML files
+### YAML color picker — `YamlColorProvider`
+
+1. `provideDocumentColors()` scans every line of YAML files
 2. `KEY_VALUE_RE` (`/^(\s*)([\w-]+)\s*:\s*/`) matches YAML key-value lines
 3. `extractValueSpan()` extracts the value portion (handles both quoted and unquoted values, strips inline comments)
-4. `parseColor()` uses `colord` library to validate and parse — supports hex, rgb(), rgba(), hsl(), named colors
-5. If valid, a `ColorInformation` is returned → VS Code shows the color swatch
+4. If `parseColor()` succeeds, a `ColorInformation` is returned → VS Code shows the swatch
+5. Presentations: Hex (`'#rrggbb'`/`'#rrggbbaa'`) and RGB (`'rgb(...)'`/`'rgba(...)'`), always quoted (preserves original quote style; defaults to `'`)
 
-### Color presentations
+### Markdown color picker — `MarkdownColorProvider`
 
-When the user picks a color from the VS Code color picker, two representations are offered:
+Handles colorify markup `{colorName}(text)` — the same syntax as `@diplodoc/color-extension`.
 
-- Hex (`'#rrggbb'` or `'#rrggbbaa'`)
-- RGB (`'rgb(r, g, b)'` or `'rgba(r, g, b, a)'`)
+1. `findMarkdownColors()` scans lines with `MD_COLOR_RE` (`/\{([^{}]+)\}\(/g`) — the `}(`
+   suffix is what distinguishes colorify from `{#anchor}` / `{.class}` (markdown-it-attrs),
+   which are therefore never matched
+2. Fenced code blocks (`FENCE_RE`) are skipped so code samples aren't touched
+3. The swatch range is the color-name token (between `{` and `}`); valid colors get a `ColorInformation`
+4. Presentations are **bare** (no quotes) — picking a color rewrites `{red}(…)` → `{#ff0000}(…)`
 
-Both are always quoted (preserves original quote style; defaults to `'` if unquoted).
+### Invalid-color diagnostics
+
+A single `DiagnosticCollection('diplodoc-color')` (created lazily in `activate`, so importing
+the module has no side effects) publishes `DiagnosticSeverity.Warning` (yellow wavy underline,
+also shown in Problems) for values that don't parse as a color:
+
+- **Markdown**: any `{colorName}(…)` where `parseColor` fails (e.g. `{qwerty}(…)`)
+- **YAML**: values gated by `isColorLike(raw, quoted)` so plain strings aren't flagged — a value
+  counts as color-intended when it starts with `#`, matches `COLOR_FUNCTION_RE`
+  (`rgb()/hsl()/hwb()/lab()/lch()/oklab()/oklch()/color()`), or is a **quoted** bare hex string
+  matching `BARE_HEX_RE` (lengths 3/4/6/8, e.g. `'dddd'`). So `link-hover: 'dddd'` is flagged,
+  while `unknownColor: '#ff0000'` (valid value) and `title: Hello` (not color-like) are not.
+
+Diagnostic message is English: `Unknown color "<raw>". Expected a CSS color (e.g. red, #f00, rgb(0, 0, 255)).`
+Refreshed on `onDidOpenTextDocument` / `onDidChangeTextDocument`, cleared on `onDidCloseTextDocument`.
+
+Constants live in `constants.ts`: `KEY_VALUE_RE`, `MD_COLOR_RE`, `FENCE_RE`, `COLOR_FUNCTION_RE`, `BARE_HEX_RE`.
+
+### WYSIWYG rendering of colorify (related, separate)
+
+Rendering `{color}(text)` **inside the WYSIWYG editor** is not part of this module — it's
+configured in `src/ui/hooks/useEditor.ts`. The `yfm` preset lacks the Color extension (only
+`full` has it), so it's added explicitly with `builder.use(Color)`, and `overrideMarkSpec`
+replaces the mark's `toDOM` to emit an inline `style="color: …"` instead of the palette class
+`yfm-colorify--<name>`. This lets any CSS color render without shipping palette CSS.
 
 ## Editor Modules
 
