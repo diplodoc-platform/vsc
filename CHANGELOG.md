@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/diplodoc-platform/vsc/compare/v1.1.1...v1.1.2) (2026-07-13)
+
+
+### Bug Fixes
+
+* fixed anchors detect ([#162](https://github.com/diplodoc-platform/vsc/issues/162)) ([997bdb8](https://github.com/diplodoc-platform/vsc/commit/997bdb83c576a7b58fff90976c72cdbe005730d5))
+
 ## [1.1.1](https://github.com/diplodoc-platform/vsc/compare/v1.1.0...v1.1.1) (2026-07-13)
 
 
