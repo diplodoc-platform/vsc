@@ -113,6 +113,57 @@ describe('parseAnchors — all mode', () => {
     });
 });
 
+describe('parseAnchors — fenced code blocks', () => {
+    it('ignores headings inside fenced code blocks', () => {
+        const content = [
+            '## Real heading',
+            '',
+            '```yaml',
+            '# yaml comment that looks like heading',
+            '## Another fake heading {#fake}',
+            '```',
+            '',
+            '## After code block',
+        ].join('\n');
+        const anchors = parseAnchors(content, 'sections-only');
+        const ids = anchors.map((a) => a.id);
+
+        expect(ids).toContain('real-heading');
+        expect(ids).toContain('after-code-block');
+        expect(ids).not.toContain('fake');
+        expect(ids).not.toContain('yaml-comment-that-looks-like-heading');
+    });
+
+    it('ignores inline anchors inside fenced code blocks', () => {
+        const content = ['Text {#real-anchor}', '', '```', 'Example {#code-anchor}', '```'].join(
+            '\n',
+        );
+        const anchors = parseAnchors(content, 'all');
+        const ids = anchors.map((a) => a.id);
+
+        expect(ids).toContain('real-anchor');
+        expect(ids).not.toContain('code-anchor');
+    });
+
+    it('handles tilde fenced code blocks', () => {
+        const content = [
+            '## Before',
+            '',
+            '~~~',
+            '## Inside tilde block {#inside}',
+            '~~~',
+            '',
+            '## After',
+        ].join('\n');
+        const anchors = parseAnchors(content, 'sections-only');
+        const ids = anchors.map((a) => a.id);
+
+        expect(ids).toContain('before');
+        expect(ids).toContain('after');
+        expect(ids).not.toContain('inside');
+    });
+});
+
 describe('parseAnchors — slugification', () => {
     it('lowercases heading text', () => {
         const content = '## UPPERCASE TITLE\n';
@@ -311,6 +362,20 @@ describe('AnchorCompletionProvider', () => {
         expect(item?.insertText).toBe('#install');
     });
 
+    it('uses document content for same-file anchor links', async () => {
+        const selfContent = '## About {#about}\n\nText {#inline-id}\n';
+        const doc = makeDocument('[link](#)', 'markdown');
+        (doc as any).getText = () => selfContent;
+
+        const result = await provider.provideCompletionItems(doc, pos(8));
+
+        expect(result).toBeDefined();
+        const labels = getLabels(result as vscode.CompletionItem[]);
+        expect(labels).toContain('#about');
+        expect(labels).toContain('#inline-id');
+        expect(readFileMock).not.toHaveBeenCalled();
+    });
+
     it('includes heading text as detail', async () => {
         const line = '[text](./article.md#)';
         const doc = makeDocument(line);
@@ -369,5 +434,19 @@ describe('findAnchorLine', () => {
 
     it('returns null for empty content', () => {
         expect(findAnchorLine('', 'anything')).toBeNull();
+    });
+
+    it('ignores headings inside fenced code blocks', () => {
+        const content = ['## Real {#real}', '', '```', '## Fake {#fake}', '```'].join('\n');
+
+        expect(findAnchorLine(content, 'real')).toBe(0);
+        expect(findAnchorLine(content, 'fake')).toBeNull();
+    });
+
+    it('ignores inline anchors inside fenced code blocks', () => {
+        const content = ['Text {#outside}', '```', 'Code {#inside}', '```'].join('\n');
+
+        expect(findAnchorLine(content, 'outside')).toBe(0);
+        expect(findAnchorLine(content, 'inside')).toBeNull();
     });
 });
