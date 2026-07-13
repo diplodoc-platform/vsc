@@ -113,6 +113,57 @@ describe('parseAnchors — all mode', () => {
     });
 });
 
+describe('parseAnchors — fenced code blocks', () => {
+    it('ignores headings inside fenced code blocks', () => {
+        const content = [
+            '## Real heading',
+            '',
+            '```yaml',
+            '# yaml comment that looks like heading',
+            '## Another fake heading {#fake}',
+            '```',
+            '',
+            '## After code block',
+        ].join('\n');
+        const anchors = parseAnchors(content, 'sections-only');
+        const ids = anchors.map((a) => a.id);
+
+        expect(ids).toContain('real-heading');
+        expect(ids).toContain('after-code-block');
+        expect(ids).not.toContain('fake');
+        expect(ids).not.toContain('yaml-comment-that-looks-like-heading');
+    });
+
+    it('ignores inline anchors inside fenced code blocks', () => {
+        const content = ['Text {#real-anchor}', '', '```', 'Example {#code-anchor}', '```'].join(
+            '\n',
+        );
+        const anchors = parseAnchors(content, 'all');
+        const ids = anchors.map((a) => a.id);
+
+        expect(ids).toContain('real-anchor');
+        expect(ids).not.toContain('code-anchor');
+    });
+
+    it('handles tilde fenced code blocks', () => {
+        const content = [
+            '## Before',
+            '',
+            '~~~',
+            '## Inside tilde block {#inside}',
+            '~~~',
+            '',
+            '## After',
+        ].join('\n');
+        const anchors = parseAnchors(content, 'sections-only');
+        const ids = anchors.map((a) => a.id);
+
+        expect(ids).toContain('before');
+        expect(ids).toContain('after');
+        expect(ids).not.toContain('inside');
+    });
+});
+
 describe('parseAnchors — slugification', () => {
     it('lowercases heading text', () => {
         const content = '## UPPERCASE TITLE\n';
@@ -218,6 +269,10 @@ function pos(character: number): vscode.Position {
     return new vscodeModule.Position(0, character);
 }
 
+function getLabels(items: vscode.CompletionItem[]): string[] {
+    return items.map((i) => (typeof i.label === 'string' ? i.label : i.label.label));
+}
+
 const ARTICLE_CONTENT = [
     '# Overview',
     '',
@@ -255,11 +310,11 @@ describe('AnchorCompletionProvider', () => {
         const result = await provider.provideCompletionItems(doc, pos(28));
 
         expect(result).toBeDefined();
-        const ids = (result as vscode.CompletionItem[]).map((i) => i.label);
-        expect(ids).toContain('overview');
-        expect(ids).toContain('install');
-        expect(ids).toContain('config');
-        expect(ids).not.toContain('inline-anchor'); // inline anchor excluded
+        const labels = getLabels(result as vscode.CompletionItem[]);
+        expect(labels).toContain('#overview');
+        expect(labels).toContain('#install');
+        expect(labels).toContain('#config');
+        expect(labels).not.toContain('#inline-anchor');
     });
 
     it('provides all anchors (including inline) in a link context', async () => {
@@ -268,9 +323,9 @@ describe('AnchorCompletionProvider', () => {
         const result = await provider.provideCompletionItems(doc, pos(25));
 
         expect(result).toBeDefined();
-        const ids = (result as vscode.CompletionItem[]).map((i) => i.label);
-        expect(ids).toContain('install');
-        expect(ids).toContain('inline-anchor');
+        const labels = getLabels(result as vscode.CompletionItem[]);
+        expect(labels).toContain('#install');
+        expect(labels).toContain('#inline-anchor');
     });
 
     it('filters completions by typed prefix', async () => {
@@ -278,10 +333,10 @@ describe('AnchorCompletionProvider', () => {
         const doc = makeDocument(line);
         const result = await provider.provideCompletionItems(doc, pos(23));
 
-        const ids = (result as vscode.CompletionItem[]).map((i) => i.label);
-        expect(ids).toContain('install');
-        expect(ids).not.toContain('config');
-        expect(ids).not.toContain('overview');
+        const labels = getLabels(result as vscode.CompletionItem[]);
+        expect(labels).toContain('#install');
+        expect(labels).not.toContain('#config');
+        expect(labels).not.toContain('#overview');
     });
 
     it('returns empty array when target file is not found', async () => {
@@ -294,7 +349,7 @@ describe('AnchorCompletionProvider', () => {
         expect(result).toEqual([]);
     });
 
-    it('sets insertText to anchor id (without #)', async () => {
+    it('sets insertText to #anchor-id', async () => {
         const line = '[text](./article.md#)';
         const doc = makeDocument(line);
         const result = (await provider.provideCompletionItems(
@@ -302,9 +357,23 @@ describe('AnchorCompletionProvider', () => {
             pos(20),
         )) as vscode.CompletionItem[];
 
-        const item = result.find((i) => i.label === 'install');
+        const item = result.find((i) => getLabels([i])[0] === '#install');
         expect(item).toBeDefined();
-        expect(item?.insertText).toBe('install');
+        expect(item?.insertText).toBe('#install');
+    });
+
+    it('uses document content for same-file anchor links', async () => {
+        const selfContent = '## About {#about}\n\nText {#inline-id}\n';
+        const doc = makeDocument('[link](#)', 'markdown');
+        (doc as any).getText = () => selfContent;
+
+        const result = await provider.provideCompletionItems(doc, pos(8));
+
+        expect(result).toBeDefined();
+        const labels = getLabels(result as vscode.CompletionItem[]);
+        expect(labels).toContain('#about');
+        expect(labels).toContain('#inline-id');
+        expect(readFileMock).not.toHaveBeenCalled();
     });
 
     it('includes heading text as detail', async () => {
@@ -315,7 +384,7 @@ describe('AnchorCompletionProvider', () => {
             pos(20),
         )) as vscode.CompletionItem[];
 
-        const item = result.find((i) => i.label === 'install');
+        const item = result.find((i) => getLabels([i])[0] === '#install');
         expect(item?.detail).toBe('Installation');
     });
 });
@@ -365,5 +434,19 @@ describe('findAnchorLine', () => {
 
     it('returns null for empty content', () => {
         expect(findAnchorLine('', 'anything')).toBeNull();
+    });
+
+    it('ignores headings inside fenced code blocks', () => {
+        const content = ['## Real {#real}', '', '```', '## Fake {#fake}', '```'].join('\n');
+
+        expect(findAnchorLine(content, 'real')).toBe(0);
+        expect(findAnchorLine(content, 'fake')).toBeNull();
+    });
+
+    it('ignores inline anchors inside fenced code blocks', () => {
+        const content = ['Text {#outside}', '```', 'Code {#inside}', '```'].join('\n');
+
+        expect(findAnchorLine(content, 'outside')).toBe(0);
+        expect(findAnchorLine(content, 'inside')).toBeNull();
     });
 });
