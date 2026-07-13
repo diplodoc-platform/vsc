@@ -471,6 +471,11 @@ Add the field name to `LINK_FIELDS` in `src/modules/links/constants.ts`. No othe
 - Explicit heading anchor: `## Title {#id}` — matched by `id`
 - Auto-slug heading anchor: `## My Section` — matched by slug `my-section`
 - Inline anchor: `{#id}` in a paragraph — matched by `id`
+- Fenced code blocks (` ``` ` / `~~~`) are skipped — no false-positive anchors from code samples
+
+**`slugify(text)`** uses Unicode-aware regex (`\p{L}`, `\p{N}` with `u` flag) to preserve Cyrillic and other non-ASCII characters. E.g. `Корневая секция` → `корневая-секция`, not empty string.
+
+**Anchor ID regex** (`EXPLICIT_ANCHOR_IN_HEADING_RE`, `INLINE_ANCHOR_RE`) also uses `[\p{L}\p{N}_-]` with `u` flag to support Unicode anchor IDs.
 
 ### Anchor completion
 
@@ -481,10 +486,13 @@ Add the field name to `LINK_FIELDS` in `src/modules/links/constants.ts`. No othe
 - Include: `{%\s*include\s*\[[^\]]*\]\(path#prefix$`
 - Link: `\[[^\]]*\]\(path#prefix$`
 
+**Same-file anchors**: when `targetPath` is empty (e.g. `[text](#anchor)`), the provider reads the current document buffer via `document.getText()` instead of trying to resolve a file path. This ensures inline `{#id}` anchors and heading anchors from the current file are suggested.
+
 **`parseAnchors(content, mode)`**:
 
 - `'sections-only'` (includes): heading anchors only
 - `'all'` (links): heading anchors + inline `{#id}` anchors
+- Fenced code blocks are skipped
 
 For headings with `{#id}`, the anchor ID is the explicit id — not the slug of the full text including `{#id}` (which is what VS Code's built-in incorrectly produces for YFM, e.g. `installation-install` instead of `install`).
 

@@ -218,6 +218,10 @@ function pos(character: number): vscode.Position {
     return new vscodeModule.Position(0, character);
 }
 
+function getLabels(items: vscode.CompletionItem[]): string[] {
+    return items.map((i) => (typeof i.label === 'string' ? i.label : i.label.label));
+}
+
 const ARTICLE_CONTENT = [
     '# Overview',
     '',
@@ -255,11 +259,11 @@ describe('AnchorCompletionProvider', () => {
         const result = await provider.provideCompletionItems(doc, pos(28));
 
         expect(result).toBeDefined();
-        const ids = (result as vscode.CompletionItem[]).map((i) => i.label);
-        expect(ids).toContain('overview');
-        expect(ids).toContain('install');
-        expect(ids).toContain('config');
-        expect(ids).not.toContain('inline-anchor'); // inline anchor excluded
+        const labels = getLabels(result as vscode.CompletionItem[]);
+        expect(labels).toContain('#overview');
+        expect(labels).toContain('#install');
+        expect(labels).toContain('#config');
+        expect(labels).not.toContain('#inline-anchor');
     });
 
     it('provides all anchors (including inline) in a link context', async () => {
@@ -268,9 +272,9 @@ describe('AnchorCompletionProvider', () => {
         const result = await provider.provideCompletionItems(doc, pos(25));
 
         expect(result).toBeDefined();
-        const ids = (result as vscode.CompletionItem[]).map((i) => i.label);
-        expect(ids).toContain('install');
-        expect(ids).toContain('inline-anchor');
+        const labels = getLabels(result as vscode.CompletionItem[]);
+        expect(labels).toContain('#install');
+        expect(labels).toContain('#inline-anchor');
     });
 
     it('filters completions by typed prefix', async () => {
@@ -278,10 +282,10 @@ describe('AnchorCompletionProvider', () => {
         const doc = makeDocument(line);
         const result = await provider.provideCompletionItems(doc, pos(23));
 
-        const ids = (result as vscode.CompletionItem[]).map((i) => i.label);
-        expect(ids).toContain('install');
-        expect(ids).not.toContain('config');
-        expect(ids).not.toContain('overview');
+        const labels = getLabels(result as vscode.CompletionItem[]);
+        expect(labels).toContain('#install');
+        expect(labels).not.toContain('#config');
+        expect(labels).not.toContain('#overview');
     });
 
     it('returns empty array when target file is not found', async () => {
@@ -294,7 +298,7 @@ describe('AnchorCompletionProvider', () => {
         expect(result).toEqual([]);
     });
 
-    it('sets insertText to anchor id (without #)', async () => {
+    it('sets insertText to #anchor-id', async () => {
         const line = '[text](./article.md#)';
         const doc = makeDocument(line);
         const result = (await provider.provideCompletionItems(
@@ -302,9 +306,9 @@ describe('AnchorCompletionProvider', () => {
             pos(20),
         )) as vscode.CompletionItem[];
 
-        const item = result.find((i) => i.label === 'install');
+        const item = result.find((i) => getLabels([i])[0] === '#install');
         expect(item).toBeDefined();
-        expect(item?.insertText).toBe('install');
+        expect(item?.insertText).toBe('#install');
     });
 
     it('includes heading text as detail', async () => {
@@ -315,7 +319,7 @@ describe('AnchorCompletionProvider', () => {
             pos(20),
         )) as vscode.CompletionItem[];
 
-        const item = result.find((i) => i.label === 'install');
+        const item = result.find((i) => getLabels([i])[0] === '#install');
         expect(item?.detail).toBe('Installation');
     });
 });
