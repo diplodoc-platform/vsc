@@ -77,6 +77,18 @@ export function parseAnchors(content: string, mode: 'all' | 'sections-only'): An
     return anchors;
 }
 
+function isHeadingAnchorMatch(rawText: string, anchorId: string): boolean {
+    const explicitMatch = EXPLICIT_ANCHOR_IN_HEADING_RE.exec(rawText);
+
+    if (explicitMatch) {
+        return explicitMatch[1] === anchorId;
+    }
+
+    const cleanText = rawText.replace(/\{[^}]*\}/g, '').trim();
+
+    return slugify(cleanText) === anchorId;
+}
+
 export function findAnchorLine(content: string, anchorId: string): number | null {
     if (!content) {
         return null;
@@ -99,24 +111,11 @@ export function findAnchorLine(content: string, anchorId: string): number | null
 
         const headingMatch = HEADING_RE.exec(line);
 
-        if (headingMatch) {
-            const rawText = headingMatch[2].trim();
-            const explicitMatch = EXPLICIT_ANCHOR_IN_HEADING_RE.exec(rawText);
-
-            if (explicitMatch && explicitMatch[1] === anchorId) {
-                return i;
-            }
-
-            const cleanText = rawText.replace(/\{[^}]*\}/g, '').trim();
-
-            if (slugify(cleanText) === anchorId) {
-                return i;
-            }
-
-            continue;
+        if (headingMatch && isHeadingAnchorMatch(headingMatch[2].trim(), anchorId)) {
+            return i;
         }
 
-        if (line.includes(`{#${anchorId}}`)) {
+        if (!headingMatch && line.includes(`{#${anchorId}}`)) {
             return i;
         }
     }
