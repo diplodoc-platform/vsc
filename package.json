@@ -4,7 +4,7 @@
   "publisher": "diplodoc",
   "icon": "assets/diplodoc-logo.png",
   "description": "Diplodoc Extension for VSC",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "MIT",
   "telemetryKey": "YOUR-APPLICATION-INSIGHTS-CONNECTION-STRING",
   "repository": {
