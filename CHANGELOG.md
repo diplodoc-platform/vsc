@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.3](https://github.com/diplodoc-platform/vsc/compare/v1.1.2...v1.1.3) (2026-07-14)
+
+
+### Bug Fixes
+
+* **deps:** Update @diplodoc/ajv@0.1.1 ([#169](https://github.com/diplodoc-platform/vsc/issues/169)) ([bbfd571](https://github.com/diplodoc-platform/vsc/commit/bbfd571ea7a2ce04c0c2df5a3f8a1332b94bc482))
+* **deps:** Update @diplodoc/mermaid-extension@2.2.0 ([#165](https://github.com/diplodoc-platform/vsc/issues/165)) ([3345e73](https://github.com/diplodoc-platform/vsc/commit/3345e73a7ce5f40f3b03006a8d20cc70151ce621))
+
 ## [1.1.2](https://github.com/diplodoc-platform/vsc/compare/v1.1.1...v1.1.2) (2026-07-13)
 
 
