@@ -333,7 +333,7 @@
     "yaml-language-server": "^1.21.0"
   },
   "devDependencies": {
-    "@diplodoc/infra": "2.2.0",
+    "@diplodoc/infra": "2.2.1",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
