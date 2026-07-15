@@ -19,6 +19,12 @@ import {OrphanDecorationProvider} from './decorator';
 import {ORPHAN_DIAGNOSTIC_MESSAGE, OrphanCodeActionProvider} from './code-actions';
 import {handleFileDeleted} from './on-delete';
 import {handleFileRenamed} from './on-rename';
+import {createBulkOperationDetector} from './bulk-detector';
+import {
+    BULK_OPERATION_THRESHOLD,
+    BULK_OPERATION_WINDOW_MS,
+    DELETE_FLUSH_DELAY_MS,
+} from './constants';
 import {findVcsDir, isVcsOperationInProgress} from './utils';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -91,6 +97,11 @@ export function activate(context: vscode.ExtensionContext) {
 
     const renamedPaths = new Set<string>();
 
+    const bulkDetector = createBulkOperationDetector({
+        threshold: BULK_OPERATION_THRESHOLD,
+        windowMs: BULK_OPERATION_WINDOW_MS,
+    });
+
     let gitSwitching = false;
     let switchTimeout: ReturnType<typeof setTimeout> | undefined;
 
@@ -135,16 +146,16 @@ export function activate(context: vscode.ExtensionContext) {
     function isVcsOperationActive(): boolean {
         const paths = (vscode.workspace.workspaceFolders ?? []).map((f) => f.uri.fsPath);
 
-        return gitSwitching || isVcsOperationInProgress(paths);
+        return gitSwitching || bulkDetector.isBulk() || isVcsOperationInProgress(paths);
     }
 
-    async function onFileDeleted(uri: vscode.Uri) {
-        if (isInExcludedDir(uri.fsPath)) {
-            return;
-        }
+    const pendingDeletes = new Map<string, vscode.Uri>();
 
-        if (renamedPaths.has(uri.fsPath)) {
-            renamedPaths.delete(uri.fsPath);
+    async function flushDeletes() {
+        const uris = [...pendingDeletes.values()];
+        pendingDeletes.clear();
+
+        if (uris.length === 0) {
             return;
         }
 
@@ -153,26 +164,48 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
-        try {
-            await handleFileDeleted(uri);
-        } catch (error) {
-            telemetry.sendException(error instanceof Error ? error : new Error(String(error)), {
-                event: EVENTS.ORPHAN_ERROR,
-                operation: 'delete',
-            });
+        for (const uri of uris) {
+            if (renamedPaths.has(uri.fsPath)) {
+                renamedPaths.delete(uri.fsPath);
+                continue;
+            }
+
+            try {
+                await handleFileDeleted(uri);
+            } catch (error) {
+                telemetry.sendException(error instanceof Error ? error : new Error(String(error)), {
+                    event: EVENTS.ORPHAN_ERROR,
+                    operation: 'delete',
+                });
+            }
         }
 
         debouncedRefresh();
     }
 
+    const debouncedFlushDeletes = debounce(flushDeletes, DELETE_FLUSH_DELAY_MS);
+
+    function onFileDeleted(uri: vscode.Uri) {
+        if (isInExcludedDir(uri.fsPath)) {
+            return;
+        }
+
+        bulkDetector.record();
+        pendingDeletes.set(uri.fsPath, uri);
+        debouncedFlushDeletes();
+    }
+
     async function onFileRenamed(event: vscode.FileRenameEvent) {
-        for (const {oldUri, newUri} of event.files) {
+        for (const {oldUri} of event.files) {
             renamedPaths.add(oldUri.fsPath);
+        }
 
-            if (isVcsOperationActive()) {
-                continue;
-            }
+        if (event.files.length > 1 || isVcsOperationActive()) {
+            debouncedRefresh();
+            return;
+        }
 
+        for (const {oldUri, newUri} of event.files) {
             if (oldUri.fsPath.endsWith('.md') || oldUri.fsPath.endsWith('.yaml')) {
                 try {
                     await handleFileRenamed(oldUri, newUri);
@@ -198,10 +231,16 @@ export function activate(context: vscode.ExtensionContext) {
         tocWatcher.onDidChange(() => debouncedRefresh()),
         tocWatcher.onDidCreate(() => debouncedRefresh()),
         tocWatcher.onDidDelete(() => debouncedRefresh()),
-        mdWatcher.onDidCreate(() => debouncedRefresh()),
+        mdWatcher.onDidCreate(() => {
+            bulkDetector.record();
+            debouncedRefresh();
+        }),
         mdWatcher.onDidDelete((uri) => onFileDeleted(uri)),
         mdWatcher.onDidChange(() => debouncedRefresh()),
-        yamlWatcher.onDidCreate(() => debouncedRefresh()),
+        yamlWatcher.onDidCreate(() => {
+            bulkDetector.record();
+            debouncedRefresh();
+        }),
         yamlWatcher.onDidDelete((uri) => onFileDeleted(uri)),
         yamlWatcher.onDidChange(() => debouncedRefresh()),
         yfmWatcher.onDidCreate(() => {
