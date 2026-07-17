@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.5](https://github.com/diplodoc-platform/vsc/compare/v1.1.4...v1.1.5) (2026-07-17)
+
+
+### Bug Fixes
+
+* fixed phantom git deletions ([#173](https://github.com/diplodoc-platform/vsc/issues/173)) ([786ec30](https://github.com/diplodoc-platform/vsc/commit/786ec307b2eecce46698578abce81dc2b028c862))
+
 ## [1.1.4](https://github.com/diplodoc-platform/vsc/compare/v1.1.3...v1.1.4) (2026-07-15)
 
 
