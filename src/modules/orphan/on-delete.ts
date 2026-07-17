@@ -15,6 +15,16 @@ interface TocReference {
     lineIndex: number;
 }
 
+async function fileExists(uri: vscode.Uri): Promise<boolean> {
+    try {
+        await vscode.workspace.fs.stat(uri);
+
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 async function readFileText(uri: vscode.Uri): Promise<string | null> {
     try {
         const bytes = await vscode.workspace.fs.readFile(uri);
@@ -246,6 +256,10 @@ async function handleRedirect(root: string, deletedUri: vscode.Uri): Promise<voi
 }
 
 export async function handleFileDeleted(deletedUri: vscode.Uri): Promise<void> {
+    if (await fileExists(deletedUri)) {
+        return;
+    }
+
     const root = findYfmRoot(deletedUri.fsPath);
 
     if (!root) {
