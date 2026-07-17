@@ -297,9 +297,25 @@ describe('addRedirect', () => {
 });
 
 describe('handleFileDeleted', () => {
+    const statMock = vi.mocked(vscode.workspace.fs.stat);
+
     beforeEach(() => {
         vi.clearAllMocks();
         findFilesMock.mockResolvedValue([]);
+        statMock.mockRejectedValue(new Error('ENOENT'));
+    });
+
+    it('does nothing when the file still exists on disk (spurious VFS delete)', async () => {
+        statMock.mockResolvedValue({} as vscode.FileStat);
+
+        mockFindFiles(['/docs/toc.yaml'], []);
+        mockFiles({
+            '/docs/toc.yaml': '  - name: Page\n    href: deleted.md',
+        });
+
+        await handleFileDeleted(makeUri('/docs/deleted.md'));
+
+        expect(vi.mocked(vscode.window.showQuickPick)).not.toHaveBeenCalled();
     });
 
     it('does nothing when file is not in toc and not linked in md', async () => {
