@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.6](https://github.com/diplodoc-platform/vsc/compare/v1.1.5...v1.1.6) (2026-07-20)
+
+
+### Bug Fixes
+
+* added s3 release ([#176](https://github.com/diplodoc-platform/vsc/issues/176)) ([8c3c585](https://github.com/diplodoc-platform/vsc/commit/8c3c58551c3bce8d922804db4529f3d7981386d0))
+
 ## [1.1.5](https://github.com/diplodoc-platform/vsc/compare/v1.1.4...v1.1.5) (2026-07-17)
 
 
