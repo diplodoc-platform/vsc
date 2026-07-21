@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/diplodoc-platform/vsc/compare/v1.1.6...v1.2.0) (2026-07-21)
+
+
+### Features
+
+* update react ([#175](https://github.com/diplodoc-platform/vsc/issues/175)) ([92bb039](https://github.com/diplodoc-platform/vsc/commit/92bb0394748c7e0120b8073d719b18d7db27b8d2))
+
 ## [1.1.6](https://github.com/diplodoc-platform/vsc/compare/v1.1.5...v1.1.6) (2026-07-20)
 
 
