@@ -73,6 +73,16 @@ describe('parseAnchors — sections-only mode', () => {
         expect(anchors).toHaveLength(1);
         expect(anchors[0].id).toBe('dup');
     });
+
+    it('detects explicit heading anchor with spaces inside braces', () => {
+        const content = '## Remove job { #remove-job }\n';
+        const anchors = parseAnchors(content, 'sections-only');
+
+        expect(anchors).toHaveLength(1);
+        expect(anchors[0].id).toBe('remove-job');
+        expect(anchors[0].isSection).toBe(true);
+        expect(anchors[0].headingText).toBe('Remove job');
+    });
 });
 
 describe('parseAnchors — all mode', () => {
@@ -110,6 +120,16 @@ describe('parseAnchors — all mode', () => {
 
         expect(ids).toContain('anchor-a');
         expect(ids).toContain('anchor-b');
+    });
+
+    it('detects inline anchor with spaces inside braces', () => {
+        const content = 'Text before. {   #remove-job   } Text after.\n';
+        const anchors = parseAnchors(content, 'all');
+
+        const anchor = anchors.find((a) => a.id === 'remove-job');
+
+        expect(anchor).toBeDefined();
+        expect(anchor?.isSection).toBe(false);
     });
 });
 
@@ -389,10 +409,6 @@ describe('AnchorCompletionProvider', () => {
     });
 });
 
-// ---------------------------------------------------------------------------
-// findAnchorLine
-// ---------------------------------------------------------------------------
-
 describe('findAnchorLine', () => {
     const content = [
         '# Overview',
@@ -448,5 +464,11 @@ describe('findAnchorLine', () => {
 
         expect(findAnchorLine(content, 'outside')).toBe(0);
         expect(findAnchorLine(content, 'inside')).toBeNull();
+    });
+
+    it('finds anchor line when inline anchor has spaces inside braces', () => {
+        const content = ['# Overview', '', 'Text before. { #remove-job } Text after.'].join('\n');
+
+        expect(findAnchorLine(content, 'remove-job')).toBe(2);
     });
 });
