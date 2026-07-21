@@ -13,8 +13,8 @@ export interface AnchorContext {
     anchorStart: number;
 }
 
-const EXPLICIT_ANCHOR_IN_HEADING_RE = /\{#([\p{L}\p{N}_-]+)\}/u;
-const INLINE_ANCHOR_RE = /\{#([\p{L}\p{N}_-]+)\}/gu;
+const EXPLICIT_ANCHOR_IN_HEADING_RE = /\{\s*#([\p{L}\p{N}_-]+)\s*\}/u;
+const INLINE_ANCHOR_RE = /\{\s*#([\p{L}\p{N}_-]+)\s*\}/gu;
 const HEADING_RE = /^(#{1,6})\s+(.+)$/;
 const FENCED_CODE_RE = /^\s*(`{3,}|~{3,})/;
 
@@ -115,7 +115,13 @@ export function findAnchorLine(content: string, anchorId: string): number | null
             return i;
         }
 
-        if (!headingMatch && line.includes(`{#${anchorId}}`)) {
+        const escapedAnchorId = anchorId.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+
+        const inlineAnchorMatchRe = new RegExp(
+            String.raw`\{\s*#` + escapedAnchorId + String.raw`\s*\}`,
+        );
+
+        if (!headingMatch && inlineAnchorMatchRe.test(line)) {
             return i;
         }
     }
