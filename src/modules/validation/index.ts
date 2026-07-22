@@ -137,10 +137,23 @@ function resolveYamlSchema(document: vscode.TextDocument): SchemaType | null {
         }
     }
 
+    if (fileName === 'index.yaml') {
+        try {
+            const parsed = yamlLoad(document.getText());
+
+            if (typeof parsed === 'object' && parsed !== null && 'blocks' in parsed) {
+                return 'pc';
+            }
+        } catch {}
+
+        return 'leading';
+    }
+
     try {
         const parsed = yamlLoad(document.getText());
+
         if (typeof parsed === 'object' && parsed !== null && 'blocks' in parsed) {
-            return fileName === 'index.yaml' ? 'leading' : 'pc';
+            return 'pc';
         }
     } catch {}
 
