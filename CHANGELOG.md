@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/diplodoc-platform/vsc/compare/v1.2.1...v1.2.2) (2026-07-22)
+
+
+### Bug Fixes
+
+* fixed leading pages ([#184](https://github.com/diplodoc-platform/vsc/issues/184)) ([6777ee8](https://github.com/diplodoc-platform/vsc/commit/6777ee857b53c2cd3f3a3123888ac2dae479fb4f))
+
 ## [1.2.1](https://github.com/diplodoc-platform/vsc/compare/v1.2.0...v1.2.1) (2026-07-21)
 
 
