@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.3](https://github.com/diplodoc-platform/vsc/compare/v1.2.2...v1.2.3) (2026-07-23)
+
+
+### Bug Fixes
+
+* **deps:** Update deps ([#188](https://github.com/diplodoc-platform/vsc/issues/188)) ([b8c0e4d](https://github.com/diplodoc-platform/vsc/commit/b8c0e4de75a07ae812fcc86056d6f4b69b7007bc))
+
 ## [1.2.2](https://github.com/diplodoc-platform/vsc/compare/v1.2.1...v1.2.2) (2026-07-22)
 
 
