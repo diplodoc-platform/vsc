@@ -29,6 +29,33 @@ export const YfmSerializer: ExtensionAuto = (builder) => {
         state.renderList(node, '  ', () => '- ');
     });
 
+    builder.overrideNodeSerializerSpec('image', () => (state, node) => {
+        const attrs = node.attrs as Record<string, string | null>;
+        let result = '![';
+
+        if (attrs.alt) {
+            result += state.esc(attrs.alt);
+        }
+
+        result += '](';
+
+        if (attrs.src) {
+            result += attrs.src;
+        }
+
+        if (attrs.title) {
+            const quote = (state as unknown as {quote(s: string): string}).quote;
+            result += ` ${quote(attrs.title)}`;
+        }
+
+        if (attrs.width || attrs.height) {
+            result += ` =${attrs.width || ''}x${attrs.height || ''}`;
+        }
+
+        result += ')';
+        state.write(result);
+    });
+
     builder.overrideNodeSerializerSpec('yfm_note_title', (prev) => (state, node, parent, index) => {
         if (hasContent(node)) {
             prev(state, node, parent, index);
