@@ -19,6 +19,36 @@ function makeCloseRe(tagName: string): RegExp {
     return new RegExp(`^{%[-\\s]*end${tagName}\\s*-?%}\\s*$`);
 }
 
+function wholeLine(state: StateBlock, i: number): string {
+    return state.src.slice(state.bMarks[i] + state.tShift[i], state.eMarks[i]);
+}
+
+function isOrphanKnownEnd(state: StateBlock, startLine: number, base: string): boolean {
+    const stack: string[] = [];
+
+    for (let i = 0; i < startLine; i++) {
+        const line = wholeLine(state, i);
+
+        if (!LIQUID_TAG_RE.test(line) || INCLUDE_RE.test(line)) {
+            continue;
+        }
+
+        const name = LIQUID_OPEN_RE.exec(line)?.[1] ?? '';
+
+        if (name.startsWith('end')) {
+            const b = name.slice(3);
+
+            if (KNOWN_LIQUID_TAGS.has(b) && stack[stack.length - 1] === b) {
+                stack.pop();
+            }
+        } else if (KNOWN_LIQUID_TAGS.has(name)) {
+            stack.push(name);
+        }
+    }
+
+    return stack[stack.length - 1] !== base;
+}
+
 function yfmDirectiveBlockRule(
     state: StateBlock,
     startLine: number,
@@ -88,10 +118,13 @@ function yfmLiquidTagBlockRule(
     const nameMatch = LIQUID_OPEN_RE.exec(line);
     const tagName = nameMatch?.[1] ?? '';
 
-    const baseName = tagName.startsWith('end') ? tagName.slice(3) : tagName;
+    const isEnd = tagName.startsWith('end');
+    const baseName = isEnd ? tagName.slice(3) : tagName;
 
     if (KNOWN_LIQUID_TAGS.has(baseName)) {
-        return false;
+        if (!isEnd || !isOrphanKnownEnd(state, startLine, baseName)) {
+            return false;
+        }
     }
 
     if (silent) {

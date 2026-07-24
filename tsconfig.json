@@ -10,7 +10,8 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "paths": {
-      "vscode": ["../../node_modules/@types/vscode"]
+      "vscode": ["../../node_modules/@types/vscode"],
+      "csstype": ["./node_modules/csstype"]
     },
     "jsx": "react-jsx",
     "noEmit": true

@@ -158,12 +158,23 @@ describe('yfmLiquidTagPlugin', () => {
         expect(token).toBeUndefined();
     });
 
-    it('skips {% endnote %} — handled by @diplodoc/transform', () => {
+    it('captures an orphan {% endnote %} (no matching opener) so it is not dropped', () => {
         const md = createMd();
         const tokens = md.parse('{% endnote %}\n', {});
         const token = findToken(tokens, LIQUID_TOKEN_NAME);
 
-        expect(token).toBeUndefined();
+        expect(token).toBeDefined();
+        expect(token?.content).toBe('{% endnote %}');
+    });
+
+    it('does not capture a paired {% endnote %} (matching opener above)', () => {
+        const md = createMd();
+        const tokens = findAllTokens(
+            md.parse('{% note info %}\n\n{% endnote %}\n', {}),
+            LIQUID_TOKEN_NAME,
+        );
+
+        expect(tokens).toHaveLength(0);
     });
 
     it('does not match {% include [...](path) %}', () => {

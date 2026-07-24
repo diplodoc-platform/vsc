@@ -2,6 +2,27 @@ export function isTrustedOrigin(origin: string): boolean {
     return origin === '' || origin === window.location.origin;
 }
 
+export function resolveMediaSrc(base: string | undefined, src: string): string {
+    if (
+        !base ||
+        !src ||
+        src.startsWith('http') ||
+        src.startsWith('data:') ||
+        src.startsWith('blob:') ||
+        src.startsWith('vscode-')
+    ) {
+        return src;
+    }
+
+    try {
+        const baseWithSlash = base.endsWith('/') ? base : base + '/';
+
+        return new URL(src, baseWithSlash).toString();
+    } catch {
+        return src;
+    }
+}
+
 export function getFilesMap(fileName: string, files: string[]) {
     const filesMap = new Map();
 

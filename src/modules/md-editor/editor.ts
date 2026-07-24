@@ -7,7 +7,7 @@ import * as telemetry from '../telemetry';
 import {EVENTS} from '../telemetry/constants';
 
 export class MdEditor extends BaseEditor {
-    private _pendingSync?: {text: string; fileName: string};
+    private _pendingSync?: {text: string; fileName: string; imageDirUri?: string};
     private _leadingWhitespace = '';
     private _trailingWhitespace = '';
     private _configListener?: vscode.Disposable;
@@ -74,15 +74,34 @@ export class MdEditor extends BaseEditor {
         }
     }
 
+    protected _extraSetContentFields(): Record<string, unknown> {
+        if (!this._currentDocUri || !this._panel) return {};
+        const dirUri = vscode.Uri.joinPath(this._currentDocUri, '..');
+        return {imageDirUri: this._panel.webview.asWebviewUri(dirUri).toString()};
+    }
+
     protected _onSyncContent(content: string, fileName: string) {
-        this._pendingSync = {text: content, fileName};
+        this._pendingSync = {
+            text: content,
+            fileName,
+            ...this._extraSetContentFields(),
+        };
     }
 
     protected _onShowFileContent(content: string, fileName: string, isNewPanel: boolean) {
         if (isNewPanel) {
-            this._pendingSync = {text: content, fileName};
+            this._pendingSync = {
+                text: content,
+                fileName,
+                ...this._extraSetContentFields(),
+            };
         } else {
-            this._panel?.webview.postMessage({command: 'setContent', text: content, fileName});
+            this._panel?.webview.postMessage({
+                command: 'setContent',
+                text: content,
+                fileName,
+                ...this._extraSetContentFields(),
+            });
         }
     }
 

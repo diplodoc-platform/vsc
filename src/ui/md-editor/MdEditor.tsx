@@ -4,6 +4,7 @@ import {ThemeProvider, Toaster, ToasterProvider, configure} from '@gravity-ui/ui
 import {useMemo, useState} from 'react';
 
 import {wYfmIncludeItemData} from '../../extensions/yfm-include/toolbar';
+import {wYfmVideoItemData} from '../../extensions/yfm-video/toolbar';
 import {ErrorBoundary} from '../error/ErrorBoundary';
 import {useVscodeTheme} from '../useVscodeTheme';
 import {editorShortcuts, useShortcuts} from '../shortcuts';
@@ -36,6 +37,7 @@ const wysiwygToolbarConfig = [
         wYfmHtmlBlockItemData,
         wYfmPageConstructorItemData,
         wYfmIncludeItemData,
+        wYfmVideoItemData,
     ],
 ];
 
