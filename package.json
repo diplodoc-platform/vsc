@@ -315,7 +315,7 @@
     "@diplodoc/yfmlint": "^1.7.6",
     "@gravity-ui/components": "^4.18.0",
     "@gravity-ui/icons": "^2.18.0",
-    "@gravity-ui/markdown-editor": "file:../../markdown-editor/packages/editor",
+    "@gravity-ui/markdown-editor": "^15.39.0",
     "@gravity-ui/markdown-editor-page-constructor-extension": "^0.1.0",
     "@gravity-ui/uikit": "^7.37.0",
     "@vscode/extension-telemetry": "^1.5.2",
