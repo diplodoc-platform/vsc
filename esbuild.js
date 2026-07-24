@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const esbuild = require('esbuild');
 const {sassPlugin} = require('esbuild-sass-plugin');
 
@@ -41,6 +43,69 @@ const nodeShims = {
                 `,
                 loader: 'js',
             };
+        });
+    },
+};
+
+// Force every bare-module import to resolve to a single physical copy, so shared
+// singletons stay unique: React/@gravity-ui/uikit contexts, and prosemirror-state
+// PluginKeys (two copies produce "Adding different instances of a keyed plugin").
+// First prefer VSC's own node_modules; for packages absent there (the library's
+// pnpm transitive deps, e.g. prosemirror-*), resolve them from the library so all
+// importers share one copy. pluginData.deduped guards against infinite recursion.
+const localLibDir = path.resolve(__dirname, '..', '..', 'markdown-editor', 'packages', 'editor');
+
+// ProseMirror packages expose separate esm (index.js) and cjs (index.cjs) entries.
+// When one importer takes esm and another takes cjs, the package is bundled twice —
+// each copy gets its own PluginKey counter, breaking keyed-plugin identity. Pin every
+// prosemirror-* import to the single esm build resolved from the library.
+const prosemirrorAlias = {};
+for (const pkg of [
+    'prosemirror-state',
+    'prosemirror-model',
+    'prosemirror-view',
+    'prosemirror-transform',
+    'prosemirror-commands',
+    'prosemirror-keymap',
+    'prosemirror-inputrules',
+    'prosemirror-history',
+    'prosemirror-gapcursor',
+    'prosemirror-schema-list',
+]) {
+    try {
+        const cjs = require.resolve(pkg, {paths: [localLibDir]});
+        const esm = cjs.replace(/\.cjs$/, '.js');
+        prosemirrorAlias[pkg] = fs.existsSync(esm) ? esm : cjs;
+    } catch {
+        // package not present — skip
+    }
+}
+
+const dedupeLibraryDeps = {
+    name: 'dedupe-library-deps',
+    setup(build) {
+        build.onResolve({filter: /^[^./]/}, async (args) => {
+            if (args.pluginData?.deduped) return;
+
+            const fromVsc = await build.resolve(args.path, {
+                resolveDir: __dirname,
+                kind: args.kind,
+                pluginData: {deduped: true},
+            });
+            if (!fromVsc.errors.length) {
+                return fromVsc;
+            }
+
+            const fromLib = await build.resolve(args.path, {
+                resolveDir: localLibDir,
+                kind: args.kind,
+                pluginData: {deduped: true},
+            });
+            if (!fromLib.errors.length) {
+                return fromLib;
+            }
+
+            return; // Resolvable from neither root — fall back to default resolution
         });
     },
 };
@@ -114,7 +179,9 @@ const webviewBase = {
     format: 'iife',
     sourcemap: false,
     minify: !isWatch,
+    alias: prosemirrorAlias,
     plugins: [
+        dedupeLibraryDeps,
         nodeShims,
         pageConstructorFixes,
         sassPlugin({filter: /\.module\.scss$/, type: 'local-css'}),

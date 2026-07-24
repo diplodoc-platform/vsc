@@ -97,13 +97,23 @@ export abstract class BaseEditor {
             command: 'setContent',
             text: content,
             fileName,
+            ...this._extraSetContentFields(),
         });
     }
 
     protected _onSyncContent(_content: string, _fileName: string) {}
 
+    protected _extraSetContentFields(): Record<string, unknown> {
+        return {};
+    }
+
     protected _onShowFileContent(content: string, fileName: string, _isNewPanel: boolean) {
-        this._panel?.webview.postMessage({command: 'setContent', text: content, fileName});
+        this._panel?.webview.postMessage({
+            command: 'setContent',
+            text: content,
+            fileName,
+            ...this._extraSetContentFields(),
+        });
     }
 
     protected _onPanelCreated() {}
@@ -120,6 +130,7 @@ export abstract class BaseEditor {
                 retainContextWhenHidden: true,
                 localResourceRoots: [
                     vscode.Uri.joinPath(this._extensionUri, 'build', this._buildSubdir()),
+                    ...(vscode.workspace.workspaceFolders?.map((f) => f.uri) ?? []),
                 ],
             },
         );

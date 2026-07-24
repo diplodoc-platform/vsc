@@ -15,10 +15,11 @@ export function getBaseHtml(
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <meta http-equiv="Content-Security-Policy"
                     content="default-src 'none';
-                        style-src ${cspSource} 'unsafe-inline';
+                        style-src ${cspSource} 'unsafe-inline' https://fonts.googleapis.com;
                         script-src ${cspSource} 'unsafe-eval';
                         img-src ${cspSource} data: https: blob:;
-                        font-src ${cspSource} data:;
+                        frame-src https:;
+                        font-src ${cspSource} data: https://fonts.gstatic.com;
                         worker-src blob:;">
                 <link rel="stylesheet" href="${styleUri}">
                 <style>

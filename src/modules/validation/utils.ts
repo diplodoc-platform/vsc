@@ -183,16 +183,11 @@ function findLinkRange(message: string, document: vscode.TextDocument): vscode.R
 
     const href = stripAnsi(match[1]);
 
-    for (let line = 0; line < document.lineCount; line++) {
-        const lineText = document.lineAt(line).text;
-        const hrefIndex = lineText.indexOf(href);
-
-        if (hrefIndex >= 0) {
-            return new vscode.Range(line, hrefIndex, line, hrefIndex + href.length);
-        }
-    }
-
-    return fullLineRange(0, document);
+    return (
+        findTextRange(document, href) ??
+        findTextRange(document, href.replace(/_/g, '\\_')) ??
+        fullLineRange(0, document)
+    );
 }
 
 function findAssetRange(message: string, document: vscode.TextDocument): vscode.Range {
@@ -202,7 +197,10 @@ function findAssetRange(message: string, document: vscode.TextDocument): vscode.
     const fromPath = svgMatch?.[2];
 
     if (assetPath) {
-        const range = findTextRange(document, assetPath);
+        const range =
+            findTextRange(document, assetPath) ??
+            findTextRange(document, assetPath.replace(/([^\w./])/g, '\\$1')) ??
+            findTextRange(document, assetPath.replace(/_/g, '\\_'));
 
         if (range) {
             return range;

@@ -312,3 +312,56 @@ describe('bullet_list serializer', () => {
         expect(renderedItems[0]).toBe('- ');
     });
 });
+
+describe('image serializer', () => {
+    function makeImageState() {
+        let out = '';
+        return {
+            get out() {
+                return out;
+            },
+            write(text: string) {
+                out += text;
+            },
+            esc: (s: string) => s.replace(/([_*[\]])/g, '\\$1'),
+            quote: (s: string) => `"${s}"`,
+        };
+    }
+
+    it('does not markdown-escape underscores in the src', () => {
+        const state = makeImageState();
+        const serialize = getSerializer('image');
+
+        serialize(state, makeNode({src: '../_assets/plugin.png'}), makeNode(), 0);
+
+        expect(state.out).toBe('![](../_assets/plugin.png)');
+    });
+
+    it('preserves the YFM size suffix', () => {
+        const state = makeImageState();
+        const serialize = getSerializer('image');
+
+        serialize(
+            state,
+            makeNode({src: '../_assets/x.png', width: '600', height: null}),
+            makeNode(),
+            0,
+        );
+
+        expect(state.out).toBe('![](../_assets/x.png =600x)');
+    });
+
+    it('escapes the alt text but keeps title and size', () => {
+        const state = makeImageState();
+        const serialize = getSerializer('image');
+
+        serialize(
+            state,
+            makeNode({src: 'a_b.png', alt: 'x_y', title: 'T', width: null, height: '80'}),
+            makeNode(),
+            0,
+        );
+
+        expect(state.out).toBe('![x\\_y](a_b.png "T" =x80)');
+    });
+});
