@@ -31,7 +31,6 @@ export const YfmImageReparse: ExtensionAuto = (builder) => {
                         return failed;
                     },
                 },
-                filterTransaction: (tr) => tr.getMeta(FAILED_META) === undefined,
                 appendTransaction: (trs, _oldState, newState) => {
                     if (trs.some((tr) => tr.getMeta(FAILED_META))) {
                         return null;

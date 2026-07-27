@@ -1,8 +1,8 @@
 # Images
 
-![](./\_assets/4.png)
+![](./_assets/4.png)
 
-![](./\_assets/5.gif)
+![](./_assets/5.gif)
 
 ![](./\_assets/5.giff)
 
