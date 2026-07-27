@@ -1,6 +1,12 @@
+import type {ExtensionAuto} from '@gravity-ui/markdown-editor';
+
 import {describe, expect, it, vi} from 'vitest';
 
 import {YfmSerializer} from './index';
+
+type ExtensionBuilder = Parameters<ExtensionAuto>[0];
+type SerializerFn = (state: unknown, node: unknown, parent: unknown, index: number) => void;
+type SerializerCb = (prev: SerializerFn) => SerializerFn;
 
 interface MockNode {
     type: {name: string};
@@ -107,13 +113,10 @@ function makeContentNode(text: string): MockNode {
     };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getSerializer(nodeName: string): (...args: any[]) => void {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let fn: (...args: any[]) => void = () => {};
+function getSerializer(nodeName: string): SerializerFn {
+    let fn: SerializerFn = () => {};
     const builder = {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        overrideNodeSerializerSpec(name: string, cb: any) {
+        overrideNodeSerializerSpec(name: string, cb: SerializerCb) {
             if (name === nodeName) {
                 fn = cb(() => {
                     throw new Error('prev should not be called for empty nodes');
@@ -124,8 +127,8 @@ function getSerializer(nodeName: string): (...args: any[]) => void {
         },
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, new-cap
-    YfmSerializer(builder as any);
+    // eslint-disable-next-line new-cap
+    YfmSerializer(builder as unknown as ExtensionBuilder);
 
     return fn;
 }
@@ -140,8 +143,8 @@ describe('YfmSerializer', () => {
             },
         };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, new-cap
-        YfmSerializer(builder as any);
+        // eslint-disable-next-line new-cap
+        YfmSerializer(builder as unknown as ExtensionBuilder);
 
         expect(overrides).toContain('bullet_list');
         expect(overrides).toContain('yfm_note_title');
@@ -177,8 +180,7 @@ describe('yfm_note_title serializer fix', () => {
     it('calls prev for non-empty note title', () => {
         const prevCalled = {value: false};
         const builder = {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            overrideNodeSerializerSpec(name: string, cb: any) {
+            overrideNodeSerializerSpec(name: string, cb: SerializerCb) {
                 if (name === 'yfm_note_title') {
                     const fn = cb(() => {
                         prevCalled.value = true;
@@ -191,8 +193,8 @@ describe('yfm_note_title serializer fix', () => {
             },
         };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, new-cap
-        YfmSerializer(builder as any);
+        // eslint-disable-next-line new-cap
+        YfmSerializer(builder as unknown as ExtensionBuilder);
 
         expect(prevCalled.value).toBe(true);
     });
@@ -224,8 +226,7 @@ describe('yfm_cut_title serializer fix', () => {
     it('calls prev for non-empty cut title', () => {
         const prevCalled = {value: false};
         const builder = {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            overrideNodeSerializerSpec(name: string, cb: any) {
+            overrideNodeSerializerSpec(name: string, cb: SerializerCb) {
                 if (name === 'yfm_cut_title') {
                     const fn = cb(() => {
                         prevCalled.value = true;
@@ -238,8 +239,8 @@ describe('yfm_cut_title serializer fix', () => {
             },
         };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, new-cap
-        YfmSerializer(builder as any);
+        // eslint-disable-next-line new-cap
+        YfmSerializer(builder as unknown as ExtensionBuilder);
 
         expect(prevCalled.value).toBe(true);
     });
@@ -260,8 +261,7 @@ describe('yfm_note_content serializer fix', () => {
     it('calls prev for non-empty content', () => {
         const prevCalled = {value: false};
         const builder = {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            overrideNodeSerializerSpec(name: string, cb: any) {
+            overrideNodeSerializerSpec(name: string, cb: SerializerCb) {
                 if (name === 'yfm_note_content') {
                     const fn = cb(() => {
                         prevCalled.value = true;
@@ -274,8 +274,8 @@ describe('yfm_note_content serializer fix', () => {
             },
         };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, new-cap
-        YfmSerializer(builder as any);
+        // eslint-disable-next-line new-cap
+        YfmSerializer(builder as unknown as ExtensionBuilder);
 
         expect(prevCalled.value).toBe(true);
     });
@@ -291,6 +291,28 @@ describe('yfm_cut_content serializer fix', () => {
 
         expect(state.out).toBe('\n');
         expect(state.out).not.toContain('Cut');
+    });
+
+    it('calls prev for non-empty cut content', () => {
+        const prevCalled = {value: false};
+        const builder = {
+            overrideNodeSerializerSpec(name: string, cb: SerializerCb) {
+                if (name === 'yfm_cut_content') {
+                    const fn = cb(() => {
+                        prevCalled.value = true;
+                    });
+
+                    fn({}, makeContentNode('Cut body text'), makeNode(), 0);
+                }
+
+                return builder;
+            },
+        };
+
+        // eslint-disable-next-line new-cap
+        YfmSerializer(builder as unknown as ExtensionBuilder);
+
+        expect(prevCalled.value).toBe(true);
     });
 });
 

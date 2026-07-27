@@ -385,6 +385,7 @@ describe('AnchorCompletionProvider', () => {
     it('uses document content for same-file anchor links', async () => {
         const selfContent = '## About {#about}\n\nText {#inline-id}\n';
         const doc = makeDocument('[link](#)', 'markdown');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (doc as any).getText = () => selfContent;
 
         const result = await provider.provideCompletionItems(doc, pos(8));

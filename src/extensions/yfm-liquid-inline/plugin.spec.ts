@@ -64,4 +64,11 @@ describe('yfmLiquidInlinePlugin', () => {
 
         expect(liquid).toHaveLength(0);
     });
+
+    it('works in silent mode: does not push a token but still advances pos', () => {
+        const md = createMd();
+        const result = md.renderInline('{% if a %}text{% endif %}');
+
+        expect(result).not.toBe('');
+    });
 });
