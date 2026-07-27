@@ -55,7 +55,7 @@ export const YfmVideo: ExtensionAuto = (builder) => {
                 const service = node.attrs[VideoAttr.Service];
                 const videoId = node.attrs[VideoAttr.VideoID];
 
-                return buildExternalVideoDom(service, videoId) ?? baseToDOM?.(node) ?? '';
+                return buildExternalVideoDom(service, videoId) ?? baseToDOM?.(node) ?? ['span', {}];
             },
         };
     });
