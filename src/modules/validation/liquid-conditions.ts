@@ -15,17 +15,35 @@ interface OpenTag {
 }
 
 const TAG_RE = /\{%-?\s*(\w+)[^%]*?-?%\}/g;
+const FENCED_CODE_RE = /^\s*(`{3,}|~{3,})/;
+const INLINE_CODE_RE = /`[^`]*`/g;
+
+function maskInlineCode(text: string): string {
+    return text.replace(INLINE_CODE_RE, (span) => ' '.repeat(span.length));
+}
 
 export function validateLiquidConditions(content: string): LiquidConditionError[] {
     const errors: LiquidConditionError[] = [];
     const stack: OpenTag[] = [];
     const lines = content.split('\n');
+    let inCodeBlock = false;
 
     lines.forEach((text, line) => {
+        if (FENCED_CODE_RE.test(text)) {
+            inCodeBlock = !inCodeBlock;
+            return;
+        }
+
+        if (inCodeBlock) {
+            return;
+        }
+
+        const scanned = maskInlineCode(text);
+
         TAG_RE.lastIndex = 0;
         let m: RegExpExecArray | null;
 
-        while ((m = TAG_RE.exec(text)) !== null) {
+        while ((m = TAG_RE.exec(scanned)) !== null) {
             const keyword = m[1];
 
             if (!LIQUID_CONTROL_KEYWORDS.has(keyword)) {

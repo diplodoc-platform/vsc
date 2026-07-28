@@ -4,6 +4,7 @@ import {useState} from 'react';
 import {Button, Popup, TextInput} from '@gravity-ui/uikit';
 
 import {detectVideoService} from './detect';
+import styles from './VideoForm.module.scss';
 
 type VideoFormProps = {
     editor: ActionStorage;
@@ -35,7 +36,7 @@ export const VideoForm: React.FC<VideoFormProps> = ({editor, anchorElement, hide
                 }
             }}
         >
-            <div style={{display: 'flex', gap: 8, padding: 8, width: 360}}>
+            <div className={styles.form}>
                 <TextInput
                     autoFocus
                     size="m"

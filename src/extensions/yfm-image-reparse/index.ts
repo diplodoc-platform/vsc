@@ -47,8 +47,15 @@ export const YfmImageReparse: ExtensionAuto = (builder) => {
                     const failed = key.getState(newState) ?? new Set<string>();
                     const replacements: {from: number; to: number; alt: string; src: string}[] = [];
 
-                    newState.doc.descendants((textNode, pos) => {
+                    newState.doc.descendants((textNode, pos, parent) => {
                         if (!textNode.isText || !textNode.text) {
+                            return;
+                        }
+
+                        if (
+                            parent?.type.spec.code ||
+                            textNode.marks.some((mark) => mark.type.spec.code)
+                        ) {
                             return;
                         }
 

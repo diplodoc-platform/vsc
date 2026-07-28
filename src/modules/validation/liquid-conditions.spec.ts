@@ -60,4 +60,28 @@ describe('validateLiquidConditions', () => {
         const src = '{% note info %}\nhi\n{% endnote %}\n{% include [t](f.md) %}\n';
         expect(validateLiquidConditions(src)).toEqual([]);
     });
+
+    it('ignores a lone {% if %} inside a fenced code block', () => {
+        const src = '```\n{% if is_internal %}\n```\n';
+        expect(validateLiquidConditions(src)).toEqual([]);
+    });
+
+    it('ignores tildes-fenced code block', () => {
+        const src = '~~~\n{% endif %}\n~~~\n';
+        expect(validateLiquidConditions(src)).toEqual([]);
+    });
+
+    it('ignores a lone {% if %} inside inline code', () => {
+        const src = 'text `{% if is_internal %}` more\n';
+        expect(validateLiquidConditions(src)).toEqual([]);
+    });
+
+    it('still validates real tags outside code', () => {
+        const src = '```\n{% if x %}\n```\n{% if y %}\nz\n';
+        const errors = validateLiquidConditions(src);
+
+        expect(errors).toHaveLength(1);
+        expect(errors[0].line).toBe(3);
+        expect(errors[0].column).toBe(0);
+    });
 });

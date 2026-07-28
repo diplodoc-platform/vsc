@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 
 import {MAX_DIAGNOSTICS_PER_FILE} from '../validation/constants';
 import {getYaMakeDests} from '../shared/ya-make';
+import {findYfmRoot} from '../utils';
 
 import {
     BLOCK_SCALAR_RE,
@@ -110,25 +111,34 @@ async function checkLink(
     baseUri: vscode.Uri,
     diagnostics: vscode.Diagnostic[],
     yaMakeDests: Set<string>,
+    rootUri?: vscode.Uri,
 ): Promise<void> {
     const targetUri = vscode.Uri.joinPath(baseUri, value);
 
     try {
         await vscode.workspace.fs.stat(targetUri);
-    } catch {
-        if (yaMakeDests.has(value)) {
-            return;
-        }
+        return;
+    } catch {}
 
-        const range = new vscode.Range(lineIndex, start, lineIndex, start + value.length);
-        const diagnostic = new vscode.Diagnostic(
-            range,
-            `Link is unreachable: ${value}`,
-            vscode.DiagnosticSeverity.Error,
-        );
-        diagnostic.source = 'Diplodoc';
-        diagnostics.push(diagnostic);
+    if (rootUri && rootUri.toString() !== baseUri.toString()) {
+        try {
+            await vscode.workspace.fs.stat(vscode.Uri.joinPath(rootUri, value));
+            return;
+        } catch {}
     }
+
+    if (yaMakeDests.has(value)) {
+        return;
+    }
+
+    const range = new vscode.Range(lineIndex, start, lineIndex, start + value.length);
+    const diagnostic = new vscode.Diagnostic(
+        range,
+        `Link is unreachable: ${value}`,
+        vscode.DiagnosticSeverity.Error,
+    );
+    diagnostic.source = 'Diplodoc';
+    diagnostics.push(diagnostic);
 }
 
 async function checkAnchor(
@@ -283,6 +293,8 @@ export async function validateLinks(
 
     const diagnostics: vscode.Diagnostic[] = [];
     const baseUri = vscode.Uri.joinPath(document.uri, '..');
+    const yfmRoot = findYfmRoot(document.uri.fsPath);
+    const rootUri = yfmRoot ? vscode.Uri.file(yfmRoot) : baseUri;
     const yaMakeDests = getYaMakeDests(baseUri.fsPath);
     const navigationLines = getNavigationLines(document);
     const includerLines = getIncluderLines(document);
@@ -312,7 +324,9 @@ export async function validateLinks(
             if (value) {
                 const valueStart = line.text.indexOf(value);
 
-                checks.push(checkLink(value, i, valueStart, baseUri, diagnostics, yaMakeDests));
+                checks.push(
+                    checkLink(value, i, valueStart, baseUri, diagnostics, yaMakeDests, rootUri),
+                );
             }
 
             continue;
@@ -331,7 +345,9 @@ export async function validateLinks(
                 if (value && !isExternalUrl(value) && !SNIPPET_RE.test(value)) {
                     const valueStart = line.text.indexOf(value);
 
-                    checks.push(checkLink(value, i, valueStart, baseUri, diagnostics, yaMakeDests));
+                    checks.push(
+                        checkLink(value, i, valueStart, baseUri, diagnostics, yaMakeDests, rootUri),
+                    );
                 }
 
                 continue;
