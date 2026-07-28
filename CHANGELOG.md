@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/diplodoc-platform/vsc/compare/v1.2.3...v1.3.0) (2026-07-28)
+
+
+### Features
+
+* added video plugin + image plugin ([#191](https://github.com/diplodoc-platform/vsc/issues/191)) ([1b35358](https://github.com/diplodoc-platform/vsc/commit/1b35358aeebbcac6777abf0ab2360da594e6003b))
+
+
+### Bug Fixes
+
+* **deps:** Update @diplodoc/ajv@0.1.4 ([#194](https://github.com/diplodoc-platform/vsc/issues/194)) ([036b22a](https://github.com/diplodoc-platform/vsc/commit/036b22adad69562e0127a4f996e833dd48e50d49))
+
 ## [1.2.3](https://github.com/diplodoc-platform/vsc/compare/v1.2.2...v1.2.3) (2026-07-26)
 
 
