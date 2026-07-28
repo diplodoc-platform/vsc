@@ -15,15 +15,7 @@ import {
 } from '@diplodoc/ajv';
 
 export type SchemaType =
-    | 'pc'
-    | 'fm'
-    | 'leading'
-    | 'toc'
-    | 'yfm'
-    | 'yfmlint'
-    | 'presets'
-    | 'redirects'
-    | 'theme';
+    'pc' | 'fm' | 'leading' | 'toc' | 'yfm' | 'yfmlint' | 'presets' | 'redirects' | 'theme';
 
 interface SchemaEntry {
     schema: object;
