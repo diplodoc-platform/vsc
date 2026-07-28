@@ -11,8 +11,14 @@ import {toVscodeRange} from './position';
 const TYPE_MISMATCH_RE = /^Incorrect type\./;
 const MISSING_PROPERTY_RE = /^Missing property/;
 
+function messageText(d: LspDiagnostic): string {
+    return typeof d.message === 'string' ? d.message : d.message.value;
+}
+
 function diagnosticSeverity(d: LspDiagnostic): vscode.DiagnosticSeverity {
-    if (TYPE_MISMATCH_RE.test(d.message) || MISSING_PROPERTY_RE.test(d.message)) {
+    const message = messageText(d);
+
+    if (TYPE_MISMATCH_RE.test(message) || MISSING_PROPERTY_RE.test(message)) {
         return vscode.DiagnosticSeverity.Error;
     }
 
