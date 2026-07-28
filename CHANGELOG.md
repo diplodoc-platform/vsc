@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/diplodoc-platform/vsc/compare/v1.3.0...v1.3.1) (2026-07-28)
+
+
+### Bug Fixes
+
+* update lock ([#197](https://github.com/diplodoc-platform/vsc/issues/197)) ([d80596c](https://github.com/diplodoc-platform/vsc/commit/d80596c5cbf48398d7e2359b73729e969b06ce6b))
+
 ## [1.3.0](https://github.com/diplodoc-platform/vsc/compare/v1.2.3...v1.3.0) (2026-07-28)
 
 
