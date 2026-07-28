@@ -253,6 +253,10 @@ export function activate(context: vscode.ExtensionContext) {
     const collection = vscode.languages.createDiagnosticCollection('diplodoc-links');
 
     function validateDocument(doc: vscode.TextDocument) {
+        if (doc.uri.scheme !== 'file') {
+            return;
+        }
+
         if (doc.languageId === 'yaml') {
             validateLinks(doc, collection);
         } else if (doc.languageId === 'markdown') {

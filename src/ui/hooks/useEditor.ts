@@ -1,7 +1,7 @@
 import type {MarkdownEditorMode, MarkdownEditorPreset} from '@gravity-ui/markdown-editor';
 
 import {useMarkdownEditor, wysiwygToolbarConfigs} from '@gravity-ui/markdown-editor';
-import {useEffect, useMemo, useRef} from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 import {Color, colorMarkName} from '@gravity-ui/markdown-editor/extensions/yfm/Color/index.js';
 import {Math as MathExtension} from '@gravity-ui/markdown-editor/extensions/additional/Math/index.js';
 import {Mermaid as MermaidExtension} from '@gravity-ui/markdown-editor/extensions/additional/Mermaid/index.js';
@@ -14,8 +14,11 @@ import {wYfmIncludeItemData} from '../../extensions/yfm-include/toolbar';
 import {YfmFrontmatter} from '../../extensions/yfm-frontmatter';
 import {YfmDirective} from '../../extensions/yfm-directive';
 import {YfmTables} from '../../extensions/yfm-tables';
+import {YfmVideo} from '../../extensions/yfm-video';
+import {YfmImageReparse} from '../../extensions/yfm-image-reparse';
+import {YfmLiquidInline} from '../../extensions/yfm-liquid-inline';
 import {YfmSerializer} from '../../extensions/yfm-serializer';
-import {isTrustedOrigin} from '../utils';
+import {isTrustedOrigin, resolveMediaSrc} from '../utils';
 import {debounce} from '../../utils';
 
 interface EditorParams {
@@ -55,6 +58,12 @@ const commandMenuActions = [
 export function useEditor({setFileName, preset, mode}: EditorParams) {
     const isSettingContent = useRef<boolean>(false);
     const lastContent = useRef<string>('');
+    const imageDirUriRef = useRef<string | undefined>(undefined);
+
+    const resolveImageSrc = useCallback(
+        (src: string): string => resolveMediaSrc(imageDirUriRef.current, src),
+        [],
+    );
 
     const editor = useMarkdownEditor({
         preset: preset ?? 'yfm',
@@ -65,6 +74,7 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
             mode: mode ?? 'wysiwyg',
         },
         wysiwygConfig: {
+            disableMarkdownAttrs: true,
             escapeConfig: {
                 commonEscape: /.^/,
                 startOfLineEscape: /.^/,
@@ -99,7 +109,10 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
                 builder.use(YfmInclude);
                 builder.use(YfmFrontmatter);
                 builder.use(YfmDirective);
+                builder.use(YfmLiquidInline);
                 builder.use(YfmTables);
+                builder.use(YfmVideo);
+                builder.use(YfmImageReparse);
                 builder.use(YfmSerializer);
                 builder.overrideNodeSpec('paragraph', (prev) => ({
                     ...prev,
@@ -125,6 +138,9 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
             extensionOptions: {
                 commandMenu: {
                     actions: commandMenuActions,
+                },
+                imgSize: {
+                    resolveImageSrc,
                 },
             },
         },
@@ -161,10 +177,11 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
                 return;
             }
 
-            const {command, text, fileName: name, mode} = event.data ?? {};
+            const {command, text, fileName: name, mode, imageDirUri} = event.data ?? {};
 
             if (command === 'setContent') {
                 setFileName(name ?? '');
+                imageDirUriRef.current = imageDirUri as string | undefined;
                 isSettingContent.current = true;
                 editor.replace(text ?? '');
                 setTimeout(() => {

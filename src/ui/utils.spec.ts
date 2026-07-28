@@ -1,6 +1,6 @@
 import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest';
 
-import {getFilesMap, isTrustedOrigin} from './utils';
+import {getFilesMap, isTrustedOrigin, resolveMediaSrc} from './utils';
 
 describe('isTrustedOrigin', () => {
     beforeAll(() => {
@@ -57,5 +57,38 @@ describe('getFilesMap', () => {
         const keys = [...result.keys()];
 
         expect(keys[0]).toBe('');
+    });
+});
+
+describe('resolveMediaSrc', () => {
+    const base = 'https://file+.vscode-resource.vscode-cdn.net/docs/';
+
+    it('resolves a relative path against the base', () => {
+        expect(resolveMediaSrc(base, './_assets/img.png')).toBe(`${base}_assets/img.png`);
+    });
+
+    it('appends a trailing slash to the base when missing', () => {
+        expect(resolveMediaSrc('https://host/docs', 'img.png')).toBe('https://host/docs/img.png');
+    });
+
+    it.each(['http://x/a.png', 'https://x/a.png', 'data:image/png;base64,AAA', 'blob:abc'])(
+        'leaves absolute source %s unchanged',
+        (src) => {
+            expect(resolveMediaSrc(base, src)).toBe(src);
+        },
+    );
+
+    it('leaves already-resolved webview sources unchanged', () => {
+        const src = 'vscode-resource://file/img.png';
+
+        expect(resolveMediaSrc(base, src)).toBe(src);
+    });
+
+    it('returns the source as-is when base is missing', () => {
+        expect(resolveMediaSrc(undefined, './img.png')).toBe('./img.png');
+    });
+
+    it('returns an empty source unchanged', () => {
+        expect(resolveMediaSrc(base, '')).toBe('');
     });
 });

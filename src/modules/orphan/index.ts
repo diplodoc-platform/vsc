@@ -39,7 +39,11 @@ export function activate(context: vscode.ExtensionContext) {
 
         const allUris = [
             ...vscode.workspace.textDocuments
-                .filter((d) => d.languageId === 'markdown' || d.languageId === 'yaml')
+                .filter(
+                    (d) =>
+                        d.uri.scheme === 'file' &&
+                        (d.languageId === 'markdown' || d.languageId === 'yaml'),
+                )
                 .map((d) => d.uri),
         ];
 

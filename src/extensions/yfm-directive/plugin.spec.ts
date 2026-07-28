@@ -158,12 +158,23 @@ describe('yfmLiquidTagPlugin', () => {
         expect(token).toBeUndefined();
     });
 
-    it('skips {% endnote %} — handled by @diplodoc/transform', () => {
+    it('captures an orphan {% endnote %} (no matching opener) so it is not dropped', () => {
         const md = createMd();
         const tokens = md.parse('{% endnote %}\n', {});
         const token = findToken(tokens, LIQUID_TOKEN_NAME);
 
-        expect(token).toBeUndefined();
+        expect(token).toBeDefined();
+        expect(token?.content).toBe('{% endnote %}');
+    });
+
+    it('does not capture a paired {% endnote %} (matching opener above)', () => {
+        const md = createMd();
+        const tokens = findAllTokens(
+            md.parse('{% note info %}\n\n{% endnote %}\n', {}),
+            LIQUID_TOKEN_NAME,
+        );
+
+        expect(tokens).toHaveLength(0);
     });
 
     it('does not match {% include [...](path) %}', () => {
@@ -282,5 +293,33 @@ describe('yfmLiquidTagPlugin', () => {
 
         expect(token).toBeDefined();
         expect(token?.content).toBe('{% custom %}');
+    });
+
+    it('captures endnote that follows a different known opener (mismatched stack)', () => {
+        const md = createMd();
+        const tokens = findAllTokens(
+            md.parse('{% cut "T" %}\n\n{% endnote %}\n', {}),
+            LIQUID_TOKEN_NAME,
+        );
+
+        expect(tokens.some((t) => t.content === '{% endnote %}')).toBe(true);
+    });
+
+    it('does not capture endcut when a matching cut is open', () => {
+        const md = createMd();
+        const tokens = findAllTokens(
+            md.parse('{% cut "T" %}\n\n{% endcut %}\n', {}),
+            LIQUID_TOKEN_NAME,
+        );
+
+        expect(tokens.every((t) => t.content !== '{% endcut %}')).toBe(true);
+    });
+
+    it('skips include lines inside isOrphanKnownEnd scan', () => {
+        const md = createMd();
+        const src = '{% include [Title](file.md) %}\n\n{% endnote %}\n';
+        const token = findToken(md.parse(src, {}), LIQUID_TOKEN_NAME);
+
+        expect(token?.content).toBe('{% endnote %}');
     });
 });

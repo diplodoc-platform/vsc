@@ -204,6 +204,7 @@ function revalidateOnConfigChange() {
 }
 
 export function activate(context: vscode.ExtensionContext) {
+    collection?.dispose();
     collection = vscode.languages.createDiagnosticCollection('diplodoc');
 
     const yfmConfigWatcher = vscode.workspace.createFileSystemWatcher('**/.yfm');
@@ -361,7 +362,11 @@ export function deactivate() {
 }
 
 function isSupportedDocument(doc: vscode.TextDocument): boolean {
-    return (isMarkdown(doc) || isYaml(doc)) && !isInExcludedDir(doc.uri.fsPath);
+    return (
+        doc.uri.scheme === 'file' &&
+        (isMarkdown(doc) || isYaml(doc)) &&
+        !isInExcludedDir(doc.uri.fsPath)
+    );
 }
 
 function isMarkdown(doc: vscode.TextDocument): boolean {

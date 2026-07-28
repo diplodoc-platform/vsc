@@ -1,6 +1,7 @@
 import type {PluginMessage, ValidationMessage, YfmLintError} from './types';
 import type {TextDocument} from 'vscode';
 
+import * as vscode from 'vscode';
 import * as path from 'path';
 import {readFileSync} from 'fs';
 import {yfmlint} from '@diplodoc/yfmlint';
@@ -25,6 +26,23 @@ import {
     toDiagnostics,
 } from './utils';
 import {isYaMakeProvidedLink} from './ya-make';
+import {validateLiquidConditions} from './liquid-conditions';
+
+function liquidConditionDiagnostics(content: string): vscode.Diagnostic[] {
+    return validateLiquidConditions(content).map((error) => {
+        const range = new vscode.Range(error.line, error.column, error.line, error.endColumn);
+        const diagnostic = new vscode.Diagnostic(
+            range,
+            error.message,
+            vscode.DiagnosticSeverity.Error,
+        );
+
+        diagnostic.source = 'Diplodoc';
+        diagnostic.code = 'liquid-condition';
+
+        return diagnostic;
+    });
+}
 
 function isResolvedConditionalAnchor(error: ValidationMessage): boolean {
     if (!('message' in error) || typeof error.message !== 'string') {
@@ -112,5 +130,5 @@ export async function validateMarkdown(
             !isYaMakeProvidedLink(error, yaMakeDests),
     );
 
-    return toDiagnostics(errors, document);
+    return [...toDiagnostics(errors, document), ...liquidConditionDiagnostics(content)];
 }

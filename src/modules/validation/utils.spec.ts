@@ -192,6 +192,49 @@ describe('toDiagnostics', () => {
     });
 });
 
+describe('toPluginDiagnostic range — findLinkRange underscore fallback', () => {
+    it('finds a link href that is escaped with \\_ in the document', () => {
+        const doc = mockDocument('see [text](../\\_assets/img.png) here');
+        const error = mockPluginError({
+            level: 'error',
+            message: 'Link is unreachable: ../_assets/img.png in /doc.md',
+        });
+
+        const diag = toPluginDiagnostic(error, doc);
+
+        expect(diag.range.start.line).toBe(0);
+        expect(diag.range.start.character).toBeGreaterThan(0);
+    });
+
+    it('falls back to line 0 when href is not in the document', () => {
+        const doc = mockDocument('unrelated text');
+        const error = mockPluginError({
+            level: 'error',
+            message: 'Link is unreachable: ../missing.md in /doc.md',
+        });
+
+        const diag = toPluginDiagnostic(error, doc);
+
+        expect(diag.range.start.line).toBe(0);
+        expect(diag.range.start.character).toBe(0);
+    });
+});
+
+describe('toPluginDiagnostic range — findAssetRange underscore fallback', () => {
+    it('finds an asset path that is escaped with \\_ in the document', () => {
+        const doc = mockDocument('![](../\\_assets/img.png)');
+        const error = mockPluginError({
+            level: 'error',
+            message: 'Asset not found: ../_assets/img.png in /doc.md',
+        });
+
+        const diag = toPluginDiagnostic(error, doc);
+
+        expect(diag.range.start.line).toBe(0);
+        expect(diag.range.start.character).toBeGreaterThan(0);
+    });
+});
+
 describe('findConfig', () => {
     const testRoot = join(tmpdir(), `yfm-config-test-${Date.now()}`);
     const nestedDir = join(testRoot, 'a', 'b', 'c');

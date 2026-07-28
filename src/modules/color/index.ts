@@ -64,7 +64,7 @@ function colorProblems(document: vscode.TextDocument): ColorProblem[] {
 }
 
 function refreshDiagnostics(document: vscode.TextDocument) {
-    if (!diagnostics) {
+    if (!diagnostics || document.uri.scheme !== 'file') {
         return;
     }
 
@@ -83,6 +83,7 @@ function refreshDiagnostics(document: vscode.TextDocument) {
 }
 
 export function activate(context: vscode.ExtensionContext) {
+    diagnostics?.dispose();
     diagnostics = vscode.languages.createDiagnosticCollection('diplodoc-color');
 
     context.subscriptions.push(
