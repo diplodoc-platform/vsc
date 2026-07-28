@@ -8,11 +8,14 @@ import {DiagnosticSeverity as LspSeverity} from 'vscode-languageserver-types';
 import {createVirtualDocument, getConfiguredService} from './yaml-service';
 import {toVscodeRange} from './position';
 
-const TYPE_MISMATCH_RE = /^Incorrect type\./;
-const MISSING_PROPERTY_RE = /^Missing property/;
+function messageText(d: LspDiagnostic): string {
+    return typeof d.message === 'string' ? d.message : d.message.value;
+}
 
 function diagnosticSeverity(d: LspDiagnostic): vscode.DiagnosticSeverity {
-    if (TYPE_MISMATCH_RE.test(d.message) || MISSING_PROPERTY_RE.test(d.message)) {
+    const message = messageText(d);
+
+    if (message.startsWith('Incorrect type.') || message.startsWith('Missing property')) {
         return vscode.DiagnosticSeverity.Error;
     }
 
