@@ -26,7 +26,10 @@ export const YfmTables: ExtensionAuto = (builder) => {
     builder.overrideNodeSerializerSpec('doc', (prev) => (state, node, parent, index) => {
         prev(state, node, parent, index);
 
-        state.out = state.out.replace(/\n{3,}/g, '\n\n');
+        state.out = state.out
+            .replace(/\n{3,}/g, '\n\n')
+            .replace(/\\([{}])/g, '$1')
+            .replace(/\\_/g, '_');
     });
 };
 
@@ -41,7 +44,7 @@ function serializeCompactBody(state: State, tbody: PMNode) {
                 state.write('|');
             }
 
-            const hasContent = td.textContent.trim().length > 0;
+            const hasContent = td.firstChild !== null && td.firstChild.childCount > 0;
 
             if (hasContent && td.firstChild) {
                 state.write(' ');

@@ -1,5 +1,4 @@
 import type {ExtensionAuto} from '@gravity-ui/markdown-editor';
-import type {AttrOp, TextOp} from './types';
 
 import {type EditorState, Plugin, PluginKey} from '@gravity-ui/markdown-editor/pm/state';
 import {
@@ -11,8 +10,30 @@ import {findImageMatches} from './matches';
 import {matchLeadingAttrs} from './utils';
 
 const FAILED_META = 'image-load-failed';
+const RAW_ATTRS = 'rawAttrs';
 
 const key = new PluginKey<Set<string>>('yfmImageReparse');
+
+type TextOp = {
+    pos: number;
+    kind: 'text';
+    from: number;
+    to: number;
+    src: string;
+    alt: string;
+    width: string | null;
+    height: string | null;
+    rawAttrs: string | null;
+};
+
+type AttrOp = {
+    pos: number;
+    kind: 'attr';
+    imgPos: number;
+    textFrom: number;
+    textTo: number;
+    mergedAttrs: Record<string, unknown>;
+};
 
 function buildFixupTransaction(state: EditorState) {
     const imageType = state.schema.nodes[imageNodeName];
@@ -22,7 +43,6 @@ function buildFixupTransaction(state: EditorState) {
     }
 
     const failed = key.getState(state) ?? new Set<string>();
-
     const ops: Array<TextOp | AttrOp> = [];
 
     state.doc.descendants((node, pos, parent, index) => {
@@ -41,6 +61,7 @@ function buildFixupTransaction(state: EditorState) {
                     alt: match.alt,
                     width: match.width,
                     height: match.height,
+                    rawAttrs: match.rawAttrs,
                 });
             }
         }
@@ -64,6 +85,7 @@ function buildFixupTransaction(state: EditorState) {
                             textTo: nextPos + attrs.consumeLength,
                             mergedAttrs: {
                                 ...node.attrs,
+                                [RAW_ATTRS]: attrs.rawAttrs,
                                 ...(attrs.width === null ? {} : {[ImgSizeAttr.Width]: attrs.width}),
                                 ...(attrs.height === null
                                     ? {}
@@ -93,6 +115,7 @@ function buildFixupTransaction(state: EditorState) {
                     [ImgSizeAttr.Src]: op.src,
                     [ImgSizeAttr.Alt]: op.alt || null,
                     [ImgSizeAttr.Title]: null,
+                    [RAW_ATTRS]: op.rawAttrs,
                     ...(op.width === null ? {} : {[ImgSizeAttr.Width]: op.width}),
                     ...(op.height === null ? {} : {[ImgSizeAttr.Height]: op.height}),
                 }),
@@ -107,6 +130,14 @@ function buildFixupTransaction(state: EditorState) {
 }
 
 export const YfmImageReparse: ExtensionAuto = (builder) => {
+    builder.overrideNodeSpec(imageNodeName, (prev) => ({
+        ...prev,
+        attrs: {
+            ...prev.attrs,
+            [RAW_ATTRS]: {default: null},
+        },
+    }));
+
     builder.addPlugin(
         () =>
             new Plugin<Set<string>>({

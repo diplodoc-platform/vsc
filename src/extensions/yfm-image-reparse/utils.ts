@@ -1,6 +1,6 @@
 import type {InlineAttrs} from './types';
 
-const LEADING_ATTRS_RE = /^\s*(\{[^}]*(?:width|height)=[^}]*\})/;
+const LEADING_ATTRS_RE = /^\s*(\{[^}]+\})/;
 
 export function parseInlineAttrs(attrsStr: string): {width: string | null; height: string | null} {
     const widthMatch = attrsStr.match(/width=(\d+)/);
@@ -19,11 +19,34 @@ export function matchLeadingAttrs(text: string): InlineAttrs | null {
         return null;
     }
 
+    const rawAttrs = m[1].slice(1, -1); // content between { and }
     const {width, height} = parseInlineAttrs(m[1]);
 
-    if (width === null && height === null) {
-        return null;
+    return {consumeLength: m[0].length, width, height, rawAttrs};
+}
+
+export function rebuildRawAttrs(
+    rawAttrs: string,
+    width: string | null,
+    height: string | null,
+): string {
+    let result = rawAttrs;
+
+    if (width !== null) {
+        if (/width=\S+/.test(result)) {
+            result = result.replace(/width=\S+/, `width=${width}`);
+        } else {
+            result = `width=${width} ${result}`;
+        }
     }
 
-    return {consumeLength: m[0].length, width, height};
+    if (height !== null) {
+        if (/height=\S+/.test(result)) {
+            result = result.replace(/height=\S+/, `height=${height}`);
+        } else {
+            result = `${result} height=${height}`;
+        }
+    }
+
+    return result.trim();
 }

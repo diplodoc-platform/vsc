@@ -17,7 +17,8 @@ export function findImageMatches(text: string, failed: ReadonlySet<string>): Ima
         }
 
         const attrs = m[3] ? parseInlineAttrs(m[3]) : {width: null, height: null};
-        result.push({index: m.index, length: m[0].length, alt: m[1], src, ...attrs});
+        const rawAttrs = m[3] ? m[3].slice(1, -1) : null;
+        result.push({index: m.index, length: m[0].length, alt: m[1], src, ...attrs, rawAttrs});
     }
 
     return result;

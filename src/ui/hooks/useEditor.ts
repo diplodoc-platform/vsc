@@ -16,6 +16,7 @@ import {YfmDirective} from '../../extensions/yfm-directive';
 import {YfmTables} from '../../extensions/yfm-tables';
 import {YfmVideo} from '../../extensions/yfm-video';
 import {YfmImageReparse} from '../../extensions/yfm-image-reparse';
+import {YfmLinks} from '../../extensions/yfm-links';
 import {YfmLiquidInline} from '../../extensions/yfm-liquid-inline';
 import {YfmSerializer} from '../../extensions/yfm-serializer';
 import {isTrustedOrigin, resolveMediaSrc} from '../utils';
@@ -113,6 +114,7 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
                 builder.use(YfmTables);
                 builder.use(YfmVideo);
                 builder.use(YfmImageReparse);
+                builder.use(YfmLinks);
                 builder.use(YfmSerializer);
                 builder.overrideNodeSpec('paragraph', (prev) => ({
                     ...prev,

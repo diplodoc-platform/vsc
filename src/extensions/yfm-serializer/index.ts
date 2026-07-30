@@ -1,5 +1,7 @@
 import type {ExtensionAuto, SerializerNodeToken} from '@gravity-ui/markdown-editor';
 
+import {rebuildRawAttrs} from '../yfm-image-reparse/utils';
+
 type State = Parameters<SerializerNodeToken>[0];
 type PMNode = Parameters<SerializerNodeToken>[1];
 
@@ -22,6 +24,15 @@ function isNodeEmpty(node: PMNode): boolean {
     });
 
     return empty;
+}
+
+function tabsOpener(variant: '' | ' radio'): (state: State, node: PMNode) => void {
+    return (state, node) => {
+        const group = node.attrs['data-diplodoc-group'] as string | undefined;
+        const groupSuffix = group && group !== 'unknown' ? ` group=${group}` : '';
+
+        state.write(`{% list tabs${variant}${groupSuffix} %}`);
+    };
 }
 
 export const YfmSerializer: ExtensionAuto = (builder) => {
@@ -48,11 +59,16 @@ export const YfmSerializer: ExtensionAuto = (builder) => {
             result += ` ${quote(attrs.title)}`;
         }
 
-        if (attrs.width || attrs.height) {
-            result += ` =${attrs.width || ''}x${attrs.height || ''}`;
+        if (attrs.rawAttrs) {
+            result += ')';
+            result += `{${rebuildRawAttrs(attrs.rawAttrs, attrs.width, attrs.height)}}`;
+        } else {
+            if (attrs.width || attrs.height) {
+                result += ` =${attrs.width || ''}x${attrs.height || ''}`;
+            }
+            result += ')';
         }
 
-        result += ')';
         state.write(result);
     });
 
@@ -104,6 +120,63 @@ export const YfmSerializer: ExtensionAuto = (builder) => {
             state.write('\n');
         },
     );
+
+    builder.overrideNodeSerializerSpec('yfm_tabs', (_prev) => (state, node) => {
+        tabsOpener('')(state, node);
+        state.write('\n');
+        state.write('\n');
+
+        const children: PMNode[] = [];
+        node.content.forEach((a) => {
+            children.push(a);
+        });
+
+        const tabList = children[0].content;
+        tabList.forEach((tab: PMNode, _: number, i: number) => {
+            state.write('- ' + (tab.textContent || ''));
+            state.write('\n');
+            state.write('\n');
+
+            if (children[i + 1]) {
+                state.renderList(children[i + 1], '  ', () => '  ');
+            }
+        });
+
+        state.write('{% endlist %}');
+        state.closeBlock(node);
+    });
+
+    builder.overrideNodeSerializerSpec('yfm_radio_tabs', (_prev) => (state, node) => {
+        tabsOpener(' radio')(state, node);
+        state.write('\n');
+        state.write('\n');
+
+        const children: {node: PMNode}[] = [];
+        node.content.forEach((child) => {
+            children.push({node: child});
+        });
+
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+
+            if (child.node.type.name !== 'yfm_radio_tab') {
+                continue;
+            }
+
+            state.write('- ' + (child.node.textContent || ''));
+            state.write('\n');
+            state.write('\n');
+
+            const nextChild = children[i + 1];
+
+            if (nextChild && nextChild.node.type.name === 'yfm_tab_panel') {
+                state.renderList(nextChild.node, '  ', () => '  ');
+            }
+        }
+
+        state.write('{% endlist %}');
+        state.closeBlock(node);
+    });
 };
 
 function serializeEmptyNoteTitle(state: State, parent: PMNode): void {
