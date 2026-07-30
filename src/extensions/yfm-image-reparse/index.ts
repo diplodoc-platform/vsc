@@ -1,4 +1,5 @@
 import type {ExtensionAuto} from '@gravity-ui/markdown-editor';
+import type {AttrOp, TextOp} from './types';
 
 import {type EditorState, Plugin, PluginKey} from '@gravity-ui/markdown-editor/pm/state';
 import {
@@ -21,25 +22,6 @@ function buildFixupTransaction(state: EditorState) {
     }
 
     const failed = key.getState(state) ?? new Set<string>();
-
-    type TextOp = {
-        pos: number;
-        kind: 'text';
-        from: number;
-        to: number;
-        src: string;
-        alt: string;
-        width: string | null;
-        height: string | null;
-    };
-    type AttrOp = {
-        pos: number;
-        kind: 'attr';
-        imgPos: number;
-        textFrom: number;
-        textTo: number;
-        mergedAttrs: Record<string, unknown>;
-    };
 
     const ops: Array<TextOp | AttrOp> = [];
 
