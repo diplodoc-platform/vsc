@@ -1,6 +1,8 @@
-export type ImageMatch = {index: number; length: number; alt: string; src: string};
+import type {ImageMatch} from './types';
 
-const IMAGE_MD_RE = /!\[([^\]]*)\]\(([^)\s]+)\)/g;
+import {parseInlineAttrs} from './utils';
+
+const IMAGE_MD_RE = /!\[([^\]]*)\]\(([^)\s]+)\)(\{[^}]+\})?/g;
 
 export function findImageMatches(text: string, failed: ReadonlySet<string>): ImageMatch[] {
     const result: ImageMatch[] = [];
@@ -9,10 +11,13 @@ export function findImageMatches(text: string, failed: ReadonlySet<string>): Ima
     let m: RegExpExecArray | null;
     while ((m = IMAGE_MD_RE.exec(text)) !== null) {
         const src = m[2];
+
         if (failed.has(src)) {
             continue;
         }
-        result.push({index: m.index, length: m[0].length, alt: m[1], src});
+
+        const attrs = m[3] ? parseInlineAttrs(m[3]) : {width: null, height: null};
+        result.push({index: m.index, length: m[0].length, alt: m[1], src, ...attrs});
     }
 
     return result;

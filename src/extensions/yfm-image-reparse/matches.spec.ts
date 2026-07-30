@@ -30,4 +30,36 @@ describe('findImageMatches', () => {
     it('ignores plain links without the leading !', () => {
         expect(findImageMatches('[text](./page.md)', new Set())).toHaveLength(0);
     });
+
+    it('returns null width and height when no inline attrs', () => {
+        const [m] = findImageMatches('![](./a.png)', new Set());
+
+        expect(m).toMatchObject({width: null, height: null});
+    });
+
+    it('captures width when image and attrs are in the same text node', () => {
+        const [m] = findImageMatches('![](./a.png){width=600}', new Set());
+
+        expect(m).toMatchObject({src: './a.png', width: '600', height: null});
+        expect(m.length).toBe('![](./a.png){width=600}'.length);
+    });
+
+    it('captures height from inline attrs', () => {
+        const [m] = findImageMatches('![](./a.png){height=300}', new Set());
+
+        expect(m).toMatchObject({src: './a.png', width: null, height: '300'});
+    });
+
+    it('captures both dimensions', () => {
+        const [m] = findImageMatches('![](./a.png){width=400 height=200}', new Set());
+
+        expect(m).toMatchObject({src: './a.png', width: '400', height: '200'});
+    });
+
+    it('consumes the {attrs} so it is not left as text', () => {
+        const [m] = findImageMatches('prefix ![](./a.png){width=400} suffix', new Set());
+
+        expect(m.index).toBe(7);
+        expect(m.length).toBe('![](./a.png){width=400}'.length);
+    });
 });
