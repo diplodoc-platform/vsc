@@ -206,7 +206,7 @@ function findLinkRange(
 
     return (
         findTextRange(document, href, occurrence) ??
-        findTextRange(document, href.replace(/_/g, '\\_'), occurrence) ??
+        findTextRange(document, href.replace(/_/g, String.raw`\_`), occurrence) ??
         fullLineRange(0, document)
     );
 }
@@ -224,8 +224,8 @@ function findAssetRange(
     if (assetPath) {
         const range =
             findTextRange(document, assetPath, occurrence) ??
-            findTextRange(document, assetPath.replace(/([^\w./])/g, '\\$1'), occurrence) ??
-            findTextRange(document, assetPath.replace(/_/g, '\\_'), occurrence);
+            findTextRange(document, assetPath.replace(/([^\w./])/g, String.raw`\$1`), occurrence) ??
+            findTextRange(document, assetPath.replace(/_/g, String.raw`\_`), occurrence);
 
         if (range) {
             return range;

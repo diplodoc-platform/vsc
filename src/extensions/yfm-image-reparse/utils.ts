@@ -3,8 +3,8 @@ import type {InlineAttrs} from './types';
 const LEADING_ATTRS_RE = /^\s*(\{[^}]+\})/;
 
 export function parseInlineAttrs(attrsStr: string): {width: string | null; height: string | null} {
-    const widthMatch = attrsStr.match(/width=(\d+)/);
-    const heightMatch = attrsStr.match(/height=(\d+)/);
+    const widthMatch = /width=(\d+)/.exec(attrsStr);
+    const heightMatch = /height=(\d+)/.exec(attrsStr);
 
     return {
         width: widthMatch ? widthMatch[1] : null,

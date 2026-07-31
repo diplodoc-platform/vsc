@@ -169,7 +169,7 @@ export const YfmSerializer: ExtensionAuto = (builder) => {
 
             const nextChild = children[i + 1];
 
-            if (nextChild && nextChild.node.type.name === 'yfm_tab_panel') {
+            if (nextChild?.node.type.name === 'yfm_tab_panel') {
                 state.renderList(nextChild.node, '  ', () => '  ');
             }
         }

@@ -39,9 +39,10 @@ describe('findImageMatches', () => {
 
     it('captures width and rawAttrs from {width=600}', () => {
         const [m] = findImageMatches('![](./a.png){width=600}', new Set());
+        const {length} = m;
 
         expect(m).toMatchObject({src: './a.png', width: '600', rawAttrs: 'width=600'});
-        expect(m.length).toBe('![](./a.png){width=600}'.length);
+        expect(length).toBe('![](./a.png){width=600}'.length);
     });
 
     it('captures both dimensions', () => {
@@ -61,8 +62,9 @@ describe('findImageMatches', () => {
 
     it('consumes the {attrs} so it is not left as text', () => {
         const [m] = findImageMatches('prefix ![](./a.png){width=400} suffix', new Set());
+        const {index, length} = m;
 
-        expect(m.index).toBe(7);
-        expect(m.length).toBe('![](./a.png){width=400}'.length);
+        expect(index).toBe(7);
+        expect(length).toBe('![](./a.png){width=400}'.length);
     });
 });

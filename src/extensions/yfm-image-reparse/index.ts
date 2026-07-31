@@ -1,6 +1,8 @@
 import type {ExtensionAuto} from '@gravity-ui/markdown-editor';
+import type {Node, NodeType} from '@gravity-ui/markdown-editor/pm/model';
+import type {EditorState, Transaction} from '@gravity-ui/markdown-editor/pm/state';
 
-import {type EditorState, Plugin, PluginKey} from '@gravity-ui/markdown-editor/pm/state';
+import {Plugin, PluginKey} from '@gravity-ui/markdown-editor/pm/state';
 import {
     ImgSizeAttr,
     imageNodeName,
@@ -35,6 +37,98 @@ type AttrOp = {
     mergedAttrs: Record<string, unknown>;
 };
 
+function collectTextOps(
+    node: Node,
+    pos: number,
+    parent: Node | null,
+    failed: ReadonlySet<string>,
+): TextOp[] {
+    if (!node.isText || !node.text) {
+        return [];
+    }
+
+    if (parent?.type.spec.code || node.marks.some((mark) => mark.type.spec.code)) {
+        return [];
+    }
+
+    return findImageMatches(node.text, failed).map((match) => ({
+        pos: pos + match.index,
+        kind: 'text' as const,
+        from: pos + match.index,
+        to: pos + match.index + match.length,
+        src: match.src,
+        alt: match.alt,
+        width: match.width,
+        height: match.height,
+        rawAttrs: match.rawAttrs,
+    }));
+}
+
+function buildAttrOp(
+    node: Node,
+    pos: number,
+    parent: Node | null,
+    index: number,
+    imageType: NodeType,
+): AttrOp | null {
+    if (node.type !== imageType || !parent) {
+        return null;
+    }
+
+    const nextIdx = index + 1;
+
+    if (nextIdx >= parent.childCount) {
+        return null;
+    }
+
+    const nextNode = parent.child(nextIdx);
+
+    if (!nextNode.isText || !nextNode.text) {
+        return null;
+    }
+
+    const attrs = matchLeadingAttrs(nextNode.text);
+
+    if (!attrs) {
+        return null;
+    }
+
+    const nextPos = pos + node.nodeSize;
+
+    return {
+        pos: nextPos,
+        kind: 'attr',
+        imgPos: pos,
+        textFrom: nextPos,
+        textTo: nextPos + attrs.consumeLength,
+        mergedAttrs: {
+            ...node.attrs,
+            [RAW_ATTRS]: attrs.rawAttrs,
+            ...(attrs.width === null ? {} : {[ImgSizeAttr.Width]: attrs.width}),
+            ...(attrs.height === null ? {} : {[ImgSizeAttr.Height]: attrs.height}),
+        },
+    };
+}
+
+function applyTextOp(tr: Transaction, imageType: NodeType, op: TextOp): Transaction {
+    return tr.replaceWith(
+        op.from,
+        op.to,
+        imageType.create({
+            [ImgSizeAttr.Src]: op.src,
+            [ImgSizeAttr.Alt]: op.alt || null,
+            [ImgSizeAttr.Title]: null,
+            [RAW_ATTRS]: op.rawAttrs,
+            ...(op.width === null ? {} : {[ImgSizeAttr.Width]: op.width}),
+            ...(op.height === null ? {} : {[ImgSizeAttr.Height]: op.height}),
+        }),
+    );
+}
+
+function applyAttrOp(tr: Transaction, op: AttrOp): Transaction {
+    return tr.delete(op.textFrom, op.textTo).setNodeMarkup(op.imgPos, undefined, op.mergedAttrs);
+}
+
 function buildFixupTransaction(state: EditorState) {
     const imageType = state.schema.nodes[imageNodeName];
 
@@ -46,55 +140,12 @@ function buildFixupTransaction(state: EditorState) {
     const ops: Array<TextOp | AttrOp> = [];
 
     state.doc.descendants((node, pos, parent, index) => {
-        if (node.isText && node.text) {
-            if (parent?.type.spec.code || node.marks.some((mark) => mark.type.spec.code)) {
-                return;
-            }
+        ops.push(...collectTextOps(node, pos, parent, failed));
 
-            for (const match of findImageMatches(node.text, failed)) {
-                ops.push({
-                    pos: pos + match.index,
-                    kind: 'text',
-                    from: pos + match.index,
-                    to: pos + match.index + match.length,
-                    src: match.src,
-                    alt: match.alt,
-                    width: match.width,
-                    height: match.height,
-                    rawAttrs: match.rawAttrs,
-                });
-            }
-        }
+        const attrOp = buildAttrOp(node, pos, parent, index, imageType);
 
-        if (node.type === imageType && parent) {
-            const nextIdx = index + 1;
-
-            if (nextIdx < parent.childCount) {
-                const nextNode = parent.child(nextIdx);
-                const nextPos = pos + node.nodeSize;
-
-                if (nextNode.isText && nextNode.text) {
-                    const attrs = matchLeadingAttrs(nextNode.text);
-
-                    if (attrs) {
-                        ops.push({
-                            pos: nextPos,
-                            kind: 'attr',
-                            imgPos: pos,
-                            textFrom: nextPos,
-                            textTo: nextPos + attrs.consumeLength,
-                            mergedAttrs: {
-                                ...node.attrs,
-                                [RAW_ATTRS]: attrs.rawAttrs,
-                                ...(attrs.width === null ? {} : {[ImgSizeAttr.Width]: attrs.width}),
-                                ...(attrs.height === null
-                                    ? {}
-                                    : {[ImgSizeAttr.Height]: attrs.height}),
-                            },
-                        });
-                    }
-                }
-            }
+        if (attrOp) {
+            ops.push(attrOp);
         }
     });
 
@@ -108,21 +159,9 @@ function buildFixupTransaction(state: EditorState) {
 
     for (const op of ops) {
         if (op.kind === 'text') {
-            tr = tr.replaceWith(
-                op.from,
-                op.to,
-                imageType.create({
-                    [ImgSizeAttr.Src]: op.src,
-                    [ImgSizeAttr.Alt]: op.alt || null,
-                    [ImgSizeAttr.Title]: null,
-                    [RAW_ATTRS]: op.rawAttrs,
-                    ...(op.width === null ? {} : {[ImgSizeAttr.Width]: op.width}),
-                    ...(op.height === null ? {} : {[ImgSizeAttr.Height]: op.height}),
-                }),
-            );
+            tr = applyTextOp(tr, imageType, op);
         } else {
-            tr = tr.delete(op.textFrom, op.textTo);
-            tr = tr.setNodeMarkup(op.imgPos, undefined, op.mergedAttrs);
+            tr = applyAttrOp(tr, op);
         }
     }
 
