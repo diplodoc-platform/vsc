@@ -60,8 +60,13 @@ export const YfmSerializer: ExtensionAuto = (builder) => {
         }
 
         if (attrs.rawAttrs) {
+            const rebuilt = rebuildRawAttrs(attrs.rawAttrs, attrs.width, attrs.height);
+
             result += ')';
-            result += `{${rebuildRawAttrs(attrs.rawAttrs, attrs.width, attrs.height)}}`;
+
+            if (rebuilt) {
+                result += `{${rebuilt}}`;
+            }
         } else {
             if (attrs.width || attrs.height) {
                 result += ` =${attrs.width || ''}x${attrs.height || ''}`;

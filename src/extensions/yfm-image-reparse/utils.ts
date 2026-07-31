@@ -25,6 +25,51 @@ export function matchLeadingAttrs(text: string): InlineAttrs | null {
     return {consumeLength: m[0].length, width, height, rawAttrs};
 }
 
+const EMPTY_MANAGED_ATTR_RE = /^(?:width|height)=$/;
+
+function setRawAttr(rawAttrs: string, name: string, value: string, prepend: boolean): string {
+    const key = `${name}=`;
+    const attr = `${key}${value}`;
+    const parts: string[] = [];
+    let replaced = false;
+
+    for (const part of rawAttrs.split(/\s+/)) {
+        if (!part || EMPTY_MANAGED_ATTR_RE.test(part)) {
+            continue;
+        }
+
+        if (part.startsWith(key)) {
+            if (!replaced) {
+                parts.push(attr);
+                replaced = true;
+            }
+
+            continue;
+        }
+
+        parts.push(part);
+    }
+
+    if (!replaced) {
+        if (prepend) {
+            parts.unshift(attr);
+        } else {
+            parts.push(attr);
+        }
+    }
+
+    return parts.join(' ');
+}
+
+function removeRawAttr(rawAttrs: string, name: string): string {
+    const key = `${name}=`;
+
+    return rawAttrs
+        .split(/\s+/)
+        .filter((part) => part && !part.startsWith(key))
+        .join(' ');
+}
+
 export function rebuildRawAttrs(
     rawAttrs: string,
     width: string | null,
@@ -33,18 +78,18 @@ export function rebuildRawAttrs(
     let result = rawAttrs;
 
     if (width !== null) {
-        if (/width=\S+/.test(result)) {
-            result = result.replace(/width=\S+/, `width=${width}`);
+        if (width) {
+            result = setRawAttr(result, 'width', width, true);
         } else {
-            result = `width=${width} ${result}`;
+            result = removeRawAttr(result, 'width');
         }
     }
 
     if (height !== null) {
-        if (/height=\S+/.test(result)) {
-            result = result.replace(/height=\S+/, `height=${height}`);
+        if (height) {
+            result = setRawAttr(result, 'height', height, false);
         } else {
-            result = `${result} height=${height}`;
+            result = removeRawAttr(result, 'height');
         }
     }
 

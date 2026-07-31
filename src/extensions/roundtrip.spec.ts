@@ -15,7 +15,7 @@ const SERIALIZER_OPTIONS = {
     startOfLineEscape: /.^/,
 };
 
-function roundtrip(markdown: string): string {
+function createManager() {
     const extensions: ExtensionAuto = (builder) => {
         builder.use(YfmSpecsPreset, {});
         builder.use(YfmLiquidInline);
@@ -25,11 +25,21 @@ function roundtrip(markdown: string): string {
         builder.use(YfmSerializer);
     };
 
-    const {markupParser, serializer} = ExtensionsManager.process(extensions, {
-        mdOpts: {html: true},
-    });
+    return ExtensionsManager.process(extensions, {mdOpts: {html: true}});
+}
+
+function roundtrip(markdown: string): string {
+    const {markupParser, serializer} = createManager();
 
     const doc = markupParser.parse(markdown);
+
+    return serializer.serialize(doc, SERIALIZER_OPTIONS);
+}
+
+function serializeDoc(docJson: object): string {
+    const {schema, serializer} = createManager();
+
+    const doc = schema.nodeFromJSON(docJson);
 
     return serializer.serialize(doc, SERIALIZER_OPTIONS);
 }
@@ -133,5 +143,43 @@ describe('roundtrip: links with formatting', () => {
         const out = roundtrip('[x](path/{var}.md)\n');
 
         expect(out).toContain('[x](path/{var}.md)');
+    });
+});
+
+describe('roundtrip: image size cleanup', () => {
+    it('removes the width key when the width is cleared in the editor', () => {
+        const out = serializeDoc({
+            type: 'doc',
+            content: [
+                {
+                    type: 'paragraph',
+                    content: [
+                        {
+                            type: 'image',
+                            attrs: {src: 'x.png', rawAttrs: 'width=600 a=1', width: ''},
+                        },
+                    ],
+                },
+            ],
+        });
+
+        expect(out).toContain('![](x.png){a=1}');
+    });
+
+    it('drops the attrs block when all sizes are cleared', () => {
+        const out = serializeDoc({
+            type: 'doc',
+            content: [
+                {
+                    type: 'paragraph',
+                    content: [
+                        {type: 'image', attrs: {src: 'x.png', rawAttrs: 'width=600', width: ''}},
+                    ],
+                },
+            ],
+        });
+
+        expect(out).toContain('![](x.png)');
+        expect(out).not.toContain('{');
     });
 });

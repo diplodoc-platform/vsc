@@ -113,4 +113,34 @@ describe('rebuildRawAttrs', () => {
     it('updates both width and height', () => {
         expect(rebuildRawAttrs('width=400 height=300', '600', '500')).toBe('width=600 height=500');
     });
+
+    it('replaces an empty width value instead of duplicating the key', () => {
+        expect(rebuildRawAttrs('width=', '600', null)).toBe('width=600');
+    });
+
+    it('does not write empty dimensions coming from the image form', () => {
+        expect(rebuildRawAttrs('width=', '600', '')).toBe('width=600');
+    });
+
+    it('removes duplicate and empty keys left by previous edits', () => {
+        expect(rebuildRawAttrs('width=600 width= height=', '600', '')).toBe('width=600');
+    });
+
+    it('keeps attr position when replacing in the middle', () => {
+        expect(rebuildRawAttrs('inline=false width=400', '600', null)).toBe(
+            'inline=false width=600',
+        );
+    });
+
+    it('removes the width key when the width is cleared', () => {
+        expect(rebuildRawAttrs('width=600 a=1', '', null)).toBe('a=1');
+    });
+
+    it('removes the height key when the height is cleared', () => {
+        expect(rebuildRawAttrs('width=600 height=300', null, '')).toBe('width=600');
+    });
+
+    it('returns an empty string when all sizes are cleared', () => {
+        expect(rebuildRawAttrs('width=600', '', null)).toBe('');
+    });
 });
