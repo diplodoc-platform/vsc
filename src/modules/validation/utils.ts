@@ -63,7 +63,19 @@ export function toDiagnostics(
     errors: ValidationMessage[],
     document: vscode.TextDocument,
 ): vscode.Diagnostic[] {
-    return errors.map((error) => toDiagnostic(error, document));
+    const messageCounts = new Map<string, number>();
+
+    return errors.map((error) => {
+        if (isYfmLintError(error)) {
+            return toLintDiagnostic(error, document);
+        }
+
+        const key = stripAnsi(error.message);
+        const occurrence = messageCounts.get(key) ?? 0;
+        messageCounts.set(key, occurrence + 1);
+
+        return toPluginDiagnostic(error, document, occurrence);
+    });
 }
 
 export function toDiagnostic(
@@ -91,9 +103,10 @@ export function toLintDiagnostic(
 export function toPluginDiagnostic(
     error: PluginMessage,
     document: vscode.TextDocument,
+    occurrence = 0,
 ): vscode.Diagnostic {
     const diagnostic = new vscode.Diagnostic(
-        getPluginRange(error, document),
+        getPluginRange(error, document, occurrence),
         formatPluginMessage(error),
         getSeverity(error),
     );
@@ -144,19 +157,23 @@ function getLintRange(error: YfmLintError, document: vscode.TextDocument): vscod
     return new vscode.Range(line, start, line, Math.max(start + 1, end));
 }
 
-function getPluginRange(error: PluginMessage, document: vscode.TextDocument): vscode.Range {
+function getPluginRange(
+    error: PluginMessage,
+    document: vscode.TextDocument,
+    occurrence: number,
+): vscode.Range {
     const message = stripAnsi(error.message);
 
     if (message.startsWith('Link is unreachable: ') || message.startsWith('Title not found: ')) {
-        return findLinkRange(message, document);
+        return findLinkRange(message, document, occurrence);
     }
 
     if (message.startsWith('Asset not found: ') || message.startsWith('SVG ')) {
-        return findAssetRange(message, document);
+        return findAssetRange(message, document, occurrence);
     }
 
     if (message.startsWith('No such file or has no access to ')) {
-        return findIncludeRange(message, document);
+        return findIncludeRange(message, document, occurrence);
     }
 
     if (message.startsWith('Empty link in ')) {
@@ -174,7 +191,11 @@ function getPluginRange(error: PluginMessage, document: vscode.TextDocument): vs
     return fullLineRange(0, document);
 }
 
-function findLinkRange(message: string, document: vscode.TextDocument): vscode.Range {
+function findLinkRange(
+    message: string,
+    document: vscode.TextDocument,
+    occurrence: number,
+): vscode.Range {
     const match = /^(?:Link is unreachable|Title not found): (.+?) in /.exec(message);
 
     if (!match) {
@@ -184,13 +205,17 @@ function findLinkRange(message: string, document: vscode.TextDocument): vscode.R
     const href = stripAnsi(match[1]);
 
     return (
-        findTextRange(document, href) ??
-        findTextRange(document, href.replace(/_/g, '\\_')) ??
+        findTextRange(document, href, occurrence) ??
+        findTextRange(document, href.replace(/_/g, '\\_'), occurrence) ??
         fullLineRange(0, document)
     );
 }
 
-function findAssetRange(message: string, document: vscode.TextDocument): vscode.Range {
+function findAssetRange(
+    message: string,
+    document: vscode.TextDocument,
+    occurrence: number,
+): vscode.Range {
     const assetMatch = /^Asset not found: (.+?) in /.exec(message);
     const svgMatch = /^SVG (.+?) from (.+?) not found$/.exec(message);
     const assetPath = assetMatch?.[1] ?? svgMatch?.[1];
@@ -198,9 +223,9 @@ function findAssetRange(message: string, document: vscode.TextDocument): vscode.
 
     if (assetPath) {
         const range =
-            findTextRange(document, assetPath) ??
-            findTextRange(document, assetPath.replace(/([^\w./])/g, '\\$1')) ??
-            findTextRange(document, assetPath.replace(/_/g, '\\_'));
+            findTextRange(document, assetPath, occurrence) ??
+            findTextRange(document, assetPath.replace(/([^\w./])/g, '\\$1'), occurrence) ??
+            findTextRange(document, assetPath.replace(/_/g, '\\_'), occurrence);
 
         if (range) {
             return range;
@@ -208,7 +233,7 @@ function findAssetRange(message: string, document: vscode.TextDocument): vscode.
     }
 
     if (fromPath) {
-        const range = findTextRange(document, fromPath);
+        const range = findTextRange(document, fromPath, occurrence);
 
         if (range) {
             return range;
@@ -218,7 +243,11 @@ function findAssetRange(message: string, document: vscode.TextDocument): vscode.
     return fullLineRange(0, document);
 }
 
-function findIncludeRange(message: string, document: vscode.TextDocument): vscode.Range {
+function findIncludeRange(
+    message: string,
+    document: vscode.TextDocument,
+    occurrence: number,
+): vscode.Range {
     const match = /^No such file or has no access to (.+?) in /.exec(message);
 
     if (!match) {
@@ -226,7 +255,7 @@ function findIncludeRange(message: string, document: vscode.TextDocument): vscod
     }
 
     return (
-        findTextRange(document, match[1]) ??
+        findTextRange(document, match[1], occurrence) ??
         findDirectiveRange(document, /^\s*{%\s*include\b/, /^$/)
     );
 }
@@ -281,15 +310,31 @@ function findDirectiveRange(
     return fullLineRange(0, document);
 }
 
-function findTextRange(document: vscode.TextDocument, text: string): vscode.Range | undefined {
+function findTextRange(
+    document: vscode.TextDocument,
+    text: string,
+    occurrence = 0,
+): vscode.Range | undefined {
     const needle = stripAnsi(text);
+    let seen = 0;
 
     for (let line = 0; line < document.lineCount; line++) {
         const lineText = document.lineAt(line).text;
-        const start = lineText.indexOf(needle);
+        let fromIndex = 0;
 
-        if (start >= 0) {
-            return new vscode.Range(line, start, line, start + needle.length);
+        for (;;) {
+            const start = lineText.indexOf(needle, fromIndex);
+
+            if (start < 0) {
+                break;
+            }
+
+            if (seen === occurrence) {
+                return new vscode.Range(line, start, line, start + needle.length);
+            }
+
+            seen++;
+            fromIndex = start + needle.length;
         }
     }
 

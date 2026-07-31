@@ -19,7 +19,7 @@ export function matchLeadingAttrs(text: string): InlineAttrs | null {
         return null;
     }
 
-    const rawAttrs = m[1].slice(1, -1); // content between { and }
+    const rawAttrs = m[1].slice(1, -1);
     const {width, height} = parseInlineAttrs(m[1]);
 
     return {consumeLength: m[0].length, width, height, rawAttrs};
