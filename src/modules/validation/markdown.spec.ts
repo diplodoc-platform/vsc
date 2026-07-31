@@ -1,4 +1,5 @@
 import {describe, expect, it} from 'vitest';
+import {join} from 'path';
 
 import {validateMarkdown} from './markdown';
 
@@ -6,7 +7,7 @@ function createDocument(text: string) {
     const lines = text.split('\n');
 
     return {
-        fileName: '/Users/separatrix/Desktop/diplodoc/vsc/tests/mocks/notes.md',
+        fileName: join(__dirname, '../../../tests/mocks/notes.md'),
         getText: () => text,
         lineCount: lines.length,
         lineAt: (line: number) => ({text: lines[line] ?? ''}),
