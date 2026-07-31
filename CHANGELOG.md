@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/diplodoc-platform/vsc/compare/v1.3.1...v1.3.2) (2026-07-31)
+
+
+### Bug Fixes
+
+* fixed image sizes ([#201](https://github.com/diplodoc-platform/vsc/issues/201)) ([fd6906f](https://github.com/diplodoc-platform/vsc/commit/fd6906fd50a11c2cb14d854aa109b60ae8a2a5e0))
+
 ## [1.3.1](https://github.com/diplodoc-platform/vsc/compare/v1.3.0...v1.3.1) (2026-07-28)
 
 
