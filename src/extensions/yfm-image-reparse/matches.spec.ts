@@ -30,4 +30,41 @@ describe('findImageMatches', () => {
     it('ignores plain links without the leading !', () => {
         expect(findImageMatches('[text](./page.md)', new Set())).toHaveLength(0);
     });
+
+    it('returns null width, height, rawAttrs when no inline attrs', () => {
+        const [m] = findImageMatches('![](./a.png)', new Set());
+
+        expect(m).toMatchObject({width: null, height: null, rawAttrs: null});
+    });
+
+    it('captures width and rawAttrs from {width=600}', () => {
+        const [m] = findImageMatches('![](./a.png){width=600}', new Set());
+        const {length} = m;
+
+        expect(m).toMatchObject({src: './a.png', width: '600', rawAttrs: 'width=600'});
+        expect(length).toBe('![](./a.png){width=600}'.length);
+    });
+
+    it('captures both dimensions', () => {
+        const [m] = findImageMatches('![](./a.png){width=400 height=200}', new Set());
+
+        expect(m).toMatchObject({width: '400', height: '200'});
+    });
+
+    it('preserves arbitrary attrs in rawAttrs', () => {
+        const [m] = findImageMatches('![](./a.png){width=400 inline=false}', new Set());
+
+        expect(m).toMatchObject({
+            width: '400',
+            rawAttrs: 'width=400 inline=false',
+        });
+    });
+
+    it('consumes the {attrs} so it is not left as text', () => {
+        const [m] = findImageMatches('prefix ![](./a.png){width=400} suffix', new Set());
+        const {index, length} = m;
+
+        expect(index).toBe(7);
+        expect(length).toBe('![](./a.png){width=400}'.length);
+    });
 });

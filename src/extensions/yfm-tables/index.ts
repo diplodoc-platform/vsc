@@ -22,12 +22,6 @@ export const YfmTables: ExtensionAuto = (builder) => {
 
         state.out = state.out.slice(0, before) + padGfmBlock(raw);
     });
-
-    builder.overrideNodeSerializerSpec('doc', (prev) => (state, node, parent, index) => {
-        prev(state, node, parent, index);
-
-        state.out = state.out.replace(/\n{3,}/g, '\n\n');
-    });
 };
 
 function serializeCompactBody(state: State, tbody: PMNode) {
@@ -41,7 +35,7 @@ function serializeCompactBody(state: State, tbody: PMNode) {
                 state.write('|');
             }
 
-            const hasContent = td.textContent.trim().length > 0;
+            const hasContent = td.firstChild !== null && td.firstChild.childCount > 0;
 
             if (hasContent && td.firstChild) {
                 state.write(' ');

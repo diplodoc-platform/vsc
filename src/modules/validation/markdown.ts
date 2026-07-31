@@ -104,6 +104,7 @@ export async function validateMarkdown(
         pluginOptions: {
             path: filePath,
             root,
+            svgInline: {enabled: false},
             log: {
                 error(message: string) {
                     pluginMessages.push({level: 'error', message});

@@ -55,6 +55,8 @@ interface EditorInternals {
     _extraSetContentFields(): Record<string, unknown>;
     _onShowFileContent(content: string, fileName: string, isNewPanel: boolean): void;
     _onWebviewMessage(message: Record<string, unknown>): Promise<void>;
+    _transformForWebview(text: string, document: vscode.TextDocument): string;
+    _transformFromWebview(text: string, document: vscode.TextDocument): string;
 }
 
 function makeEditor() {
@@ -126,6 +128,40 @@ describe('MdEditor._onShowFileContent', () => {
         expect(postMessage).toHaveBeenCalledWith(
             expect.objectContaining({command: 'setContent', text: 'text', fileName: 'file.md'}),
         );
+    });
+});
+
+describe('MdEditor webview transforms', () => {
+    const document = {} as vscode.TextDocument;
+
+    it('round-trips liquid variables through the webview transforms', () => {
+        const editor = makeEditor();
+        const src = '# Presets\n\nПресет {{ aaa.b }} {{aaa.c.d}} {{dddd}}\n';
+
+        const forWebview = access(editor)._transformForWebview(src, document);
+        const back = access(editor)._transformFromWebview(forWebview, document);
+
+        expect(back).toBe(src);
+    });
+
+    it('passes liquid variables to the webview without escaping', () => {
+        const editor = makeEditor();
+        const src = '{% list tabs group=os %}\n\n- {{ presets_text }}\n\n{% endlist %}';
+
+        const forWebview = access(editor)._transformForWebview(src, document);
+
+        expect(forWebview).toContain('- {{ presets_text }}');
+        expect(forWebview).not.toContain('\\{\\{');
+    });
+
+    it('does not strip literal escaped braces coming from the editor', () => {
+        const editor = makeEditor();
+        const fromEditor =
+            '{% list tabs group=os %}\n\n- \\{\\{ presets_text \\}\\}\n\n{% endlist %}';
+
+        const back = access(editor)._transformFromWebview(fromEditor, document);
+
+        expect(back).toContain('- \\{\\{ presets_text \\}\\}');
     });
 });
 
