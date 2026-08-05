@@ -35,3 +35,19 @@ describe('frontmatter diagnostics', () => {
         expect(rewrittenDiagnostics).toEqual([]);
     });
 });
+
+describe('leading diagnostics', () => {
+    it('validates meta against the frontmatter schema', async () => {
+        const diagnostics = await getDiagnostics(
+            {
+                type: 'leading',
+                startLine: 0,
+                endLine: 3,
+                content: ['meta:', '  noIndex: invalid'].join('\n'),
+            },
+            'leading',
+        );
+
+        expect(diagnostics.some(({message}) => message.includes('boolean'))).toBe(true);
+    });
+});

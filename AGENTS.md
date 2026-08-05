@@ -829,3 +829,5 @@ Manual test files in `tests/mocks/`: `toc.yaml`, `pc.yaml`, `presets.yaml`, `red
 7. **Diagnostic severity override**: yaml-language-server returns all schema violations as warnings. We promote type mismatches and missing required properties to errors for better UX.
 
 8. **No dependency on Red Hat YAML extension**: the extension is fully self-contained. No `yamlValidation` contribution in package.json.
+
+9. **Local cross-schema resolution**: schemas can reference other `@diplodoc/ajv` schemas by their public `$id`. `yaml-service.ts` resolves these references from the imported schema objects so validation and completion do not depend on network access.

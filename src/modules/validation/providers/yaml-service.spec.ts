@@ -1,4 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {frontmatterSchemaJson} from '@diplodoc/ajv';
 
 const getLanguageService = vi.fn();
 
@@ -61,6 +62,28 @@ describe('yaml-service', () => {
             uri: 'diplodoc://fm-schema',
             fileMatch: ['diplodoc://fm.yaml'],
         });
+    });
+
+    it('resolves the frontmatter schema locally', async () => {
+        const service = {
+            configure: vi.fn(),
+        };
+        getLanguageService.mockReturnValue(service);
+
+        const {getConfiguredService} = await import('./yaml-service');
+
+        getConfiguredService();
+
+        const [{schemaRequestService}] = getLanguageService.mock.calls[0];
+        const schemaId = (frontmatterSchemaJson as {$id: string}).$id;
+
+        await expect(schemaRequestService(schemaId)).resolves.toBe(
+            JSON.stringify(frontmatterSchemaJson),
+        );
+        await expect(schemaRequestService(schemaId.replace(/#$/, ''))).resolves.toBe(
+            JSON.stringify(frontmatterSchemaJson),
+        );
+        await expect(schemaRequestService('https://example.com/schema')).resolves.toBe('{}');
     });
 
     it('creates virtual documents with incrementing versions', async () => {

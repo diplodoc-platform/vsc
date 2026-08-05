@@ -22,6 +22,11 @@ interface SchemaEntry {
     name: string;
 }
 
+const FRONTMATTER_SCHEMA_ID = String((frontmatterSchemaJson as {$id?: string}).$id).replace(
+    /#$/,
+    '',
+);
+
 function title(schema: object): string {
     return (schema as {title?: string}).title ?? '';
 }
@@ -51,7 +56,13 @@ let versionCounter = 0;
 export function getConfiguredService(): LanguageService {
     if (!service) {
         service = getLanguageService({
-            schemaRequestService: () => Promise.resolve('{}'),
+            schemaRequestService: (uri) => {
+                if (uri.replace(/#$/, '') === FRONTMATTER_SCHEMA_ID) {
+                    return Promise.resolve(JSON.stringify(frontmatterSchemaJson));
+                }
+
+                return Promise.resolve('{}');
+            },
             workspaceContext: {
                 resolveRelativePath: (relativePath: string) => relativePath,
             },
