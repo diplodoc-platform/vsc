@@ -306,7 +306,7 @@
     "lock": "npm install --no-workspaces --package-lock-only --ignore-scripts"
   },
   "dependencies": {
-    "@diplodoc/ajv": "^0.2.1",
+    "@diplodoc/ajv": "^0.3.0",
     "@diplodoc/html-extension": "^2.9.12",
     "@diplodoc/latex-extension": "^2.0.1",
     "@diplodoc/mermaid-extension": "^2.2.1",
