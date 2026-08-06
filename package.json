@@ -347,7 +347,7 @@
     "lint-staged": "^16.4.0",
     "node-fetch": "^3.3.2",
     "sass": "^1.98.0",
-    "typescript": "^6.0.2",
+    "typescript": "6.0.3",
     "vitest": "^4.1.4"
   },
   "overrides": {
