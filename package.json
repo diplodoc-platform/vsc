@@ -311,7 +311,7 @@
     "@diplodoc/latex-extension": "^2.0.2",
     "@diplodoc/mermaid-extension": "^2.2.2",
     "@diplodoc/transform": "^4.77.5",
-    "@diplodoc/utils": "^2.3.5",
+    "@diplodoc/utils": "^2.3.6",
     "@diplodoc/yfmlint": "^1.7.6",
     "@gravity-ui/components": "^4.18.0",
     "@gravity-ui/icons": "^2.18.0",
