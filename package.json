@@ -307,7 +307,7 @@
   },
   "dependencies": {
     "@diplodoc/ajv": "^0.3.0",
-    "@diplodoc/html-extension": "^2.9.12",
+    "@diplodoc/html-extension": "^2.9.13",
     "@diplodoc/latex-extension": "^2.0.2",
     "@diplodoc/mermaid-extension": "^2.2.2",
     "@diplodoc/transform": "^4.77.5",
