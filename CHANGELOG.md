@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.5](https://github.com/diplodoc-platform/vsc/compare/v1.3.4...v1.3.5) (2026-08-10)
+
+
+### Bug Fixes
+
+* **deps:** Update @diplodoc/ajv@0.4.3 ([#216](https://github.com/diplodoc-platform/vsc/issues/216)) ([2e28987](https://github.com/diplodoc-platform/vsc/commit/2e28987332cf7218915ec8c3b51d036b0c8c36ad))
+* Upgrade typescript to 6.0.3 DOCSTOOLS-6359 ([4e5658b](https://github.com/diplodoc-platform/vsc/commit/4e5658bd57b06f631ba06dba9f2d1e93ef2d89a6))
+
 ## [1.3.4](https://github.com/diplodoc-platform/vsc/compare/v1.3.3...v1.3.4) (2026-08-04)
 
 
