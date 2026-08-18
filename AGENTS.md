@@ -256,7 +256,7 @@ Errors arrive via **two independent channels** — do not confuse them:
 
 | Channel             | Source                                                                   | Has `lineNumber`? | Handled by                                  |
 | ------------------- | ------------------------------------------------------------------------ | ----------------- | ------------------------------------------- |
-| **Lint errors**     | yfmlint rules (YFM001–YFM018)                                            | Yes               | `toLintDiagnostic()` → `getLintRange()`     |
+| **Lint errors**     | yfmlint rules (YFM001–YFM021)                                            | Yes               | `toLintDiagnostic()` → `getLintRange()`     |
 | **Plugin messages** | Transform plugins via `log.error/warn/info` callbacks in `pluginOptions` | **No**            | `toPluginDiagnostic()` → `getPluginRange()` |
 
 `getPluginRange()` must figure out the range from the message text alone. It uses `DIRECTIVE_HANDLERS` table (regex → document search) and specific handlers for links/assets/includes.
@@ -303,7 +303,7 @@ Used by `validateMarkdown()` to load:
 
 Both config files live at the documentation project root (never nested deeper).
 
-Available rules (yfmlint 1.7.0, no YFM012–YFM017, no YFM019):
+Available rules (no YFM012–YFM017, no YFM019):
 
 | Rule   | Alias                              | Default level |
 | ------ | ---------------------------------- | ------------- |
@@ -320,6 +320,9 @@ Available rules (yfmlint 1.7.0, no YFM012–YFM017, no YFM019):
 | YFM011 | max-svg-size                       | warn          |
 | YFM018 | term-definition-from-include       | info          |
 | YFM020 | invalid-yfm-directive              | warn          |
+| YFM021 | empty-auto-heading-anchor          | warn          |
+
+YFM021 relies on a marker produced by the transform anchors plugin during lint runs. Markdown validation passes `extractTitle: true`, matching the CLI: H1 is treated as the page title, while section headings with empty automatic anchors are reported as warnings.
 
 Local yfmlint source: `../packages/yfmlint`.
 

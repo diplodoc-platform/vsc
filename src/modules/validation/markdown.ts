@@ -104,6 +104,7 @@ export async function validateMarkdown(
         pluginOptions: {
             path: filePath,
             root,
+            extractTitle: true,
             svgInline: {enabled: false},
             log: {
                 error(message: string) {
