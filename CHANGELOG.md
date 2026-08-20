@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.8](https://github.com/diplodoc-platform/vsc/compare/v1.3.7...v1.3.8) (2026-08-20)
+
+
+### Bug Fixes
+
+* **deps:** Update @diplodoc/mermaid-extension@2.2.3 ([fa07adb](https://github.com/diplodoc-platform/vsc/commit/fa07adb2ce1d665f6b5817c6b4cd8bf807b8d5e7))
+
 ## [1.3.7](https://github.com/diplodoc-platform/vsc/compare/v1.3.6...v1.3.7) (2026-08-13)
 
 
