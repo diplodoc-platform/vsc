@@ -309,7 +309,7 @@
     "@diplodoc/ajv": "^0.4.4",
     "@diplodoc/html-extension": "^2.9.13",
     "@diplodoc/latex-extension": "^2.0.2",
-    "@diplodoc/mermaid-extension": "^2.2.2",
+    "@diplodoc/mermaid-extension": "^2.2.3",
     "@diplodoc/transform": "^4.77.5",
     "@diplodoc/utils": "^2.3.6",
     "@diplodoc/yfmlint": "^1.9.1",
