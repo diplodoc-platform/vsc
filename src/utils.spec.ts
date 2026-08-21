@@ -56,6 +56,12 @@ describe('insertElement', () => {
         expect(result).toBe('@[]()');
     });
 
+    it('returns comment', () => {
+        const result = insertElement('comment');
+
+        expect(result).toBe('[//]: # (Comment text)');
+    });
+
     it('returns mermaid block', () => {
         const result = insertElement('mermaid');
 

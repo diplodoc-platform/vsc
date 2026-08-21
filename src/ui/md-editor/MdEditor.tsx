@@ -3,6 +3,7 @@ import {wYfmPageConstructorItemData} from '@gravity-ui/markdown-editor-page-cons
 import {ThemeProvider, Toaster, ToasterProvider, configure} from '@gravity-ui/uikit';
 import {useMemo, useState} from 'react';
 
+import {wYfmCommentItemData} from '../../extensions/yfm-comment/toolbar';
 import {wYfmIncludeItemData} from '../../extensions/yfm-include/toolbar';
 import {wYfmVideoItemData} from '../../extensions/yfm-video/toolbar';
 import {ErrorBoundary} from '../error/ErrorBoundary';
@@ -38,6 +39,7 @@ const wysiwygToolbarConfig = [
         wYfmPageConstructorItemData,
         wYfmIncludeItemData,
         wYfmVideoItemData,
+        wYfmCommentItemData,
     ],
 ];
 

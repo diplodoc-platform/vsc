@@ -130,6 +130,11 @@
         "command": "diplodoc.insertVideo",
         "key": "alt+v",
         "when": "editorLangId == markdown && editorTextFocus"
+      },
+      {
+        "command": "diplodoc.insertComment",
+        "key": "alt+g",
+        "when": "editorLangId == markdown && editorTextFocus"
       }
     ],
     "commands": [
@@ -195,6 +200,10 @@
       {
         "command": "diplodoc.insertVideo",
         "title": "Diplodoc: Insert Video"
+      },
+      {
+        "command": "diplodoc.insertComment",
+        "title": "Diplodoc: Insert YFM Comment"
       },
       {
         "command": "diplodoc.findFileReferences",

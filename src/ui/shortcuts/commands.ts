@@ -84,6 +84,7 @@ export const editorShortcuts: EditorCommand[] = [
         alt: true,
         handler: (editor) => {
             editor.focus();
+
             if (editor.currentMode === 'wysiwyg') {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (editor as any).actions?.toYfmInclude?.run();
@@ -176,6 +177,21 @@ export const editorShortcuts: EditorCommand[] = [
 
             if (editor.currentMode !== 'wysiwyg') {
                 insertAtCursor(editor, insertElement('video'));
+            }
+        },
+    },
+    {
+        action: 'insertComment',
+        key: 'g',
+        alt: true,
+        handler: (editor) => {
+            editor.focus();
+
+            if (editor.currentMode === 'wysiwyg') {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (editor as any).actions?.createYfmComment?.run();
+            } else {
+                insertAtCursor(editor, insertElement('comment'));
             }
         },
     },

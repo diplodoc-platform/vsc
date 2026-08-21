@@ -88,6 +88,7 @@ code --install-extension diplodoc.diplodoc-vsc-extension
 | `Alt+P`   | Вставить page-constructor  |
 | `Alt+H`   | Вставить HTML-блок         |
 | `Alt+V`   | Вставить видео             |
+| `Alt+G`   | Вставить YFM-комментарий   |
 
 ### Валидация
 

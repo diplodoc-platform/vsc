@@ -88,6 +88,7 @@ The editor supports two modes: **WYSIWYG** and **Markup**. Set the default mode 
 | `Alt+P`  | Insert Page Constructor |
 | `Alt+H`  | Insert HTML Block       |
 | `Alt+V`  | Insert Video            |
+| `Alt+G`  | Insert YFM Comment      |
 
 ### Validation
 
