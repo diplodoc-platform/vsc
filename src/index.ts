@@ -95,6 +95,10 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
+        vscode.commands.registerCommand('diplodoc.insertComment', () => insertBlock('comment')),
+    );
+
+    context.subscriptions.push(
         vscode.window.onDidChangeActiveTextEditor((editor) => {
             updateYamlContext(editor);
 

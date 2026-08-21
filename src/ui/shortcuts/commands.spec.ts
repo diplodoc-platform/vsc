@@ -254,4 +254,30 @@ describe('editorShortcuts', () => {
         expect(insertElement).toHaveBeenCalledWith('video');
         expect(insertAtCursor).toHaveBeenCalledWith(editor, '@[]()');
     });
+
+    it('does not insert comment in wysiwyg mode', () => {
+        const editor = {
+            currentMode: 'wysiwyg',
+            focus: vi.fn(),
+        };
+
+        findShortcut('insertComment').handler(editor as never);
+
+        expect(editor.focus).toHaveBeenCalledOnce();
+        expect(insertAtCursor).not.toHaveBeenCalled();
+    });
+
+    it('inserts comment snippet in markdown mode', () => {
+        const editor = {
+            currentMode: 'markup',
+            focus: vi.fn(),
+        };
+        vi.mocked(insertElement).mockReturnValue('[//]: # (Comment text)');
+
+        findShortcut('insertComment').handler(editor as never);
+
+        expect(editor.focus).toHaveBeenCalledOnce();
+        expect(insertElement).toHaveBeenCalledWith('comment');
+        expect(insertAtCursor).toHaveBeenCalledWith(editor, '[//]: # (Comment text)');
+    });
 });

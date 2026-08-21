@@ -9,6 +9,8 @@ import {YfmHtmlBlock} from '@gravity-ui/markdown-editor/extensions/additional/Yf
 import {YfmPageConstructorExtension} from '@gravity-ui/markdown-editor-page-constructor-extension';
 import {wYfmPageConstructorItemData} from '@gravity-ui/markdown-editor-page-constructor-extension/configs';
 
+import {YfmComment} from '../../extensions/yfm-comment';
+import {wYfmCommentItemData} from '../../extensions/yfm-comment/toolbar';
 import {YfmInclude} from '../../extensions/yfm-include';
 import {wYfmIncludeItemData} from '../../extensions/yfm-include/toolbar';
 import {YfmFrontmatter} from '../../extensions/yfm-frontmatter';
@@ -54,6 +56,7 @@ const commandMenuActions = [
     wYfmPageConstructorItemData,
     wYfmHtmlBlockItemData,
     wYfmIncludeItemData,
+    wYfmCommentItemData,
 ];
 
 export function useEditor({setFileName, preset, mode}: EditorParams) {
@@ -106,6 +109,7 @@ export function useEditor({setFileName, preset, mode}: EditorParams) {
                         lang: (document.documentElement.lang || 'en') as 'en',
                     },
                 });
+                builder.use(YfmComment);
                 builder.use(YfmHtmlBlock, {});
                 builder.use(YfmInclude);
                 builder.use(YfmFrontmatter);

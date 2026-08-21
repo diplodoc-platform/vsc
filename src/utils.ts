@@ -13,7 +13,8 @@ export type ElementType =
     | 'frontmatter'
     | 'pageConstructor'
     | 'htmlBlock'
-    | 'video';
+    | 'video'
+    | 'comment';
 
 export function insertElement(type: ElementType): string {
     const elements = {
@@ -30,6 +31,7 @@ export function insertElement(type: ElementType): string {
             '::: page-constructor\nblocks:\n  - type: "header-block"\n    title: "Title"\n    description: "Description"\n:::',
         htmlBlock: '::: html\n<div>HTML content</div>\n:::',
         video: '@[]()',
+        comment: '[//]: # (Comment text)',
     };
 
     return elements[type];
