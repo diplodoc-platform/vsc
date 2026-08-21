@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.0](https://github.com/diplodoc-platform/vsc/compare/v1.3.8...v1.4.0) (2026-08-21)
+
+
+### Features
+
+* added yfm comments ([#227](https://github.com/diplodoc-platform/vsc/issues/227)) ([bc2455e](https://github.com/diplodoc-platform/vsc/commit/bc2455e0b4719b104595336169de41ffd00a11a2))
+
+
+### Bug Fixes
+
+* **yfmlint:** utf16 in headers [#6545](https://github.com/diplodoc-platform/vsc/issues/6545) ([#224](https://github.com/diplodoc-platform/vsc/issues/224)) ([bb8ec23](https://github.com/diplodoc-platform/vsc/commit/bb8ec2318d8959dea9db7cd16ebf7f9f50b9bb4d))
+
 ## [1.3.8](https://github.com/diplodoc-platform/vsc/compare/v1.3.7...v1.3.8) (2026-08-20)
 
 
