@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.1](https://github.com/diplodoc-platform/vsc/compare/v1.4.0...v1.4.1) (2026-08-25)
+
+
+### Bug Fixes
+
+* avoid false markdown diagnostics ([#234](https://github.com/diplodoc-platform/vsc/issues/234)) ([33a3afc](https://github.com/diplodoc-platform/vsc/commit/33a3afc38fa557b9c0ec62902910c20511cc1a4b))
+* **deps:** Update @diplodoc/yfmlint@1.9.2 ([#231](https://github.com/diplodoc-platform/vsc/issues/231)) ([1117d7e](https://github.com/diplodoc-platform/vsc/commit/1117d7ede7252a3a1a3f693a2f95a2b00205af9d))
+
 ## [1.4.0](https://github.com/diplodoc-platform/vsc/compare/v1.3.8...v1.4.0) (2026-08-21)
 
 
