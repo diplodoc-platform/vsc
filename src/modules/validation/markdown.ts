@@ -25,8 +25,9 @@ import {
     parseMissingAnchor,
     toDiagnostics,
 } from './utils';
-import {isYaMakeProvidedLink} from './ya-make';
 import {validateLiquidConditions} from './liquid-conditions';
+import {createOpenApiLinkSkipper} from './openapi';
+import {isYaMakeProvidedLink} from './ya-make';
 
 function liquidConditionDiagnostics(content: string): vscode.Diagnostic[] {
     return validateLiquidConditions(content).map((error) => {
@@ -91,6 +92,7 @@ export async function validateMarkdown(
     const yfmlintConfig = findConfig(root, '.yfmlint');
     const allowHtml = yfmConfig?.allowHtml ?? yfmConfig?.allowHTML ?? false;
     const isFileIncluded = isIncluded(filePath);
+    const needSkipLinkFn = createOpenApiLinkSkipper(filePath);
 
     const lintConfig = buildLintConfig(
         yfmlintConfig,
@@ -105,6 +107,7 @@ export async function validateMarkdown(
             path: filePath,
             root,
             extractTitle: true,
+            needSkipLinkFn,
             svgInline: {enabled: false},
             log: {
                 error(message: string) {
