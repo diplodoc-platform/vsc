@@ -307,6 +307,12 @@ describe('findMarkdownColors', () => {
         expect(matches.map((m) => m.raw)).toEqual(['red', 'blue']);
     });
 
+    it('does not treat inline Liquid conditions as colors', () => {
+        const doc = mockDocument('{% if lang == "ru" %}(https://example.com/){% endif %}');
+
+        expect(findMarkdownColors(doc)).toHaveLength(0);
+    });
+
     it('skips fenced code blocks', () => {
         const doc = mockDocument(
             ['```', '{red}(not highlighted)', '```', '{blue}(yes)'].join('\n'),

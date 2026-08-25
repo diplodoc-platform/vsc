@@ -57,6 +57,7 @@ src/
 │   │   ├── parser.ts                           # Extract frontmatter + ::: page-constructor blocks from .md
 │   │   ├── page-constructor.ts                 # Thin wrapper: getDiagnostics(content, schemaType)
 │   │   ├── markdown.ts                         # @diplodoc/yfmlint integration for .md linting
+│   │   ├── openapi.ts                          # Recognize generated OpenAPI endpoint links
 │   │   ├── utils.ts                            # yfmlint/plugin errors → vscode.Diagnostic; findYfmConfig()
 │   │   └── providers/
 │   │       ├── yaml-service.ts                 # yaml-language-server singleton, ALL schemas registered
@@ -271,6 +272,8 @@ Errors arrive via **two independent channels** — do not confuse them:
 4. **User's `.yfmlint` overrides**: processed by `processYfmlintConfig()` — **highest priority**, spread last, can override everything above (including `MD033`/`MD041` and `diplodoc.lintRules`)
 
 Both `diplodoc.lintRules` and `.yfmlint` entries spread on top of extension defaults, so the user **can** re-enable `MD013` or set `default: false`. `.yfmlint` wins over `diplodoc.lintRules` on any conflicting key. `diplodoc.lintRules` is read in `validation/index.ts` and passed through `validateMd()` → `validateMarkdown()` → `buildLintConfig()`.
+
+OpenAPI endpoint links are skipped by the links plugin only when they are inside an includer's generated directory and their filename matches an `operationId` in that includer's specification. Typos remain unreachable-link errors.
 
 ##### `.yfmlint` config format
 
@@ -681,9 +684,9 @@ CSS keyword names.
 
 Handles colorify markup `{colorName}(text)` — the same syntax as `@diplodoc/color-extension`.
 
-1. `findMarkdownColors()` scans lines with `MD_COLOR_RE` (`/\{([^{}]+)\}\(/g`) — the `}(`
-   suffix is what distinguishes colorify from `{#anchor}` / `{.class}` (markdown-it-attrs),
-   which are therefore never matched
+1. `findMarkdownColors()` scans lines with `MD_COLOR_RE` (`/\{(?!%)([^{}]+)\}\(/g`) — the
+   `}(` suffix distinguishes colorify from `{#anchor}` / `{.class}` (markdown-it-attrs), while
+   `(?!%)` excludes Liquid tags such as `{% if ... %}(`
 2. Fenced code blocks (`FENCE_RE`) are skipped so code samples aren't touched
 3. The swatch range is the color-name token (between `{` and `}`); valid colors get a `ColorInformation`
 4. Presentations are **bare** (no quotes) — picking a color rewrites `{red}(…)` → `{#ff0000}(…)`
