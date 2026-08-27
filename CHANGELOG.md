@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.2](https://github.com/diplodoc-platform/vsc/compare/v1.4.1...v1.4.2) (2026-08-27)
+
+
+### Bug Fixes
+
+* **deps:** Update @diplodoc/transform@4.77.15 ([ee44d5f](https://github.com/diplodoc-platform/vsc/commit/ee44d5f45bbc225e2feaa2f000b5d18cbc89f87e))
+
 ## [1.4.1](https://github.com/diplodoc-platform/vsc/compare/v1.4.0...v1.4.1) (2026-08-25)
 
 
