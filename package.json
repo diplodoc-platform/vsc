@@ -6,7 +6,6 @@
   "description": "Diplodoc Extension for VSC",
   "version": "1.4.2",
   "license": "MIT",
-  "telemetryKey": "YOUR-APPLICATION-INSIGHTS-CONNECTION-STRING",
   "repository": {
     "type": "git",
     "url": "https://github.com/diplodoc-platform/vsc"
@@ -312,7 +311,8 @@
     "remove-vsix": "rm -f *.vsix",
     "pre-commit": "lint-staged",
     "prepare": "husky || true",
-    "lock": "npm install --no-workspaces --package-lock-only --ignore-scripts"
+    "lock": "npm install --no-workspaces --package-lock-only --ignore-scripts",
+    "compile:telemetry": "node scripts/build-telemetry.cjs"
   },
   "dependencies": {
     "@diplodoc/ajv": "^0.4.4",
@@ -327,7 +327,6 @@
     "@gravity-ui/markdown-editor": "^15.46.0",
     "@gravity-ui/markdown-editor-page-constructor-extension": "^0.1.0",
     "@gravity-ui/uikit": "^7.37.0",
-    "@vscode/extension-telemetry": "^1.5.2",
     "colord": "^2.9.3",
     "highlight.js": "^11.11.1",
     "js-yaml": "^4.1.1",
@@ -352,9 +351,11 @@
     "@vscode/vsce": "^3.7.1",
     "esbuild": "^0.27.4",
     "esbuild-sass-plugin": "^3.7.0",
+    "eslint": "8.57.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "node-fetch": "^3.3.2",
+    "prettier": "3.9.6",
     "sass": "^1.98.0",
     "typescript": "6.0.3",
     "vitest": "^4.1.4"

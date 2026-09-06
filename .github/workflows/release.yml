@@ -99,6 +99,8 @@ jobs:
 
       - name: Build package
         if: inputs.release_type != 'deprecate'
+        env:
+          DIPLODOC_TELEMETRY_ENDPOINT: ${{ vars.DIPLODOC_TELEMETRY_ENDPOINT }}
         run: npm run build
 
       # === STABLE RELEASE STEPS ===

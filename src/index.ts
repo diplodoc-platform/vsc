@@ -11,10 +11,10 @@ import * as telemetry from './modules/telemetry';
 import {TocEditor} from './modules/toc-editor/editor';
 import {insertBlock, openMdEditor, openTocEditor} from './commands';
 import {isBlocksYaml, isToc} from './utils';
-import {EVENTS, TELEMETRY_CONNECTION_STRING} from './modules/telemetry/constants';
+import {EVENTS} from './modules/telemetry/constants';
 
-export function activate(context: vscode.ExtensionContext) {
-    const reporter = telemetry.activate(TELEMETRY_CONNECTION_STRING);
+export async function activate(context: vscode.ExtensionContext) {
+    const reporter = await telemetry.activate(context);
 
     context.subscriptions.push(reporter);
     telemetry.sendEvent(EVENTS.EXTENSION_ACTIVATED);
@@ -145,4 +145,5 @@ async function updateYamlContext(editor?: vscode.TextEditor) {
 
 export function deactivate() {
     validation.deactivate();
+    return telemetry.deactivate();
 }

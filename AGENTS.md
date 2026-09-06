@@ -22,6 +22,10 @@ After completing a task, if you discovered new knowledge about the project's arc
 
 Do not duplicate — check that the section is not already described. Update existing sections if information has changed. Place new content in the appropriate existing section, or create a new section if needed.
 
+### Code Style
+
+Do not add comments to authored code. Separate logical blocks with blank lines. Use braces and multiline bodies for conditionals and loops, including early returns. The standalone telemetry function build also removes generated comments and formats control-flow blocks.
+
 ### Language
 
 This document is written in English. Keep all additions in English for consistency.
@@ -835,3 +839,15 @@ Manual test files in `tests/mocks/`: `toc.yaml`, `pc.yaml`, `presets.yaml`, `red
 7. **Diagnostic severity override**: yaml-language-server returns all schema violations as warnings. We promote type mismatches and missing required properties to errors for better UX.
 
 8. **No dependency on Red Hat YAML extension**: the extension is fully self-contained. No `yamlValidation` contribution in package.json.
+
+## Telemetry
+
+- `src/modules/telemetry/index.ts` uses VS Code `createTelemetryLogger` with a custom sender, no Azure SDK. Existing `sendEvent`, `sendError`, `sendException` call sites are preserved. Exceptions become their named `properties.event` with an allowlisted `errorType`; messages/stacks are never sent. Native common properties and automatic unhandled errors are disabled.
+- `schema.ts` is the shared privacy/validation boundary for the extension and the receiver. All 17 event names are preserved, but only explicit enumerated dimensions and bounded numeric counters are exported. Add new approved fields here, not by forwarding arbitrary properties.
+- VS Code prefixes sender event names with the full extension ID; `index.ts` strips only that exact prefix. Usage/error enablement comes from the native logger. Changing enablement filters the pending queue and aborts an in-flight batch; a generation check prevents requeueing cancelled data after a quick disable/re-enable.
+- `sender.ts` keeps up to 100 pending events in memory, sends up to 20 every 10 seconds, expires after 5 minutes and attempts at most 3 times. Original event UUIDs survive retries; storage/CHV do not guarantee deduplication. Shutdown tries one final batch. The persistent random installation UUID is stored in globalState without registering it for Settings Sync; every activation gets a fresh session UUID.
+- `DIPLODOC_TELEMETRY_ENDPOINT` is embedded by `esbuild.js` at build time. Empty means no telemetry. Use the API Gateway HTTPS URL ending in `/telemetry`; do not use the private function URL or embed credentials. Ordinary builds without the variable remain disabled. The VSIX and npm release workflows pass the same GitHub Actions repository variable into their build steps.
+- `npm run compile:telemetry` builds a separate Node.js 22 `build/telemetry/index.js` (`index.handler`) plus fresh console/HTTP test fixtures. `telemetry/api-gateway.yaml` invokes the existing private function; all infrastructure changes remain manual. Receiver resources are excluded from VSIX. See `telemetry/README.md` for manual deployment and acceptance checks.
+- The collector revalidates a versioned JSON batch (64 KiB, 1–20 events), then posts CRLF-separated counters to `https://yandex.ru/clck/click` using `/table=rum_events/path=690.32`. Project is fixed to `diplodoc-vsc`; `TELEMETRY_ENVIRONMENT` is server-controlled and defaults to `testing`. No viewer, database, storage keys or incoming HTTP headers are used. 202 means upstream HTTP acceptance; rows in CHV are the ingestion proof.
+- CHV `yandexuid` is a decimal UInt64 derived from the random installation UUID with a project-scoped hash; it counts installations, not Passport accounts. Session, OS, VS Code version, approved dimensions/counters and receive time are in `additional`. Inherited IP/geolocation describes the function's egress. CHV project filters are not ACLs, and the shared service controls retention. Gateway abuse protection requires an SWS/Advanced Rate Limiter profile; the old gateway rate-limit extensions are unsupported. SWS attachment is deferred for the initial rollout by user decision, so it is not a release prerequisite and the current gateway has no configured SWS rate limit.
+- Event semantics matter for product analytics: `md-editor/mode` is emitted on webview `ready` with the configured initial mode, not on every mode switch. `project/init` is emitted after the CLI availability check, before the initialization flow completes, so it is not a success counter. `extension/activated` alone does not demonstrate deliberate feature use.
