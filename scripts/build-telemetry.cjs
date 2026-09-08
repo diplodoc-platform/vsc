@@ -4,10 +4,12 @@ const path = require('node:path');
 const {build} = require('esbuild');
 const {Linter} = require('eslint');
 const prettier = require('prettier');
-const ts = require('typescript');
 
 const root = path.resolve(__dirname, '..');
 const out = path.join(root, 'build/telemetry');
+const writeJson = (name, value) => {
+    writeFileSync(path.join(out, name), JSON.stringify(value, null, 2) + '\n');
+};
 
 async function main() {
     mkdirSync(out, {recursive: true});
@@ -22,18 +24,10 @@ async function main() {
         format: 'cjs',
         write: false,
         legalComments: 'none',
+        minifyWhitespace: true,
     });
 
-    const source = ts.createSourceFile(
-        'index.js',
-        result.outputFiles[0].text,
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.JS,
-    );
-
-    const code = ts.createPrinter({removeComments: true}).printFile(source);
-    const formatted = new Linter().verifyAndFix(code, {
+    const formatted = new Linter().verifyAndFix(result.outputFiles[0].text, {
         parserOptions: {ecmaVersion: 2022, sourceType: 'script'},
         rules: {
             curly: ['error', 'all'],
@@ -77,38 +71,33 @@ async function main() {
             {
                 name: 'extension/activated',
                 kind: 'usage',
-                properties: {},
-                measurements: {},
             },
             {
                 name: 'md-editor/opened',
                 kind: 'usage',
                 properties: {source: 'command', fileType: 'md'},
-                measurements: {},
             },
             {
                 name: 'validation/error',
                 kind: 'error',
                 properties: {errorType: 'TypeError'},
-                measurements: {},
             },
-        ].map((event) => ({...event, id: randomUUID(), timestamp: Date.now()})),
+        ].map((event) => ({
+            properties: {},
+            measurements: {},
+            ...event,
+            id: randomUUID(),
+            timestamp: Date.now(),
+        })),
     };
 
-    writeFileSync(path.join(out, 'test-payload.json'), JSON.stringify(payload, null, 2) + '\n');
-    writeFileSync(
-        path.join(out, 'test-event.json'),
-        JSON.stringify(
-            {
-                httpMethod: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                isBase64Encoded: false,
-                body: JSON.stringify(payload),
-            },
-            null,
-            2,
-        ) + '\n',
-    );
+    writeJson('test-payload.json', payload);
+    writeJson('test-event.json', {
+        httpMethod: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        isBase64Encoded: false,
+        body: JSON.stringify(payload),
+    });
     process.stdout.write(
         'Created build/telemetry/index.js, test-event.json (console), test-payload.json (HTTP).\n',
     );

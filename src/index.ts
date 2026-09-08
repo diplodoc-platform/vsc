@@ -14,9 +14,7 @@ import {isBlocksYaml, isToc} from './utils';
 import {EVENTS} from './modules/telemetry/constants';
 
 export async function activate(context: vscode.ExtensionContext) {
-    const reporter = await telemetry.activate(context);
-
-    context.subscriptions.push(reporter);
+    await telemetry.activate(context);
     telemetry.sendEvent(EVENTS.EXTENSION_ACTIVATED);
 
     validation.activate(context);

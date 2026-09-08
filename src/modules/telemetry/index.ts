@@ -10,10 +10,10 @@ let reporter: vscode.TelemetryLogger | undefined;
 let queue: EventQueue | undefined;
 let subscription: vscode.Disposable | undefined;
 
-export async function activate(context: vscode.ExtensionContext): Promise<vscode.Disposable> {
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
     dispose();
 
-    const disposable = {dispose};
+    context.subscriptions.push({dispose});
     const endpoint =
         typeof __DIPLODOC_TELEMETRY_ENDPOINT__ === 'string' ? __DIPLODOC_TELEMETRY_ENDPOINT__ : '';
 
@@ -21,10 +21,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<vscode
         const url = new URL(endpoint);
 
         if (url.protocol !== 'https:' || url.username || url.password || url.hash || url.search) {
-            return disposable;
+            return;
         }
     } catch {
-        return disposable;
+        return;
     }
 
     const key = 'telemetry.installationId';
@@ -36,7 +36,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<vscode
         try {
             await context.globalState.update(key, installationId);
         } catch {
-            return disposable;
+            return;
         }
     }
 
@@ -70,8 +70,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<vscode
 
     subscription = logger.onDidChangeEnableStates(update);
     update();
-
-    return disposable;
 }
 
 export function sendEvent(

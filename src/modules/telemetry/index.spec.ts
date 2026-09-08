@@ -53,6 +53,7 @@ const context = () => {
     const storage = new Map<string, unknown>();
 
     return {
+        subscriptions: [],
         extension: {
             id: 'diplodoc.diplodoc-vsc-extension',
             packageJSON: {version: '1.4.1'},
@@ -243,10 +244,12 @@ describe('extension telemetry', () => {
             'https://test.apigw.yandexcloud.net/telemetry',
         );
 
-        const disposable = await telemetry.activate(context());
+        const ctx = context();
+
+        await telemetry.activate(ctx);
 
         telemetry.sendEvent('settings/opened');
-        disposable.dispose();
+        ctx.subscriptions.forEach((disposable) => disposable.dispose());
         await vi.advanceTimersByTimeAsync(30000);
         expect(fetch).not.toHaveBeenCalled();
     });

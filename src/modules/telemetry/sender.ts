@@ -19,8 +19,8 @@ export class EventQueue {
     private generation = 0;
     private disposed = false;
 
-    private endpoint: string;
-    private common: Omit<TelemetryBatch, 'events'>;
+    private readonly endpoint: string;
+    private readonly common: Omit<TelemetryBatch, 'events'>;
 
     constructor(endpoint: string, common: Omit<TelemetryBatch, 'events'>) {
         this.endpoint = endpoint;

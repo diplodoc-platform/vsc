@@ -113,28 +113,24 @@ export function sanitizeEvent(name: string, properties: unknown, measurements: u
         ...(kind === 'error' ? {errorType: errorTypes} : {}),
     };
 
-    if (isRecord(properties)) {
-        for (const [key, values] of Object.entries(allowed)) {
-            const value = properties[key];
+    for (const [key, values] of Object.entries(allowed)) {
+        const value = isRecord(properties) ? properties[key] : undefined;
 
-            if (typeof value === 'string' && values.includes(value)) {
-                props[key] = value;
-            }
+        if (typeof value === 'string' && values.includes(value)) {
+            props[key] = value;
         }
     }
 
-    if (isRecord(measurements)) {
-        for (const key of counters[name] ?? []) {
-            const value = measurements[key];
+    for (const key of counters[name] ?? []) {
+        const value = isRecord(measurements) ? measurements[key] : undefined;
 
-            if (
-                typeof value === 'number' &&
-                Number.isSafeInteger(value) &&
-                value >= 0 &&
-                value <= 1_000_000
-            ) {
-                nums[key] = value;
-            }
+        if (
+            typeof value === 'number' &&
+            Number.isSafeInteger(value) &&
+            value >= 0 &&
+            value <= 1_000_000
+        ) {
+            nums[key] = value;
         }
     }
 
