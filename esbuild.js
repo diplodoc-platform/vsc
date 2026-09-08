@@ -5,6 +5,17 @@ const {sassPlugin} = require('esbuild-sass-plugin');
 
 const isWatch = process.argv.includes('--watch');
 const target = process.env.BUILD_TARGET ?? 'all';
+const telemetryEndpoint = process.env.DIPLODOC_TELEMETRY_ENDPOINT || '';
+
+if (telemetryEndpoint) {
+    const url = new URL(telemetryEndpoint);
+
+    if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash) {
+        throw new Error(
+            'DIPLODOC_TELEMETRY_ENDPOINT must be an HTTPS URL without credentials, query or fragment',
+        );
+    }
+}
 
 const browserPolyfills = {
     punycode: require.resolve('punycode/'),
@@ -160,6 +171,7 @@ if (target === 'ext' || target === 'all') {
             bundle: true,
             outfile: 'build/index.js',
             external: ['vscode'],
+            define: {__DIPLODOC_TELEMETRY_ENDPOINT__: JSON.stringify(telemetryEndpoint)},
             platform: 'node',
             target: 'node18',
             format: 'cjs',

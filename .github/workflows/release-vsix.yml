@@ -27,6 +27,8 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          DIPLODOC_TELEMETRY_ENDPOINT: ${{ vars.DIPLODOC_TELEMETRY_ENDPOINT }}
         run: npm run build
 
       - name: Package VSIX

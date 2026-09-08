@@ -45,3 +45,5 @@ build/**/*.map
 
 # Schema overlays (only needed for generation, not runtime)
 schemas/overlays/**
+
+build/telemetry/**

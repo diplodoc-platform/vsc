@@ -1,6 +1,3 @@
-export const TELEMETRY_CONNECTION_STRING =
-    'InstrumentationKey=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX;...';
-
 export const EVENTS = {
     EXTENSION_ACTIVATED: 'extension/activated',
     MD_EDITOR_OPENED: 'md-editor/opened',

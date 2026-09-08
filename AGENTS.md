@@ -22,6 +22,10 @@ After completing a task, if you discovered new knowledge about the project's arc
 
 Do not duplicate — check that the section is not already described. Update existing sections if information has changed. Place new content in the appropriate existing section, or create a new section if needed.
 
+### Code Style
+
+Do not add comments to authored code. Separate logical blocks with blank lines. Use braces and multiline bodies for conditionals and loops, including early returns. The standalone telemetry function build also removes generated comments and formats control-flow blocks.
+
 ### Language
 
 This document is written in English. Keep all additions in English for consistency.
@@ -835,3 +839,13 @@ Manual test files in `tests/mocks/`: `toc.yaml`, `pc.yaml`, `presets.yaml`, `red
 7. **Diagnostic severity override**: yaml-language-server returns all schema violations as warnings. We promote type mismatches and missing required properties to errors for better UX.
 
 8. **No dependency on Red Hat YAML extension**: the extension is fully self-contained. No `yamlValidation` contribution in package.json.
+
+## Telemetry
+
+VS Code sends events through API Gateway and a private Cloud Function to CHV. Gateway configuration is managed in the cloud console. The viewer and internal ClickHouse are not involved; YT export remains separate work.
+
+- `src/modules/telemetry/index.ts` uses native `createTelemetryLogger`, preserves existing `sendEvent`/`sendError`/`sendException` callers and registers its cleanup in `context.subscriptions`. Strip only the full extension-ID prefix supplied by VS Code. Consent changes filter pending events and abort the current request; the sender's generation guard prevents retrying cancelled data after re-enabling.
+- `schema.ts` is shared by sender and collector. Keep both validations: these are separate trust boundaries. Only its enumerated dimensions and bounded counters may leave the extension; never forward arbitrary properties, exception messages/stacks or native common properties.
+- `DIPLODOC_TELEMETRY_ENDPOINT` is embedded by `esbuild.js`. Empty disables telemetry; both release workflows use the Actions repository variable. The collector's `TELEMETRY_ENVIRONMENT` defaults to `testing`; project and upstream URL are fixed server-side.
+- `npm run compile:telemetry` builds the standalone Node.js 22 handler at `build/telemetry/index.js` (entry point `index.handler`). esbuild removes comments with `minifyWhitespace`; ESLint/Prettier restore braces and spacing. Receiver artifacts are excluded from VSIX; infrastructure changes remain manual.
+- SWS/ARL is deferred by user decision, not a release prerequisite. The current public gateway has no configured SWS rate limit; anonymous event forgery and best-effort delivery remain limitations.

@@ -13,6 +13,12 @@
 
 VS Code extension for the [Diplodoc](https://diplodoc.com) documentation platform. Provides a WYSIWYG Markdown editor, YAML validation, autocompletion, linting, and visual editors for `.md`, `toc.yaml`, and page-constructor `.yaml` files.
 
+## Telemetry
+
+Builds configured with a telemetry endpoint send feature-use events and classified errors to Yandex through a Yandex Cloud receiver. Events include a random persistent installation ID, a session ID, extension/VS Code versions, OS, timestamps and approved feature choices or counts. Installation IDs are pseudonymous and are not tied to your account.
+
+Document text, file paths, usernames and exception messages/stacks are not included. The receiving infrastructure can log source IP addresses. Set VS Code `telemetry.telemetryLevel` to `off` to disable collection; `error` permits only classified errors. Disabling collection clears queued events and cancels pending requests. Builds without a configured endpoint send nothing.
+
 ## Features
 
 - **WYSIWYG Markdown Editor** — visual editing with toolbar for Diplodoc-specific blocks (notes, cuts, tabs, includes, page-constructor, HTML blocks, Mermaid diagrams)
