@@ -1,4 +1,3 @@
-const {randomUUID} = require('node:crypto');
 const {mkdirSync, writeFileSync} = require('node:fs');
 const path = require('node:path');
 const {build} = require('esbuild');
@@ -7,9 +6,6 @@ const prettier = require('prettier');
 
 const root = path.resolve(__dirname, '..');
 const out = path.join(root, 'build/telemetry');
-const writeJson = (name, value) => {
-    writeFileSync(path.join(out, name), JSON.stringify(value, null, 2) + '\n');
-};
 
 async function main() {
     mkdirSync(out, {recursive: true});
@@ -60,47 +56,7 @@ async function main() {
         await prettier.format(formatted.output, {...config, parser: 'babel'}),
     );
 
-    const payload = {
-        schemaVersion: 1,
-        installationId: randomUUID(),
-        sessionId: randomUUID(),
-        extensionVersion: require('../package.json').version.split('-')[0],
-        vscodeVersion: '1.110.0',
-        os: 'darwin',
-        events: [
-            {
-                name: 'extension/activated',
-                kind: 'usage',
-            },
-            {
-                name: 'md-editor/opened',
-                kind: 'usage',
-                properties: {source: 'command', fileType: 'md'},
-            },
-            {
-                name: 'validation/error',
-                kind: 'error',
-                properties: {errorType: 'TypeError'},
-            },
-        ].map((event) => ({
-            properties: {},
-            measurements: {},
-            ...event,
-            id: randomUUID(),
-            timestamp: Date.now(),
-        })),
-    };
-
-    writeJson('test-payload.json', payload);
-    writeJson('test-event.json', {
-        httpMethod: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        isBase64Encoded: false,
-        body: JSON.stringify(payload),
-    });
-    process.stdout.write(
-        'Created build/telemetry/index.js, test-event.json (console), test-payload.json (HTTP).\n',
-    );
+    process.stdout.write('Created build/telemetry/index.js\n');
 }
 
 main().catch(() => {

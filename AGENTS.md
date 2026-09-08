@@ -842,10 +842,10 @@ Manual test files in `tests/mocks/`: `toc.yaml`, `pc.yaml`, `presets.yaml`, `red
 
 ## Telemetry
 
-See [telemetry/README.md](telemetry/README.md) for deployment, acceptance checks, data semantics and delivery limits. The viewer and internal ClickHouse are not involved; YT export remains separate work.
+VS Code sends events through API Gateway and a private Cloud Function to CHV. Gateway configuration is managed in the cloud console. The viewer and internal ClickHouse are not involved; YT export remains separate work.
 
 - `src/modules/telemetry/index.ts` uses native `createTelemetryLogger`, preserves existing `sendEvent`/`sendError`/`sendException` callers and registers its cleanup in `context.subscriptions`. Strip only the full extension-ID prefix supplied by VS Code. Consent changes filter pending events and abort the current request; the sender's generation guard prevents retrying cancelled data after re-enabling.
 - `schema.ts` is shared by sender and collector. Keep both validations: these are separate trust boundaries. Only its enumerated dimensions and bounded counters may leave the extension; never forward arbitrary properties, exception messages/stacks or native common properties.
 - `DIPLODOC_TELEMETRY_ENDPOINT` is embedded by `esbuild.js`. Empty disables telemetry; both release workflows use the Actions repository variable. The collector's `TELEMETRY_ENVIRONMENT` defaults to `testing`; project and upstream URL are fixed server-side.
-- `npm run compile:telemetry` builds a standalone Node.js 22 handler and fresh console/HTTP fixtures. esbuild removes comments with `minifyWhitespace`; ESLint/Prettier restore braces and spacing. Receiver artifacts are excluded from VSIX; infrastructure changes remain manual.
+- `npm run compile:telemetry` builds the standalone Node.js 22 handler at `build/telemetry/index.js` (entry point `index.handler`). esbuild removes comments with `minifyWhitespace`; ESLint/Prettier restore braces and spacing. Receiver artifacts are excluded from VSIX; infrastructure changes remain manual.
 - SWS/ARL is deferred by user decision, not a release prerequisite. The current public gateway has no configured SWS rate limit; anonymous event forgery and best-effort delivery remain limitations.

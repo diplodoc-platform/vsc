@@ -1,9 +1,10 @@
-import {afterEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {handler} from './collector';
 
 const eventId = '207904f3-ed28-4f6f-97cb-9a0e24e79b3a';
-const batch = () => ({
+const fetchMock = vi.fn();
+const batch = (common: Record<string, unknown> = {}, event: Record<string, unknown> = {}) => ({
     schemaVersion: 1,
     installationId: '60f62126-19ad-4aad-b090-617253b6f011',
     sessionId: '3fc9e71c-7ee4-4531-9722-a82c0c2e89c6',
@@ -18,14 +19,22 @@ const batch = () => ({
             kind: 'usage',
             properties: {},
             measurements: {found: 0},
+            ...event,
         },
     ],
+    ...common,
 });
 
 const request = (data: unknown) => ({
     httpMethod: 'POST',
     headers: {'content-type': 'application/json'},
     body: JSON.stringify(data),
+});
+
+beforeEach(() => {
+    fetchMock.mockReset().mockImplementation(async () => new Response('', {status: 200}));
+    vi.stubGlobal('fetch', fetchMock);
+    vi.stubEnv('TELEMETRY_ENVIRONMENT', 'testing');
 });
 
 afterEach(() => {
@@ -35,16 +44,11 @@ afterEach(() => {
 
 describe('telemetry collector', () => {
     it('forwards an event with its ID, zero measurement and stable UInt64 installation identity', async () => {
-        const fetch = vi.fn().mockResolvedValue(new Response('', {status: 200}));
-
-        vi.stubGlobal('fetch', fetch);
-        vi.stubEnv('TELEMETRY_ENVIRONMENT', 'testing');
-
         const data = batch();
 
         expect((await handler(request(data))).statusCode).toBe(202);
 
-        const [url, options] = fetch.mock.calls[0];
+        const [url, options] = fetchMock.mock.calls[0];
 
         expect(url).toBe('https://yandex.ru/clck/click');
         expect(options.body).toContain(`/reqid=${eventId}/table=rum_events/path=690.32/vars=`);
@@ -61,31 +65,21 @@ describe('telemetry collector', () => {
         expect(options.headers).not.toHaveProperty('Cookie');
         expect(options.redirect).toBe('error');
 
-        const second = batch();
-
-        second.sessionId = 'b7d0939f-21df-472a-811b-a73e433819b3';
-        await handler(request(second));
-        expect(fetch.mock.calls[1][1].body).toContain(`-yandexuid=${uid}`);
+        await handler(request(batch({sessionId: 'b7d0939f-21df-472a-811b-a73e433819b3'})));
+        expect(fetchMock.mock.calls[1][1].body).toContain(`-yandexuid=${uid}`);
     });
 
     it('strips unknown fields and invalid dimension values before forwarding a base64 batch', async () => {
-        const fetch = vi.fn().mockResolvedValue(new Response('', {status: 200}));
-
-        vi.stubGlobal('fetch', fetch);
-
-        const data = batch();
-
-        Object.assign(data, {
-            project: 'other-project',
-            url: 'https://private.example',
-        });
-        Object.assign(data.events[0], {
-            message: '/Users/alice/private.md',
-            stack: 'secret',
-        });
-        data.events[0].properties = {source: '/private/path', text: 'secret'};
-
-        const input = request(data);
+        const input = request(
+            batch(
+                {project: 'other-project', url: 'https://private.example'},
+                {
+                    message: '/Users/alice/private.md',
+                    stack: 'secret',
+                    properties: {source: '/private/path', text: 'secret'},
+                },
+            ),
+        );
         const result = await handler({
             ...input,
             isBase64Encoded: true,
@@ -93,84 +87,36 @@ describe('telemetry collector', () => {
         });
 
         expect(result.statusCode).toBe(202);
-        expect(fetch.mock.calls[0][1].body).not.toMatch(/private|secret|other-project/);
+        expect(fetchMock.mock.calls[0][1].body).not.toMatch(/private|secret|other-project/);
     });
 
     it.each([
-        [
-            'unknown event',
-            (data: ReturnType<typeof batch>) => {
-                data.events[0].name = 'arbitrary/event';
-            },
-        ],
-        [
-            'forged category',
-            (data: ReturnType<typeof batch>) => {
-                data.events[0].kind = 'error';
-            },
-        ],
-        [
-            'invalid identity',
-            (data: ReturnType<typeof batch>) => {
-                data.installationId = 'alice@yandex.ru';
-            },
-        ],
-        [
-            'invalid version',
-            (data: ReturnType<typeof batch>) => {
-                data.extensionVersion = '/secret';
-            },
-        ],
-        [
-            'stale event',
-            (data: ReturnType<typeof batch>) => {
-                data.events[0].timestamp = 0;
-            },
-        ],
-        [
-            'empty batch',
-            (data: ReturnType<typeof batch>) => {
-                data.events = [];
-            },
-        ],
-        [
-            'oversized batch',
-            (data: ReturnType<typeof batch>) => {
-                data.events = Array(21).fill(data.events[0]);
-            },
-        ],
-    ])('rejects %s without contacting the upstream', async (_name, change) => {
-        const fetch = vi.fn();
-
-        vi.stubGlobal('fetch', fetch);
-
-        const data = batch();
-
-        change(data);
-        expect((await handler(request(data))).statusCode).toBe(400);
-        expect(fetch).not.toHaveBeenCalled();
+        ['unknown event', {}, {name: 'arbitrary/event'}],
+        ['forged category', {}, {kind: 'error'}],
+        ['invalid identity', {installationId: 'alice@yandex.ru'}, {}],
+        ['invalid version', {extensionVersion: '/secret'}, {}],
+        ['stale event', {}, {timestamp: 0}],
+        ['empty batch', {events: []}, {}],
+        ['oversized batch', {events: Array(21).fill(batch().events[0])}, {}],
+    ])('rejects %s without contacting the upstream', async (_name, common, event) => {
+        expect((await handler(request(batch(common, event)))).statusCode).toBe(400);
+        expect(fetchMock).not.toHaveBeenCalled();
     });
 
     it('rejects wrong methods, non-JSON, oversized and malformed bodies before forwarding', async () => {
-        const fetch = vi.fn();
-
-        vi.stubGlobal('fetch', fetch);
         expect((await handler({...request(batch()), httpMethod: 'GET'})).statusCode).toBe(405);
         expect((await handler({...request(batch()), headers: {}})).statusCode).toBe(415);
         expect((await handler({...request(batch()), body: 'x'.repeat(65537)})).statusCode).toBe(
             413,
         );
         expect((await handler({...request(batch()), body: '{'})).statusCode).toBe(400);
-        expect(fetch).not.toHaveBeenCalled();
+        expect(fetchMock).not.toHaveBeenCalled();
     });
 
     it('reports upstream failures without reflecting their body or exception text', async () => {
-        const fetch = vi
-            .fn()
+        fetchMock
             .mockResolvedValueOnce(new Response('private details', {status: 500}))
             .mockRejectedValueOnce(new Error('secret'));
-
-        vi.stubGlobal('fetch', fetch);
 
         for (let i = 0; i < 2; i++) {
             const result = await handler(request(batch()));
