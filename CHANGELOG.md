@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/diplodoc-platform/vsc/compare/v1.4.2...v1.5.0) (2026-09-08)
+
+
+### Features
+
+* **telemetry:** collect extension events ([#241](https://github.com/diplodoc-platform/vsc/issues/241)) ([22eb69c](https://github.com/diplodoc-platform/vsc/commit/22eb69cfa2a31ea565d2d8230d7cc7ffb66d1670))
+
 ## [1.4.2](https://github.com/diplodoc-platform/vsc/compare/v1.4.1...v1.4.2) (2026-08-27)
 
 
