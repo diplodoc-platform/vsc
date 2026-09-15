@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/diplodoc-platform/vsc/compare/v1.5.0...v1.6.0) (2026-09-15)
+
+
+### Features
+
+* schemas updated ([#244](https://github.com/diplodoc-platform/vsc/issues/244)) ([ecaf8e2](https://github.com/diplodoc-platform/vsc/commit/ecaf8e2ce43544207eed6bfde28cd298996bf280))
+
 ## [1.5.0](https://github.com/diplodoc-platform/vsc/compare/v1.4.2...v1.5.0) (2026-09-08)
 
 
