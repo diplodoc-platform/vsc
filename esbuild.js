@@ -5,7 +5,9 @@ const {sassPlugin} = require('esbuild-sass-plugin');
 
 const isWatch = process.argv.includes('--watch');
 const target = process.env.BUILD_TARGET ?? 'all';
-const telemetryEndpoint = process.env.DIPLODOC_TELEMETRY_ENDPOINT || '';
+const telemetryEndpoint =
+    process.env.DIPLODOC_TELEMETRY_ENDPOINT ??
+    'https://d5damd6hkb46uvk1liqp.nnekmrav.apigw.yandexcloud.net/telemetry';
 
 if (telemetryEndpoint) {
     const url = new URL(telemetryEndpoint);
