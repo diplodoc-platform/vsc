@@ -35,7 +35,7 @@
           "default": "wysiwyg",
           "description": "Default mode for Markdown editor."
         },
-        "diplodoc.isOnlyYfm": {
+        "diplodoc.isOnlyYFM": {
           "type": "boolean",
           "default": false,
           "description": "Should only MD files within a YFM project be validated? Valid page-constructor blocks are validated regardless of this option."
