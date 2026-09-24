@@ -512,10 +512,12 @@ Completion items use `sortText = '0_<id>'` to appear above VS Code's built-in he
 
 Declared in `package.json` under `contributes.configuration.properties`, read via the `getVscConfig()` helper (`src/modules/utils.ts`).
 
+Settings UI labels are generated from the setting keys; `isOnlyYFM` produces `Is Only YFM`. After reinstalling a VSIX with the same version, VS Code may retain old keys in `CachedProfilesData/<profile>/extensions.user.cache`. If the installed manifest is correct but the label remains stale, back up and remove that scan cache, then reload the VS Code window.
+
 | Setting                  | Type    | Used by                                                         | Notes                                                                                                    |
 | ------------------------ | ------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | `diplodoc.editorMode`    | string  | `md-editor/editor.ts`                                           | `wysiwyg`/`markup`, sent to webview on creation and config change.                                       |
-| `diplodoc.isOnlyYfm`     | boolean | `validation/index.ts` (`validateMd`)                            | When `true`, only Markdown files inside a YFM project are validated (`isYfmFile`).                       |
+| `diplodoc.isOnlyYFM`     | boolean | `validation/index.ts` (`validateMd`)                            | When `true`, only Markdown files inside a YFM project are validated (`isYfmFile`).                       |
 | `diplodoc.excludedDirs`  | array   | `utils.ts` (`getExcludeDirs`)                                   | Extra dirs excluded from validation/scanning, on top of `node_modules`, `_build`, `.yfm` output.         |
 | `diplodoc.excludedFiles` | array   | `validation/index.ts`, `orphan/decorator.ts`, `orphan/index.ts` | Files (exact name / basename / regex) inside a YFM project that are neither validated nor orphan-marked. |
 | `diplodoc.lintRules`     | object  | `validation/index.ts` → `buildLintConfig`                       | Lint rules in `.yfmlint` format; merged below `.yfmlint` (see Markdown Linting merge order).             |

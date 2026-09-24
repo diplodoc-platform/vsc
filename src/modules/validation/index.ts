@@ -278,7 +278,7 @@ async function validate(document: vscode.TextDocument) {
         return validateYaml(document);
     }
 
-    const isOnlyYfm = getVscConfig<boolean>('isOnlyYfm', false);
+    const isOnlyYfm = getVscConfig<boolean>('isOnlyYFM', false);
     const excludedFiles = getVscConfig<string[]>('excludedFiles', []);
     const lintRules = getVscConfig<Record<string, unknown>>('lintRules', {});
 
