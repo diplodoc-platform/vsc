@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/diplodoc-platform/vsc/compare/v1.6.0...v1.6.1) (2026-09-24)
+
+
+### Bug Fixes
+
+* Yfm -&gt; YFM ([#246](https://github.com/diplodoc-platform/vsc/issues/246)) ([49faaa7](https://github.com/diplodoc-platform/vsc/commit/49faaa71d573196e2fdfbb98f6cc187258cfb076))
+
 ## [1.6.0](https://github.com/diplodoc-platform/vsc/compare/v1.5.0...v1.6.0) (2026-09-15)
 
 
