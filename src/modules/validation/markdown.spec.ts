@@ -26,6 +26,7 @@ describe('validateMarkdown', () => {
             mkdirSync(join(root, 'ru'));
             mkdirSync(join(root, '_openapi'));
             writeFileSync(join(root, '.yfm'), 'allowHtml: true\n');
+            writeFileSync(join(root, '_openapi/overview.md'), '# API overview\n');
             writeFileSync(
                 join(root, '_openapi/books.yaml'),
                 dump({
@@ -45,10 +46,12 @@ describe('validateMarkdown', () => {
         });
 
         it.each([
-            {hidden: false, missingSpec: false, overviewError: false},
-            {hidden: true, missingSpec: false, overviewError: true},
-            {hidden: false, missingSpec: true, overviewError: true},
-        ])('validates the overview with %j', async ({hidden, missingSpec, overviewError}) => {
+            {hidden: false, missingSpec: false, path: '', overviewError: false},
+            {hidden: true, missingSpec: false, path: '', overviewError: true},
+            {hidden: false, missingSpec: true, path: '', overviewError: true},
+            {hidden: false, missingSpec: false, path: 'overview.md', overviewError: false},
+            {hidden: false, missingSpec: false, path: 'missing.md', overviewError: true},
+        ])('validates the overview with %j', async ({hidden, missingSpec, path, overviewError}) => {
             writeFileSync(
                 join(root, 'ru/toc.yaml'),
                 dump({
@@ -63,7 +66,7 @@ describe('validateMarkdown', () => {
                                         input: missingSpec
                                             ? '_openapi/missing.yaml'
                                             : '_openapi/books.yaml',
-                                        tags: {__root__: {hidden}},
+                                        tags: {__root__: {hidden, path}},
                                     },
                                 ],
                             },

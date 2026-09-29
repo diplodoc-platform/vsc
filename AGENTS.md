@@ -277,7 +277,7 @@ Errors arrive via **two independent channels** — do not confuse them:
 
 Both `diplodoc.lintRules` and `.yfmlint` entries spread on top of extension defaults, so the user **can** re-enable `MD013` or set `default: false`. `.yfmlint` wins over `diplodoc.lintRules` on any conflicting key. `diplodoc.lintRules` is read in `validation/index.ts` and passed through `validateMd()` → `validateMarkdown()` → `buildLintConfig()`.
 
-OpenAPI endpoint links are skipped by the links plugin only when they are inside an includer's generated directory and their filename matches an `operationId` in that includer's specification. The root `index.md` is also recognized when the specification is readable and `tags.__root__.hidden` does not hide the overview. Typos and unknown nested index pages remain unreachable-link errors.
+OpenAPI endpoint links are skipped by the links plugin only when they are inside an includer's generated directory and their filename matches an `operationId` in that includer's specification. The root `index.md` is also recognized when the specification is readable and `tags.__root__.hidden` does not hide the overview. If `tags.__root__.path` specifies a custom overview, that file must also be readable; its path is relative to the specification directory, matching the OpenAPI includer. Typos and unknown nested index pages remain unreachable-link errors.
 
 ##### `.yfmlint` config format
 

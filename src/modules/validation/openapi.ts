@@ -7,7 +7,7 @@ import {findYfmRoot} from '../utils';
 const TOC_RE = /^toc(?:-.+)?\.ya?ml$/;
 const OPERATION_ID_RE = /^\s*operationId:\s*(?:"([^"]+)"|'([^']+)'|([^\s#]+))/gm;
 
-type GeneratedApi = {dir: string; spec: string; hasIndex: boolean};
+type GeneratedApi = {dir: string; spec: string; hasIndex: boolean; indexPath?: string};
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -70,6 +70,7 @@ export function createOpenApiLinkSkipper(filePath: string): (href: string) => bo
                         dir: resolve(dirname(tocPath), include.path),
                         spec: resolve(root, includer.input),
                         hasIndex: !rootTag.hidden,
+                        indexPath: typeof rootTag.path === 'string' ? rootTag.path : undefined,
                     });
                 }
             }
@@ -79,7 +80,7 @@ export function createOpenApiLinkSkipper(filePath: string): (href: string) => bo
     return (href) => {
         const target = resolve(dirname(filePath), href.split(/[?#]/, 1)[0]);
 
-        return generated.some(({dir, spec, hasIndex}) => {
+        return generated.some(({dir, spec, hasIndex, indexPath}) => {
             const pathFromGeneratedDir = relative(dir, target);
             const isInside =
                 pathFromGeneratedDir !== '..' &&
@@ -94,6 +95,10 @@ export function createOpenApiLinkSkipper(filePath: string): (href: string) => bo
                 const content = readFileSync(spec, 'utf8');
 
                 if (hasIndex && pathFromGeneratedDir === 'index.md') {
+                    if (indexPath) {
+                        readFileSync(join(dirname(spec), indexPath), 'utf8');
+                    }
+
                     return true;
                 }
 
