@@ -7,7 +7,7 @@ import {findYfmRoot} from '../utils';
 const TOC_RE = /^toc(?:-.+)?\.ya?ml$/;
 const OPERATION_ID_RE = /^\s*operationId:\s*(?:"([^"]+)"|'([^']+)'|([^\s#]+))/gm;
 
-type GeneratedApi = {dir: string; spec: string};
+type GeneratedApi = {dir: string; spec: string; hasIndex: boolean};
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -63,9 +63,13 @@ export function createOpenApiLinkSkipper(filePath: string): (href: string) => bo
                 );
 
                 if (isRecord(includer) && typeof includer.input === 'string') {
+                    const tags = isRecord(includer.tags) ? includer.tags : {};
+                    const rootTag = isRecord(tags.__root__) ? tags.__root__ : {};
+
                     generated.push({
                         dir: resolve(dirname(tocPath), include.path),
                         spec: resolve(root, includer.input),
+                        hasIndex: !rootTag.hidden,
                     });
                 }
             }
@@ -75,7 +79,7 @@ export function createOpenApiLinkSkipper(filePath: string): (href: string) => bo
     return (href) => {
         const target = resolve(dirname(filePath), href.split(/[?#]/, 1)[0]);
 
-        return generated.some(({dir, spec}) => {
+        return generated.some(({dir, spec, hasIndex}) => {
             const pathFromGeneratedDir = relative(dir, target);
             const isInside =
                 pathFromGeneratedDir !== '..' &&
@@ -87,7 +91,13 @@ export function createOpenApiLinkSkipper(filePath: string): (href: string) => bo
             }
 
             try {
-                return [...readFileSync(spec, 'utf8').matchAll(OPERATION_ID_RE)].some(
+                const content = readFileSync(spec, 'utf8');
+
+                if (hasIndex && pathFromGeneratedDir === 'index.md') {
+                    return true;
+                }
+
+                return [...content.matchAll(OPERATION_ID_RE)].some(
                     (match) => `${match[1] ?? match[2] ?? match[3]}.md` === basename(target),
                 );
             } catch {
