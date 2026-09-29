@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.2](https://github.com/diplodoc-platform/vsc/compare/v1.6.1...v1.6.2) (2026-09-29)
+
+
+### Bug Fixes
+
+* fixed openapi index validation ([#248](https://github.com/diplodoc-platform/vsc/issues/248)) ([95c4e7a](https://github.com/diplodoc-platform/vsc/commit/95c4e7a82a915a5ee55eb6072ea7fa9a993a5dbc))
+
 ## [1.6.1](https://github.com/diplodoc-platform/vsc/compare/v1.6.0...v1.6.1) (2026-09-24)
 
 
