@@ -1,13 +1,16 @@
-import {describe, expect, it} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it} from 'vitest';
+import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from 'fs';
+import {tmpdir} from 'os';
 import {join} from 'path';
+import {dump} from 'js-yaml';
 
 import {validateMarkdown} from './markdown';
 
-function createDocument(text: string) {
+function createDocument(text: string, fileName = join(__dirname, '../../../tests/mocks/notes.md')) {
     const lines = text.split('\n');
 
     return {
-        fileName: join(__dirname, '../../../tests/mocks/notes.md'),
+        fileName,
         getText: () => text,
         lineCount: lines.length,
         lineAt: (line: number) => ({text: lines[line] ?? ''}),
@@ -15,6 +18,92 @@ function createDocument(text: string) {
 }
 
 describe('validateMarkdown', () => {
+    describe('generated OpenAPI overview links', () => {
+        let root: string;
+
+        beforeEach(() => {
+            root = mkdtempSync(join(tmpdir(), 'diplodoc-openapi-'));
+            mkdirSync(join(root, 'ru'));
+            mkdirSync(join(root, '_openapi'));
+            writeFileSync(join(root, '.yfm'), 'allowHtml: true\n');
+            writeFileSync(join(root, '_openapi/overview.md'), '# API overview\n');
+            writeFileSync(
+                join(root, '_openapi/books.yaml'),
+                dump({
+                    openapi: '3.0.3',
+                    info: {title: 'Library API', version: '1.0.0'},
+                    paths: {
+                        '/books': {
+                            get: {operationId: 'getBook', responses: {'200': {description: 'OK'}}},
+                        },
+                    },
+                }),
+            );
+        });
+
+        afterEach(() => {
+            rmSync(root, {recursive: true, force: true});
+        });
+
+        it.each([
+            {hidden: false, missingSpec: false, path: '', overviewError: false},
+            {hidden: true, missingSpec: false, path: '', overviewError: true},
+            {hidden: false, missingSpec: true, path: '', overviewError: true},
+            {hidden: false, missingSpec: false, path: 'overview.md', overviewError: false},
+            {hidden: false, missingSpec: false, path: 'missing.md', overviewError: true},
+        ])('validates the overview with %j', async ({hidden, missingSpec, path, overviewError}) => {
+            writeFileSync(
+                join(root, 'ru/toc.yaml'),
+                dump({
+                    items: [
+                        {
+                            include: {
+                                path: 'features/openapi',
+                                mode: 'link',
+                                includers: [
+                                    {
+                                        name: 'openapi',
+                                        input: missingSpec
+                                            ? '_openapi/missing.yaml'
+                                            : '_openapi/books.yaml',
+                                        tags: {__root__: {hidden, path}},
+                                    },
+                                ],
+                            },
+                        },
+                    ],
+                }),
+            );
+
+            const links = [
+                'features/openapi/index.md',
+                'features/openapi/getBook.md',
+                'features/openapi/indx.md',
+                'features/openapi/unknown/index.md',
+                'features/other/index.md',
+            ];
+            const diagnostics = await validateMarkdown(
+                createDocument(
+                    '# Features\n\n' +
+                        links.map((href) => `[Example](${href})`).join('\n\n') +
+                        '\n',
+                    join(root, 'ru/features.md'),
+                ) as never,
+            );
+            const unreachable = diagnostics.filter(({message}) =>
+                message.includes('Link is unreachable:'),
+            );
+
+            expect(unreachable.map(({range}) => range.start.line)).toEqual([
+                ...(overviewError ? [2] : []),
+                ...(missingSpec ? [4] : []),
+                6,
+                8,
+                10,
+            ]);
+        });
+    });
+
     it('ignores frontmatter for markdownlint rules', async () => {
         const diagnostics = await validateMarkdown(
             createDocument(
