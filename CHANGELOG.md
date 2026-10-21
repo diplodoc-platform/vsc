@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.3](https://github.com/diplodoc-platform/vsc/compare/v1.6.2...v1.6.3) (2026-10-21)
+
+
+### Bug Fixes
+
+* **deps:** Update @diplodoc/ajv@0.11.0 ([#250](https://github.com/diplodoc-platform/vsc/issues/250)) ([68afe2c](https://github.com/diplodoc-platform/vsc/commit/68afe2cb9642b12e83e1da1ce57f01721eade1de))
+
 ## [1.6.2](https://github.com/diplodoc-platform/vsc/compare/v1.6.1...v1.6.2) (2026-09-29)
 
 
