@@ -10,6 +10,11 @@ import {LruCache} from '../shared/lru-cache';
 import {isToc} from '../../utils';
 import * as telemetry from '../telemetry';
 import {EVENTS} from '../telemetry/constants';
+import {
+    clearDiagnosticsTelemetry,
+    reportDiagnostics,
+    trackSavedDiagnostics,
+} from '../telemetry/diagnostics';
 
 import {parseContent} from './parser';
 import {validateMarkdown} from './markdown';
@@ -227,6 +232,7 @@ export function activate(context: vscode.ExtensionContext) {
         }),
         vscode.workspace.onDidSaveTextDocument((doc) => {
             if (isSupportedDocument(doc)) {
+                trackSavedDiagnostics(doc);
                 scheduleValidation(doc);
             }
         }),
@@ -242,6 +248,8 @@ export function activate(context: vscode.ExtensionContext) {
             }
         }),
         vscode.workspace.onDidCloseTextDocument((doc) => {
+            clearDiagnosticsTelemetry(doc);
+
             const key = doc.uri.toString();
             collection.delete(doc.uri);
             blocksCache.delete(key);
@@ -286,10 +294,13 @@ async function validate(document: vscode.TextDocument) {
 }
 
 async function validateYaml(document: vscode.TextDocument) {
+    const version = document.version;
     const schemaType = resolveYamlSchema(document);
 
     if (!schemaType) {
         blocksCache.delete(document.uri.toString());
+        reportDiagnostics(document, version, 'validation', []);
+
         return;
     }
 
@@ -304,7 +315,9 @@ async function validateYaml(document: vscode.TextDocument) {
     blocksCache.set(document.uri.toString(), [block]);
 
     const diags = await validatePageConstructor(block, schemaType);
+
     collection.set(document.uri, capDiagnostics(diags));
+    reportDiagnostics(document, version, 'validation', diags, schemaType);
 }
 
 async function validateMd(
@@ -320,6 +333,7 @@ async function validateMd(
         return;
     }
 
+    const version = document.version;
     const content = document.getText();
     const {pcContent, fmContent} = parseContent(content);
 
@@ -345,10 +359,15 @@ async function validateMd(
 
     const mdDiags = await validateMarkdown(document, lintRules);
 
-    collection.set(document.uri, capDiagnostics([...mdDiags, ...pcDiags, ...fmDiags]));
+    const diags = [...mdDiags, ...pcDiags, ...fmDiags];
+
+    collection.set(document.uri, capDiagnostics(diags));
+    reportDiagnostics(document, version, 'validation', diags, 'md');
 }
 
 export function deactivate() {
+    clearDiagnosticsTelemetry();
+
     for (const timer of debounceTimers.values()) {
         clearTimeout(timer);
     }

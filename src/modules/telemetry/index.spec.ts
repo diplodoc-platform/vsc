@@ -89,6 +89,22 @@ afterEach(async () => {
 });
 
 describe('extension telemetry', () => {
+    it('sends diagnostic counts only with usage consent and never as error telemetry', async () => {
+        await telemetry.activate(context());
+        telemetry.sendEvent('validation/diagnostics', {fileType: 'toc'}, {errors: 2, warnings: 1});
+        await vi.advanceTimersByTimeAsync(10000);
+
+        expect(batches()[0]?.events).toMatchObject([
+            {name: 'validation/diagnostics', kind: 'usage', measurements: {errors: 2, warnings: 1}},
+        ]);
+
+        setLevel(false, true);
+        telemetry.sendEvent('validation/diagnostics', {fileType: 'yfm'}, {errors: 1, warnings: 0});
+        telemetry.sendError('validation/diagnostics', {fileType: 'yfm'}, {errors: 1, warnings: 0});
+        await vi.advanceTimersByTimeAsync(10000);
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
     it('keeps installation identity across sessions and sends only sanitized fields', async () => {
         const ctx = context();
 

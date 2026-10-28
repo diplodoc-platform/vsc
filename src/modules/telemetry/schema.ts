@@ -47,6 +47,20 @@ const errorTypes = [
 ];
 
 const fields: Record<string, Record<string, readonly string[]>> = {
+    [EVENTS.VALIDATION_DIAGNOSTICS]: {
+        fileType: [
+            'md',
+            'toc',
+            'yfm',
+            'yfmlint',
+            'presets',
+            'redirects',
+            'theme',
+            'leading',
+            'pc',
+            'yaml',
+        ],
+    },
     [EVENTS.MD_EDITOR_OPENED]: {
         source: ['command', 'sidebar'],
         fileType: ['md', 'blocks-yaml'],
@@ -82,6 +96,7 @@ const fields: Record<string, Record<string, readonly string[]>> = {
 };
 
 const counters: Record<string, string[]> = {
+    [EVENTS.VALIDATION_DIAGNOSTICS]: ['errors', 'warnings'],
     [EVENTS.REFERENCES_FIND]: ['found'],
     [EVENTS.ORPHAN_DELETE_ACTION]: ['tocRefs', 'mdRefs'],
     [EVENTS.ORPHAN_RENAME_ACTION]: ['tocRefs', 'mdRefs'],

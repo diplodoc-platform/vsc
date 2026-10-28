@@ -13,6 +13,7 @@ export const EVENTS = {
     PRESET_GOTO: 'preset/goto',
     REFERENCES_FIND: 'references/find',
     VALIDATION_ERROR: 'validation/error',
+    VALIDATION_DIAGNOSTICS: 'validation/diagnostics',
     ORPHAN_DELETE_ACTION: 'orphan/delete-action',
     ORPHAN_RENAME_ACTION: 'orphan/rename-action',
     ORPHAN_ERROR: 'orphan/error',

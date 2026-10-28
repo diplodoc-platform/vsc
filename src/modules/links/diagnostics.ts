@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import {MAX_DIAGNOSTICS_PER_FILE} from '../validation/constants';
 import {getYaMakeDests} from '../shared/ya-make';
 import {findYfmRoot} from '../utils';
+import {reportDiagnostics} from '../telemetry/diagnostics';
 
 import {
     BLOCK_SCALAR_RE,
@@ -291,6 +292,7 @@ export async function validateLinks(
         return;
     }
 
+    const version = document.version;
     const diagnostics: vscode.Diagnostic[] = [];
     const baseUri = vscode.Uri.joinPath(document.uri, '..');
     const yfmRoot = findYfmRoot(document.uri.fsPath);
@@ -364,6 +366,7 @@ export async function validateLinks(
     await Promise.all(checks);
 
     collection.set(document.uri, diagnostics.slice(0, MAX_DIAGNOSTICS_PER_FILE));
+    reportDiagnostics(document, version, 'links', diagnostics);
 }
 
 const FENCED_CODE_RE = /^\s*(`{3,}|~{3,})/;
@@ -376,6 +379,7 @@ export async function validateMarkdownFileAnchors(
         return;
     }
 
+    const version = document.version;
     const diagnostics: vscode.Diagnostic[] = [];
     const baseUri = vscode.Uri.joinPath(document.uri, '..');
     const yaMakeDests = getYaMakeDests(baseUri.fsPath);
@@ -409,4 +413,5 @@ export async function validateMarkdownFileAnchors(
     await Promise.all(checks);
 
     collection.set(document.uri, diagnostics.slice(0, MAX_DIAGNOSTICS_PER_FILE));
+    reportDiagnostics(document, version, 'links', diagnostics);
 }
