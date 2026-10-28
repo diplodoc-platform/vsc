@@ -8,8 +8,6 @@ const reply = (statusCode: number, data: Record<string, unknown>) => ({
     body: JSON.stringify(data),
 });
 
-const encode = (value: unknown) => encodeURIComponent(String(value)).replace(/\*/g, '%2A');
-
 export async function handler(event: unknown) {
     if (!isRecord(event) || event.httpMethod !== 'POST') {
         return reply(405, {error: 'method_not_allowed'});
@@ -67,60 +65,110 @@ export async function handler(event: unknown) {
         return reply(503, {error: 'invalid_environment'});
     }
 
+    const applicationKey = process.env.MONIUM_APPLICATION_KEY?.trim();
+
+    if (!applicationKey) {
+        return reply(503, {error: 'missing_application_key'});
+    }
+
     const uid = createHash('sha256')
         .update(`diplodoc-vsc:${batch.installationId}`)
         .digest()
         .readBigUInt64BE();
 
-    const lines = batch.events.map((item) => {
-        const fields = {
-            project: 'diplodoc-vsc',
-            env: environment,
-            service: 'vscode-extension',
-            page: item.name.split('/')[0],
-            platform: 'desktop',
-            version: batch.extensionVersion,
-            yandexuid: (uid || 1n).toString(),
-            ts: item.timestamp,
-            type: 'integer',
-            value: item.measurements.found ?? 1,
-            name: item.name,
-            additional: JSON.stringify({
-                schemaVersion: 1,
-                sessionId: batch.sessionId,
-                kind: item.kind,
-                os: batch.os,
-                vscodeVersion: batch.vscodeVersion,
-                receivedAt: now,
-                ...item.properties,
-                ...item.measurements,
+    const logRecords = batch.events.map((item) => ({
+        timeUnixNano: (BigInt(now) * 1_000_000n).toString(),
+        body: {
+            stringValue: JSON.stringify({
+                event_id: item.id,
+                client_timestamp: String(item.timestamp),
+                installation_id: (uid || 1n).toString(),
+                version: batch.extensionVersion,
+                name: item.name,
+                additional: {
+                    schemaVersion: 1,
+                    sessionId: batch.sessionId,
+                    kind: item.kind,
+                    os: batch.os,
+                    vscodeVersion: batch.vscodeVersion,
+                    receivedAt: now,
+                    ...item.properties,
+                    ...item.measurements,
+                },
             }),
-        };
+        },
+    }));
 
-        const vars = Object.entries(fields)
-            .map(([key, value]) => `-${key}=${encode(value)}`)
-            .join(',');
-
-        return `/reqid=${item.id}/table=rum_events/path=690.32/vars=${vars}/cts=${now}/*`;
-    });
+    const attributes = Object.entries({
+        project: 'docstools',
+        cluster: environment,
+        service: 'vscode-extension',
+    }).map(([key, value]) => ({key, value: {stringValue: value}}));
 
     try {
-        const response = await fetch('https://yandex.ru/clck/click', {
+        const response = await fetch('https://ingest.monium.yandex/otlp/v1/logs', {
             method: 'POST',
-            headers: {'Content-Type': 'text/plain;charset=UTF-8'},
-            body: lines.join('\r\n'),
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Application-Key ${applicationKey}`,
+                'x-monium-project': 'docstools',
+            },
+            body: JSON.stringify({
+                resourceLogs: [{resource: {attributes}, scopeLogs: [{logRecords}]}],
+            }),
             redirect: 'error',
             signal: AbortSignal.timeout(3000),
         });
 
-        await response.body?.cancel();
-
-        if (!response.ok) {
-            return reply(502, {error: 'collector_rejected'});
-        }
-
-        return reply(202, {forwarded: batch.events.length});
+        return await readCollectorResponse(response, batch.events.length);
     } catch {
         return reply(502, {error: 'collector_unavailable'});
     }
+}
+
+async function readCollectorResponse(response: Response, eventCount: number) {
+    if (response.status !== 200) {
+        await response.body?.cancel();
+
+        return reply(502, {error: 'collector_rejected'});
+    }
+
+    const chunks: Uint8Array[] = [];
+    let size = 0;
+
+    for await (const chunk of response.body ?? []) {
+        size += chunk.length;
+
+        if (size > MAX_BODY_BYTES) {
+            return reply(422, {error: 'collector_response_too_large'});
+        }
+
+        chunks.push(chunk);
+    }
+
+    const result: unknown = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+
+    if (
+        !isRecord(result) ||
+        (result.partialSuccess !== undefined && !isRecord(result.partialSuccess))
+    ) {
+        return reply(502, {error: 'invalid_collector_response'});
+    }
+
+    const rejected = isRecord(result.partialSuccess)
+        ? Number(result.partialSuccess.rejectedLogRecords ?? 0)
+        : 0;
+
+    if (!Number.isSafeInteger(rejected) || rejected < 0 || rejected > eventCount) {
+        return reply(502, {error: 'invalid_collector_response'});
+    }
+
+    if (rejected > 0) {
+        return reply(422, {
+            error: 'collector_rejected',
+            forwarded: eventCount - rejected,
+        });
+    }
+
+    return reply(202, {forwarded: eventCount});
 }
