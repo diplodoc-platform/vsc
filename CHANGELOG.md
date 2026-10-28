@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.4](https://github.com/diplodoc-platform/vsc/compare/v1.6.3...v1.6.4) (2026-10-28)
+
+
+### Bug Fixes
+
+* **deps:** Update @diplodoc/transform@4.78.11, @diplodoc/yfmlint@1.11.0 ([b01ad29](https://github.com/diplodoc-platform/vsc/commit/b01ad2948d7875bf36be468b683106bc7d2db66a))
+
 ## [1.6.3](https://github.com/diplodoc-platform/vsc/compare/v1.6.2...v1.6.3) (2026-10-21)
 
 
