@@ -47,6 +47,32 @@ afterEach(() => {
 });
 
 describe('telemetry collector', () => {
+    it('forwards only allowlisted diagnostic counts and file types', async () => {
+        const data = batch(
+            {},
+            {
+                name: 'validation/diagnostics',
+                kind: 'usage',
+                properties: {fileType: 'yfm', path: '/private/.yfm', message: 'private contents'},
+                measurements: {errors: 2, warnings: 1, line: 42},
+            },
+        );
+
+        expect((await handler(request(data))).statusCode).toBe(202);
+
+        const resource = JSON.parse(fetchMock.mock.calls[0][1].body).resourceLogs[0];
+        const event = JSON.parse(resource.scopeLogs[0].logRecords[0].body.stringValue);
+
+        expect(event.name).toBe('validation/diagnostics');
+        expect(event.additional).toMatchObject({
+            kind: 'usage',
+            fileType: 'yfm',
+            errors: 2,
+            warnings: 1,
+        });
+        expect(JSON.stringify(event)).not.toMatch(/private|contents|"line"/);
+    });
+
     it('forwards OTLP logs with event identity, timestamps, zero counters and stable installation identity', async () => {
         const data = batch();
         const result = await handler(request(data));
