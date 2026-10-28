@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/diplodoc-platform/vsc/compare/v1.6.5...v1.7.0) (2026-10-28)
+
+
+### Features
+
+* **telemetry:** report saved document diagnostics ([#263](https://github.com/diplodoc-platform/vsc/issues/263)) ([ea1d756](https://github.com/diplodoc-platform/vsc/commit/ea1d756779297a047ba50b87b2a1a181d3ddd55d))
+
 ## [1.6.5](https://github.com/diplodoc-platform/vsc/compare/v1.6.4...v1.6.5) (2026-10-28)
 
 
