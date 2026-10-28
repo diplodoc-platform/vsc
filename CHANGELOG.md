@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.5](https://github.com/diplodoc-platform/vsc/compare/v1.6.4...v1.6.5) (2026-10-28)
+
+
+### Bug Fixes
+
+* **telemetry:** forward collector events to Monium ([#261](https://github.com/diplodoc-platform/vsc/issues/261)) ([86177f1](https://github.com/diplodoc-platform/vsc/commit/86177f187c68c98360119120e23f2a4c2db10245))
+
 ## [1.6.4](https://github.com/diplodoc-platform/vsc/compare/v1.6.3...v1.6.4) (2026-10-28)
 
 
