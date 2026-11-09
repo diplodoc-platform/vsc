@@ -516,6 +516,8 @@ The parse cache is keyed by document identity and version. Validation runs on op
 
 `YfmDirective` treats `code` as a standalone tag and never searches for `endcode`. The visual editor preserves the original directive rather than expanding it. The shared directive registry suggested in DOCSTOOLS-6865 remains a separate design decision; this implementation adds no packages or dependency changes.
 
+Path completion items replace the full source argument and set `filterText` to the full inserted path, including its directory. The display label contains only the entry name; using that label for filtering would hide suggestions after a directory prefix.
+
 ## Extension Settings
 
 Declared in `package.json` under `contributes.configuration.properties`, read via the `getVscConfig()` helper (`src/modules/utils.ts`).

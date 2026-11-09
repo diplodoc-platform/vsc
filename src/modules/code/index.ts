@@ -215,6 +215,7 @@ export class CodeCompletionProvider implements vscode.CompletionItemProvider {
                     const quote = argument.quoted ? directive.source[argument.start - 1] : '';
                     const escaped = quote ? name.split(quote).join('\\' + quote) : name;
                     item.insertText = directory + escaped + (folder ? '/' : '');
+                    item.filterText = item.insertText;
                     item.range = argumentRange(directive, argument);
                     item.sortText = (folder ? '0' : '1') + name;
 

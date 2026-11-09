@@ -127,6 +127,42 @@ describe('code directive editor support', () => {
         expect(items?.[0].range).toMatchObject({start: {character: 9}, end: {character: cursor}});
     });
 
+    it.each(['./examples/a', '../examples/a', '/examples/a', 'a'])(
+        'keeps file and folder suggestions visible for the replacement prefix %s',
+        async (path) => {
+            vi.mocked(vscode.workspace.fs.readDirectory).mockResolvedValue([
+                ['a.ts', vscode.FileType.File],
+                ['assets', vscode.FileType.Directory],
+            ]);
+            const text = `{% code "${path}" %}`;
+            const cursor = text.indexOf(path) + path.length;
+            const items = await new CodeCompletionProvider().provideCompletionItems(
+                document(text),
+                new vscode.Position(0, cursor),
+            );
+
+            expect(items).toHaveLength(2);
+
+            for (const item of items ?? []) {
+                const range = item.range as vscode.Range;
+                const replacementPrefix = text.slice(range.start.character, cursor);
+                const label = typeof item.label === 'string' ? item.label : item.label.label;
+                const filterText = item.filterText ?? label;
+
+                expect(filterText.startsWith(replacementPrefix)).toBe(true);
+
+                const completed =
+                    text.slice(0, range.start.character) +
+                    item.insertText +
+                    text.slice(range.end.character);
+                const directory = path.slice(0, path.lastIndexOf('/') + 1);
+                const suffix = item.kind === vscode.CompletionItemKind.Folder ? '/' : '';
+
+                expect(completed).toBe(`{% code "${directory}${label}${suffix}" %}`);
+            }
+        },
+    );
+
     it('offers source files in an empty directive', async () => {
         vi.mocked(vscode.workspace.fs.readDirectory).mockResolvedValue([
             ['main.ts', vscode.FileType.File],
