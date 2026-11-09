@@ -240,6 +240,49 @@ describe('code directive editor support', () => {
         expect(vscode.workspace.fs.readDirectory).not.toHaveBeenCalled();
     });
 
+    it('supports navigation, diagnostics and completion inside table cells', async () => {
+        vi.mocked(vscode.workspace.fs.stat).mockRejectedValue(new Error('ENOENT'));
+        vi.mocked(vscode.workspace.fs.readDirectory).mockResolvedValue([
+            ['a.ts', vscode.FileType.File],
+        ]);
+        const line = '| escaped \\| {% code "a" %} | {% code "a" %} |';
+        const doc = document('| A | B |\n|---|---|\n' + line);
+        const links = new CodeLinkProvider().provideDocumentLinks(doc);
+        const diagnostics = await validateCodeDirectives(doc);
+        const cursor = line.lastIndexOf('"a"') + 2;
+        const items = await new CodeCompletionProvider().provideCompletionItems(
+            doc,
+            new vscode.Position(2, cursor),
+        );
+
+        expect(links).toHaveLength(2);
+        expect(diagnostics).toHaveLength(2);
+        expect(vscode.workspace.fs.stat).toHaveBeenCalledTimes(1);
+        expect(items?.[0].insertText).toBe('a.ts');
+        expect(items?.[0].range).toMatchObject({
+            start: {line: 2, character: cursor - 1},
+            end: {line: 2, character: cursor},
+        });
+        expect(diagnostics[1].range.start.character).toBe(cursor - 1);
+    });
+
+    it('decodes table path prefixes and escapes pipes in inserted completions', async () => {
+        vi.mocked(vscode.workspace.fs.readDirectory).mockResolvedValue([
+            ['a|b.ts', vscode.FileType.File],
+        ]);
+        const line = '| {% code "a\\|b" %} |';
+        const doc = document('| A |\n|---|\n' + line);
+        const links = new CodeLinkProvider().provideDocumentLinks(doc);
+        const items = await new CodeCompletionProvider().provideCompletionItems(
+            doc,
+            new vscode.Position(2, line.indexOf('b"') + 1),
+        );
+
+        expect(links[0].target?.fsPath).toBe(resolve('/docs/guide', 'a|b'));
+        expect(items?.[0].insertText).toBe('a\\|b.ts');
+        expect(items?.[0].filterText).toBe('a\\|b.ts');
+    });
+
     it('invalidates the parse cache after an edit', () => {
         const doc = document('{% code a.ts %}');
         const provider = new CodeLinkProvider();

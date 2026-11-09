@@ -4,7 +4,14 @@ import {dirname, isAbsolute, relative, resolve, sep} from 'node:path';
 import * as vscode from 'vscode';
 
 import {debounceByKey} from '../../utils';
-import {findYfmRoot, isInExcludedDir, logger} from '../utils';
+import {
+    findYfmRoot,
+    getVscConfig,
+    isFileExcluded,
+    isInExcludedDir,
+    isYfmFile,
+    logger,
+} from '../utils';
 
 import {CODE_ATTRIBUTES, findCodeDirectives} from './parser';
 
@@ -241,7 +248,8 @@ export class CodeCompletionProvider implements vscode.CompletionItemProvider {
                 : undefined);
 
         if (argument && cursor >= argument.start && cursor <= argument.end) {
-            const partial = directive.source.slice(argument.start, cursor);
+            const rawPartial = directive.source.slice(argument.start, cursor);
+            const partial = directive.inTable ? rawPartial.replace(/\\\|/g, '|') : rawPartial;
             const slash = partial.lastIndexOf('/');
             const directory = partial.slice(0, slash + 1);
             const prefix = partial.slice(slash + 1).toLowerCase();
@@ -276,6 +284,11 @@ export class CodeCompletionProvider implements vscode.CompletionItemProvider {
                     const quote = argument.quoted ? directive.source[argument.start - 1] : '';
                     const escaped = quote ? name.split(quote).join('\\' + quote) : name;
                     item.insertText = directory + escaped + (folder ? '/' : '');
+
+                    if (directive.inTable) {
+                        item.insertText = item.insertText.replace(/\|/g, '\\|');
+                    }
+
                     item.filterText = item.insertText;
                     item.range = argumentRange(directive, argument);
                     item.sortText = (folder ? '0' : '1') + name;
@@ -323,20 +336,32 @@ export class CodeCompletionProvider implements vscode.CompletionItemProvider {
 
 export function activate(context: vscode.ExtensionContext) {
     const collection = vscode.languages.createDiagnosticCollection('diplodoc-code');
+    let configurationVersion = 0;
 
     async function validateDocument(document: vscode.TextDocument) {
+        if (document.languageId !== 'markdown' || document.uri.scheme !== 'file') {
+            return;
+        }
+
         if (
-            document.languageId !== 'markdown' ||
-            document.uri.scheme !== 'file' ||
-            isInExcludedDir(document.uri.fsPath)
+            isInExcludedDir(document.uri.fsPath) ||
+            (getVscConfig<boolean>('isOnlyYFM', false) && !isYfmFile(document.uri.fsPath)) ||
+            isFileExcluded(document.fileName, getVscConfig<string[]>('excludedFiles', []))
         ) {
+            collection.delete(document.uri);
+
             return;
         }
 
         const version = document.version;
+        const settingsVersion = configurationVersion;
         const diagnostics = await validateCodeDirectives(document);
 
-        if (!document.isClosed && document.version === version) {
+        if (
+            !document.isClosed &&
+            document.version === version &&
+            settingsVersion === configurationVersion
+        ) {
             collection.set(document.uri, diagnostics);
         }
     }
@@ -366,6 +391,17 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.workspace.onDidOpenTextDocument(validate),
         vscode.workspace.onDidSaveTextDocument(validate),
         vscode.workspace.onDidChangeTextDocument(({document}) => debounced(document)),
+        vscode.workspace.onDidChangeConfiguration((event) => {
+            if (!event.affectsConfiguration('diplodoc')) {
+                return;
+            }
+
+            configurationVersion++;
+
+            for (const document of vscode.workspace.textDocuments) {
+                validate(document);
+            }
+        }),
         vscode.workspace.onDidCloseTextDocument((document) => {
             debounced.clear(document.uri.toString());
             cache.delete(document);

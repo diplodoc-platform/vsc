@@ -1,4 +1,5 @@
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline';
+import type Token from 'markdown-it/lib/token';
 
 import MarkdownIt from 'markdown-it';
 
@@ -17,6 +18,7 @@ export interface CodeDirective {
     arguments: CodeArgument[];
     messages: Array<{message: string; warning?: boolean}>;
     legacy: boolean;
+    inTable?: boolean;
 }
 
 export const CODE_ATTRIBUTES = ['lang', 'lines', 'keep-indents', 'jsonpath'];
@@ -251,49 +253,144 @@ function codeRule(state: StateInline, silent: boolean): boolean {
 const markdown = new MarkdownIt({html: true});
 markdown.inline.ruler.before('text', 'code_directive', codeRule);
 
+interface TableRowSource {
+    line: number;
+    original: string;
+    text: string;
+    columns: number[];
+    delimiters: number[];
+    cursor: number;
+    delimiter: number;
+}
+
+function createTableRow(original: string, line: number): TableRowSource {
+    const row: TableRowSource = {
+        line,
+        original,
+        text: '',
+        columns: [],
+        delimiters: [],
+        cursor: 0,
+        delimiter: 0,
+    };
+
+    for (let index = 0; index < original.length; index++) {
+        if (original[index] === '\\' && original[index + 1] === '|') {
+            index++;
+        } else if (original[index] === '|') {
+            row.delimiters.push(row.text.length);
+        }
+
+        row.columns.push(index);
+        row.text += original[index];
+    }
+
+    return row;
+}
+
+function appendTableDirectives(token: Token, row: TableRowSource, result: CodeDirective[]) {
+    const start = row.text.indexOf(token.content, row.cursor);
+
+    if (start < 0) {
+        row.cursor = row.text.length;
+
+        return;
+    }
+
+    row.cursor = start + token.content.length;
+
+    while (row.delimiters[row.delimiter] <= start) {
+        row.delimiter++;
+    }
+
+    const cellEnd = row.delimiters[row.delimiter] ?? row.text.length;
+
+    for (const child of token.children ?? []) {
+        if (child.type !== 'code_directive') {
+            continue;
+        }
+
+        const offset = start + (child.meta.start as number);
+        const column = row.columns[offset];
+        const normalizedEnd = child.content.endsWith('%}')
+            ? offset + child.content.length
+            : cellEnd;
+        const end = row.columns[normalizedEnd - 1] + 1;
+        const source = row.original.slice(column, end).replace(/\r$/, '');
+        const parsed = parseCodeArguments(row.text.slice(offset, normalizedEnd).replace(/\r$/, ''));
+
+        for (const argument of parsed.arguments) {
+            argument.start = (row.columns[offset + argument.start] ?? end) - column;
+            argument.end = (row.columns[offset + argument.end] ?? end) - column;
+        }
+
+        result.push({source, line: row.line, column, inTable: true, ...parsed});
+    }
+}
+
+function appendMappedDirectives(
+    token: Token,
+    firstLine: number,
+    lines: string[],
+    result: CodeDirective[],
+) {
+    const inlineLines = token.content.split('\n');
+    const prefixes = inlineLines.map((text, index) =>
+        Math.max(lines[firstLine + index]?.indexOf(text) ?? 0, 0),
+    );
+    let line = 0;
+    let lineStart = 0;
+
+    for (const child of token.children ?? []) {
+        if (child.type !== 'code_directive') {
+            continue;
+        }
+
+        const start = child.meta.start as number;
+
+        while (lineStart + inlineLines[line].length < start) {
+            lineStart += inlineLines[line++].length + 1;
+        }
+
+        const documentLine = firstLine + line;
+        const column = prefixes[line] + start - lineStart;
+        const source = child.content.endsWith('%}')
+            ? child.content
+            : lines[documentLine].slice(column).replace(/\r$/, '');
+
+        result.push({source, line: documentLine, column, ...parseCodeArguments(source)});
+    }
+}
+
 export function findCodeDirectives(content: string): CodeDirective[] {
     const lines = content.split('\n');
     const result: CodeDirective[] = [];
     const masked = content.replace(/^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/, (frontmatter) =>
         frontmatter.replace(/[^\r\n]/g, ' '),
     );
+    let row: TableRowSource | undefined;
 
     for (const token of markdown.parse(masked, {})) {
-        if (token.type !== 'inline' || !token.map) {
-            continue;
-        }
-
-        const inlineLines = token.content.split('\n');
-        const firstLine = token.map[0];
-        const prefixes = inlineLines.map((text, index) =>
-            Math.max(lines[firstLine + index]?.indexOf(text) ?? 0, 0),
-        );
-        let line = 0;
-        let lineStart = 0;
-
-        for (const child of token.children ?? []) {
-            if (child.type !== 'code_directive') {
-                continue;
+        switch (token.type) {
+            case 'tr_open': {
+                const line = token.map?.[0];
+                const source = line === undefined ? '' : lines[line];
+                row =
+                    line !== undefined && source.includes('{%')
+                        ? createTableRow(source, line)
+                        : undefined;
+                break;
             }
-
-            const start = child.meta.start as number;
-
-            while (lineStart + inlineLines[line].length < start) {
-                lineStart += inlineLines[line++].length + 1;
-            }
-
-            const documentLine = token.map[0] + line;
-            const column = prefixes[line] + start - lineStart;
-            const source = child.content.endsWith('%}')
-                ? child.content
-                : lines[documentLine].slice(column).replace(/\r$/, '');
-
-            result.push({
-                source,
-                line: documentLine,
-                column,
-                ...parseCodeArguments(source),
-            });
+            case 'tr_close':
+                row = undefined;
+                break;
+            case 'inline':
+                if (token.map) {
+                    appendMappedDirectives(token, token.map[0], lines, result);
+                } else if (row) {
+                    appendTableDirectives(token, row, result);
+                }
+                break;
         }
     }
 
