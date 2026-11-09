@@ -148,7 +148,7 @@ function yfmLiquidTagBlockRule(
     const isEndTag = tagName.startsWith('end');
     let closeLine = -1;
 
-    if (tagName && !isEndTag) {
+    if (tagName && !isEndTag && tagName !== 'code') {
         const closeRe = makeCloseRe(tagName);
 
         for (let i = startLine + 1; i < endLine; i++) {
