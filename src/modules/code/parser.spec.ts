@@ -169,15 +169,16 @@ describe('code directive parsing', () => {
         ]);
     });
 
-    it('decodes escaped pipes in table arguments while preserving source ranges', () => {
-        const source = '{% code "a\\|b.ts" lines="A\\|B" %}';
+    it.each(['a\\|b.ts', '\\|a\\|'])('preserves escaped table argument ranges for %s', (path) => {
+        const source = '{% code "' + path + '" lines="A\\|B" %}';
         const directive = findCodeDirectives('| A |\n|---|\n| ' + source + ' |')[0];
 
         expect(directive.source).toBe(source);
-        expect(directive.arguments.map(({value}) => value)).toEqual(['a|b.ts', 'A|B']);
-        expect(source.slice(directive.arguments[0].start, directive.arguments[0].end)).toBe(
-            'a\\|b.ts',
-        );
+        expect(directive.arguments.map(({value}) => value)).toEqual([
+            path.replace(/\\\|/g, '|'),
+            'A|B',
+        ]);
+        expect(source.slice(directive.arguments[0].start, directive.arguments[0].end)).toBe(path);
         expect(source.slice(directive.arguments[1].start, directive.arguments[1].end)).toBe(
             'A\\|B',
         );

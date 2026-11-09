@@ -275,13 +275,14 @@ function createTableRow(original: string, line: number): TableRowSource {
     };
 
     for (let index = 0; index < original.length; index++) {
+        row.columns.push(index);
+
         if (original[index] === '\\' && original[index + 1] === '|') {
             index++;
         } else if (original[index] === '|') {
             row.delimiters.push(row.text.length);
         }
 
-        row.columns.push(index);
         row.text += original[index];
     }
 
@@ -315,7 +316,7 @@ function appendTableDirectives(token: Token, row: TableRowSource, result: CodeDi
         const normalizedEnd = child.content.endsWith('%}')
             ? offset + child.content.length
             : cellEnd;
-        const end = row.columns[normalizedEnd - 1] + 1;
+        const end = row.columns[normalizedEnd] ?? row.original.length;
         const source = row.original.slice(column, end).replace(/\r$/, '');
         const parsed = parseCodeArguments(row.text.slice(offset, normalizedEnd).replace(/\r$/, ''));
 
