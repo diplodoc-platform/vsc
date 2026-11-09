@@ -286,7 +286,7 @@ export class CodeCompletionProvider implements vscode.CompletionItemProvider {
                     item.insertText = directory + escaped + (folder ? '/' : '');
 
                     if (directive.inTable) {
-                        item.insertText = item.insertText.replace(/\|/g, '\\|');
+                        item.insertText = item.insertText.replace(/\|/g, String.raw`\|`);
                     }
 
                     item.filterText = item.insertText;
