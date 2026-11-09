@@ -1,4 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {resolve} from 'node:path';
 import * as vscode from 'vscode';
 
 import {
@@ -38,8 +39,8 @@ describe('code directive editor support', () => {
         const links = new CodeLinkProvider().provideDocumentLinks(document(text));
 
         expect(links.map((link) => link.target?.fsPath)).toEqual([
-            '/docs/examples/a file.ts',
-            '/docs/examples/root.ts',
+            resolve('/docs/examples/a file.ts'),
+            resolve('/docs/examples/root.ts'),
         ]);
         expect(text.slice(links[0].range.start.character, links[0].range.end.character)).toBe(
             '../examples/a file.ts',
@@ -49,7 +50,7 @@ describe('code directive editor support', () => {
     it('does not treat hashes in source filenames as markdown anchors', () => {
         const links = new CodeLinkProvider().provideDocumentLinks(document('{% code "a#b.ts" %}'));
 
-        expect(links[0].target?.fsPath).toBe('/docs/guide/a#b.ts');
+        expect(links[0].target?.fsPath).toBe(resolve('/docs/guide/a#b.ts'));
     });
 
     it('does not read source contents and checks repeated paths only once per validation', async () => {
@@ -74,6 +75,25 @@ describe('code directive editor support', () => {
         expect(diagnostics).toHaveLength(2);
         expect(diagnostics[0].message).toContain('missing.ts');
         expect(diagnostics[0].range.start.character).toBe(8);
+    });
+
+    it('starts unique source checks together and preserves diagnostic order', async () => {
+        vi.mocked(vscode.workspace.fs.stat).mockResolvedValue({
+            type: vscode.FileType.Directory,
+            size: 0,
+            ctime: 0,
+            mtime: 0,
+        });
+        const result = validateCodeDirectives(
+            document('{% code first.ts %}\n\n{% code second.ts %}\n\n{% code ./first.ts %}'),
+        );
+
+        expect(vscode.workspace.fs.stat).toHaveBeenCalledTimes(2);
+
+        const diagnostics = await result;
+
+        expect(diagnostics.map((diagnostic) => diagnostic.range.start.line)).toEqual([0, 2, 4]);
+        expect(vscode.workspace.fs.readFile).not.toHaveBeenCalled();
     });
 
     it('rejects external paths and escapes from the input root without I/O', async () => {
@@ -122,7 +142,7 @@ describe('code directive editor support', () => {
         ]);
         expect(vscode.workspace.fs.readDirectory).toHaveBeenCalledTimes(1);
         expect(vi.mocked(vscode.workspace.fs.readDirectory).mock.calls[0][0].fsPath).toBe(
-            '/docs/examples',
+            resolve('/docs/examples'),
         );
         expect(items?.[0].range).toMatchObject({start: {character: 9}, end: {character: cursor}});
     });
@@ -186,6 +206,29 @@ describe('code directive editor support', () => {
         expect(items?.map((item) => item.label)).toEqual(['lines', 'keep-indents']);
     });
 
+    it('completes an attribute after a long source path', async () => {
+        const text = `{% code "${'a'.repeat(20000)}.ts" lan`;
+        const items = await new CodeCompletionProvider().provideCompletionItems(
+            document(text),
+            new vscode.Position(0, text.length),
+        );
+
+        expect(items?.map((item) => item.label)).toEqual(['lang']);
+    });
+
+    it.each([
+        '{% code "a.ts" lines="START ',
+        `{% code "a.ts" lines="START'prefix la`,
+        '{% code "a.ts" lang="',
+    ])('does not suggest attributes inside a value: %s', async (text) => {
+        const items = await new CodeCompletionProvider().provideCompletionItems(
+            document(text),
+            new vscode.Position(0, text.length),
+        );
+
+        expect(items).toBeUndefined();
+    });
+
     it('does not offer completions inside code samples', async () => {
         const text = '```md\n{% code "a" %}\n```';
         const items = await new CodeCompletionProvider().provideCompletionItems(
@@ -200,8 +243,12 @@ describe('code directive editor support', () => {
     it('invalidates the parse cache after an edit', () => {
         const doc = document('{% code a.ts %}');
         const provider = new CodeLinkProvider();
-        expect(provider.provideDocumentLinks(doc)[0].target?.fsPath).toBe('/docs/guide/a.ts');
+        expect(provider.provideDocumentLinks(doc)[0].target?.fsPath).toBe(
+            resolve('/docs/guide/a.ts'),
+        );
         Object.assign(doc, {version: 2, getText: () => '{% code b.ts %}'});
-        expect(provider.provideDocumentLinks(doc)[0].target?.fsPath).toBe('/docs/guide/b.ts');
+        expect(provider.provideDocumentLinks(doc)[0].target?.fsPath).toBe(
+            resolve('/docs/guide/b.ts'),
+        );
     });
 });

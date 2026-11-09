@@ -512,11 +512,13 @@ Completion items use `sortText = '0_<id>'` to appear above VS Code's built-in he
 
 `src/modules/code/` provides Markdown `{% code %}` navigation, completion and diagnostics. `parser.ts` uses a MarkdownIt inline rule so fences, indented/inline code and HTML comments are skipped by the existing Markdown parser; frontmatter is masked while preserving line positions. The supported editor form is single-line. Argument names and quote handling follow the CLI code-includer contract. `jsonpath` is preserved without evaluation or source validation.
 
-The parse cache is keyed by document identity and version. Validation runs on open/save and after a 400 ms edit debounce, deduplicates `fs.stat` calls within each pass, and discards stale or closed-document results. It never reads source contents or scans the workspace. Relative paths start at the referring document, `/` paths at the `.yfm` root; URI schemes and paths escaping that root are rejected. File existence is refreshed on the next referring-document validation.
+The parse cache is keyed by document identity and version. Validation runs on open/save and after a 400 ms edit debounce, deduplicates `fs.stat` calls within each pass, waits for unique checks together, and preserves source order in diagnostics. It discards stale or closed-document results and logs unexpected validation failures through a guarded event handler. It never reads source contents or scans the workspace. Relative paths start at the referring document, `/` paths at the `.yfm` root; URI schemes and paths escaping that root are rejected. File existence is refreshed on the next referring-document validation.
 
 `YfmDirective` treats `code` as a standalone tag and never searches for `endcode`. The visual editor preserves the original directive rather than expanding it. The shared directive registry suggested in DOCSTOOLS-6865 remains a separate design decision; this implementation adds no packages or dependency changes.
 
 Path completion items replace the full source argument and set `filterText` to the full inserted path, including its directory. The display label contains only the entry name; using that label for filtering would hide suggestions after a directory prefix.
+
+Attribute completion scans the final word backwards and uses parsed argument ranges to exclude attribute values. Avoid unanchored suffix regexes here: repeated backtracking over a long source path can block completion. Tests compare native file paths with `node:path.resolve`, keeping Windows path separators distinct from Markdown's `/` syntax.
 
 ## Extension Settings
 

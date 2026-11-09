@@ -4,7 +4,7 @@ import {dirname, isAbsolute, relative, resolve, sep} from 'node:path';
 import * as vscode from 'vscode';
 
 import {debounceByKey} from '../../utils';
-import {findYfmRoot, isInExcludedDir} from '../utils';
+import {findYfmRoot, isInExcludedDir, logger} from '../utils';
 
 import {CODE_ATTRIBUTES, findCodeDirectives} from './parser';
 
@@ -13,7 +13,7 @@ const cache = new WeakMap<vscode.TextDocument, {version: number; directives: Cod
 function getDirectives(document: vscode.TextDocument): CodeDirective[] {
     const previous = cache.get(document);
 
-    if (previous && previous.version === document.version) {
+    if (previous?.version === document.version) {
         return previous.directives;
     }
 
@@ -90,70 +90,131 @@ function hasFileType(type: vscode.FileType, expected: vscode.FileType): boolean 
     return type === expected || type === expected + vscode.FileType.SymbolicLink;
 }
 
+function createDiagnostic(
+    directive: CodeDirective,
+    message: string,
+    warning = false,
+    argument?: CodeArgument,
+): vscode.Diagnostic {
+    const diagnostic = new vscode.Diagnostic(
+        argumentRange(directive, argument),
+        `Code directive: ${message}`,
+        warning ? vscode.DiagnosticSeverity.Warning : vscode.DiagnosticSeverity.Error,
+    );
+    diagnostic.source = 'Diplodoc';
+    diagnostic.code = 'code-directive';
+
+    return diagnostic;
+}
+
+interface PreparedValidation {
+    directive: CodeDirective;
+    diagnostics: vscode.Diagnostic[];
+    source?: {argument: CodeArgument; key: string};
+}
+
+function prepareValidation(
+    document: vscode.TextDocument,
+    directive: CodeDirective,
+    checks: Map<string, PromiseLike<boolean>>,
+): PreparedValidation {
+    const result: PreparedValidation = {
+        directive,
+        diagnostics: directive.messages.map(({message, warning}) =>
+            createDiagnostic(directive, message, warning),
+        ),
+    };
+    const argument = sourceArgument(directive);
+
+    if (
+        !argument?.value ||
+        directive.legacy ||
+        directive.messages.some((message) => !message.warning)
+    ) {
+        return result;
+    }
+
+    const target = resolveCodeSource(document, argument.value);
+
+    if (!target) {
+        result.diagnostics.push(
+            createDiagnostic(
+                directive,
+                'Source must be a local file inside the documentation root',
+                false,
+                argument,
+            ),
+        );
+
+        return result;
+    }
+
+    const key = target.toString();
+
+    if (!checks.has(key)) {
+        checks.set(
+            key,
+            vscode.workspace.fs.stat(target).then(
+                (stat) => hasFileType(stat.type, vscode.FileType.File),
+                () => false,
+            ),
+        );
+    }
+
+    result.source = {argument, key};
+
+    return result;
+}
+
 export async function validateCodeDirectives(
     document: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> {
-    const diagnostics: vscode.Diagnostic[] = [];
-    const checked = new Map<string, PromiseLike<boolean>>();
+    const checks = new Map<string, PromiseLike<boolean>>();
+    const prepared = getDirectives(document).map((directive) =>
+        prepareValidation(document, directive, checks),
+    );
+    const keys = [...checks.keys()];
+    const results = await Promise.all(checks.values());
+    const existing = new Map(keys.map((key, index) => [key, results[index]]));
 
-    for (const directive of getDirectives(document)) {
-        for (const {message, warning} of directive.messages) {
-            const diagnostic = new vscode.Diagnostic(
-                argumentRange(directive),
-                `Code directive: ${message}`,
-                warning ? vscode.DiagnosticSeverity.Warning : vscode.DiagnosticSeverity.Error,
+    return prepared.flatMap(({directive, diagnostics, source}) => {
+        if (source && !existing.get(source.key)) {
+            diagnostics.push(
+                createDiagnostic(
+                    directive,
+                    `Source file is missing or is not a file: ${source.argument.value}`,
+                    false,
+                    source.argument,
+                ),
             );
-            diagnostic.source = 'Diplodoc';
-            diagnostic.code = 'code-directive';
-            diagnostics.push(diagnostic);
         }
 
-        const argument = sourceArgument(directive);
+        return diagnostics;
+    });
+}
 
-        if (
-            !argument?.value ||
-            directive.legacy ||
-            directive.messages.some((message) => !message.warning)
-        ) {
-            continue;
-        }
+function getAttributePrefix(before: string): string | undefined {
+    let start = before.length;
 
-        const target = resolveCodeSource(document, argument.value);
-        let message: string | undefined;
-
-        if (target) {
-            const key = target.toString();
-
-            if (!checked.has(key)) {
-                checked.set(
-                    key,
-                    vscode.workspace.fs.stat(target).then(
-                        (stat) => hasFileType(stat.type, vscode.FileType.File),
-                        () => false,
-                    ),
-                );
-            }
-
-            if (!(await checked.get(key))) {
-                message = `Source file is missing or is not a file: ${argument.value}`;
-            }
-        } else {
-            message = 'Source must be a local file inside the documentation root';
-        }
-
-        if (message) {
-            const diagnostic = new vscode.Diagnostic(
-                argumentRange(directive, argument),
-                `Code directive: ${message}`,
-                vscode.DiagnosticSeverity.Error,
-            );
-            diagnostic.source = 'Diplodoc';
-            diagnostic.code = 'code-directive';
-            diagnostics.push(diagnostic);
-        }
+    while (start > 0 && /[\w-]/.test(before[start - 1])) {
+        start--;
     }
 
-    return diagnostics;
+    if (start === 0 || !/\s/.test(before[start - 1])) {
+        return undefined;
+    }
+
+    return before.slice(start);
+}
+
+function isAttributeValue(directive: CodeDirective, cursor: number): boolean {
+    return directive.arguments.some(
+        (argument) =>
+            argument.name &&
+            argument.value !== undefined &&
+            cursor >= argument.start &&
+            cursor <= argument.end,
+    );
 }
 
 export class CodeCompletionProvider implements vscode.CompletionItemProvider {
@@ -232,11 +293,12 @@ export class CodeCompletionProvider implements vscode.CompletionItemProvider {
 
         const before = directive.source.slice(0, cursor);
 
-        if (!/\s[\w-]*$/.test(before) || /[=]['"][^'"]*$/.test(before)) {
+        const partial = getAttributePrefix(before);
+
+        if (partial === undefined || isAttributeValue(directive, cursor)) {
             return undefined;
         }
 
-        const partial = /[\w-]*$/.exec(before)?.[0] ?? '';
         const existing = new Set(
             directive.arguments.filter((entry) => entry.end < cursor).map((entry) => entry.name),
         );
@@ -262,7 +324,7 @@ export class CodeCompletionProvider implements vscode.CompletionItemProvider {
 export function activate(context: vscode.ExtensionContext) {
     const collection = vscode.languages.createDiagnosticCollection('diplodoc-code');
 
-    async function validate(document: vscode.TextDocument) {
+    async function validateDocument(document: vscode.TextDocument) {
         if (
             document.languageId !== 'markdown' ||
             document.uri.scheme !== 'file' ||
@@ -277,6 +339,12 @@ export function activate(context: vscode.ExtensionContext) {
         if (!document.isClosed && document.version === version) {
             collection.set(document.uri, diagnostics);
         }
+    }
+
+    function validate(document: vscode.TextDocument) {
+        validateDocument(document).catch((error: unknown) => {
+            logger({message: 'Code directive validation failed', error: String(error)});
+        });
     }
 
     const debounced = debounceByKey(validate, 400, (document) => document.uri.toString());

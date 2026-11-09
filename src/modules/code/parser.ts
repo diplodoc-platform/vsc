@@ -54,91 +54,93 @@ function readValue(source: string, start: number, attribute = false): CodeArgume
     return {value, start: start + (quoted ? 1 : 0), end, quoted};
 }
 
+interface ReadArgumentResult {
+    argument?: CodeArgument;
+    offset: number;
+    error?: string;
+}
+
+function finishQuotedArgument(source: string, argument: CodeArgument): ReadArgumentResult {
+    if (source[argument.end] !== source[argument.start - 1]) {
+        return {argument, offset: argument.end, error: 'Unterminated quoted value'};
+    }
+
+    return {argument, offset: argument.end + 1};
+}
+
+function readAttribute(
+    source: string,
+    name: string | undefined,
+    start: number,
+): ReadArgumentResult {
+    const offset = skipWhitespace(source, start);
+    const argument = {...readValue(source, offset, true), name};
+
+    if (offset === source.length) {
+        argument.value = undefined;
+    }
+
+    return argument.quoted
+        ? finishQuotedArgument(source, argument)
+        : {argument, offset: argument.end};
+}
+
+function readArgument(source: string, start: number): ReadArgumentResult {
+    let argument = readValue(source, start);
+
+    if (argument.quoted) {
+        return finishQuotedArgument(source, argument);
+    }
+
+    if (argument.start === argument.end) {
+        return {offset: start, error: 'Unexpected "="'};
+    }
+
+    const offset = skipWhitespace(source, argument.end);
+
+    if (source[offset] === '=') {
+        return readAttribute(source, argument.value, offset + 1);
+    }
+
+    if (CODE_ATTRIBUTES.includes(argument.value ?? '')) {
+        argument = {...argument, name: argument.value, value: undefined};
+    }
+
+    return {argument, offset};
+}
+
 function tokenizeArguments(source: string): Pick<CodeDirective, 'arguments' | 'messages'> {
     const args: CodeArgument[] = [];
     const messages: CodeDirective['messages'] = [];
-    const closed = source.endsWith('%}');
-    const body = source.slice(0, closed ? -2 : undefined);
+    const body = source.slice(0, source.endsWith('%}') ? -2 : undefined);
     let offset = /^{%\s*code\b\s*/.exec(body)?.[0].length ?? body.length;
 
     while (offset < body.length) {
-        if (/\s/.test(body[offset])) {
-            offset++;
-            continue;
-        }
+        offset = skipWhitespace(body, offset);
 
-        let argument = readValue(body, offset);
-        offset = argument.end;
-
-        if (!argument.quoted && argument.start === argument.end) {
-            messages.push({message: 'Unexpected "="'});
+        if (offset === body.length) {
             break;
         }
 
-        if (argument.quoted) {
-            if (body[offset] !== body[argument.start - 1]) {
-                messages.push({message: 'Unterminated quoted value'});
-                args.push(argument);
-                break;
-            }
+        const result = readArgument(body, offset);
 
-            offset++;
-        } else {
-            offset = skipWhitespace(body, offset);
-
-            if (body[offset] === '=') {
-                const name = argument.value;
-                offset++;
-
-                offset = skipWhitespace(body, offset);
-
-                argument = {...readValue(body, offset, true), name};
-
-                if (offset === body.length) {
-                    argument.value = undefined;
-                }
-                offset = argument.end;
-
-                if (argument.quoted && body[offset] === body[argument.start - 1]) {
-                    offset++;
-                } else if (argument.quoted) {
-                    messages.push({message: 'Unterminated quoted value'});
-                }
-            } else if (CODE_ATTRIBUTES.includes(argument.value ?? '')) {
-                argument = {...argument, name: argument.value, value: undefined};
-            }
+        if (result.argument) {
+            args.push(result.argument);
         }
 
-        args.push(argument);
+        if (result.error) {
+            messages.push({message: result.error});
+            break;
+        }
+
+        offset = result.offset;
     }
 
     return {arguments: args, messages};
 }
 
-export function parseCodeArguments(
-    source: string,
-): Pick<CodeDirective, 'arguments' | 'messages' | 'legacy'> {
-    const {arguments: args, messages} = tokenizeArguments(source);
-    const legacy = args.some((argument) => argument.name === 'jsonpath');
-
-    if (legacy) {
-        return {arguments: args, messages: [], legacy};
-    }
-
-    if (!source.endsWith('%}')) {
-        messages.push({message: 'Code directive must end with %}'});
-    }
-
-    const positional = args.filter((argument) => !argument.name);
-
-    if (!positional[0]?.value) {
-        messages.push({message: 'Source path is required'});
-    }
-
-    if (positional.length > 1) {
-        messages.push({message: 'Extra positional arguments are ignored', warning: true});
-    }
-
+function validateAttributes(args: CodeArgument[]): CodeDirective['messages'] {
+    const messages: CodeDirective['messages'] = [];
     const attributes = new Map<string, CodeArgument>();
 
     for (const argument of args) {
@@ -175,6 +177,35 @@ export function parseCodeArguments(
             messages.push({message: 'Attribute "lang" contains unsafe characters'});
         }
     }
+
+    return messages;
+}
+
+export function parseCodeArguments(
+    source: string,
+): Pick<CodeDirective, 'arguments' | 'messages' | 'legacy'> {
+    const {arguments: args, messages} = tokenizeArguments(source);
+    const legacy = args.some((argument) => argument.name === 'jsonpath');
+
+    if (legacy) {
+        return {arguments: args, messages: [], legacy};
+    }
+
+    if (!source.endsWith('%}')) {
+        messages.push({message: 'Code directive must end with %}'});
+    }
+
+    const positional = args.filter((argument) => !argument.name);
+
+    if (!positional[0]?.value) {
+        messages.push({message: 'Source path is required'});
+    }
+
+    if (positional.length > 1) {
+        messages.push({message: 'Extra positional arguments are ignored', warning: true});
+    }
+
+    messages.push(...validateAttributes(args));
 
     return {arguments: args, messages, legacy};
 }
