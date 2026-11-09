@@ -508,6 +508,14 @@ For headings with `{#id}`, the anchor ID is the explicit id — not the slug of 
 
 Completion items use `sortText = '0_<id>'` to appear above VS Code's built-in heading suggestions. `detail` shows the clean heading text.
 
+## Code directive support
+
+`src/modules/code/` provides Markdown `{% code %}` navigation, completion and diagnostics. `parser.ts` uses a MarkdownIt inline rule so fences, indented/inline code and HTML comments are skipped by the existing Markdown parser; frontmatter is masked while preserving line positions. The supported editor form is single-line. Argument names and quote handling follow the CLI code-includer contract. `jsonpath` is preserved without evaluation or source validation.
+
+The parse cache is keyed by document identity and version. Validation runs on open/save and after a 400 ms edit debounce, deduplicates `fs.stat` calls within each pass, and discards stale or closed-document results. It never reads source contents or scans the workspace. Relative paths start at the referring document, `/` paths at the `.yfm` root; URI schemes and paths escaping that root are rejected. File existence is refreshed on the next referring-document validation.
+
+`YfmDirective` treats `code` as a standalone tag and never searches for `endcode`. The visual editor preserves the original directive rather than expanding it. The shared directive registry suggested in DOCSTOOLS-6865 remains a separate design decision; this implementation adds no packages or dependency changes.
+
 ## Extension Settings
 
 Declared in `package.json` under `contributes.configuration.properties`, read via the `getVscConfig()` helper (`src/modules/utils.ts`).

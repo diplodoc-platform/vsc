@@ -37,6 +37,10 @@
 - **Сайдбар** — браузер файлов с поиском, навигацией и инициализацией проекта
 - **Подсветка синтаксиса** — подсветка YAML внутри блоков `::: page-constructor` в Markdown; подсветка Liquid-синтаксиса в Markdown
 
+## Code directives
+
+`{% code %}` supports source-file navigation, path and attribute completion, validation, and preservation in the visual editor. See [syntax, examples and limitations](README.md#code-directives).
+
 ## Требования
 
 VS Code 1.110+
