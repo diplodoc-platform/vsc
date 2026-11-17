@@ -15,6 +15,7 @@ import includesPlugin from '@diplodoc/transform/lib/plugins/includes';
 import linksPlugin from '@diplodoc/transform/lib/plugins/links';
 
 import {isIncluded} from '../utils';
+import {FRONTMATTER_RE} from '../shared/frontmatter';
 import {getYaMakeDests} from '../shared/ya-make';
 
 import {
@@ -45,6 +46,15 @@ function liquidConditionDiagnostics(content: string): vscode.Diagnostic[] {
     });
 }
 
+function isUnknownCodeDirective(error: ValidationMessage): boolean {
+    return (
+        'ruleNames' in error &&
+        error.ruleNames?.includes('YFM020') === true &&
+        typeof error.errorDetail === 'string' &&
+        /^Unknown or invalid directive '\{% code(?:\s|%})/.test(error.errorDetail)
+    );
+}
+
 function isResolvedConditionalAnchor(error: ValidationMessage): boolean {
     if (!('message' in error) || typeof error.message !== 'string') {
         return false;
@@ -66,8 +76,6 @@ function isResolvedConditionalAnchor(error: ValidationMessage): boolean {
         return false;
     }
 }
-
-const FRONTMATTER_RE = /^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/;
 
 const allPlugins = [
     ...defaultPlugins,
@@ -129,6 +137,7 @@ export async function validateMarkdown(
 
     const errors = [...(lintErrors || []), ...pluginMessages].filter(
         (error) =>
+            !isUnknownCodeDirective(error) &&
             !isTermDefinition(error, content) &&
             !isResolvedConditionalAnchor(error) &&
             (error as YfmLintError).level !== 'disabled' &&

@@ -1,5 +1,7 @@
 import type {Content} from './types';
 
+import {FRONTMATTER_RE} from '../shared/frontmatter';
+
 export function parseContent(content: string) {
     const {fmContent, bodyContent, fmLineCount} = extractFrontmatter(content);
     const pcContent = extractPcBlocks(bodyContent, fmLineCount);
@@ -11,7 +13,7 @@ export function parseContent(content: string) {
 }
 
 function extractFrontmatter(content: string) {
-    const match = content.match(/^---\n([\s\S]*?)\n---/);
+    const match = FRONTMATTER_RE.exec(content);
 
     if (!match) {
         return {
@@ -21,9 +23,9 @@ function extractFrontmatter(content: string) {
         };
     }
 
-    const inner = match[1];
+    const inner = match[1].replace(/\r?\n$/, '');
     const startLine = 1;
-    const endLine = inner.split('\n').length;
+    const endLine = match[1] ? inner.split('\n').length : 0;
 
     const fmContent: Content = {
         type: 'fm',
@@ -35,7 +37,7 @@ function extractFrontmatter(content: string) {
     return {
         fmContent,
         bodyContent: content.slice(match[0].length),
-        fmLineCount: endLine + 1,
+        fmLineCount: endLine + 2,
     };
 }
 

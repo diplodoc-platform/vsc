@@ -37,6 +37,28 @@ Document text, file paths, usernames and exception messages/stacks are not inclu
 - **Sidebar** — file browser with search, quick navigation, and project initialization
 - **Syntax Highlighting** — YAML highlighting inside `::: page-constructor` blocks in Markdown; Liquid syntax highlighting in Markdown
 
+## Code directives
+
+The extension supports single-line `{% code %}` directives in Markdown:
+
+```markdown
+{% code "./examples/main.ts" lang="typescript" lines="[BEGIN example]-[END example]" keep-indents %}
+```
+
+- Ctrl+Click the source path to open the file. Relative paths start at the Markdown file's directory; `/examples/main.ts` starts at the documentation root identified by `.yfm`.
+- URI-like prefixes are rejected: `chapter:1.ts` is treated as a URI scheme. Use `./chapter:1.ts` on file systems that allow `:` in file names. File completion inserts `./` for you when the first segment looks like a URI scheme. Colons later in a path, such as `examples/chapter:1.ts`, do not require this prefix.
+- Complete file paths inside the first argument and the `lang`, `lines`, and `keep-indents` attributes. Quote paths containing spaces. Within a quoted path, completion supports file and folder names with an escaped quote.
+- Missing files, directories used as files, invalid arguments and paths escaping the documentation root produce diagnostics on open, edit and save. Repeated references to the same file share one existence check per validation.
+- Code directives use their specific argument and file diagnostics instead of a generic YFM020 "unknown directive" warning. YFM020 continues to validate other directives.
+- Navigation, completion and diagnostics also work inside Markdown table cells.
+- Validation respects `diplodoc.isOnlyYFM`, `diplodoc.excludedFiles` and excluded directories. Changing Diplodoc settings refreshes diagnostics in open documents and clears them for excluded files.
+- `lines` is passed through as a marker selection, matching the [CLI code directive](https://github.com/diplodoc-platform/cli/tree/master/src/commands/build/features/code-includer). Marker existence is checked during the documentation build.
+- Code samples inside fenced/indented code, inline code, HTML comments and YAML frontmatter do not produce links or diagnostics.
+- The visual editor preserves the directive and its arguments as editable source. It does not expand the included file or require an `{% endcode %}` tag.
+- Legacy `jsonpath` directives are preserved without evaluating their expressions or validating their source files. The closing `%}` is still required. They are not offered in completions.
+
+Source contents are never read for code-directive validation. Source-file changes are checked when the referring Markdown document is edited or saved.
+
 ## Requirements
 
 VS Code 1.110+
