@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/diplodoc-platform/vsc/compare/v1.7.1...v1.8.0) (2026-11-17)
+
+
+### Features
+
+* **vsc:** support code directives #DOCSTOOLS-6865 ([fec9b30](https://github.com/diplodoc-platform/vsc/commit/fec9b30773342cd4f21da39c72feb343cb43ab7d))
+
 ## [1.7.1](https://github.com/diplodoc-platform/vsc/compare/v1.7.0...v1.7.1) (2026-11-05)
 
 
