@@ -508,6 +508,32 @@ For headings with `{#id}`, the anchor ID is the explicit id — not the slug of 
 
 Completion items use `sortText = '0_<id>'` to appear above VS Code's built-in heading suggestions. `detail` shows the clean heading text.
 
+## Code directive support
+
+`src/modules/code/` provides Markdown `{% code %}` navigation, completion and diagnostics. `parser.ts` uses a MarkdownIt inline rule so fences, indented/inline code and HTML comments are skipped by the existing Markdown parser; frontmatter is masked while preserving line positions. Code parsing, Markdown linting and YAML block extraction share the frontmatter boundary in `src/modules/shared/frontmatter.ts`, including adjacent opening and closing fences for an empty header. The supported editor form is single-line. Argument names and quote handling follow the CLI code-includer contract. `jsonpath` is preserved without evaluation or source/attribute validation, but a missing closing `%}` still produces a diagnostic. Partial arguments remain available.
+
+Table-cell inline tokens have no line map. Their positions are recovered from the enclosing `tr_open` token and a forward-only cell cursor. A row-local column map accounts for escaped pipes while retaining original source ranges. Cells keep their own parsed children so code spans and comments do not cross cell boundaries.
+
+The parse cache is keyed by document identity and version. Validation runs on open/save and after a 400 ms edit debounce, deduplicates `fs.stat` calls within each pass, waits for unique checks together, and preserves source order in diagnostics. Immediate validation cancels that document's pending timer, including on configuration changes; timers for other documents remain active. Each run has a per-document request token so only the latest run can publish, even when two saves share a document version. It discards stale or closed-document results and logs unexpected validation failures through a guarded event handler. It never reads source contents or scans the workspace. Relative paths start at the referring document, `/` paths at the `.yfm` root; URI schemes and paths escaping that root are rejected. A URI-like first segment such as `chapter:1.ts` needs an explicit `./` prefix on file systems supporting colons. File existence is refreshed on the next referring-document validation.
+
+Code diagnostics honor `isOnlyYFM`, `excludedFiles` and excluded directories before parsing. Diplodoc configuration changes revalidate open documents and delete diagnostics for excluded files. A configuration version prevents pending checks from restoring diagnostics from older settings.
+
+`YfmDirective` treats `code` as a standalone tag and never searches for `endcode`. The visual editor preserves the original directive rather than expanding it. The shared directive registry suggested in DOCSTOOLS-6865 remains a separate design decision; this implementation adds no packages or dependency changes.
+
+`validation/markdown.ts` drops only the older linter's YFM020 "unknown directive"
+diagnostic for the exact `code` name. The dedicated code provider still validates
+arguments and source files. Other YFM020 errors, including `endcode`, similar
+unknown names, invalid notes/includes and another directive on the same line,
+remain visible. `validation/markdown-code.spec.ts` exercises the real Markdown
+linter and code validation together on the manual fixture. Do not disable YFM020
+globally or register `code` as a paired custom directive: that would also accept
+an unsupported `endcode`. The compatibility filter uses existing diagnostic data
+and adds no Markdown parse or file read.
+
+Path completion decodes table escapes and the active quote for filesystem lookup. It retains the typed directory spelling for insertion and filtering. Items replace the full source argument. For a URI-like entry at the start of a relative path, insertion adds `./` while `filterText` matches the spelling the user typed.
+
+Attribute completion scans the final word backwards and uses parsed argument ranges to exclude attribute values. Avoid unanchored suffix regexes here: repeated backtracking over a long source path can block completion. Tests compare native file paths with `node:path.resolve`, keeping Windows path separators distinct from Markdown's `/` syntax.
+
 ## Extension Settings
 
 Declared in `package.json` under `contributes.configuration.properties`, read via the `getVscConfig()` helper (`src/modules/utils.ts`).

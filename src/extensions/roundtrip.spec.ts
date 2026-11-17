@@ -9,6 +9,7 @@ import {YfmLinks} from './yfm-links';
 import {YfmLiquidInline} from './yfm-liquid-inline';
 import {YfmSerializer} from './yfm-serializer';
 import {YfmTables} from './yfm-tables';
+import {YfmDirective} from './yfm-directive';
 
 const SERIALIZER_OPTIONS = {
     commonEscape: /.^/,
@@ -18,6 +19,7 @@ const SERIALIZER_OPTIONS = {
 function createManager() {
     const extensions: ExtensionAuto = (builder) => {
         builder.use(YfmSpecsPreset, {});
+        builder.use(YfmDirective);
         builder.use(YfmLiquidInline);
         builder.use(YfmTables);
         builder.use(YfmImageReparse);
@@ -43,6 +45,18 @@ function serializeDoc(docJson: object): string {
 
     return serializer.serialize(doc, SERIALIZER_OPTIONS);
 }
+
+describe('roundtrip: code directives', () => {
+    it('preserves arguments, quotes and following content without looking for endcode', () => {
+        const directive = `{% code "./a file.ts" lang='ts' lines="[BEGIN]-[END]" keep-indents %}`;
+        const source = `${directive}\n\n# Following heading\n\n{% endcode %}\n`;
+        const output = roundtrip(source);
+
+        expect(output).toContain(directive);
+        expect(output).toContain('# Following heading');
+        expect(output).toContain('{% endcode %}');
+    });
+});
 
 describe('roundtrip: tables with images', () => {
     const src = [

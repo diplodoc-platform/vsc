@@ -15,6 +15,16 @@ describe('parseContent', () => {
         expect(pcContent).toEqual([]);
     });
 
+    it.each(['\n', '\r\n'])('locates page content after empty frontmatter (%j)', (eol) => {
+        const input = ['---', '---', '::: page-constructor', 'blocks: []', ':::', '', '---'].join(
+            eol,
+        );
+        const {fmContent, pcContent} = parseContent(input);
+
+        expect(fmContent?.content).toBe('');
+        expect(pcContent).toMatchObject([{startLine: 3, endLine: 3}]);
+    });
+
     it('returns null frontmatter when absent', () => {
         const {fmContent} = parseContent('Just body text');
         expect(fmContent).toBeNull();
