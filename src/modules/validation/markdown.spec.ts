@@ -104,6 +104,49 @@ describe('validateMarkdown', () => {
         });
     });
 
+    it.each([
+        ['suffix in a valid link', '[ok](pre-a.md)\n\n[broken](a.md)', [[2, 9, 13]]],
+        [
+            'plain text before repeated links',
+            'a.md [a](<a.md>) [b](a.md)',
+            [
+                [0, 10, 14],
+                [0, 21, 25],
+            ],
+        ],
+        [
+            'mixed reference and inline links',
+            '[ref][a]\n\n[a]: a.md\n\n[inline](a.md)',
+            [
+                [2, 5, 9],
+                [4, 9, 13],
+            ],
+        ],
+    ] as const)('locates broken link destinations with %s', async (_, content, ranges) => {
+        const root = mkdtempSync(join(tmpdir(), 'diplodoc-markdown-links-'));
+
+        try {
+            writeFileSync(join(root, 'pre-a.md'), '# Target\n');
+
+            const diagnostics = await validateMarkdown(
+                createDocument(content, join(root, 'page.md')) as never,
+            );
+            const unreachable = diagnostics.filter(({message}) =>
+                message.includes('Link is unreachable: a.md'),
+            );
+
+            expect(
+                unreachable.map(({range}) => [
+                    range.start.line,
+                    range.start.character,
+                    range.end.character,
+                ]),
+            ).toEqual(ranges);
+        } finally {
+            rmSync(root, {recursive: true, force: true});
+        }
+    });
+
     it('ignores frontmatter for markdownlint rules', async () => {
         const diagnostics = await validateMarkdown(
             createDocument(

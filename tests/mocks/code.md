@@ -7,3 +7,6 @@
 ```markdown
 {% code "./not-a-reference.ts" %}
 ```
+
+[Настройка](toc-include.md)
+[См. также](include.md)
