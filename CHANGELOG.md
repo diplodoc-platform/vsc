@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/diplodoc-platform/vsc/compare/v1.8.0...v1.8.1) (2026-11-28)
+
+
+### Bug Fixes
+
+* fixed the detection of missing links ([#271](https://github.com/diplodoc-platform/vsc/issues/271)) ([3c2b0ff](https://github.com/diplodoc-platform/vsc/commit/3c2b0ff8b43be2069b750a89a06494a393327670))
+
 ## [1.8.0](https://github.com/diplodoc-platform/vsc/compare/v1.7.1...v1.8.0) (2026-11-17)
 
 
