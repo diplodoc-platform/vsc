@@ -228,16 +228,9 @@ function findLinkRange(
             continue;
         }
 
-        for (const {value, start, end} of extractMarkdownLinks(lineText)) {
-            const offset = value.startsWith('<') && value.endsWith('>') ? 1 : 0;
-            const destination = offset ? value.slice(1, -1) : value;
-
-            if (destination !== href && destination !== escapedHref) {
-                continue;
-            }
-
+        for (const {start, end} of findMatchingLinkDestinations(lineText, href, escapedHref)) {
             if (matched === occurrence) {
-                range = new vscode.Range(line, start + offset, line, end - offset);
+                range = new vscode.Range(line, start, line, end);
             }
 
             matched++;
@@ -253,6 +246,21 @@ function findLinkRange(
         findTextRange(document, escapedHref, occurrence) ??
         fullLineRange(0, document)
     );
+}
+
+function* findMatchingLinkDestinations(
+    lineText: string,
+    href: string,
+    escapedHref: string,
+): Generator<{start: number; end: number}> {
+    for (const {value, start, end} of extractMarkdownLinks(lineText)) {
+        const offset = value.startsWith('<') && value.endsWith('>') ? 1 : 0;
+        const destination = offset ? value.slice(1, -1) : value;
+
+        if (destination === href || destination === escapedHref) {
+            yield {start: start + offset, end: end - offset};
+        }
+    }
 }
 
 function findAssetRange(
