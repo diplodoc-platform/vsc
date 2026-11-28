@@ -6,6 +6,7 @@ import {existsSync, readFileSync} from 'fs';
 import {dirname, resolve} from 'path';
 import {load as yamlLoad} from 'js-yaml';
 
+import {extractMarkdownLinks} from '../../utils';
 import {LruCache} from '../shared/lru-cache';
 
 import {CONFIG_CACHE_MAX} from './constants';
@@ -64,6 +65,15 @@ export function toDiagnostics(
     document: vscode.TextDocument,
 ): vscode.Diagnostic[] {
     const messageCounts = new Map<string, number>();
+    const messageOccurrences = new Map<string, number>();
+
+    for (const error of errors) {
+        if (!isYfmLintError(error)) {
+            const key = stripAnsi(error.message);
+
+            messageCounts.set(key, (messageCounts.get(key) ?? 0) + 1);
+        }
+    }
 
     return errors.map((error) => {
         if (isYfmLintError(error)) {
@@ -71,10 +81,11 @@ export function toDiagnostics(
         }
 
         const key = stripAnsi(error.message);
-        const occurrence = messageCounts.get(key) ?? 0;
-        messageCounts.set(key, occurrence + 1);
+        const occurrence = messageOccurrences.get(key) ?? 0;
 
-        return toPluginDiagnostic(error, document, occurrence);
+        messageOccurrences.set(key, occurrence + 1);
+
+        return toPluginDiagnostic(error, document, occurrence, messageCounts.get(key));
     });
 }
 
@@ -104,9 +115,10 @@ export function toPluginDiagnostic(
     error: PluginMessage,
     document: vscode.TextDocument,
     occurrence = 0,
+    totalOccurrences = occurrence + 1,
 ): vscode.Diagnostic {
     const diagnostic = new vscode.Diagnostic(
-        getPluginRange(error, document, occurrence),
+        getPluginRange(error, document, occurrence, totalOccurrences),
         formatPluginMessage(error),
         getSeverity(error),
     );
@@ -161,11 +173,12 @@ function getPluginRange(
     error: PluginMessage,
     document: vscode.TextDocument,
     occurrence: number,
+    totalOccurrences: number,
 ): vscode.Range {
     const message = stripAnsi(error.message);
 
     if (message.startsWith('Link is unreachable: ') || message.startsWith('Title not found: ')) {
-        return findLinkRange(message, document, occurrence);
+        return findLinkRange(message, document, occurrence, totalOccurrences);
     }
 
     if (message.startsWith('Asset not found: ') || message.startsWith('SVG ')) {
@@ -195,6 +208,7 @@ function findLinkRange(
     message: string,
     document: vscode.TextDocument,
     occurrence: number,
+    totalOccurrences: number,
 ): vscode.Range {
     const match = /^(?:Link is unreachable|Title not found): (.+?) in /.exec(message);
 
@@ -203,12 +217,50 @@ function findLinkRange(
     }
 
     const href = stripAnsi(match[1]);
+    const escapedHref = href.replace(/_/g, String.raw`\_`);
+    let matched = 0;
+    let range: vscode.Range | undefined;
+
+    for (let line = 0; line < document.lineCount; line++) {
+        const lineText = document.lineAt(line).text;
+
+        if (!lineText.includes(href) && !lineText.includes(escapedHref)) {
+            continue;
+        }
+
+        for (const {start, end} of findMatchingLinkDestinations(lineText, href, escapedHref)) {
+            if (matched === occurrence) {
+                range = new vscode.Range(line, start, line, end);
+            }
+
+            matched++;
+
+            if (matched === totalOccurrences && range) {
+                return range;
+            }
+        }
+    }
 
     return (
         findTextRange(document, href, occurrence) ??
-        findTextRange(document, href.replace(/_/g, String.raw`\_`), occurrence) ??
+        findTextRange(document, escapedHref, occurrence) ??
         fullLineRange(0, document)
     );
+}
+
+function* findMatchingLinkDestinations(
+    lineText: string,
+    href: string,
+    escapedHref: string,
+): Generator<{start: number; end: number}> {
+    for (const {value, start, end} of extractMarkdownLinks(lineText)) {
+        const offset = value.startsWith('<') && value.endsWith('>') ? 1 : 0;
+        const destination = offset ? value.slice(1, -1) : value;
+
+        if (destination === href || destination === escapedHref) {
+            yield {start: start + offset, end: end - offset};
+        }
+    }
 }
 
 function findAssetRange(
